@@ -27,7 +27,6 @@ class SiteController extends Controller
 
 	public function actionIndex()
 	{
-        vardumpd($_SERVER);
         $releaseRequestSearchModel=new ReleaseRequest('search');
         $releaseRequestSearchModel->unsetAttributes();  // clear any default values
         if(isset($_GET['ReleaseRequest']))
