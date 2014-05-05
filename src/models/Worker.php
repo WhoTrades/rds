@@ -91,7 +91,7 @@ class Worker extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('obj_id',$this->obj_id,true);
+		$criteria->compare('obj_id',$this->obj_id);
 		$criteria->compare('obj_created',$this->obj_created,true);
 		$criteria->compare('obj_modified',$this->obj_modified,true);
 		$criteria->compare('obj_status_did',$this->obj_status_did);

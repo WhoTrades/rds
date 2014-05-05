@@ -12,6 +12,7 @@
  * @property string $build_worker_obj_id
  * @property string $build_project_obj_id
  * @property string $build_status
+ * @property string $build_attach
  *
  * The followings are the available model relations:
  * @property Worker $worker
@@ -20,6 +21,11 @@
 class Build extends CActiveRecord
 {
     const STATUS_NEW = 'new';
+    const STATUS_BUILDING = 'building';
+    const STATUS_BUILT = 'built';
+    const STATUS_INSTALLED = 'installed';
+    const STATUS_FAILED = 'failed';
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -49,7 +55,7 @@ class Build extends CActiveRecord
 			array('build_status', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('obj_id, obj_created, obj_modified, obj_status_did, build_worker_obj_id, build_status', 'safe', 'on'=>'search'),
+			array('obj_id, obj_created, obj_modified, obj_status_did, build_worker_obj_id, build_status, build_attach', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -78,6 +84,7 @@ class Build extends CActiveRecord
 			'obj_status_did' => 'Obj Status Did',
 			'build_worker_obj_id' => 'build Worker Obj',
 			'build_status' => 'build Status',
+			'build_attach' => 'Attach',
 		);
 	}
 
@@ -99,12 +106,13 @@ class Build extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('obj_id',$this->obj_id,true);
+		$criteria->compare('obj_id',$this->obj_id);
 		$criteria->compare('obj_created',$this->obj_created,true);
 		$criteria->compare('obj_modified',$this->obj_modified,true);
 		$criteria->compare('obj_status_did',$this->obj_status_did);
-		$criteria->compare('build_worker_obj_id',$this->build_worker_obj_id,true);
+		$criteria->compare('build_worker_obj_id',$this->build_worker_obj_id);
 		$criteria->compare('build_status',$this->build_status,true);
+		$criteria->compare('build_attach',$this->build_attach,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

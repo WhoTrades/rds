@@ -40,7 +40,7 @@ $this->pageTitle=Yii::app()->name;
                     'with' => 'worker',
                 ));
                 foreach ($list as $val) {
-                    echo "{$val->worker->worker_name} - {$val->build_status}<br />";
+                    echo "{$val->worker->worker_name} - {$val->build_status} {$val->build_version}<br />";
                 }
             },
             'type' => 'html',

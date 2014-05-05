@@ -1,15 +1,10 @@
 <?php
-/* @var $this WorkerController */
-/* @var $model Worker */
+/* @var $this BuildController */
+/* @var $model Build */
 
 $this->breadcrumbs=array(
-	'Workers'=>array('index'),
+	'Builds'=>array('index'),
 	'Manage',
-);
-
-$this->menu=array(
-	array('label'=>'List Worker', 'url'=>array('index')),
-	array('label'=>'Create Worker', 'url'=>array('create')),
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -18,7 +13,7 @@ $('.search-button').click(function(){
 	return false;
 });
 $('.search-form form').submit(function(){
-	$('#worker-grid').yiiGridView('update', {
+	$('#build-grid').yiiGridView('update', {
 		data: $(this).serialize()
 	});
 	return false;
@@ -26,7 +21,7 @@ $('.search-form form').submit(function(){
 ");
 ?>
 
-<h1>Manage Workers</h1>
+<h1>Manage Builds</h1>
 
 <p>
 You may optionally enter a comparison operator (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b>
@@ -41,13 +36,17 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 </div><!-- search-form -->
 
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
-	'id'=>'worker-grid',
+	'id'=>'build-grid',
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
 	'columns'=>array(
 		'obj_id',
 		'obj_created',
-		'worker_name',
+		'project.project_name',
+		'worker.worker_name',
+		'build_status',
+		'build_attach',
+		'build_version',
 		array(
 			'class'=>'CButtonColumn',
 		),

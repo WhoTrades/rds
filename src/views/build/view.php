@@ -1,0 +1,39 @@
+<?php
+/* @var $this BuildController */
+/* @var $model Build */
+
+$this->breadcrumbs=array(
+	'Builds'=>array('index'),
+	$model->obj_id,
+);
+
+$this->menu=array(
+	array('label'=>'Update Build', 'url'=>array('update', 'id'=>$model->obj_id)),
+	array('label'=>'Delete Build', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->obj_id),'confirm'=>'Are you sure you want to delete this item?')),
+	array('label'=>'Manage Build', 'url'=>array('admin')),
+);
+?>
+
+<h1>View Build #<?php echo $model->obj_id; ?></h1>
+
+<?php $this->widget('zii.widgets.CDetailView', array(
+	'data'=>$model,
+	'attributes'=>array(
+		'obj_id',
+		'obj_created',
+		'obj_modified',
+		'obj_status_did',
+		'build_release_request_obj_id',
+		'build_worker_obj_id',
+		'build_project_obj_id',
+		'build_status',
+		'build_version',
+		array(
+            'name' => 'build_attach',
+            'value' => function($e){
+                return $this->cliColorsToHtml($e->build_attach);
+            },
+            'type' => 'html',
+        ),
+	),
+)); ?>

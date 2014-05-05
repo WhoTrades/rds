@@ -95,12 +95,12 @@ class Project2worker extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('obj_id',$this->obj_id,true);
+		$criteria->compare('obj_id',$this->obj_id);
 		$criteria->compare('obj_created',$this->obj_created,true);
 		$criteria->compare('obj_modified',$this->obj_modified,true);
 		$criteria->compare('obj_status_did',$this->obj_status_did);
-		$criteria->compare('worker_obj_id',$this->worker_obj_id,true);
-		$criteria->compare('project_obj_id',$this->project_obj_id,true);
+		$criteria->compare('worker_obj_id',$this->worker_obj_id);
+		$criteria->compare('project_obj_id',$this->project_obj_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

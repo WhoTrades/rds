@@ -10,7 +10,7 @@
  * @property integer $obj_status_did
  * @property string $rr_user
  * @property string $rr_comment
- * @property string $rr_project
+ * @property string $rr_project_obj_id
  */
 class ReleaseReject extends CActiveRecord
 {
@@ -92,13 +92,13 @@ class ReleaseReject extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('obj_id',$this->obj_id,true);
+		$criteria->compare('obj_id',$this->obj_id);
 		$criteria->compare('obj_created',$this->obj_created,true);
 		$criteria->compare('obj_modified',$this->obj_modified,true);
 		$criteria->compare('obj_status_did',$this->obj_status_did);
 		$criteria->compare('rr_user',$this->rr_user,true);
 		$criteria->compare('rr_comment',$this->rr_comment,true);
-		$criteria->compare('rr_project_obj_id',$this->rr_project_obj_id,true);
+		$criteria->compare('rr_project_obj_id',$this->rr_project_obj_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
