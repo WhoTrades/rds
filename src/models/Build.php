@@ -8,15 +8,16 @@
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
- * @property string $build_release_request_obj_id
- * @property string $build_worker_obj_id
- * @property string $build_project_obj_id
+ * @property integer $build_release_request_obj_id
+ * @property integer $build_worker_obj_id
+ * @property integer $build_project_obj_id
  * @property string $build_status
  * @property string $build_attach
  *
  * The followings are the available model relations:
  * @property Worker $worker
  * @property Project $project
+ * @property ReleaseRequest $releaseRequest
  */
 class Build extends CActiveRecord
 {
@@ -69,6 +70,7 @@ class Build extends CActiveRecord
 		return array(
 			'worker' => array(self::BELONGS_TO, 'Worker', 'build_worker_obj_id'),
 			'project' => array(self::BELONGS_TO, 'Project', 'build_project_obj_id'),
+			'releaseRequest' => array(self::BELONGS_TO, 'ReleaseRequest', 'build_release_request_obj_id'),
 		);
 	}
 
@@ -78,12 +80,12 @@ class Build extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'obj_id' => 'Obj',
-			'obj_created' => 'Obj Created',
-			'obj_modified' => 'Obj Modified',
-			'obj_status_did' => 'Obj Status Did',
-			'build_worker_obj_id' => 'build Worker Obj',
-			'build_status' => 'build Status',
+			'obj_id' => 'ID',
+			'obj_created' => 'Created',
+			'obj_modified' => 'Modified',
+			'obj_status_did' => 'Status Did',
+			'build_worker_obj_id' => 'Worker ID',
+			'build_status' => 'Status',
 			'build_attach' => 'Attach',
 		);
 	}

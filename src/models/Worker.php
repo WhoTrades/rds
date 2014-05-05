@@ -65,10 +65,10 @@ class Worker extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'obj_id' => 'Obj',
-			'obj_created' => 'Obj Created',
-			'obj_modified' => 'Obj Modified',
-			'obj_status_did' => 'Obj Status Did',
+			'obj_id' => 'ID',
+			'obj_created' => 'Created',
+			'obj_modified' => 'Modified',
+			'obj_status_did' => 'Status Did',
 			'worker_name' => 'Worker Name',
 		);
 	}

@@ -64,13 +64,13 @@ class ReleaseReject extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'obj_id' => 'Obj',
-			'obj_created' => 'Obj Created',
-			'obj_modified' => 'Obj Modified',
-			'obj_status_did' => 'Obj Status Did',
-			'rr_user' => 'Rr User',
-			'rr_comment' => 'Rr Comment',
-			'rr_project_obj_id' => 'Project',
+			'obj_id' => 'ID',
+			'obj_created' => 'Created',
+			'obj_modified' => 'Modified',
+			'obj_status_did' => 'Status Did',
+			'rr_user' => 'User',
+			'rr_comment' => 'Comment',
+			'rr_project_obj_id' => 'Project ID',
 		);
 	}
 

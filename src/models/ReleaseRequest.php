@@ -12,6 +12,7 @@
  * @property string $rr_comment
  * @property string $rr_project_obj_id
  * @property string $rr_status
+ * @property Build[] builds
  */
 class ReleaseRequest extends CActiveRecord
 {
@@ -58,6 +59,7 @@ class ReleaseRequest extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
             'project' => array(self::BELONGS_TO, 'Project', 'rr_project_obj_id'),
+            'builds' => array(self::HAS_MANY, 'Build', 'build_release_request_obj_id'),
 		);
 	}
 
@@ -67,12 +69,12 @@ class ReleaseRequest extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'obj_id' => 'Obj',
-			'obj_created' => 'Obj Created',
-			'obj_modified' => 'Obj Modified',
-			'obj_status_did' => 'Obj Status Did',
-			'rr_user' => 'Rr User',
-			'rr_comment' => 'Rr Comment',
+			'obj_id' => 'ID',
+			'obj_created' => 'Created',
+			'obj_modified' => 'Modified',
+			'obj_status_did' => 'Status Did',
+			'rr_user' => 'User',
+			'rr_comment' => 'Comment',
 			'rr_project_obj_id' => 'Project',
 		);
 	}
@@ -95,18 +97,27 @@ class ReleaseRequest extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('obj_id',$this->obj_id);
-		$criteria->compare('obj_created',$this->obj_created,true);
-		$criteria->compare('obj_modified',$this->obj_modified,true);
-		$criteria->compare('obj_status_did',$this->obj_status_did);
-		$criteria->compare('rr_user',$this->rr_user,true);
-		$criteria->compare('rr_comment',$this->rr_comment,true);
-		$criteria->compare('rr_project_obj_id',$this->rr_project_obj_id);
+		$criteria->compare('t.obj_id',$this->obj_id);
+		$criteria->compare('t.obj_created',$this->obj_created,true);
+		$criteria->compare('t.obj_modified',$this->obj_modified,true);
+		$criteria->compare('t.obj_status_did',$this->obj_status_did);
+		$criteria->compare('t.rr_user',$this->rr_user,true);
+		$criteria->compare('t.rr_comment',$this->rr_comment,true);
+		$criteria->compare('t.rr_project_obj_id',$this->rr_project_obj_id);
+        $criteria->with = array('builds', 'builds.worker', 'builds.project');
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 		));
 	}
+
+    public function countNotFinishedBuilds()
+    {
+        $c = new CDbCriteria();
+        $c->compare('build_release_request_obj_id', $this->obj_id);
+        $c->compare('build_status', '<>'.Build::STATUS_INSTALLED);
+        return Build::model()->count($c);
+    }
 
 	/**
 	 * Returns the static model of the specified AR class.

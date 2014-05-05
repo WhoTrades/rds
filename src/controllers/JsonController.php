@@ -36,6 +36,7 @@ class JsonController extends Controller
         $version = $request->getPost('version');
         $attach = $request->getPost('attach');
 
+        /** @var $build Build*/
         $build = Build::model()->findByPk($taskId);
         if (!$build) {
             throw new CHttpException(404, 'Build not found');
@@ -50,15 +51,22 @@ class JsonController extends Controller
             $build->build_version = $version;
         }
 
+        $build->save();
 
         switch ($status) {
             case Build::STATUS_INSTALLED:
-                $title = "Success installed $project->project_name v.$version";
-                $text = "Проект $project->project_name был собран и разложен по серверам. <a href='".$this->createAbsoluteUrl('build/view', array('id' => $build->obj_id))."'>Подробнее</a>";
+                if ($build->releaseRequest->countNotFinishedBuilds() == 0) {
+                    $builds = $build->releaseRequest->builds;
+                    $title = "Success installed $project->project_name v.$version";
+                    $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
+                    foreach ($builds as $val) {
+                        $text .= "<a href='".$this->createAbsoluteUrl('build/view', array('id' => $build->obj_id))."'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
+                    }
 
-                Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
-                foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
-                    Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
+                    Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
+                    foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
+                        Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
+                    }
                 }
                 break;
             case Build::STATUS_FAILED:
@@ -71,7 +79,6 @@ class JsonController extends Controller
                 }
                 break;
         }
-        $build->save();
 
         echo json_encode(array("success" => true));
     }
