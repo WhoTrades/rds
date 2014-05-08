@@ -14,13 +14,13 @@
 
 <body>
 
-<?php $this->widget('bootstrap.widgets.TbNavbar',array(
+<?php
+$this->widget('bootstrap.widgets.TbNavbar',array(
     'items'=>array(
         array(
             'class'=>'bootstrap.widgets.TbMenu',
             'items'=>array(
                 array('label'=>'Home', 'url'=>array('/site/index')),
-                array('label'=>'Login', 'url'=>array('/site/login'), 'visible'=>Yii::app()->user->isGuest),
                 array('label'=>'Projects', 'url'=>array('/project/admin'), 'visible'=>!Yii::app()->user->isGuest),
                 array('label'=>'Workers', 'url'=>array('/worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
                 //array('label'=>'Project Workers', 'url'=>array('/project2worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
