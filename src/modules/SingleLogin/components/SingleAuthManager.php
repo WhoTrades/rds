@@ -5,7 +5,8 @@ class SingleAuthManager extends CPhpAuthManager
     {
         parent::load();
 
-        //Временно всем выдаем админа
-        $this->assign('admin', \Yii::app()->user->id);
+        foreach (\Yii::app()->session['userRights'] as $role) {
+            $this->assign($role, \Yii::app()->user->id);
+        }
     }
 }

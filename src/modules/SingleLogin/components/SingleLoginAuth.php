@@ -40,7 +40,7 @@ final class SingleLoginAuth extends \CComponent
             return null;
         }
 
-        vardumpd($result);
+        \Yii::app()->session['userRights'] = $result['userRights'];
 
         return new SingleLoginUser($result['userId'], $result['userEmail']);
     }

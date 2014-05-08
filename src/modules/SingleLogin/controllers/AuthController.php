@@ -21,7 +21,7 @@ class AuthController extends Controller
             'result' => array(
                 'data' => array(
                     'status' => 'OK',
-                    'list' => array('admin', 'developer'),
+                    'list' => array_keys(\Yii::app()->authManager->getAuthItems()),
                 ),
             )
         );
