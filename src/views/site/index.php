@@ -55,6 +55,12 @@ $this->pageTitle=Yii::app()->name;
             'type' => 'html',
         ),
         array(
+            'value' => function(ReleaseRequest $releaseRequest){
+                return "<button>USE</button>";
+            },
+            'type' => 'raw'
+        ),
+        array(
             'class'=>'CButtonColumn',
             'template' => '{delete}',
             'deleteButtonUrl' => 'Yii::app()->controller->createUrl("deleteReleaseRequest",array("id"=>$data->primaryKey))',
