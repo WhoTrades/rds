@@ -19,7 +19,7 @@ class JsonController extends Controller
             $result = array(
                 'id' => $task->obj_id,
                 'project' => $task->project->project_name,
-                'version' => $task->project->getNextVersion(),
+                'version' => $task->releaseRequest->rr_build_version,
             );
         } else {
             $result = array();
@@ -94,23 +94,28 @@ class JsonController extends Controller
             'rr_build_version' => $version,
             'rr_project_obj_id' => $project->obj_id,
         ));
-        if (!$releaseRequest) {
-            throw new CHttpException(404, 'not found');
-        }
 
-        $transaction = $releaseRequest->dbConnection->beginTransaction();
+        $transaction = $project->dbConnection->beginTransaction();
 
-        $oldUsed = \ReleaseRequest::model()->findByAttributes(array('rr_status' => \ReleaseRequest::STATUS_USED));
+        $project->project_current_version = $version;
+        $project->save(false);
+
+        $oldUsed = \ReleaseRequest::model()->findByAttributes(array('rr_status' => array(
+            \ReleaseRequest::STATUS_USED,
+            \ReleaseRequest::STATUS_USED_ATTEMPT,
+        )));
+
         if ($oldUsed) {
             $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
             $oldUsed->save();
         }
 
-        $releaseRequest->rr_status = $status;
-        $releaseRequest->save(false);
+        if ($releaseRequest) {
+            $releaseRequest->rr_status = $status;
+            $releaseRequest->save(false);
 
-        $releaseRequest->project->project_current_version = $version;
-        $releaseRequest->project->save(false);
+        }
+
 
         $transaction->commit();
 
