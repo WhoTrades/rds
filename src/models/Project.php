@@ -9,10 +9,13 @@
  * @property string $obj_modified
  * @property integer $obj_status_did
  * @property string $project_name
+ * @property string $project_build_version
+ * @property array $project_build_subversion
  */
 class Project extends CActiveRecord
 {
     const STATUS_NEW = 'new';
+    public $project_build_subversion_array;
 
 	/**
 	 * @return string the associated database table name
@@ -43,9 +46,41 @@ class Project extends CActiveRecord
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('obj_id, obj_created, obj_modified, obj_status_did, project_name', 'safe', 'on'=>'search'),
+			array('obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version', 'safe', 'on'=>'search'),
 		);
 	}
+
+    public function afterFind(){
+        $this->project_build_subversion_array = eval ('return array(' . $this->project_build_subversion . ');');
+    }
+
+    /**
+     * Возвращает новую версию билда для проекта
+     * @see http://jira/browse/WTS-376
+     *
+     * @return string
+     */
+    public function getNextVersion()
+    {
+        $version = \Yii::app()->params['version'];
+        $code = '00';
+
+        return implode(".", array(
+            $version,
+            $code,
+            isset($this->project_build_subversion_array[$version]) ? $this->project_build_subversion_array[$version] : 1,
+            $this->project_build_version,
+        ));
+    }
+
+    public function incrementBuildVersion()
+    {
+        $version = \Yii::app()->params['version'];
+        $this->project_build_version;
+        $subversion = isset($this->project_build_subversion_array[$version]) ? $this->project_build_subversion_array[$version]+1 : 2;
+        $sql = "UPDATE {$this->tableName()} SET project_build_version=$this->project_build_version+1, project_build_subversion = project_build_subversion || '$version=>$subversion'::hstore WHERE obj_id=$this->obj_id";
+        Yii::app()->db->createCommand($sql)->execute();
+    }
 
 	/**
 	 * @return array relational rules.

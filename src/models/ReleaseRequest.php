@@ -12,10 +12,26 @@
  * @property string $rr_comment
  * @property string $rr_project_obj_id
  * @property string $rr_status
+ * @property string $rr_build_version
+ * @property string $rr_project_owner_code
+ * @property string $rr_release_engineer_code
+ * @property string $rr_project_owner_code_entered
+ * @property string $rr_release_engineer_code_entered
  * @property Build[] builds
  */
 class ReleaseRequest extends CActiveRecord
 {
+    const IMMEDIATELY_TIME = 900;
+
+    const STATUS_NEW          = 'new';
+    const STATUS_FAILED       = 'failed';
+    const STATUS_INSTALLED    = 'installed';
+    const STATUS_CODES        = 'codes';
+    const STATUS_USING        = 'using';
+    const STATUS_USED_ATTEMPT = 'used_attempt';
+    const STATUS_USED         = 'used';
+    const STATUS_OLD          = 'old';
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -32,8 +48,6 @@ class ReleaseRequest extends CActiveRecord
         return parent::afterConstruct();
     }
 
-
-
 	/**
 	 * @return array validation rules for model attributes.
 	 */
@@ -42,11 +56,12 @@ class ReleaseRequest extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id', 'required'),
+			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_build_version', 'required'),
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id', 'safe', 'on'=>'search'),
+			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version', 'safe', 'on'=>'search'),
+			array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on'=>'use'),
 		);
 	}
 
@@ -74,8 +89,12 @@ class ReleaseRequest extends CActiveRecord
 			'obj_modified' => 'Modified',
 			'obj_status_did' => 'Status Did',
 			'rr_user' => 'User',
+			'rr_status' => 'Status',
 			'rr_comment' => 'Comment',
 			'rr_project_obj_id' => 'Project',
+			'rr_build_version' => 'Build',
+			'rr_project_owner_code' => 'Project owner code',
+			'rr_release_engineer_code' => 'Release engineer code',
 		);
 	}
 
@@ -104,6 +123,8 @@ class ReleaseRequest extends CActiveRecord
 		$criteria->compare('t.rr_user',$this->rr_user,true);
 		$criteria->compare('t.rr_comment',$this->rr_comment,true);
 		$criteria->compare('t.rr_project_obj_id',$this->rr_project_obj_id);
+		$criteria->compare('t.rr_build_version',$this->rr_build_version, true);
+        $criteria->order = 't.obj_created desc';
         $criteria->with = array('builds', 'builds.worker', 'builds.project');
 
 		return new CActiveDataProvider($this, array(
@@ -129,4 +150,14 @@ class ReleaseRequest extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+    public function canBeUsed()
+    {
+        return in_array($this->rr_status, array(self::STATUS_INSTALLED, self::STATUS_OLD));
+    }
+
+    public function canByUsedImmediately()
+    {
+        return in_array($this->rr_status, array(self::STATUS_OLD)) && (time() - strtotime($this->obj_created) < self::IMMEDIATELY_TIME);
+    }
 }

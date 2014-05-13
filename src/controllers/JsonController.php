@@ -1,7 +1,7 @@
 <?php
 class JsonController extends Controller
 {
-    public function actionGetTasks($worker)
+    public function actionGetBuildTasks($worker)
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
         if (!$worker) {
@@ -19,12 +19,102 @@ class JsonController extends Controller
             $result = array(
                 'id' => $task->obj_id,
                 'project' => $task->project->project_name,
+                'version' => $task->project->getNextVersion(),
             );
         } else {
             $result = array();
         }
 
         echo json_encode($result);
+    }
+
+    public function actionGetUseTasks($worker)
+    {
+        $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
+        if (!$worker) {
+            throw new CHttpException('unknown worker');
+        }
+
+        $c = new CDbCriteria(array(
+            'with' => array('project', 'project.project2workers'),
+        ));
+        $c->compare('project2workers.worker_obj_id', $worker->obj_id);
+        $c->compare('rr_status', \ReleaseRequest::STATUS_USING);
+
+        $task = \ReleaseRequest::model()->find($c);
+
+        if ($task) {
+            $result = array(
+                'id' => $task->obj_id,
+                'project' => $task->project->project_name,
+                'version' => $task->rr_build_version,
+            );
+        } else {
+            $result = array();
+        }
+
+        echo json_encode($result);
+    }
+
+    public function actionSetOldVersion($id, $version)
+    {
+        $releaseRequest = \ReleaseRequest::model()->findByPk($id);
+        if (!$releaseRequest) {
+            throw new CHttpException(404, 'not found');
+        }
+        $releaseRequest->rr_old_version = $version;
+        $result = array('ok' => $releaseRequest->save());
+        echo json_encode($result);
+    }
+
+    public function actionSetUseError($id, $text)
+    {
+        $releaseRequest = \ReleaseRequest::model()->findByPk($id);
+        if (!$releaseRequest) {
+            throw new CHttpException(404, 'not found');
+        }
+        $releaseRequest->rr_use_text = $text;
+        $releaseRequest->rr_status = \ReleaseRequest::STATUS_FAILED;
+        $result = array('ok' => $releaseRequest->save());
+
+        echo json_encode($result);
+    }
+
+    public function actionSetUsedVersion($project, $version, $status)
+    {
+        if (!in_array($status, array(\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT))) {
+            throw new CHttpException(503, 'Forbidden, invalid status');
+        }
+
+        $project = \Project::model()->findByAttributes(array('project_name' => $project));
+        if (!$project) {
+            throw new CHttpException(404, 'Project not found');
+        }
+        $releaseRequest = \ReleaseRequest::model()->findByAttributes(array(
+            'rr_build_version' => $version,
+            'rr_project_obj_id' => $project->obj_id,
+        ));
+        if (!$releaseRequest) {
+            throw new CHttpException(404, 'not found');
+        }
+
+        $transaction = $releaseRequest->dbConnection->beginTransaction();
+
+        $oldUsed = \ReleaseRequest::model()->findByAttributes(array('rr_status' => \ReleaseRequest::STATUS_USED));
+        if ($oldUsed) {
+            $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
+            $oldUsed->save();
+        }
+
+        $releaseRequest->rr_status = $status;
+        $releaseRequest->save(false);
+
+        $releaseRequest->project->project_current_version = $version;
+        $releaseRequest->project->save(false);
+
+        $transaction->commit();
+
+        echo json_encode(array('ok' => true));
     }
 
     public function actionSendStatus()
@@ -57,6 +147,8 @@ class JsonController extends Controller
             case Build::STATUS_INSTALLED:
                 if ($build->releaseRequest->countNotFinishedBuilds() == 0) {
                     $builds = $build->releaseRequest->builds;
+                    $build->releaseRequest->rr_status = \ReleaseRequest::STATUS_INSTALLED;
+                    $build->releaseRequest->save();
                     $title = "Success installed $project->project_name v.$version";
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
                     foreach ($builds as $val) {

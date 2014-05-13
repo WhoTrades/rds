@@ -34,9 +34,22 @@ $this->pageTitle=Yii::app()->name;
         'obj_created',
         'rr_user',
         'rr_comment',
-        'project.project_name',
         array(
             'value' => function(ReleaseRequest $releaseRequest){
+                $result = array();
+                $map = array(
+                    ReleaseRequest::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
+                    ReleaseRequest::STATUS_FAILED => array('remove', 'Не собралось', 'red'),
+                    ReleaseRequest::STATUS_INSTALLED => array('ok', 'Установлено', 'black'),
+                    ReleaseRequest::STATUS_USING=> array('refresh', 'Активируем', 'orange'),
+                    ReleaseRequest::STATUS_CODES=> array('time', 'Ждем ввода кодов', 'orange'),
+                    ReleaseRequest::STATUS_USED=> array('ok', 'Активная версия', '#32cd32'),
+                    ReleaseRequest::STATUS_USED_ATTEMPT=> array('time', 'Временная версия', 'blue'),
+                    ReleaseRequest::STATUS_OLD=> array('time', 'Старая версия', 'grey'),
+                );
+                list($icon, $text, $color) = $map[$releaseRequest->rr_status];
+                echo "<span title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$releaseRequest->rr_status}</span><hr />";
+
                 $result = array();
                 foreach ($releaseRequest->builds as $val) {
                     $map = array(
@@ -54,9 +67,15 @@ $this->pageTitle=Yii::app()->name;
             },
             'type' => 'html',
         ),
+        'project.project_name',
+        'rr_build_version',
         array(
             'value' => function(ReleaseRequest $releaseRequest){
-                return "<button>USE</button>";
+                if ($releaseRequest->canBeUsed()) {
+                    return "<a href='".$this->createUrl('/use/create', array('id' => $releaseRequest->obj_id))."'>USE</a>";
+                } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_CODES) {
+                    return "<a href='".$this->createUrl('/use/index', array('id' => $releaseRequest->obj_id))."'>Enter codes</a>";
+                }
             },
             'type' => 'raw'
         ),
