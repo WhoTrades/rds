@@ -45,9 +45,8 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
 	'columns'=>array(
-		'obj_id',
-		'obj_created',
 		'project_name',
+		'project_current_version',
 		array(
             'value' => function($list) use ($workers) {
                 $result = array();
