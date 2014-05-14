@@ -57,7 +57,8 @@ $this->pageTitle=Yii::app()->name;
                         Build::STATUS_BUILDING => array('refresh', 'Собирается', 'orange'),
                         Build::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
                         Build::STATUS_BUILT => array('upload', 'Раскладывается по серверам', 'orange'),
-                        Build::STATUS_INSTALLED => array('ok', 'Установлено', '#32cd32'),
+                        Build::STATUS_INSTALLED => array('ok', 'Скопировано на сервер', 'black'),
+                        Build::STATUS_USED=> array('ok', 'Установлено', '#32cd32'),
                     );
                     list($icon, $text, $color) = $map[$val->build_status];
                     $result[] =  "<span title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$val->worker->worker_name} - {$val->build_status} {$val->project->project_name} {$val->build_version}</span>";
@@ -75,6 +76,8 @@ $this->pageTitle=Yii::app()->name;
                     return "<a href='".$this->createUrl('/use/create', array('id' => $releaseRequest->obj_id))."'>USE</a>";
                 } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_CODES) {
                     return "<a href='".$this->createUrl('/use/index', array('id' => $releaseRequest->obj_id))."'>Enter codes</a>";
+                } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {
+                    return "<a href='".$this->createUrl('/use/fixAttempt', array('id' => $releaseRequest->obj_id))."'>Make stable</a>";
                 }
             },
             'type' => 'raw'

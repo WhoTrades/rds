@@ -94,6 +94,20 @@ class UseController extends Controller
         ));
 	}
 
+    public function actionFixAttempt($id)
+    {
+        $releaseRequest = $this->loadModel($id);
+        if ($releaseRequest->rr_status != \ReleaseRequest::STATUS_USED_ATTEMPT) {
+            $this->redirect('/');
+        }
+
+        $releaseRequest->rr_status = \ReleaseRequest::STATUS_USED;
+
+        $releaseRequest->save();
+
+        $this->redirect('/');
+    }
+
     /**
      * @param $id
      *

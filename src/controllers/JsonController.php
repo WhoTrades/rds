@@ -36,10 +36,11 @@ class JsonController extends Controller
         }
 
         $c = new CDbCriteria(array(
-            'with' => array('project', 'project.project2workers'),
+            'with' => array('project', 'project.project2workers', 'builds'),
         ));
         $c->compare('project2workers.worker_obj_id', $worker->obj_id);
         $c->compare('rr_status', \ReleaseRequest::STATUS_USING);
+        $c->compare('build_status', \Build::STATUS_INSTALLED);
 
         $task = \ReleaseRequest::model()->find($c);
 
@@ -80,8 +81,13 @@ class JsonController extends Controller
         echo json_encode($result);
     }
 
-    public function actionSetUsedVersion($project, $version, $status)
+    public function actionSetUsedVersion($worker, $project, $version, $status)
     {
+        $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
+        if (!$worker) {
+            throw new CHttpException('unknown worker');
+        }
+
         if (!in_array($status, array(\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT))) {
             throw new CHttpException(503, 'Forbidden, invalid status');
         }
@@ -90,36 +96,92 @@ class JsonController extends Controller
         if (!$project) {
             throw new CHttpException(404, 'Project not found');
         }
+
+        $transaction = $project->dbConnection->beginTransaction();
+
         $releaseRequest = \ReleaseRequest::model()->findByAttributes(array(
             'rr_build_version' => $version,
             'rr_project_obj_id' => $project->obj_id,
         ));
 
-        $transaction = $project->dbConnection->beginTransaction();
+        $builds = \Build::model()->findAllByAttributes(array(
+            'build_project_obj_id' => $project->obj_id,
+            'build_worker_obj_id' => $worker->obj_id,
+            'build_status' => Build::STATUS_USED,
+        ));
 
-        $project->project_current_version = $version;
-        $project->save(false);
-
-        $oldUsed = \ReleaseRequest::model()->findByAttributes(array('rr_status' => array(
-            \ReleaseRequest::STATUS_USED,
-            \ReleaseRequest::STATUS_USED_ATTEMPT,
-        )));
-
-        if ($oldUsed) {
-            $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
-            $oldUsed->save();
+        foreach ($builds as $build) {
+            $build->build_status = Build::STATUS_INSTALLED;
+            $build->save();
         }
 
         if ($releaseRequest) {
-            $releaseRequest->rr_status = $status;
-            $releaseRequest->save(false);
+            $build = \Build::model()->findByAttributes(array(
+                'build_project_obj_id' => $project->obj_id,
+                'build_worker_obj_id' => $worker->obj_id,
+                'build_release_request_obj_id' => $releaseRequest->obj_id,
+            ));
+            $build->build_status = Build::STATUS_USED;
+            $build->save();
+        }
 
+        $p2w = Project2worker::model()->findByAttributes(array(
+            'worker_obj_id' => $worker->obj_id,
+            'project_obj_id' => $project->obj_id,
+        ));
+        if ($p2w) {
+            $p2w->p2w_current_version = $version;
+            $p2w->save();
+        }
+        $list = \Project2worker::model()->findAllByAttributes(array(
+            'project_obj_id' => $project->obj_id,
+        ));
+        $ok = true;
+        foreach ($list as $p2w) {
+            if ($p2w->p2w_current_version != $version) {
+                $ok = false;
+                break;
+            }
+        }
+
+        if ($ok) {
+            $project->project_current_version = $version;
+            $project->save(false);
+
+            $oldUsed = \ReleaseRequest::model()->findByAttributes(array('rr_status' => array(
+                \ReleaseRequest::STATUS_USED,
+                \ReleaseRequest::STATUS_USED_ATTEMPT,
+            )));
+
+            if ($oldUsed) {
+                $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
+                $oldUsed->save();
+            }
+
+            if ($releaseRequest) {
+                $releaseRequest->rr_status = $status;
+                $releaseRequest->save(false);
+            }
         }
 
 
         $transaction->commit();
 
         echo json_encode(array('ok' => true));
+    }
+
+    public function actionGetCurrentStatus($id)
+    {
+        if (!$releaseRequest = \ReleaseRequest::model()->findByPk($id)) {
+            throw new CHttpException(404, 'Project not found');
+        }
+
+        echo json_encode(array(
+            'id' => $id,
+            'status' => $releaseRequest->rr_status,
+            'version' => $releaseRequest->rr_build_version,
+        ));
+
     }
 
     public function actionSendStatus()
