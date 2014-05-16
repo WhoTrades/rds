@@ -7,6 +7,8 @@ if (($idx = array_search('/usr/share/pear', $includePaths)) !== false) {
 set_include_path(join(PATH_SEPARATOR, array_merge($includePaths, array(
 	// local
 	dirname(__FILE__) . '/',
+	//an: prod
+	dirname(__FILE__) . '/lib',
 	// developer's
 	dirname(__FILE__) . '/../../lib/',
 	dirname(__FILE__) . '/../../lib/libcore/',
