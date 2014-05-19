@@ -5,7 +5,7 @@ class JsonController extends Controller
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
         if (!$worker) {
-            throw new CHttpException('unknown worker');
+            throw new CHttpException(404, 'unknown worker');
         }
 
         $task = \Build::model()->findByAttributes(array(
@@ -32,7 +32,7 @@ class JsonController extends Controller
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
         if (!$worker) {
-            throw new CHttpException('unknown worker');
+            throw new CHttpException(404, 'unknown worker');
         }
 
         $c = new CDbCriteria(array(
@@ -85,7 +85,7 @@ class JsonController extends Controller
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
         if (!$worker) {
-            throw new CHttpException('unknown worker');
+            throw new CHttpException(404, 'unknown worker');
         }
 
         if (!in_array($status, array(\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT))) {
