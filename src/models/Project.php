@@ -66,6 +66,7 @@ class Project extends CActiveRecord
         $code = '00';
 
         return implode(".", array(
+            date('Y'),
             $version,
             $code,
             isset($this->project_build_subversion_array[$version]) ? $this->project_build_subversion_array[$version] : 1,
