@@ -166,6 +166,12 @@ class JsonController extends Controller
                 $releaseRequest->rr_status = $status;
                 $releaseRequest->save(false);
             }
+
+            $title = "Deployed $project->project_name v.$version";
+            Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseReleased'}($project->project_name, $version);
+            foreach (explode(",", \Yii::app()->params['notify']['use']['phones']) as $phone) {
+                Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
+            }
         }
 
 
