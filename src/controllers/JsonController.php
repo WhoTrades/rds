@@ -155,6 +155,7 @@ class JsonController extends Controller
 
             if ($oldUsed) {
                 $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
+                $oldUsed->rr_last_time_on_prod = date("r");
                 $oldUsed->save();
             }
 

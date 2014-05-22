@@ -17,7 +17,8 @@
  * @property string $rr_release_engineer_code
  * @property string $rr_project_owner_code_entered
  * @property string $rr_release_engineer_code_entered
- * @property Build[] builds
+ * @property Build[] $builds
+ * @property string $rr_last_time_on_prod
  */
 class ReleaseRequest extends CActiveRecord
 {
@@ -158,6 +159,15 @@ class ReleaseRequest extends CActiveRecord
 
     public function canByUsedImmediately()
     {
-        return in_array($this->rr_status, array(self::STATUS_OLD)) && (time() - strtotime($this->obj_created) < self::IMMEDIATELY_TIME);
+        return in_array($this->rr_status, array(self::STATUS_OLD)) && (time() - $this->getLastTimeOnProdTimestamp() < self::IMMEDIATELY_TIME);
+    }
+
+    public function getLastTimeOnProdTimestamp()
+    {
+        if ($this->rr_status == self::STATUS_USED || $this->rr_status == self::STATUS_USED_ATTEMPT) {
+            return time();
+        }
+
+        return $this->rr_last_time_on_prod ? strtotime($this->rr_last_time_on_prod) : 0;
     }
 }
