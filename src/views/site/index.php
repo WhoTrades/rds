@@ -68,7 +68,11 @@ $this->pageTitle=Yii::app()->name;
             },
             'type' => 'html',
         ),
-        'project.project_name',
+        array(
+            'name' => 'rr_project_obj_id',
+            'value' => function($r){return $r->project->project_name;},
+            'filter' => \Project::model()->forList(),
+        ),
         'rr_build_version',
         array(
             'value' => function(ReleaseRequest $releaseRequest){
