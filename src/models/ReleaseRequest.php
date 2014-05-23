@@ -19,6 +19,7 @@
  * @property string $rr_release_engineer_code_entered
  * @property Build[] $builds
  * @property string $rr_last_time_on_prod
+ * @property string $rr_revert_after_time
  */
 class ReleaseRequest extends CActiveRecord
 {

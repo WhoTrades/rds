@@ -2,6 +2,7 @@
 
 class UseController extends Controller
 {
+    const USE_ATTEMPT_TIME = 20;
 	/**
 	 * @return array action filters
 	 */
@@ -41,6 +42,7 @@ class UseController extends Controller
 
         if ($releaseRequest->canByUsedImmediately()) {
             $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
+            $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
             $releaseRequest->save();
             $this->redirect('/');
         }
@@ -84,6 +86,7 @@ class UseController extends Controller
             }
             if ($releaseRequest->rr_project_owner_code_entered && $releaseRequest->rr_release_engineer_code_entered) {
                 $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
+                $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
             }
             $releaseRequest->save();
             $this->redirect('/');

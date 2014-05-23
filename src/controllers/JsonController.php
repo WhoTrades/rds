@@ -1,6 +1,15 @@
 <?php
 class JsonController extends Controller
 {
+//    public function beforeAction()
+//    {
+//        //an: Специально эмулируем ситуацию, что сервер может иногда не работать
+//        if (rand(1, 3) == 1) {
+//            vardumpd("Server down :)");
+//        }
+//
+//        return true;
+//    }
     public function actionGetBuildTasks($worker)
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
@@ -35,25 +44,45 @@ class JsonController extends Controller
             throw new CHttpException(404, 'unknown worker');
         }
 
+        $result = array();
+
+        //an: Смотрим есть ли что, что нужно откатывать к старой версии
         $c = new CDbCriteria(array(
             'with' => array('project', 'project.project2workers', 'builds'),
         ));
         $c->compare('project2workers.worker_obj_id', $worker->obj_id);
-        $c->compare('rr_status', \ReleaseRequest::STATUS_USING);
-        $c->compare('build_status', \Build::STATUS_INSTALLED);
-
+        $c->compare('rr_status', array(\ReleaseRequest::STATUS_USING, \ReleaseRequest::STATUS_USED_ATTEMPT));
+        $c->compare('build_status', \Build::STATUS_USED);
+        $c->compare('rr_revert_after_time', "<=".date("r"));
         $task = \ReleaseRequest::model()->find($c);
 
         if ($task) {
             $result = array(
                 'id' => $task->obj_id,
                 'project' => $task->project->project_name,
-                'version' => $task->rr_build_version,
+                'version' => $task->rr_old_version,
+                'use_status' => \ReleaseRequest::STATUS_USED,
             );
         } else {
-            $result = array();
-        }
+            //an: Если ничего нету - тогда смотрим какую новую версию нужно накатить
+            $c = new CDbCriteria(array(
+                'with' => array('project', 'project.project2workers', 'builds'),
+            ));
+            $c->compare('project2workers.worker_obj_id', $worker->obj_id);
+            $c->compare('rr_status', \ReleaseRequest::STATUS_USING);
+            $c->compare('build_status', \Build::STATUS_INSTALLED);
 
+            $task = \ReleaseRequest::model()->find($c);
+
+            if ($task) {
+                $result = array(
+                    'id' => $task->obj_id,
+                    'project' => $task->project->project_name,
+                    'version' => $task->rr_build_version,
+                    'use_status' => \ReleaseRequest::STATUS_USED_ATTEMPT,
+                );
+            }
+        }
         echo json_encode($result);
     }
 
@@ -145,6 +174,7 @@ class JsonController extends Controller
         }
 
         if ($ok) {
+            $oldVersion = $project->project_current_version;
             $project->project_current_version = $version;
             $project->save(false);
 
@@ -159,6 +189,7 @@ class JsonController extends Controller
             if ($oldUsed) {
                 $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
                 $oldUsed->rr_last_time_on_prod = date("r");
+                $oldUsed->rr_revert_after_time = null;
                 $oldUsed->save();
             }
 
@@ -167,7 +198,11 @@ class JsonController extends Controller
                 $releaseRequest->save(false);
             }
 
-            $title = "Deployed $project->project_name v.$version";
+            if ($oldVersion < $version) {
+                $title = "Deployed $project->project_name v.$version";
+            } else {
+                $title = "Reverted $project->project_name v.$version";
+            }
             Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseReleased'}($project->project_name, $version);
             foreach (explode(",", \Yii::app()->params['notify']['use']['phones']) as $phone) {
                 Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
