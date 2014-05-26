@@ -229,7 +229,7 @@ class JsonController extends Controller
                     $title = "Success installed $project->project_name v.$version";
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
                     foreach ($builds as $val) {
-                        $text .= "<a href='".$this->createAbsoluteUrl('build/view', array('id' => $build->obj_id))."'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
+                        $text .= "<a href='".$this->createAbsoluteUrl('build/view', array('id' => $val->obj_id))."'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
                     }
 
                     Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
