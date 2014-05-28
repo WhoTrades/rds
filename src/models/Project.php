@@ -46,7 +46,7 @@ class Project extends CActiveRecord
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version', 'safe', 'on'=>'search'),
+			array('obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version, project_current_version', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -134,6 +134,7 @@ class Project extends CActiveRecord
 		$criteria->compare('obj_modified',$this->obj_modified,true);
 		$criteria->compare('obj_status_did',$this->obj_status_did);
 		$criteria->compare('project_name',$this->project_name,true);
+		$criteria->compare('project_current_version',$this->project_current_version,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
