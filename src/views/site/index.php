@@ -93,7 +93,7 @@ $this->pageTitle=Yii::app()->name;
             'value' => function(ReleaseRequest $releaseRequest){
                 if ($releaseRequest->canBeUsed()) {
                     return "<a href='".$this->createUrl('/use/create', array('id' => $releaseRequest->obj_id))."'>USE</a>";
-                } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_NEW) {
+                } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_CODES) {
                     return "<a href='".$this->createUrl('/use/index', array('id' => $releaseRequest->obj_id))."'>Enter codes</a>";
                 } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {
                     return "<a href='".$this->createUrl('/use/fixAttempt', array('id' => $releaseRequest->obj_id))."'>Make stable</a>";
