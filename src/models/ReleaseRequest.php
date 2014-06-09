@@ -20,6 +20,7 @@
  * @property Build[] $builds
  * @property string $rr_last_time_on_prod
  * @property string $rr_revert_after_time
+ * @property string $rr_release_version
  */
 class ReleaseRequest extends CActiveRecord
 {
@@ -60,7 +61,7 @@ class ReleaseRequest extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_build_version', 'required'),
+			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_release_version', 'required'),
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
@@ -99,6 +100,7 @@ class ReleaseRequest extends CActiveRecord
 			'rr_build_version' => 'Build',
 			'rr_project_owner_code' => 'Project owner code',
 			'rr_release_engineer_code' => 'Release engineer code',
+			'rr_release_version' => 'Release version',
 		);
 	}
 

@@ -60,26 +60,25 @@ class Project extends CActiveRecord
      *
      * @return string
      */
-    public function getNextVersion()
+    public function getNextVersion($releaseVersion)
     {
-        $version = \Yii::app()->params['version'];
         $code = '00';
 
         return implode(".", array(
             date('Y'),
-            $version,
+            $releaseVersion,
             $code,
-            isset($this->project_build_subversion_array[$version]) ? $this->project_build_subversion_array[$version] : 1,
+            isset($this->project_build_subversion_array[$releaseVersion]) ? $this->project_build_subversion_array[$releaseVersion] : 1,
             $this->project_build_version,
         ));
     }
 
-    public function incrementBuildVersion()
+    public function incrementBuildVersion($releaseVersion)
     {
-        $version = \Yii::app()->params['version'];
+        $releaseVersion = (int)$releaseVersion;
         $this->project_build_version;
-        $subversion = isset($this->project_build_subversion_array[$version]) ? $this->project_build_subversion_array[$version]+1 : 2;
-        $sql = "UPDATE {$this->tableName()} SET project_build_version=$this->project_build_version+1, project_build_subversion = project_build_subversion || '$version=>$subversion'::hstore WHERE obj_id=$this->obj_id";
+        $subversion = isset($this->project_build_subversion_array[$releaseVersion]) ? $this->project_build_subversion_array[$releaseVersion]+1 : 2;
+        $sql = "UPDATE {$this->tableName()} SET project_build_version=$this->project_build_version+1, project_build_subversion = project_build_subversion || '$releaseVersion=>$subversion'::hstore WHERE obj_id=$this->obj_id";
         Yii::app()->db->createCommand($sql)->execute();
     }
 

@@ -51,9 +51,9 @@ class SiteController extends Controller
         {
             $model->attributes=$_POST['ReleaseRequest'];
             $model->rr_user = \Yii::app()->user->name;
-            $model->rr_build_version = $model->project->getNextVersion();
+            $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
             if($model->save()) {
-                $model->project->incrementBuildVersion();
+                $model->project->incrementBuildVersion($model->rr_release_version);
                 $list = Project2worker::model()->findAllByAttributes(array(
                     'project_obj_id' => $model->rr_project_obj_id,
                 ));

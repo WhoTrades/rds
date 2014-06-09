@@ -29,7 +29,7 @@ class JsonController extends Controller
                 'id' => $task->obj_id,
                 'project' => $task->project->project_name,
                 'version' => $task->releaseRequest->rr_build_version,
-                'release' => Yii::app()->params['version'],
+                'release' => $task->releaseRequest->rr_release_version,
             );
         } else {
             $result = array();
