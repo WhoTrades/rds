@@ -69,6 +69,7 @@ class SiteController extends Controller
                 Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRequestNotification'}($model->rr_user, $model->project->project_name, $model->rr_comment);
                 $text = "{$model->rr_user} requested {$model->project->project_name}. {$model->rr_comment}";
                 foreach (explode(",", \Yii::app()->params['notify']['releaseRequest']['phones']) as $phone) {
+                    if (!$phone) continue;
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
                 }
                 $this->redirect(array('index'));
@@ -91,6 +92,7 @@ class SiteController extends Controller
             if($model->save()) {
                 $text = "{$model->rr_user} rejected {$model->project->project_name}. {$model->rr_comment}";
                 foreach (explode(",", \Yii::app()->params['notify']['releaseReject']['phones']) as $phone) {
+                    if (!$phone) continue;
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
                 }
                 Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRejectNotification'}($model->rr_user, $model->project->project_name, $model->rr_comment);
@@ -106,8 +108,19 @@ class SiteController extends Controller
     public function actionDeleteReleaseRequest($id)
     {
         $model=ReleaseRequest::model()->findByPk($id);
-        if($model)
-            $model->delete();
+        if(!$model) {
+            return;
+        }
+
+        /** @var $model ReleaseRequest*/
+        foreach ($model->builds as $build) {
+            if (in_array($build->build_status, array(Build::STATUS_BUILDING, Build::STATUS_BUILT))) {
+                $model->rr_status = ReleaseRequest::STATUS_CANCELLING;
+                $model->save();
+                return;
+            }
+        }
+        $model->delete();
 
         if(!isset($_GET['ajax']))
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));

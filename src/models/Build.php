@@ -26,6 +26,7 @@ class Build extends CActiveRecord
     const STATUS_BUILT = 'built';
     const STATUS_INSTALLED = 'installed';
     const STATUS_FAILED = 'failed';
+    const STATUS_CANCELLED = 'cancelled';
     const STATUS_USED = 'used';
 
 	/**

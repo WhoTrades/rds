@@ -38,6 +38,33 @@ class JsonController extends Controller
         echo json_encode($result);
     }
 
+    public function actionGetKillTask($worker)
+    {
+        $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
+        if (!$worker) {
+            throw new CHttpException(404, 'unknown worker');
+        }
+
+        $result = array();
+
+        $c = new CDbCriteria(array(
+            'with' => array('project', 'project.project2workers', 'builds'),
+        ));
+        $c->compare('project2workers.worker_obj_id', $worker->obj_id);
+        $c->compare('rr_status', array(\ReleaseRequest::STATUS_CANCELLING));
+        $c->compare('build_status', array(\Build::STATUS_BUILDING, \Build::STATUS_BUILT));
+        $task = \ReleaseRequest::model()->find($c);
+        if ($task) {
+            $result = array(
+                'id' => $task->obj_id,
+                'project' => $task->project->project_name,
+                'use_status' => \ReleaseRequest::STATUS_USED,
+            );
+        }
+        echo json_encode($result);
+
+    }
+
     public function actionGetUseTasks($worker)
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
@@ -93,8 +120,12 @@ class JsonController extends Controller
         if (!$releaseRequest) {
             throw new CHttpException(404, 'not found');
         }
-        $releaseRequest->rr_old_version = $version;
-        $result = array('ok' => $releaseRequest->save());
+        if (!$releaseRequest->rr_old_version) {
+            $releaseRequest->rr_old_version = $version;
+            $result = array('ok' => $releaseRequest->save());
+        } else {
+            $result = array('ok' => true);
+        }
         echo json_encode($result);
     }
 
@@ -206,6 +237,7 @@ class JsonController extends Controller
             }
             Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseReleased'}($project->project_name, $version);
             foreach (explode(",", \Yii::app()->params['notify']['use']['phones']) as $phone) {
+                if (!$phone) continue;
                 Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
             }
         }
@@ -270,6 +302,7 @@ class JsonController extends Controller
 
                     Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
                     foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
+                        if (!$phone) continue;
                         Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                     }
                 }
@@ -280,6 +313,30 @@ class JsonController extends Controller
 
                 Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
                 foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
+                    if (!$phone) continue;
+                    Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
+                }
+                break;
+            case Build::STATUS_CANCELLED:
+                $title = "Failed to install $project->project_name";
+                $text = "Проект $project->project_name не удалось собрать. <a href='".$this->createAbsoluteUrl('build/view', array('id' => $build->obj_id))."'>Подробнее</a>";
+
+                $c = new CDbCriteria(array(
+                    'with' => array('project', 'project.project2workers', 'builds'),
+                ));
+                $c->compare('project2workers.worker_obj_id', $build->build_worker_obj_id);
+                $c->compare('rr_status', array(\ReleaseRequest::STATUS_CANCELLING));
+                $c->compare('build_status', array(\Build::STATUS_BUILDING, \Build::STATUS_BUILT));
+                $task = \ReleaseRequest::model()->find($c);
+                if (!$task) {
+                    $releaseRequest = $build->releaseRequest;
+                    $releaseRequest->rr_status = \ReleaseRequest::STATUS_CANCELLED;
+                    $releaseRequest->save();
+                }
+
+                Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
+                foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
+                    if (!$phone) continue;
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
                 break;
