@@ -22,6 +22,7 @@
     <?php echo $form->textFieldRow($model,'rr_comment'); ?>
 
     <?php echo $form->dropDownListRow($model, 'rr_project_obj_id', \Project::model()->forList()); ?>
+    <?php echo $form->dropDownListRow($model, 'rr_release_version', \ReleaseVersion::model()->forList()); ?>
 
     <div class="row buttons">
         <?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

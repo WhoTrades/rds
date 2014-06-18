@@ -20,6 +20,7 @@
  * @property Build[] $builds
  * @property string $rr_last_time_on_prod
  * @property string $rr_revert_after_time
+ * @property string $rr_release_version
  */
 class ReleaseRequest extends CActiveRecord
 {
@@ -33,6 +34,8 @@ class ReleaseRequest extends CActiveRecord
     const STATUS_USED_ATTEMPT = 'used_attempt';
     const STATUS_USED         = 'used';
     const STATUS_OLD          = 'old';
+    const STATUS_CANCELLING   = 'cancelling';
+    const STATUS_CANCELLED    = 'cancelled';
 
 	/**
 	 * @return string the associated database table name
@@ -58,11 +61,11 @@ class ReleaseRequest extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_build_version', 'required'),
+			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_release_version', 'required'),
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version', 'safe', 'on'=>'search'),
+			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_status', 'safe', 'on'=>'search'),
 			array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on'=>'use'),
 		);
 	}
@@ -97,6 +100,7 @@ class ReleaseRequest extends CActiveRecord
 			'rr_build_version' => 'Build',
 			'rr_project_owner_code' => 'Project owner code',
 			'rr_release_engineer_code' => 'Release engineer code',
+			'rr_release_version' => 'Release version',
 		);
 	}
 
@@ -123,6 +127,7 @@ class ReleaseRequest extends CActiveRecord
 		$criteria->compare('t.obj_modified',$this->obj_modified,true);
 		$criteria->compare('t.obj_status_did',$this->obj_status_did);
 		$criteria->compare('t.rr_user',$this->rr_user,true);
+		$criteria->compare('t.rr_status',$this->rr_status,true);
 		$criteria->compare('t.rr_comment',$this->rr_comment,true);
 		$criteria->compare('t.rr_project_obj_id',$this->rr_project_obj_id);
 		$criteria->compare('t.rr_build_version',$this->rr_build_version, true);

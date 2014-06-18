@@ -36,7 +36,6 @@ $this->pageTitle=Yii::app()->name;
         'rr_comment',
         array(
             'value' => function(ReleaseRequest $releaseRequest){
-                $result = array();
                 $map = array(
                     ReleaseRequest::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
                     ReleaseRequest::STATUS_FAILED => array('remove', 'Не собралось', 'red'),
@@ -46,6 +45,8 @@ $this->pageTitle=Yii::app()->name;
                     ReleaseRequest::STATUS_USED=> array('ok', 'Активная версия', '#32cd32'),
                     ReleaseRequest::STATUS_USED_ATTEMPT=> array('time', 'Временная версия', 'blue'),
                     ReleaseRequest::STATUS_OLD=> array('time', 'Старая версия', 'grey'),
+                    ReleaseRequest::STATUS_CANCELLING=> array('refresh', 'Отменяем...', 'orange'),
+                    ReleaseRequest::STATUS_CANCELLED=> array('ok', 'Отменено', 'red'),
                 );
                 list($icon, $text, $color) = $map[$releaseRequest->rr_status];
                 echo "<span title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$releaseRequest->rr_status}</span><hr />";
@@ -59,6 +60,7 @@ $this->pageTitle=Yii::app()->name;
                         Build::STATUS_BUILT => array('upload', 'Раскладывается по серверам', 'orange'),
                         Build::STATUS_INSTALLED => array('ok', 'Скопировано на сервер', 'black'),
                         Build::STATUS_USED=> array('ok', 'Установлено', '#32cd32'),
+                        ReleaseRequest::STATUS_CANCELLED=> array('remove', 'Отменено', 'red'),
                     );
                     list($icon, $text, $color) = $map[$val->build_status];
                     $result[] =  "<span title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$val->worker->worker_name} - {$val->build_status} {$val->project->project_name} {$val->build_version}</span>";
@@ -66,6 +68,19 @@ $this->pageTitle=Yii::app()->name;
 
                 return implode("<br />", $result);
             },
+            'name' => 'rr_status',
+            'filter' => array(
+                ReleaseRequest::STATUS_NEW => ReleaseRequest::STATUS_NEW,
+                ReleaseRequest::STATUS_FAILED => ReleaseRequest::STATUS_FAILED,
+                ReleaseRequest::STATUS_INSTALLED => ReleaseRequest::STATUS_INSTALLED,
+                ReleaseRequest::STATUS_USING => ReleaseRequest::STATUS_USING,
+                ReleaseRequest::STATUS_CODES => ReleaseRequest::STATUS_CODES,
+                ReleaseRequest::STATUS_USED => ReleaseRequest::STATUS_USED,
+                ReleaseRequest::STATUS_USED_ATTEMPT => ReleaseRequest::STATUS_USED_ATTEMPT,
+                ReleaseRequest::STATUS_OLD => ReleaseRequest::STATUS_OLD,
+                ReleaseRequest::STATUS_CANCELLING => ReleaseRequest::STATUS_CANCELLING,
+                ReleaseRequest::STATUS_CANCELLED => ReleaseRequest::STATUS_CANCELLED,
+            ),
             'type' => 'html',
         ),
         array(
@@ -82,6 +97,14 @@ $this->pageTitle=Yii::app()->name;
                     return "<a href='".$this->createUrl('/use/index', array('id' => $releaseRequest->obj_id))."'>Enter codes</a>";
                 } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {
                     return "<a href='".$this->createUrl('/use/fixAttempt', array('id' => $releaseRequest->obj_id))."'>Make stable</a>";
+                } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
+                    $oldReleaseRequest = ReleaseRequest::model()->findByAttributes(array(
+                        'rr_build_version' => $releaseRequest->rr_old_version,
+                        'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
+                    ));
+                    if ($oldReleaseRequest && $oldReleaseRequest->canBeUsed()) {
+                        return "<a href='".$this->createUrl('/use/create', array('id' => $oldReleaseRequest->obj_id))."'>Revert to $releaseRequest->rr_old_version</a>";
+                    }
                 }
             },
             'type' => 'raw'

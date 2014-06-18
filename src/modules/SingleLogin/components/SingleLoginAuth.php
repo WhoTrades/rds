@@ -43,10 +43,14 @@ final class SingleLoginAuth extends \CComponent
         $profile = $client->getClientByEmail($result['userEmail']);
         $phone = preg_replace('~^7~', '8', preg_replace('~\D~', '', $profile['phone']));
 
-        \Yii::app()->user->setState('phone', $phone);
-        \Yii::app()->session['userRights'] = $result['userRights'];
+        $user = new SingleLoginUser($result['userId'], $result['userEmail']);
 
-        return new SingleLoginUser($result['userId'], $result['userEmail']);
+        $user->setPersistentStates(array(
+            'phone' => $phone,
+            'userRights' => $result['userRights'],
+        ));
+
+        return $user;
     }
 
     private function getReturnUrl()
