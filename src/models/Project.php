@@ -143,7 +143,9 @@ class Project extends CActiveRecord
 
     public function forList(){
         $list = array('' => " - Project - ");
-        foreach ($this->findAll() as $val)
+        $c=new CDbCriteria;
+        $c->order = 'project_name';
+        foreach ($this->findAll($c) as $val)
             $list[$val->obj_id] = $val->project_name;
 
         return $list;

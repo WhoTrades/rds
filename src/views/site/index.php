@@ -63,7 +63,7 @@ $this->pageTitle=Yii::app()->name;
                         ReleaseRequest::STATUS_CANCELLED=> array('remove', 'Отменено', 'red'),
                     );
                     list($icon, $text, $color) = $map[$val->build_status];
-                    $result[] =  "<span title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$val->worker->worker_name} - {$val->build_status} {$val->project->project_name} {$val->build_version}</span>";
+                    $result[] =  "<a href='".$this->createUrl('build/view', array('id' => $val->obj_id))."' title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$val->worker->worker_name} - {$val->build_status} {$val->project->project_name} {$val->build_version}</a>";
                 }
 
                 return implode("<br />", $result);
