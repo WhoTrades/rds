@@ -165,7 +165,7 @@ class ReleaseRequest extends CActiveRecord
 
     public function canByUsedImmediately()
     {
-        return in_array($this->rr_status, array(self::STATUS_OLD)) && (time() - $this->getLastTimeOnProdTimestamp() < self::IMMEDIATELY_TIME);
+        return !empty(Yii::app()->params['useImmediately']) || (in_array($this->rr_status, array(self::STATUS_OLD)) && (time() - $this->getLastTimeOnProdTimestamp() < self::IMMEDIATELY_TIME));
     }
 
     public function getLastTimeOnProdTimestamp()
