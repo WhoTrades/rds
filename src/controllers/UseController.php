@@ -2,7 +2,7 @@
 
 class UseController extends Controller
 {
-    const USE_ATTEMPT_TIME = 20;
+    const USE_ATTEMPT_TIME = 40;
 	/**
 	 * @return array action filters
 	 */
