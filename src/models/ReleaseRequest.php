@@ -21,6 +21,7 @@
  * @property string $rr_last_time_on_prod
  * @property string $rr_revert_after_time
  * @property string $rr_release_version
+ * @property string $rr_new_migration_count
  */
 class ReleaseRequest extends CActiveRecord
 {
