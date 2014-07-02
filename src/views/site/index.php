@@ -92,7 +92,17 @@ $this->pageTitle=Yii::app()->name;
         array(
             'value' => function(ReleaseRequest $releaseRequest){
                 if ($releaseRequest->canBeUsed()) {
-                    return "<a href='".$this->createUrl('/use/create', array('id' => $releaseRequest->obj_id))."'>USE</a>";
+                    if ($releaseRequest->rr_new_migration_count) {
+                        if ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_UPDATING) {
+                            return "updating migrations";
+                        } elseif ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_FAILED) {
+                            return "updating migrations failed";
+                        } else {
+                            return "<a href='".$this->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id))."'>pre migrate</a>";
+                        }
+                    } else {
+                        return "<a href='".$this->createUrl('/use/create', array('id' => $releaseRequest->obj_id))."'>USE</a>";
+                    }
                 } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_CODES) {
                     return "<a href='".$this->createUrl('/use/index', array('id' => $releaseRequest->obj_id))."'>Enter codes</a>";
                 } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {

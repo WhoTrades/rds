@@ -22,21 +22,27 @@
  * @property string $rr_revert_after_time
  * @property string $rr_release_version
  * @property string $rr_new_migration_count
+ * @property string $rr_migration_status
  */
 class ReleaseRequest extends CActiveRecord
 {
     const IMMEDIATELY_TIME = 900;
 
-    const STATUS_NEW          = 'new';
-    const STATUS_FAILED       = 'failed';
-    const STATUS_INSTALLED    = 'installed';
-    const STATUS_CODES        = 'codes';
-    const STATUS_USING        = 'using';
-    const STATUS_USED_ATTEMPT = 'used_attempt';
-    const STATUS_USED         = 'used';
-    const STATUS_OLD          = 'old';
-    const STATUS_CANCELLING   = 'cancelling';
-    const STATUS_CANCELLED    = 'cancelled';
+    const STATUS_NEW                 = 'new';
+    const STATUS_FAILED              = 'failed';
+    const STATUS_INSTALLED           = 'installed';
+    const STATUS_CODES               = 'codes';
+    const STATUS_USING               = 'using';
+    const STATUS_USED_ATTEMPT       = 'used_attempt';
+    const STATUS_USED                = 'used';
+    const STATUS_OLD                 = 'old';
+    const STATUS_CANCELLING          = 'cancelling';
+    const STATUS_CANCELLED          = 'cancelled';
+
+    const MIGRATION_STATUS_NONE     = 'none';
+    const MIGRATION_STATUS_UPDATING = 'updating';
+    const MIGRATION_STATUS_FAILED   = 'failed';
+    const MIGRATION_STATUS_UP       = 'up';
 
 	/**
 	 * @return string the associated database table name

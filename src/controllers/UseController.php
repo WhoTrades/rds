@@ -65,6 +65,20 @@ class UseController extends Controller
 
         $this->redirect($this->createUrl('/use/index', array('id' => $id)));
 	}
+
+    public function actionMigrate($id)
+    {
+        $releaseRequest = $this->loadModel($id);
+        if (!$releaseRequest->canBeUsed()) {
+            $this->redirect('/');
+        }
+
+        $releaseRequest->rr_migration_status = \ReleaseRequest::MIGRATION_STATUS_UPDATING;
+        $releaseRequest->save();
+
+        $this->redirect('/');
+    }
+
 	/**
 	 * Lists all models.
 	 */

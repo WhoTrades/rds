@@ -128,6 +128,58 @@ class JsonController extends Controller
         }
         echo json_encode($result);
     }
+    public function actionGetMigrationTask($worker)
+    {
+        $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
+        if (!$worker) {
+            throw new CHttpException(404, 'unknown worker');
+        }
+
+        $result = array();
+
+        //an: Смотрим есть ли что, что нужно откатывать к старой версии
+        $releaseRequest = ReleaseRequest::model()->findByAttributes(array(
+            'rr_migration_status' => \ReleaseRequest::MIGRATION_STATUS_UPDATING,
+        ));
+
+        if ($releaseRequest) {
+            $result = array(
+                'project' => $releaseRequest->project->project_name,
+                'version' => $releaseRequest->rr_build_version,
+            );
+        }
+        echo json_encode($result);
+    }
+
+    public function actionSendMigrationStatus($project, $version, $status)
+    {
+        $transaction = ReleaseRequest::model()->getDbConnection()->beginTransaction();
+        $projectObj = Project::model()->findByAttributes(array('project_name' => $project));
+
+        if (!$projectObj) {
+            throw new CHttpException(404, 'unknown project');
+        }
+        $releaseRequest = ReleaseRequest::model()->findByAttributes(array('rr_build_version' => $version, 'rr_project_obj_id' => $projectObj->obj_id));
+
+        if (!$releaseRequest) {
+            throw new CHttpException(404, 'unknown release request');
+        }
+        $releaseRequest->rr_migration_status = $status;
+
+        if ($status == \ReleaseRequest::MIGRATION_STATUS_UP) {
+            $releaseRequest->rr_new_migration_count = 0;
+            $c = new CDbCriteria();
+            $c->compare('rr_build_version', "<=$version");
+            $c->compare('rr_project_obj_id', $projectObj->obj_id);
+
+            ReleaseRequest::model()->updateAll(array('rr_migration_status' => $status, 'rr_new_migration_count' => 0), $c);
+        }
+
+        $text = json_encode(array('ok' => $releaseRequest->save()));
+        $transaction->commit();
+
+        echo $text;
+    }
 
     public function actionSetOldVersion($id, $version)
     {
