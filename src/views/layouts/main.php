@@ -45,6 +45,30 @@ $this->widget('bootstrap.widgets.TbNavbar',array(
 	<div class="clear"></div>
 
 </div><!-- page -->
+<script>
+    w= 10;
+    h=20;
+    b = document.getElementsByTagName('body')[0];
+    b.style.cursor = 'none'
 
+    d = document.createElement('div');
+    d.id = 'nicecursor';
+    b.appendChild(d);
+    a = document.getElementById('nicecursor');
+    a.style.position = 'absolute';
+    a.style.top='10px';
+    a.style.left='10px';
+    a.style.width=w+'px';
+    a.style.height=h+'px';
+    a.style.backgroundColor='white';
+    a.style.pointerEvents='none';
+
+    b.onmousemove = function(e){
+        a.style.left = e.pageX - e.pageX % w   +'px';
+        a.style.top = e.pageY - e.pageY % h +'px';
+
+    }
+
+</script>
 </body>
 </html>
