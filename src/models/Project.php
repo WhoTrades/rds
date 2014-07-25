@@ -63,11 +63,13 @@ class Project extends CActiveRecord
     public function getNextVersion($releaseVersion)
     {
         $code = '00';
+        $buildNumber = isset($this->project_build_subversion_array[$releaseVersion]) ? $this->project_build_subversion_array[$releaseVersion] : 1;
 
         return implode(".", array(
             $releaseVersion,
             $code,
-            isset($this->project_build_subversion_array[$releaseVersion]) ? $this->project_build_subversion_array[$releaseVersion] : 1,
+            //an: Сделал вывод с ведущими нулями что бы лексикографическая вортировка валидно работала для наших версий (предполагаем что внутри одноо релиза не будет более 1000 билдов)
+            sprintf('%03d', $buildNumber),
             $this->project_build_version,
         ));
     }
