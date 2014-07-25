@@ -5,7 +5,7 @@ $this->pageTitle=Yii::app()->name;
 
 
 <h1>Запреты релиза</h1>
-<a href="<?=$this->createUrl('createReleaseReject')?>" class="btn btn-primary btn-large">Создать</a>
+<a href="<?=$this->createUrl('createReleaseReject')?>">Создать</a>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id'=>'release-reject-grid',
     'dataProvider'=>$releaseRejectSearchModel->search(),
@@ -24,7 +24,7 @@ $this->pageTitle=Yii::app()->name;
 ))); ?>
 <hr />
 <h2>Запрос релиза</h2>
-<a href="<?=$this->createUrl('createReleaseRequest')?>" class="btn btn-primary btn-large">Создать</a>
+<a href="<?=$this->createUrl('createReleaseRequest')?>">Создать</a>
 <?php $this->widget('bootstrap.widgets.TbGridView', array(
     'id'=>'release-request-grid',
     'dataProvider'=>$releaseRequestSearchModel->search(),
@@ -37,9 +37,9 @@ $this->pageTitle=Yii::app()->name;
         array(
             'value' => function(ReleaseRequest $releaseRequest){
                 $map = array(
-                    ReleaseRequest::STATUS_NEW => array('time', 'Ожидает сборки', 'none'),
+                    ReleaseRequest::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
                     ReleaseRequest::STATUS_FAILED => array('remove', 'Не собралось', 'red'),
-                    ReleaseRequest::STATUS_INSTALLED => array('ok', 'Установлено', 'none'),
+                    ReleaseRequest::STATUS_INSTALLED => array('ok', 'Установлено', 'black'),
                     ReleaseRequest::STATUS_USING=> array('refresh', 'Активируем', 'orange'),
                     ReleaseRequest::STATUS_CODES=> array('time', 'Ждем ввода кодов', 'orange'),
                     ReleaseRequest::STATUS_USED=> array('ok', 'Активная версия', '#32cd32'),
@@ -56,9 +56,9 @@ $this->pageTitle=Yii::app()->name;
                     $map = array(
                         Build::STATUS_FAILED => array('remove', 'Не собралось', 'red'),
                         Build::STATUS_BUILDING => array('refresh', 'Собирается', 'orange'),
-                        Build::STATUS_NEW => array('time', 'Ожидает сборки', 'none'),
+                        Build::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
                         Build::STATUS_BUILT => array('upload', 'Раскладывается по серверам', 'orange'),
-                        Build::STATUS_INSTALLED => array('ok', 'Скопировано на сервер', 'none'),
+                        Build::STATUS_INSTALLED => array('ok', 'Скопировано на сервер', 'black'),
                         Build::STATUS_USED=> array('ok', 'Установлено', '#32cd32'),
                         ReleaseRequest::STATUS_CANCELLED=> array('remove', 'Отменено', 'red'),
                     );

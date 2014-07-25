@@ -24,9 +24,9 @@
     <?php echo $form->dropDownListRow($model, 'rr_project_obj_id', \Project::model()->forList()); ?>
     <?php echo $form->dropDownListRow($model, 'rr_release_version', \ReleaseVersion::model()->forList()); ?>
 
-    <button type="submit" class="btn btn-primary btn-large">
-        <?=$model->isNewRecord ? 'Create' : 'Save'?>
-    </button>
+    <div class="row buttons">
+        <?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+    </div>
 
     <?php $this->endWidget(); ?>
 
