@@ -40,8 +40,7 @@ final class SingleLoginAuth extends \CComponent
             return null;
         }
 
-        $profile = $client->getClientByEmail($result['userEmail']);
-        $phone = preg_replace('~^7~', '8', preg_replace('~\D~', '', $profile['phone']));
+        $phone = preg_replace('~\D~', '', $result['userMobilePhone']);
 
         $user = new SingleLoginUser($result['userId'], $result['userEmail']);
 
