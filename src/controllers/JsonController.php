@@ -122,7 +122,11 @@ class JsonController extends Controller
                     'id' => $task->obj_id,
                     'project' => $task->project->project_name,
                     'version' => $task->rr_build_version,
-                    'use_status' => \ReleaseRequest::STATUS_USED_ATTEMPT,
+                    'use_status' =>
+                        //an: Для отката не используем автокат
+                        $task->rr_build_version > $task->project->project_current_version
+                            ? \ReleaseRequest::STATUS_USED_ATTEMPT
+                            : \ReleaseRequest::STATUS_USED,
                 );
             }
         }
