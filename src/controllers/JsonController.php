@@ -53,6 +53,22 @@ class JsonController extends Controller
         echo json_encode($result);
     }
 
+    public function actionSendMigrations($taskId, array $migrations)
+    {
+        /** @var $build Build */
+        $build = Build::model()->findByPk($taskId);
+        if (!$build) {
+            throw new CHttpException(404, 'Build not found');
+        }
+        $releaseRequest = $build->releaseRequest;
+        $releaseRequest->rr_new_migration_count = count($migrations);
+        $releaseRequest->rr_new_migrations = json_encode($migrations);
+
+        $result = array('ok' => $releaseRequest->save());
+
+        echo json_encode($result);
+    }
+
     public function actionGetKillTask($worker)
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));

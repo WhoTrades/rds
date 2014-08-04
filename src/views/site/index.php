@@ -98,7 +98,16 @@ $this->pageTitle=Yii::app()->name;
                         } elseif ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_FAILED) {
                             return "updating migrations failed";
                         } else {
-                            return "<a href='".$this->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id))."'>pre migrate</a>";
+                            $text =
+                                "<a href='".$this->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id))."'>pre migrate</a><br />".
+                                "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show migrations</a>
+                                <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
+                            foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
+                                $text .= "<a href='http://msa-bls2:8060/browse/migration-{$releaseRequest->project->project_name}/pre/$migration.php?hb=true'>$migration</a><br />";
+                            }
+                            $text .= "</div>";
+
+                            return $text;
                         }
                     } else {
                         return "<a href='".$this->createUrl('/use/create', array('id' => $releaseRequest->obj_id))."'>USE</a>";
