@@ -42,6 +42,11 @@ final class SingleLoginAuth extends \CComponent
 
         $phone = preg_replace('~\D~', '', $result['userMobilePhone']);
 
+        if (!$phone) {
+            $profile = $client->getClientByEmail($result['userEmail']);
+            $phone = preg_replace('~^7~', '8', preg_replace('~\D~', '', $profile['phone']));
+        }
+
         $user = new SingleLoginUser($result['userId'], $result['userEmail']);
 
         $user->setPersistentStates(array(
