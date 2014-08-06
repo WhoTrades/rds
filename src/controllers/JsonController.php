@@ -512,7 +512,7 @@ class JsonController extends Controller
             $numbersOfCurrent = explode(".", $project->project_current_version);
             if ($numbersOfCurrent[0] == 2014) array_shift($numbersOfCurrent);
 
-            if ($numbersOfCurrent[0] - 2 >= $numbersOfTest[0]) {
+            if ($numbersOfCurrent[0] - 2 > $numbersOfTest[0]) {
                 //an: если релиз отличается на 2 и больше от того что сейчас на проде, тогда удаляем
                 $c = new CDbCriteria();
                 $c->compare('rr_project_obj_id', $project->obj_id);
@@ -528,6 +528,25 @@ class JsonController extends Controller
         }
 
         echo json_encode($result);
+    }
+
+    public function actionRemoveReleaseRequest($projectName, $version)
+    {
+        $project = Project::model()->findByAttributes(['project_name' => $projectName]);
+        if (!$project) {
+            throw new CHttpException(404, 'Build not found');
+        }
+
+        $rr = ReleaseRequest::model()->findByAttributes([
+            'rr_project_obj_id' => $project->obj_id,
+            'rr_build_version' => $version,
+        ]);
+
+        if ($rr) {
+            $rr->delete();
+        }
+
+        echo json_encode(array('ok' => true));
     }
 }
 
