@@ -475,11 +475,6 @@ class JsonController extends Controller
 
         $result = array();
         foreach ($builds as $build) {
-            if (preg_match('~\d{4}\.\d\d\.\d\d\.\d\d\.\d\d~', $build['version'])) {
-                //an: очень старый формат версии, точно можно удалять
-                $result[] = $build;
-                continue;
-            }
             if (!preg_match('~\d{2,3}\.\d\d\.\d+\.\d+~', $build['version']) && !preg_match('~2014\.\d{2,3}\.\d\d\.\d+\.\d+~', $build['version'])) {
                 //an: неизвестный формат версии, лучше не будем удалять :) фиг его знает что это
                 continue;
