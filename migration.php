@@ -39,9 +39,11 @@ class Config
 
 require_once __DIR__ . '/init-libraries.php';
 
+//an: Эта конструкция нужна для корректной работы кода на деве
+set_include_path(get_include_path().PATH_SEPARATOR.__DIR__.'/../../');
 
 // change the following paths if necessary
-$yiic=dirname(__FILE__).'/../../lib/MigrationSystem/yiic.php';
+$yiic='lib/MigrationSystem/yiic.php';
 $config=dirname(__FILE__).'/config/console.php';
 
 require_once($yiic);
