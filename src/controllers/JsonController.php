@@ -298,17 +298,20 @@ class JsonController extends Controller
             $project->project_current_version = $version;
             $project->save(false);
 
-            \ReleaseRequest::model()->updateAll([
-                'rr_status' => \ReleaseRequest::STATUS_OLD,
-                'rr_last_time_on_prod' => date("r"),
-                'rr_revert_after_time' => null,
-            ], [
+            $oldUsed = \ReleaseRequest::model()->findByAttributes(array(
                 'rr_status' => array(
                     \ReleaseRequest::STATUS_USED,
                     \ReleaseRequest::STATUS_USED_ATTEMPT,
                 ),
                 'rr_project_obj_id' => $project->obj_id,
-            ]);
+            ));
+
+            if ($oldUsed) {
+                $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
+                $oldUsed->rr_last_time_on_prod = date("r");
+                $oldUsed->rr_revert_after_time = null;
+                $oldUsed->save(false);
+            }
 
             if ($releaseRequest) {
                 $releaseRequest->rr_status = $status;
