@@ -381,6 +381,7 @@ class JsonController extends Controller
                 if ($build->releaseRequest->countNotFinishedBuilds() == 0) {
                     $builds = $build->releaseRequest->builds;
                     $build->releaseRequest->rr_status = \ReleaseRequest::STATUS_INSTALLED;
+                    $build->releaseRequest->rr_built_time = date("r");
                     $build->releaseRequest->save();
                     $title = "Success installed $project->project_name v.$version";
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
