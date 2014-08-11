@@ -75,8 +75,26 @@ class ReleaseRequest extends CActiveRecord
 			// @todo Please remove those attributes that should not be searched.
 			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_status', 'safe', 'on'=>'search'),
 			array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on'=>'use'),
+            array('rr_release_version', 'checkForReleaseReject'),
 		);
 	}
+
+    public function checkForReleaseReject($attribute, $params)
+    {
+        $rejects = ReleaseReject::model()->findAllByAttributes([
+            'rr_project_obj_id' => $this->rr_project_obj_id,
+            'rr_release_version' => $this->rr_release_version,
+        ]);
+
+        if ($rejects) {
+            $messages = '';
+            foreach ($rejects as $reject) {
+                $messages[] = $reject->rr_comment." (".$reject->rr_user.")";
+            }
+            $this->addError($attribute, 'Запрет на релиз: '.implode("; ", $messages));
+        }
+
+    }
 
 	/**
 	 * @return array relational rules.

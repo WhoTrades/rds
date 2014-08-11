@@ -11,6 +11,7 @@
  * @property string $rr_user
  * @property string $rr_comment
  * @property string $rr_project_obj_id
+ * @property string $rr_release_version
  */
 class ReleaseReject extends CActiveRecord
 {
@@ -38,11 +39,11 @@ class ReleaseReject extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id', 'required'),
+			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_release_version', 'required'),
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id', 'safe', 'on'=>'search'),
+			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id rr_release_version', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -99,6 +100,7 @@ class ReleaseReject extends CActiveRecord
 		$criteria->compare('rr_user',$this->rr_user,true);
 		$criteria->compare('rr_comment',$this->rr_comment,true);
 		$criteria->compare('rr_project_obj_id',$this->rr_project_obj_id);
+		$criteria->compare('rr_release_version',$this->rr_release_version);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

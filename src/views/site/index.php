@@ -15,6 +15,7 @@ $this->pageTitle=Yii::app()->name;
         'obj_created',
         'rr_user',
         'rr_comment',
+        'rr_release_version',
         'project.project_name',
         array(
             'class'=>'CButtonColumn',
