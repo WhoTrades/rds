@@ -104,7 +104,7 @@ class UseController extends Controller
                 $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
                 $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
             }
-            $releaseRequest->save(false);
+            $releaseRequest->save();
             $this->redirect('/');
         }
         $this->render('index', array(
