@@ -63,7 +63,7 @@ class UseController extends Controller
             Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, sprintf($text, $code2));
         }
 
-        $releaseRequest->save(false);
+        $releaseRequest->save();
 
         $this->redirect($this->createUrl('/use/index', array('id' => $id)));
 	}
