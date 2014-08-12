@@ -21,4 +21,10 @@ class StatisticController extends Controller
             echo "unknown";
         }
     }
+
+    public function actionGetProjectBuildsToDeleteLastCallTime()
+    {
+        include('JsonController.php');
+        echo time() - CoreLight::getInstance()->getServiceBaseCacheKvdpp()->get(JsonController::LAST_PACKAGE_REMOVE_CALL_TIME_KEY);
+    }
 }

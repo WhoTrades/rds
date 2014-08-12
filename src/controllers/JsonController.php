@@ -1,6 +1,7 @@
 <?php
 class JsonController extends Controller
 {
+    const LAST_PACKAGE_REMOVE_CALL_TIME_KEY = 'RDS::actionGetProjectBuildsToDelete::last_call_time';
 //    public function beforeAction()
 //    {
 //        //an: Специально эмулируем ситуацию, что сервер может иногда не работать
@@ -522,6 +523,8 @@ class JsonController extends Controller
                 }
             }
         }
+
+        CoreLight::getInstance()->getServiceBaseCacheKvdpp()->set(self::LAST_PACKAGE_REMOVE_CALL_TIME_KEY, time());
 
         echo json_encode($result);
     }
