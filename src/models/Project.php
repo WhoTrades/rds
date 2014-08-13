@@ -11,6 +11,9 @@
  * @property string $project_name
  * @property string $project_build_version
  * @property array $project_build_subversion
+ * @property string $project_current_version
+ * @property string $project_pre_migration_version
+ * @property string $project_post_migration_version
  */
 class Project extends CActiveRecord
 {

@@ -1,6 +1,7 @@
 <?php
 class JsonController extends Controller
 {
+    const LAST_PACKAGE_REMOVE_CALL_TIME_KEY = 'RDS::actionGetProjectBuildsToDelete::last_call_time';
 //    public function beforeAction()
 //    {
 //        //an: Специально эмулируем ситуацию, что сервер может иногда не работать
@@ -148,6 +149,7 @@ class JsonController extends Controller
         }
         echo json_encode($result);
     }
+
     public function actionGetMigrationTask($worker)
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $worker));
@@ -309,7 +311,7 @@ class JsonController extends Controller
                 $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
                 $oldUsed->rr_last_time_on_prod = date("r");
                 $oldUsed->rr_revert_after_time = null;
-                $oldUsed->save();
+                $oldUsed->save(false);
             }
 
             if ($releaseRequest) {
@@ -380,6 +382,7 @@ class JsonController extends Controller
                 if ($build->releaseRequest->countNotFinishedBuilds() == 0) {
                     $builds = $build->releaseRequest->builds;
                     $build->releaseRequest->rr_status = \ReleaseRequest::STATUS_INSTALLED;
+                    $build->releaseRequest->rr_built_time = date("r");
                     $build->releaseRequest->save();
                     $title = "Success installed $project->project_name v.$version";
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
@@ -448,6 +451,101 @@ class JsonController extends Controller
         }
 
         echo json_encode($result);
+    }
+
+    public function actionGetProjects()
+    {
+        $projects = Project::model()->findAll();
+        $result = array();
+        foreach ($projects as $project) {
+            /** @var $project Project */
+            $result[] = array(
+                'name' => $project->project_name,
+                'current_version' => $project->project_current_version,
+            );
+        }
+
+        echo json_encode($result);
+    }
+
+    /**
+     * Метод, который анализирует сборки проектов на возможность их удаления из системы
+     */
+    public function actionGetProjectBuildsToDelete()
+    {
+        $builds = isset($_REQUEST['builds']) ? $_REQUEST['builds'] : [];
+
+        $result = array();
+        foreach ($builds as $build) {
+            if (!preg_match('~\d{2,3}\.\d\d\.\d+\.\d+~', $build['version']) && !preg_match('~2014\.\d{2,3}\.\d\d\.\d+\.\d+~', $build['version'])) {
+                //an: неизвестный формат версии, лучше не будем удалять :) фиг его знает что это
+                continue;
+            }
+            /** @var $project Project */
+            $project = Project::model()->findByAttributes(['project_name' => $build['project']]);
+            if (!$project) {
+                //an: непонятно чтои зачем нам прислали, лучше не будем удалять
+                continue;
+            }
+
+            if ($build['version'] == $project->project_current_version) {
+                //an: Ну никак нельзя удалять ту версию, что сейчас зарелижена
+                continue;
+            }
+
+            $releaseRequest = \ReleaseRequest::model()->findByAttributes([
+                'rr_project_obj_id' => $project->obj_id,
+                'rr_build_version' => $build['version'],
+            ]);
+
+            if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime('-1 month'))) {
+                //an: Не удаляем те билды, что были на проде меньше месяца назад
+                continue;
+            }
+
+            $numbersOfTest = explode(".", $build['version']);
+            if ($numbersOfTest[0] == 2014) array_shift($numbersOfTest);
+
+            $numbersOfCurrent = explode(".", $project->project_current_version);
+            if ($numbersOfCurrent[0] == 2014) array_shift($numbersOfCurrent);
+
+            if ($numbersOfCurrent[0] - 2 > $numbersOfTest[0]) {
+                //an: если релиз отличается на 2 и больше от того что сейчас на проде, тогда удаляем
+                $c = new CDbCriteria();
+                $c->compare('rr_project_obj_id', $project->obj_id);
+                $c->compare('rr_build_version', '>'.$build['version']);
+                $c->compare('rr_build_version', '<'.$project->project_current_version);
+                $count = \ReleaseRequest::model()->count($c);
+
+                if ($count > 2) {
+                    //an: Нужно наличие минимум 2 версий от текущей, что бы было куда откатываться
+                    $result[] = $build;
+                }
+            }
+        }
+
+        CoreLight::getInstance()->getServiceBaseCacheKvdpp()->set(self::LAST_PACKAGE_REMOVE_CALL_TIME_KEY, time());
+
+        echo json_encode($result);
+    }
+
+    public function actionRemoveReleaseRequest($projectName, $version)
+    {
+        $project = Project::model()->findByAttributes(['project_name' => $projectName]);
+        if (!$project) {
+            throw new CHttpException(404, 'Build not found');
+        }
+
+        $rr = ReleaseRequest::model()->findByAttributes([
+            'rr_project_obj_id' => $project->obj_id,
+            'rr_build_version' => $version,
+        ]);
+
+        if ($rr) {
+            $rr->delete();
+        }
+
+        echo json_encode(array('ok' => true));
     }
 }
 

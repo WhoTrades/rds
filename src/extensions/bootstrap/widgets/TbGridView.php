@@ -41,6 +41,14 @@ class TbGridView extends CGridView
 	 */
 	public $cssFile = false;
 
+    public $ajaxUpdateError = 'function(xhr,ts,et,err){
+        console.log(err);
+        if (xhr.status == 403) {
+            document.location += "";
+        }
+
+    }';
+
 	/**
 	 * Initializes the widget.
 	 */

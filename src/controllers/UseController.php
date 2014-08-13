@@ -47,16 +47,18 @@ class UseController extends Controller
             $this->redirect('/');
         }
 
-        $code1 = substr(md5(uniqid()), 0, 6);
-        $code2 = substr(md5(uniqid()), 0, 6);
+        $code1 = rand(pow(10, 5), pow(10, 6)-1);
+        $code2 = rand(pow(10, 5), pow(10, 6)-1);
         $releaseRequest->rr_project_owner_code = $code1;
         $releaseRequest->rr_release_engineer_code = $code2;
         $releaseRequest->rr_project_owner_code_entered = false;
         $releaseRequest->rr_release_engineer_code_entered = false;
         $releaseRequest->rr_status = \ReleaseRequest::STATUS_CODES;
 
-        $text ="Use {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}. Code: %s";
+        $text ="Project owner use {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}. Code: %s";
         Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}(Yii::app()->user->phone, sprintf($text, $code1));
+
+        $text ="Release engineer use {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}. Code: %s";
         foreach (explode(",", \Yii::app()->params['notify']['releaseEngineers']['phones']) as $phone) {
             Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, sprintf($text, $code2));
         }

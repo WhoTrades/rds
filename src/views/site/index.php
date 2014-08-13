@@ -15,6 +15,7 @@ $this->pageTitle=Yii::app()->name;
         'obj_created',
         'rr_user',
         'rr_comment',
+        'rr_release_version',
         'project.project_name',
         array(
             'class'=>'CButtonColumn',
@@ -88,7 +89,18 @@ $this->pageTitle=Yii::app()->name;
             'value' => function($r){return $r->project->project_name;},
             'filter' => \Project::model()->forList(),
         ),
-        'rr_build_version',
+        array(
+            'name' => 'rr_build_version',
+            'value' => function(ReleaseRequest $r){
+                if ($r->rr_built_time) {
+                    $time = strtotime($r->rr_built_time) - strtotime($r->obj_created);
+                    return $r->rr_build_version."<br /><br />Собрано за <b>$time</b> сек.";
+                } else {
+                    return $r->rr_build_version;
+                }
+            },
+            'type' => 'html',
+        ),
         array(
             'value' => function(ReleaseRequest $releaseRequest){
                 if ($releaseRequest->canBeUsed()) {
