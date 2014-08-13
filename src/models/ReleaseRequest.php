@@ -82,6 +82,10 @@ class ReleaseRequest extends CActiveRecord
 
     public function checkForReleaseReject($attribute, $params)
     {
+        //an: Правило действует только для новых запросов на релиз
+        if (!$this->isNewRecord) {
+            return;
+        }
         $rejects = ReleaseReject::model()->findAllByAttributes([
             'rr_project_obj_id' => $this->rr_project_obj_id,
             'rr_release_version' => $this->rr_release_version,
