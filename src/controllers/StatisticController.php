@@ -11,7 +11,7 @@ class StatisticController extends Controller
 
         $c = new CDbCriteria();
         $c->order = 'obj_id desc';
-        $c->condition = 'rr_project_obj_id='.(int)$project->obj_id;
+        $c->condition = 'rr_project_obj_id='.(int)$project->obj_id." AND NOT rr_built_time IS NULL";
         /** @var $releaseRequest ReleaseRequest*/
         $releaseRequest = ReleaseRequest::model()->find($c);
 
