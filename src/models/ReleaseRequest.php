@@ -132,7 +132,14 @@ class ReleaseRequest extends CActiveRecord
             }
             $analyzedBuildTypeIds[] = (string)$build['buildTypeId'];
             if ($build['status'] == 'FAILURE') {
-                $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
+                $ch = curl_init($build['webUrl']);
+                curl_setopt($ch, CURLOPT_USERPWD, "rest:rest123");
+                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                $text = curl_exec($ch);
+                if (preg_match('~<title>[^<]*PHPUnit_composer[^<]*</title>~', $text)) {
+                    $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
+                }
             }
         }
     }
