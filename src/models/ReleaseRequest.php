@@ -77,6 +77,7 @@ class ReleaseRequest extends CActiveRecord
 			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_status', 'safe', 'on'=>'search'),
 			array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on'=>'use'),
             array('rr_release_version', 'checkForReleaseReject'),
+            array('rr_release_version', 'checkForTeamCityHasNoErrors'),
 		);
 	}
 
@@ -99,6 +100,41 @@ class ReleaseRequest extends CActiveRecord
             $this->addError($attribute, 'Запрет на релиз: '.implode("; ", $messages));
         }
 
+    }
+
+    public function checkForTeamCityHasNoErrors($attribute, $params)
+    {
+        //an: Правило действует только для новых запросов на релиз
+        if (!$this->isNewRecord || !$this->rr_build_version) {
+            return;
+        }
+        $url = "http://ci.whotrades.net:8111/httpAuth/app/rest/builds/?count=10000&locator=branch:release-$this->rr_release_version";
+
+        $analyzedBuildTypeIds = [];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_USERPWD, "an:123");
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $text = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            return;
+        }
+
+        $xml = simplexml_load_string($text);
+        foreach ($xml->build as $build) {
+            //an: Выше эта сборка уже была проанализирована, игнорируем
+            if (in_array($build['buildTypeId'], $analyzedBuildTypeIds)) {
+                continue;
+            }
+            $analyzedBuildTypeIds[] = (string)$build['buildTypeId'];
+            if ($build['status'] == 'SUCCESS') {
+                continue;
+            }
+
+
+            $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
+        }
     }
 
 	/**
