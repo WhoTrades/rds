@@ -108,6 +108,11 @@ class ReleaseRequest extends CActiveRecord
         if (!$this->isNewRecord || !$this->rr_build_version) {
             return;
         }
+
+        if ($this->rr_release_version == 60) {
+            return;
+        }
+
         $url = "http://ci.whotrades.net:8111/httpAuth/app/rest/builds/?count=10000&locator=branch:release-$this->rr_release_version";
 
         $analyzedBuildTypeIds = [];
@@ -134,7 +139,6 @@ class ReleaseRequest extends CActiveRecord
             if ($build['status'] == 'FAILURE') {
                 $ch = curl_init($build['webUrl']);
                 curl_setopt($ch, CURLOPT_USERPWD, "rest:rest123");
-                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 $text = curl_exec($ch);
                 if (preg_match('~<title>[^<]*PHPUnit_composer[^<]*</title>~', $text)) {
