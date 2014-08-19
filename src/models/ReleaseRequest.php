@@ -128,12 +128,9 @@ class ReleaseRequest extends CActiveRecord
                 continue;
             }
             $analyzedBuildTypeIds[] = (string)$build['buildTypeId'];
-            if ($build['status'] == 'SUCCESS') {
-                continue;
+            if ($build['status'] == 'FAILURE') {
+                $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
             }
-
-
-            $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
         }
     }
 
