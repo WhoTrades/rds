@@ -112,7 +112,7 @@ class ReleaseRequest extends CActiveRecord
 
         $analyzedBuildTypeIds = [];
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_USERPWD, "an:123");
+        curl_setopt($ch, CURLOPT_USERPWD, "rest:rest123");
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         $text = curl_exec($ch);
