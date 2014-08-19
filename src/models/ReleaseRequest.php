@@ -127,6 +127,9 @@ class ReleaseRequest extends CActiveRecord
             if (in_array($build['buildTypeId'], $analyzedBuildTypeIds)) {
                 continue;
             }
+            if ($build['status'] == 'UNKNOWN') {
+                continue;
+            }
             $analyzedBuildTypeIds[] = (string)$build['buildTypeId'];
             if ($build['status'] == 'FAILURE') {
                 $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
