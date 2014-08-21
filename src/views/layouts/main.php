@@ -16,6 +16,7 @@
 
 <?php
 $this->widget('bootstrap.widgets.TbNavbar',array(
+    'fixed' => false,
     'items'=>array(
         array(
             'class'=>'bootstrap.widgets.TbMenu',
@@ -30,7 +31,6 @@ $this->widget('bootstrap.widgets.TbNavbar',array(
         ),
     ),
 )); ?>
-<br /><Br />
 
 <div id="page">
 

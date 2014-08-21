@@ -30,6 +30,7 @@ class JsDiffLib extends CApplicationComponent
 		$cs->registerCoreScript('jquery');
 		$cs->registerScriptFile($this->getAssetsUrl().'/js/difflib.js', $position);
 		$cs->registerScriptFile($this->getAssetsUrl().'/js/diffview.js', $position);
+		$cs->registerScriptFile($this->getAssetsUrl().'/js/jquery.scrollTo.js', $position);
 	}
 
 	/**

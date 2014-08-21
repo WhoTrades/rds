@@ -37,6 +37,10 @@ Yii::app()->jsdifflib->register();
             contextSize: null,
             viewType: $("#inline")[0].checked ? 1 : 0
         }));
+
+        setTimeout(function(){
+            $('body').scrollTo($('.insert, .replace, .empty, .delete').first(), 500);
+        }, 0);
     }
     diffUsingJS();
 </script>
