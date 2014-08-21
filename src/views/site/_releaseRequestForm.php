@@ -4,7 +4,7 @@
 /* @var $form TbActiveForm */
 ?>
 
-<div class="form">
+<div class="form" style="width: 400px; margin: auto">
 
     <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
         'type' => 'horizontal',
