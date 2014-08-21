@@ -14,8 +14,8 @@ Yii::app()->jsdifflib->register();
 <script>
     function diffUsingJS() {
         // get the baseText and newText values from the two textboxes, and split them into lines
-        var base = difflib.stringAsLines($("#baseText").html());
-        var newtxt = difflib.stringAsLines($("#newText").html());
+        var base = difflib.stringAsLines(document.getElementById("baseText").innerHTML);
+        var newtxt = difflib.stringAsLines(document.getElementById("newText").innerHTML);
 
         // create a SequenceMatcher instance that diffs the two sets of lines
         var sm = new difflib.SequenceMatcher(base, newtxt);

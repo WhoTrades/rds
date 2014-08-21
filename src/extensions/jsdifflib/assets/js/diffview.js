@@ -68,14 +68,14 @@ diffview = {
 		
 		function telt (name, text) {
 			var e = document.createElement(name);
-			e.appendChild(document.createTextNode(text));
+			e.innerHTML = text;
 			return e;
 		}
-		
+
 		function ctelt (name, clazz, text) {
 			var e = document.createElement(name);
 			e.className = clazz;
-			e.appendChild(document.createTextNode(text));
+			e.innerHTML = text;
 			return e;
 		}
 	
