@@ -25,6 +25,7 @@
  * @property string $rr_new_migrations
  * @property string $rr_migration_status
  * @property string $rr_built_time
+ * @property string $rr_cron_config
  */
 class ReleaseRequest extends CActiveRecord
 {

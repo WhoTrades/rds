@@ -22,7 +22,7 @@ class JsonController extends Controller
             'build_worker_obj_id' => $worker->obj_id,
             'build_status' => Build::STATUS_NEW,
         ), array(
-            'with' => 'project',
+            'with' => array('project', 'releaseRequest'),
         ));
 
         if ($task) {
@@ -54,6 +54,23 @@ class JsonController extends Controller
         echo json_encode($result);
     }
 
+    public function actionSendCronConfig()
+    {
+        /** @var $build Build */
+        $build = Build::model()->findByPk($_POST['taskId']);
+        if (!$build) {
+            throw new CHttpException(404, 'Build not found');
+        }
+        $releaseRequest = $build->releaseRequest;
+
+        $releaseRequest->rr_cron_config = $_POST['text'];
+
+        $result = array('ok' => $releaseRequest->save(false));
+
+        echo json_encode($result);
+
+    }
+
     public function actionSendMigrations($taskId, array $migrations)
     {
         /** @var $build Build */
@@ -65,7 +82,7 @@ class JsonController extends Controller
         $releaseRequest->rr_new_migration_count = count($migrations);
         $releaseRequest->rr_new_migrations = json_encode($migrations);
 
-        $result = array('ok' => $releaseRequest->save());
+        $result = array('ok' => $releaseRequest->save(false));
 
         echo json_encode($result);
     }

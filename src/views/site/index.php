@@ -50,7 +50,7 @@ $this->pageTitle=Yii::app()->name;
                     ReleaseRequest::STATUS_CANCELLED=> array('ok', 'Отменено', 'red'),
                 );
                 list($icon, $text, $color) = $map[$releaseRequest->rr_status];
-                echo "<span title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$releaseRequest->rr_status}</span><hr />";
+                echo "<span title='{$text}' style='color: ".$color."'><span class='icon-$icon'></span>{$releaseRequest->rr_status}</span><hr />";
 
                 $result = array();
                 foreach ($releaseRequest->builds as $val) {
@@ -104,6 +104,15 @@ $this->pageTitle=Yii::app()->name;
         array(
             'value' => function(ReleaseRequest $releaseRequest){
                 if ($releaseRequest->canBeUsed()) {
+                    $currentUsed = \ReleaseRequest::model()->findByAttributes([
+                        'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
+                        'rr_status' => [\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT],
+                    ]);
+
+                    if ($currentUsed && $currentUsed->rr_cron_config != $releaseRequest->rr_cron_config) {
+                        echo "<a href='".$this->createUrl('/diff/index/', ['id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id])."'>Cron changes</a><br />";
+                    }
+
                     if ($releaseRequest->rr_new_migration_count) {
                         if ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_UPDATING) {
                             return "updating migrations";
