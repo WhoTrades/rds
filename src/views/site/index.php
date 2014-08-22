@@ -1,5 +1,7 @@
 <?php
 /* @var $this SiteController */
+/* @var $releaseRejectSearchModel ReleaseReject */
+/* @var $releaseRequestSearchModel ReleaseRequest */
 $this->pageTitle=Yii::app()->name;
 ?>
 
@@ -86,7 +88,9 @@ $this->pageTitle=Yii::app()->name;
         ),
         array(
             'name' => 'rr_project_obj_id',
-            'value' => function($r){return $r->project->project_name;},
+            'value' => function($r){
+                return $r->builds[0]->project->project_name;
+            },
             'filter' => \Project::model()->forList(),
         ),
         array(
@@ -104,13 +108,22 @@ $this->pageTitle=Yii::app()->name;
         array(
             'value' => function(ReleaseRequest $releaseRequest){
                 if ($releaseRequest->canBeUsed()) {
-                    $currentUsed = \ReleaseRequest::model()->findByAttributes([
-                        'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
-                        'rr_status' => [\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT],
-                    ]);
+                    static $currentUsedCache = [];
+
+                    $currentUsed = isset($currentUsedCache[$releaseRequest->rr_project_obj_id])
+                        ? $currentUsedCache[$releaseRequest->rr_project_obj_id]
+                        : \ReleaseRequest::model()->findByAttributes([
+                            'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
+                            'rr_status' => [\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT],
+                        ]);
 
                     if ($currentUsed && $currentUsed->rr_cron_config != $releaseRequest->rr_cron_config) {
-                        echo "<a href='".$this->createUrl('/diff/index/', ['id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id])."'>Cron changes</a><br />";
+                        $diffStat = Yii::app()->diffStat->getDiffStat($currentUsed->rr_cron_config, $releaseRequest->rr_cron_config);
+                        $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
+                        $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
+                        echo "<a href='".$this->createUrl('/diff/index/', ['id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id])."'>
+                            CRON changed<br />$diffStat
+                        </a><br />";
                     }
 
                     if ($releaseRequest->rr_new_migration_count) {
@@ -146,6 +159,8 @@ $this->pageTitle=Yii::app()->name;
                         return "<a href='".$this->createUrl('/use/create', array('id' => $oldReleaseRequest->obj_id))."'>Revert to $releaseRequest->rr_old_version</a>";
                     }
                 }
+
+                        return null;
             },
             'type' => 'raw'
         ),
@@ -162,14 +177,15 @@ $this->pageTitle=Yii::app()->name;
 
 <script>
     var timer = setInterval(function(){
-        var val = parseInt($('.reload-block .seconds:first').html());
+        var element = $('.reload-block .seconds:first');
+        var val = parseInt(element.html());
         val--;
         if (val == -1) {
             $.fn.yiiGridView.update("release-reject-grid");
             $.fn.yiiGridView.update("release-request-grid");
-            $('.reload-block .seconds:first').html(10);
+            element.html(10);
         } else {
-            $('.reload-block .seconds:first').html(val);
+            element.html(val);
         }
     }, 1000);
 </script>

@@ -146,13 +146,17 @@ class Project extends CActiveRecord
 
 
     public function forList(){
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
         $list = array('' => " - Project - ");
         $c=new CDbCriteria;
         $c->order = 'project_name';
         foreach ($this->findAll($c) as $val)
             $list[$val->obj_id] = $val->project_name;
 
-        return $list;
+        return $cache = $list;
     }
 
 	/**

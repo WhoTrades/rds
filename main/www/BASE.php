@@ -1,6 +1,9 @@
 <?php
 define('SCRIPT_START_TIME', microtime(true)); // save script start time
 
+/**
+ * @property string DSN_DB4
+ */
 class Config
 {
     protected static $instance;
