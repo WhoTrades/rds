@@ -71,14 +71,20 @@ class JsonController extends Controller
 
     }
 
-    public function actionSendMigrations($taskId, array $migrations, $type = 'pre')
+    public function actionSendMigrations($project, $version, array $migrations, $type = 'pre')
     {
-        /** @var $build Build */
-        $build = Build::model()->findByPk($taskId);
-        if (!$build) {
-            throw new CHttpException(404, 'Build not found');
+        /** @var $project Project */
+        $project = Project::model()->findByAttributes(['project_name' => $project]);
+        if (!$project) {
+            throw new CHttpException(404, 'Project not found');
         }
-        $releaseRequest = $build->releaseRequest;
+        $releaseRequest = ReleaseRequest::model()->findByAttributes(array(
+            'rr_project_obj_id' => $project->obj_id,
+            'rr_build_version' => $version,
+        ));
+        if (!$releaseRequest) {
+            throw new CHttpException(404, 'Release request not found');
+        }
         if ($type == 'pre') {
             $releaseRequest->rr_new_migration_count = count($migrations);
             $releaseRequest->rr_new_migrations = json_encode($migrations);
