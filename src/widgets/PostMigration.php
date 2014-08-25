@@ -14,14 +14,14 @@ class PostMigration extends CWidget
 
             $c = new CDbCriteria();
             $c->compare('rr_project_obj_id', $project->obj_id);
-            $c->compare('rr_build_version', "<=".($version-2));
+            $c->compare('rr_build_version', "<=".($version-1));
             $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
 
             $c->order = 'rr_build_version desc';
             $c->limit = 1;
 
             if ($rr = ReleaseRequest::model()->find($c)) {
-                if ($rr->rr_new_post_migrations) {
+                if (json_decode($rr->rr_new_post_migrations)) {
                     $releaseRequests[] = $rr;
                 }
             }
