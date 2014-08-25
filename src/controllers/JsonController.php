@@ -71,7 +71,7 @@ class JsonController extends Controller
 
     }
 
-    public function actionSendMigrations($taskId, array $migrations)
+    public function actionSendMigrations($taskId, array $migrations, $type = 'pre')
     {
         /** @var $build Build */
         $build = Build::model()->findByPk($taskId);
@@ -79,8 +79,12 @@ class JsonController extends Controller
             throw new CHttpException(404, 'Build not found');
         }
         $releaseRequest = $build->releaseRequest;
-        $releaseRequest->rr_new_migration_count = count($migrations);
-        $releaseRequest->rr_new_migrations = json_encode($migrations);
+        if ($type == 'pre') {
+            $releaseRequest->rr_new_migration_count = count($migrations);
+            $releaseRequest->rr_new_migrations = json_encode($migrations);
+        } else {
+            $releaseRequest->rr_new_post_migrations = json_encode($migrations);
+        }
 
         $result = array('ok' => $releaseRequest->save(false));
 
@@ -176,21 +180,27 @@ class JsonController extends Controller
 
         $result = array();
 
-        //an: Смотрим есть ли что, что нужно откатывать к старой версии
-        $releaseRequest = ReleaseRequest::model()->findByAttributes(array(
-            'rr_migration_status' => \ReleaseRequest::MIGRATION_STATUS_UPDATING,
-        ));
+        foreach (array('pre' => 'rr_migration_status', 'post' => 'rr_post_migration_status') as $type => $field) {
+            //an: Смотрим есть ли что, что нужно откатывать к старой версии
+            $releaseRequest = ReleaseRequest::model()->findByAttributes(array(
+                $field => \ReleaseRequest::MIGRATION_STATUS_UPDATING,
+            ));
 
-        if ($releaseRequest) {
-            $result = array(
-                'project' => $releaseRequest->project->project_name,
-                'version' => $releaseRequest->rr_build_version,
-            );
+            if ($releaseRequest) {
+                $result = array(
+                    'project' => $releaseRequest->project->project_name,
+                    'version' => $releaseRequest->rr_build_version,
+                    'type' => $type,
+                );
+                break;
+            }
         }
+
+
         echo json_encode($result);
     }
 
-    public function actionSendMigrationStatus($project, $version, $status)
+    public function actionSendMigrationStatus($project, $version, $type, $status)
     {
         $transaction = ReleaseRequest::model()->getDbConnection()->beginTransaction();
         $projectObj = Project::model()->findByAttributes(array('project_name' => $project));
@@ -203,15 +213,28 @@ class JsonController extends Controller
         if (!$releaseRequest) {
             throw new CHttpException(404, 'unknown release request');
         }
-        $releaseRequest->rr_migration_status = $status;
 
-        if ($status == \ReleaseRequest::MIGRATION_STATUS_UP) {
-            $releaseRequest->rr_new_migration_count = 0;
-            $c = new CDbCriteria();
-            $c->compare('rr_build_version', "<=$version");
-            $c->compare('rr_project_obj_id', $projectObj->obj_id);
+        if ($type == 'pre') {
+            $releaseRequest->rr_migration_status = $status;
 
-            ReleaseRequest::model()->updateAll(array('rr_migration_status' => $status, 'rr_new_migration_count' => 0), $c);
+            if ($status == \ReleaseRequest::MIGRATION_STATUS_UP) {
+                $releaseRequest->rr_new_migration_count = 0;
+                $c = new CDbCriteria();
+                $c->compare('rr_build_version', "<=$version");
+                $c->compare('rr_project_obj_id', $projectObj->obj_id);
+
+                ReleaseRequest::model()->updateAll(array('rr_migration_status' => $status, 'rr_new_migration_count' => 0), $c);
+            }
+        } else {
+            $releaseRequest->rr_post_migration_status = $status;
+
+            if ($status == \ReleaseRequest::MIGRATION_STATUS_UP) {
+                $c = new CDbCriteria();
+                $c->compare('rr_build_version', "<=$version");
+                $c->compare('rr_project_obj_id', $projectObj->obj_id);
+
+                ReleaseRequest::model()->updateAll(array('rr_migration_status' => $status), $c);
+            }
         }
 
         $text = json_encode(array('ok' => $releaseRequest->save()));

@@ -133,11 +133,11 @@ $this->pageTitle=Yii::app()->name;
                             return "updating migrations failed";
                         } else {
                             $text =
-                                "<a href='".$this->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id))."'>pre migrate</a><br />".
+                                "<a href='".$this->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre'))."'>pre migrate</a><br />".
                                 "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show migrations</a>
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                             foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                                $text .= "<a href='http://msa-bls2:8060/browse/migration-{$releaseRequest->project->project_name}/pre/$migration.php?hb=true'>$migration</a><br />";
+                                $text .= "<a href='http://sources:8060/browse/migration-{$releaseRequest->project->project_name}/pre/$migration.php?hb=true'>$migration</a><br />";
                             }
                             $text .= "</div>";
 

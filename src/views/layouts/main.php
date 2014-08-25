@@ -33,6 +33,9 @@ $this->widget('bootstrap.widgets.TbNavbar',array(
     ),
 )); ?>
 
+<?$this->widget('PostMigration', [])?>
+
+
 <div id="page" class="container-fluid">
 
 	<?php if(isset($this->breadcrumbs)):?>

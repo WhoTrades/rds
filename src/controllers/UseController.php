@@ -72,17 +72,23 @@ class UseController extends Controller
         $this->redirect($this->createUrl('/use/index', array('id' => $id)));
 	}
 
-    public function actionMigrate($id)
+    public function actionMigrate($id, $type)
     {
         $releaseRequest = $this->loadModel($id);
         if (!$releaseRequest->canBeUsed()) {
             $this->redirect('/');
         }
 
+        if ($type == 'pre') {
+            $releaseRequest->rr_migration_status = \ReleaseRequest::MIGRATION_STATUS_UPDATING;
+            $logMessage = "Запущены pre миграции {$releaseRequest->getTitle()}";
+        } else {
+            $releaseRequest->rr_post_migration_status = \ReleaseRequest::MIGRATION_STATUS_UPDATING;
+            $logMessage = "Запущены post миграции {$releaseRequest->getTitle()}";
+        }
 
-        $releaseRequest->rr_migration_status = \ReleaseRequest::MIGRATION_STATUS_UPDATING;
         if ($releaseRequest->save()) {
-            Log::createLogMessage("Запущены pre миграции {$releaseRequest->getTitle()}");
+            Log::createLogMessage($logMessage);
         }
 
         $this->redirect('/');
