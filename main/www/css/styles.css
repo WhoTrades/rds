@@ -1,3 +1,7 @@
+.form .row {
+	margin-left: 0px;
+}
+
 .diff {
 	width: 100%;
 	background: none;
@@ -21,3 +25,4 @@
 	float: left;
 	width: 20%;
 }
+

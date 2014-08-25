@@ -117,4 +117,9 @@ class ReleaseReject extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+    public function getTitle()
+    {
+        return "запрет релиза #$this->obj_id {$this->project->project_name} v.$this->rr_release_version ($this->rr_comment)";
+    }
 }

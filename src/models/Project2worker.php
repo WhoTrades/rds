@@ -117,4 +117,9 @@ class Project2worker extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+    public function getTitle()
+    {
+        return "Связка {$this->project->project_name} <-> {$this->worker->worker_name}";
+    }
 }

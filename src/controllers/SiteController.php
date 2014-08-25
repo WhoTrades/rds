@@ -47,35 +47,47 @@ class SiteController extends Controller
     {
         $model=new ReleaseRequest;
 
-        if(isset($_POST['ReleaseRequest']))
-        {
-            $model->attributes=$_POST['ReleaseRequest'];
-            $model->rr_user = \Yii::app()->user->name;
-            if ($model->rr_project_obj_id) {
-                $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
-            }
-            if($model->save()) {
-                $model->project->incrementBuildVersion($model->rr_release_version);
-                $list = Project2worker::model()->findAllByAttributes(array(
-                    'project_obj_id' => $model->rr_project_obj_id,
-                ));
-                foreach ($list as $val) {
-                    /** @var $val Project2worker */
-                    $task = new Build();
-                    $task->build_release_request_obj_id = $model->obj_id;
-                    $task->build_worker_obj_id = $val->worker_obj_id;
-                    $task->build_project_obj_id = $val->project_obj_id;
-                    $task->save();
-                }
+        $transaction=$model->dbConnection->beginTransaction();
 
-                Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRequestNotification'}($model->rr_user, $model->project->project_name, $model->rr_comment);
-                $text = "{$model->rr_user} requested {$model->project->project_name}. {$model->rr_comment}";
-                foreach (explode(",", \Yii::app()->params['notify']['releaseRequest']['phones']) as $phone) {
-                    if (!$phone) continue;
-                    Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+        try {
+            if(isset($_POST['ReleaseRequest']))
+            {
+                $model->attributes=$_POST['ReleaseRequest'];
+                $model->rr_user = \Yii::app()->user->name;
+                if ($model->rr_project_obj_id) {
+                    $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
                 }
-                $this->redirect(array('index'));
+                if($model->save()) {
+                    $model->project->incrementBuildVersion($model->rr_release_version);
+                    $list = Project2worker::model()->findAllByAttributes(array(
+                        'project_obj_id' => $model->rr_project_obj_id,
+                    ));
+                    foreach ($list as $val) {
+                        /** @var $val Project2worker */
+                        $task = new Build();
+                        $task->build_release_request_obj_id = $model->obj_id;
+                        $task->build_worker_obj_id = $val->worker_obj_id;
+                        $task->build_project_obj_id = $val->project_obj_id;
+                        $task->save();
+                    }
+
+                    Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRequestNotification'}($model->rr_user, $model->project->project_name, $model->rr_comment);
+                    $text = "{$model->rr_user} requested {$model->project->project_name}. {$model->rr_comment}";
+                    foreach (explode(",", \Yii::app()->params['notify']['releaseRequest']['phones']) as $phone) {
+                        if (!$phone) continue;
+                        Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+                    }
+
+                    Log::createLogMessage("Создан {$model->getTitle()}");
+
+                    $transaction->commit();
+
+                    $this->redirect(array('index'));
+                }
             }
+        } catch (Exception $e) {
+            $transaction->rollback();
+            throw $e;
         }
 
         $this->render('createReleaseRequest',array(
@@ -92,6 +104,7 @@ class SiteController extends Controller
             $model->attributes=$_POST['ReleaseReject'];
             $model->rr_user = \Yii::app()->user->name;
             if($model->save()) {
+                Log::createLogMessage("Создан {$model->getTitle()}");
                 $text = "{$model->rr_user} rejected {$model->project->project_name}. {$model->rr_comment}";
                 foreach (explode(",", \Yii::app()->params['notify']['releaseReject']['phones']) as $phone) {
                     if (!$phone) continue;
@@ -114,15 +127,22 @@ class SiteController extends Controller
             return;
         }
 
+        $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/
         foreach ($model->builds as $build) {
             if (in_array($build->build_status, array(Build::STATUS_BUILDING, Build::STATUS_BUILT))) {
                 $model->rr_status = ReleaseRequest::STATUS_CANCELLING;
                 $model->save();
+                Log::createLogMessage("Отменен {$model->getTitle()}");
+                $transaction->commit();
                 return;
             }
         }
+
+        Log::createLogMessage("Удален {$model->getTitle()}");
         $model->delete();
+
+        $transaction->commit();
 
         if(!isset($_GET['ajax']))
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
@@ -131,8 +151,16 @@ class SiteController extends Controller
     public function actionDeleteReleaseReject($id)
     {
         $model=ReleaseReject::model()->findByPk($id);
-        if($model)
-            $model->delete();
+        if($model) {
+            $transaction = $model->getDbConnection()->beginTransaction();
+            try {
+                Log::createLogMessage("Удален {$model->getTitle()}");
+                $model->delete();
+                $transaction->commit();
+            } catch (\Exception $e) {
+                $transaction->rollback();
+            }
+        }
 
         if(!isset($_GET['ajax']))
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));

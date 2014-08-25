@@ -94,15 +94,23 @@ class ProjectController extends Controller
 		if(isset($_POST['Project']))
 		{
 			$model->attributes=$_POST['Project'];
+            $transaction = $model->getDbConnection()->beginTransaction();
 			if($model->save()) {
+                Log::createLogMessage("Удалены все связки {$model->project_name}");
                 Project2worker::model()->deleteAllByAttributes(array('project_obj_id' => $model->obj_id));
                 foreach ($_POST['workers'] as $workerId) {
+
                     $p2w = new Project2worker();
                     $p2w->worker_obj_id = $workerId;
                     $p2w->project_obj_id = $model->obj_id;
                     $p2w->save();
+                    Log::createLogMessage("Создана {$p2w->getTitle()}");
+
+                    $transaction->commit();
                 }
 				$this->redirect(array('view','id'=>$model->obj_id));
+            } else {
+                $transaction->rollback();
             }
 		}
 

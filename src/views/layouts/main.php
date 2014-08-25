@@ -21,12 +21,13 @@ $this->widget('bootstrap.widgets.TbNavbar',array(
         array(
             'class'=>'bootstrap.widgets.TbMenu',
             'items'=>array(
-                array('label'=>'Home', 'url'=>array('/site/index')),
-                array('label'=>'Projects', 'url'=>array('/project/admin'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Workers', 'url'=>array('/worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Versions', 'url'=>array('/releaseVersion/admin'), 'visible'=>!Yii::app()->user->isGuest),
+                array('label'=>'Главная', 'url'=>array('/site/index')),
+                array('label'=>'Проекты', 'url'=>array('/project/admin'), 'visible'=>!Yii::app()->user->isGuest),
+                array('label'=>'Сборщики', 'url'=>array('/worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
+                array('label'=>'Версии', 'url'=>array('/releaseVersion/admin'), 'visible'=>!Yii::app()->user->isGuest),
+                array('label'=>'Журнал', 'url'=>array('/log/index'), 'visible'=>!Yii::app()->user->isGuest),
                 //array('label'=>'Project Workers', 'url'=>array('/project2worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Logout ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
+                array('label'=>'Выйти ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
             ),
         ),
     ),

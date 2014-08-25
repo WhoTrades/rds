@@ -255,4 +255,9 @@ class ReleaseRequest extends CActiveRecord
 
         return $this->rr_last_time_on_prod ? strtotime($this->rr_last_time_on_prod) : 0;
     }
+
+    public function getTitle()
+    {
+        return "Запрос релиза #$this->obj_id {$this->project->project_name}::{$this->rr_build_version} ($this->rr_comment)";
+    }
 }
