@@ -3,6 +3,9 @@ class PostMigration extends CWidget
 {
     public function init()
     {
+        if (Yii::app()->user->isGuest) {
+            return;
+        }
         $projects = Project::model()->findAll();
 
         $releaseRequests = [];
@@ -16,12 +19,13 @@ class PostMigration extends CWidget
             $c->compare('rr_project_obj_id', $project->obj_id);
             $c->compare('rr_build_version', "<=".($version-1));
             $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
+            $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
 
             $c->order = 'rr_build_version desc';
             $c->limit = 1;
 
             if ($rr = ReleaseRequest::model()->find($c)) {
-                if (json_decode($rr->rr_new_post_migrations)) {
+                if ($rr->rr_post_migration_status != ReleaseRequest::MIGRATION_STATUS_UP && json_decode($rr->rr_new_post_migrations)) {
                     $releaseRequests[] = $rr;
                 }
             }
