@@ -71,7 +71,7 @@ class JsonController extends Controller
 
     }
 
-    public function actionSendMigrations($project, $version, array $migrations, $type = 'pre')
+    public function actionSendMigrations($project, $version, array $migrations = array(), $type = 'pre')
     {
         /** @var $project Project */
         $project = Project::model()->findByAttributes(['project_name' => $project]);
