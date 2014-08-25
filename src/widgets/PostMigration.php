@@ -23,8 +23,6 @@ class PostMigration extends CWidget
             if ($rr = ReleaseRequest::model()->find($c)) {
                 if ($rr->rr_new_post_migrations) {
                     $releaseRequests[] = $rr;
-                } else {
-                    var_dump($rr->obj_id);
                 }
             }
         }
