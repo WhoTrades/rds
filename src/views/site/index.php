@@ -67,7 +67,39 @@ $this->pageTitle=Yii::app()->name;
                     );
                     list($icon, $text, $color) = $map[$val->build_status];
                     $result[] =  "<a href='".$this->createUrl('build/view', array('id' => $val->obj_id))."' title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$val->worker->worker_name} - {$val->build_status} {$val->project->project_name} {$val->build_version}</a>";
-                    //$result[] = '<div class="progress" style="margin: 0"><div class="bar" role="progressbar"style="width: 60%;">60%: git pull comon</div></div>';
+
+                    if ($val->build_status == Build::STATUS_BUILDING) {
+                        $c = new CDbCriteria();
+                        $c->compare('build_status', [Build::STATUS_INSTALLED, Build::STATUS_USED]);
+                        $c->compare('build_project_obj_id', $val->build_project_obj_id);
+                        $c->compare('build_worker_obj_id', $val->build_worker_obj_id);
+                        $c->order = 'obj_id desc';
+                        $prev = \Build::model()->find($c);
+
+
+                        $dataCurrent = array_reverse(array_keys(json_decode($val->build_time_log, true)));
+
+                        $data = json_decode($prev->build_time_log, true);
+                        if ($data) {
+                            $lastPrev = end($data);
+
+                            $currentTime = 0;
+                            foreach ($dataCurrent as $currentKey) {
+                                if (isset($data[$currentKey])) {
+                                    $currentTime = $data[$currentKey];
+                                    break;
+                                }
+                            }
+
+                            $percent = (int)(100*$currentTime/$lastPrev);
+                            $result[] = '
+                            <div class="progress" style="margin: 0">
+                                <div class="bar" role="progressbar"style="width: '.$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
+                                    '.$currentKey.'
+                                </div>
+                            </div>';
+                        }
+                    }
                 }
 
                 return implode("<br />", $result);

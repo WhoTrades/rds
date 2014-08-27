@@ -28,6 +28,50 @@ $this->menu=array(
 		'build_project_obj_id',
 		'build_status',
 		'build_version',
+        [
+            'name' => 'build_time_log',
+            'type'=>'html',
+            'value' => function(Build $build){
+                $data = json_decode($build->build_time_log, true);
+                ob_start();
+                ?>
+                    <table>
+                        <thead>
+                            <tr style="font-weight: bold">
+                                <td>Название действия</td>
+                                <td>Затраченное время</td>
+                            </tr>
+                        </thead>
+                        <?
+                        $max = 0;
+                        $prev = 0;
+                        foreach ($data as $val) {
+                            $max = max($max, $val-$prev);
+                            $prev = $val;
+                        }
+                        $prevName = 'init';
+                        $prev = 0;
+                        ?>
+                        <?foreach ($data as $name => $time) {?>
+                            <tr>
+                                <td><?=$prevName?></td>
+                                <td>
+                                    <div class="progress" style="margin: 0">
+                                        <div class="bar" role="progressbar" style="width: <?=100*($time - $prev)/$max?>%; color: black">
+                                            <?=sprintf("%.2f", $time - $prev)?>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            <?$prev = $time;?>
+                            <?$prevName = $name;?>
+                        <?}?>
+                    </table>
+                <?
+                return ob_get_clean();
+            }
+        ],
 		array(
             'name' => 'build_attach',
             'value' => function($e){
