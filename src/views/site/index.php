@@ -95,7 +95,7 @@ $this->pageTitle=Yii::app()->name;
                             $result[] = '
                             <div class="progress" style="margin: 0; width: 250px;">
                                 <div class="bar" role="progressbar"style="width: '.$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
-                                    '.$currentKey.'
+                                    <b>'.$percent.'%:</b> '.$currentKey.'
                                 </div>
                             </div>';
                         }
