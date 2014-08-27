@@ -13,6 +13,7 @@
  * @property integer $build_project_obj_id
  * @property string $build_status
  * @property string $build_attach
+ * @property string $build_time_log
  *
  * The followings are the available model relations:
  * @property Worker $worker

@@ -67,6 +67,7 @@ $this->pageTitle=Yii::app()->name;
                     );
                     list($icon, $text, $color) = $map[$val->build_status];
                     $result[] =  "<a href='".$this->createUrl('build/view', array('id' => $val->obj_id))."' title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$val->worker->worker_name} - {$val->build_status} {$val->project->project_name} {$val->build_version}</a>";
+                    //$result[] = '<div class="progress" style="margin: 0"><div class="bar" role="progressbar"style="width: 60%;">60%: git pull comon</div></div>';
                 }
 
                 return implode("<br />", $result);
