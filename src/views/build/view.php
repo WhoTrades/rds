@@ -40,6 +40,7 @@ $this->menu=array(
                             <tr style="font-weight: bold">
                                 <td>Название действия</td>
                                 <td>Затраченное время</td>
+                                <td>Временная шкала</td>
                             </tr>
                         </thead>
                         <?
@@ -63,6 +64,7 @@ $this->menu=array(
                                     </div>
 
                                 </td>
+                                <td><?=sprintf("%.2f", $time)?></td>
                             </tr>
                             <?$prev = $time;?>
                             <?$prevName = $name;?>
