@@ -18,12 +18,15 @@ class JsonController extends Controller
             throw new CHttpException(404, 'unknown worker');
         }
 
+        $c = new CDbCriteria(array(
+            'with' => array('project', 'releaseRequest'),
+        ));
+        $c->compare('build_release_request_obj_id', '>=0');
+
         $task = \Build::model()->findByAttributes(array(
             'build_worker_obj_id' => $worker->obj_id,
             'build_status' => Build::STATUS_NEW,
-        ), array(
-            'with' => array('project', 'releaseRequest'),
-        ));
+        ), $c);
 
         if ($task) {
             $result = array(
