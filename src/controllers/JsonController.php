@@ -118,7 +118,7 @@ class JsonController extends Controller
         $task = \ReleaseRequest::model()->find($c);
         if ($task) {
             $result = array(
-                'id' => $task->obj_id,
+                'id' => $task->builds[0]->obj_id,
                 'project' => $task->project->project_name,
                 'use_status' => \ReleaseRequest::STATUS_USED,
             );
