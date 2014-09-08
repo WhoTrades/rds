@@ -262,4 +262,15 @@ class ReleaseRequest extends CActiveRecord
     {
         return "Запрос релиза #$this->obj_id {$this->project->project_name}::{$this->rr_build_version} ($this->rr_comment)";
     }
+
+
+    public static function getInstalledStatuses()
+    {
+        return [self::STATUS_INSTALLED, self::STATUS_OLD, self::STATUS_USED, self::STATUS_USED_ATTEMPT];
+    }
+
+    public function getBuildTag()
+    {
+        return $this->project->project_name."-".$this->rr_build_version;
+    }
 }

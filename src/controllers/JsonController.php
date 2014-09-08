@@ -29,17 +29,72 @@ class JsonController extends Controller
         ), $c);
 
         if ($task) {
+
+            //an: ищем предыдущую успешную сборку, что бы узнать какие новые тикеты были закомичены
+            $c = new CDbCriteria();
+            $c->compare('rr_build_version', '<'.$task->releaseRequest->rr_build_version);
+            $c->compare('rr_status', ReleaseRequest::getInstalledStatuses());
+            $c->order = 'rr_build_version desc';
+            $lastSuccess = ReleaseRequest::model()->find($c);
+
             $result = array(
                 'id' => $task->obj_id,
                 'project' => $task->project->project_name,
                 'version' => $task->releaseRequest->rr_build_version,
                 'release' => $task->releaseRequest->rr_release_version,
+                'lastBuildTag' => $lastSuccess ? $lastSuccess->project->project_name.'-'.$lastSuccess->rr_build_version : null,
             );
         } else {
             $result = array();
         }
 
         echo json_encode($result);
+    }
+
+    public function actionSendBuildPatch($project, $version, $output)
+    {
+//        $project = \Request::getPost('project');
+//        $version = \Request::getPost('version');
+//        $output = \Request::getPost('output');
+
+        if (!$Project = Project::model()->findByAttributes(['project_name' => $project])) {
+            throw new CHttpException(404, "Project $project not found");
+        }
+
+        $releaseRequest = \ReleaseRequest::model()->findByAttributes([
+            'rr_project_obj_id' => $Project->obj_id,
+            'rr_build_version' => $version,
+        ]);
+
+        if (!$releaseRequest) {
+            throw new CHttpException(404, "Release request of project=$project, version=$version not found");
+        }
+
+        $lines = explode("\n", str_replace("\r", "", $output));
+
+        foreach ($lines as $line) {
+            if (preg_match('~^\s*(?<hash>\w+)\|(?<comment>.*)\|/(?<author>.*?)/$~', $line, $matches)) {
+                $commit = new JiraCommit();
+                if (preg_match_all('~#(WT\w-\d+)~', $matches['comment'], $ans)) {
+                    foreach ($ans[1] as $val2) {
+                        $commit->attributes = [
+                            'jira_commit_build_tag' => $releaseRequest->getBuildTag(),
+                            'jira_commit_hash' => $matches['hash'],
+                            'jira_commit_author' => $matches['author'],
+                            'jira_commit_comment' => $matches['comment'],
+                            'jira_commit_ticket' => $val2,
+                            'jira_commit_project' => explode('-', $val2)[0],
+                        ];
+
+                        $commit->save();
+
+                        var_dump($commit->errors);
+                    }
+                }
+            }
+        }
+
+        echo json_encode(['ok' => true]);
     }
 
     public function actionSendMigrationCount($taskId, $count)
@@ -437,6 +492,19 @@ class JsonController extends Controller
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
                     foreach ($builds as $val) {
                         $text .= "<a href='".$this->createAbsoluteUrl('build/view', array('id' => $val->obj_id))."'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
+                    }
+
+                    foreach (Yii::app()->params['jiraProjects'] as $jiraProject) {
+                        $jiraVersion = new JiraCreateVersion();
+                        $jiraVersion->attributes = [
+                            'jira_name' => $project->project_name."-".$build->releaseRequest->rr_build_version,
+                            'jira_description' => 'Сборка #'.$build->build_release_request_obj_id.', '.$build->releaseRequest->rr_user.' [auto]',
+                            'jira_project' => $jiraProject,
+                            'jira_archived' => false,
+                            'jira_released' => false,
+                        ];
+
+                        $jiraVersion->save(false);
                     }
 
                     Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);

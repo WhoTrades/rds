@@ -39,6 +39,8 @@ class Dispatcher implements \ServiceBase\IRequestHandler
 
         //\CoreLight::getInstance()->getFatalWatcher()->stop();
         include("yii/yii.php");
+
+
         require_once(__DIR__.'/../protected/components/WebApplication.php');
         try {
             $application = \Yii::createApplication('WebApplication', $config);
