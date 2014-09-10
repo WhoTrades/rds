@@ -11,6 +11,7 @@ class PgQ_EventProcessor_RdsJiraCreateVersion extends PgQ\EventProcessor\EventPr
     public function processEvent(PgQ_Event $event)
     {
         $jira = new JiraApi($this->debugLogger);
+        $this->debugLogger->message("Creating version {$event->getData()['jira_name']} at project {$event->getData()['jira_project']}");
         $jira->createProjectVersion(
              $event->getData()['jira_project'],
              $event->getData()['jira_name'],

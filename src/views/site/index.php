@@ -142,7 +142,7 @@ $this->pageTitle=Yii::app()->name;
             'value' => function(ReleaseRequest $releaseRequest){
                 //an: 2014-09-10 06:13:13-04 - это дата, с которой мы начали отслеживать тикеты
                 if ($releaseRequest->isInstalledStatus() && $releaseRequest->obj_created > '2014-09-10 06:13:13-04') {
-                    echo "<a href='http://jira/issues/?jql=fixVersion%3D".$releaseRequest->getBuildTag()."'>Тикеты</a><br />";
+                    echo "<a href='".$this->createUrl('/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты</a><br />";
                 }
 
                 if ($releaseRequest->canBeUsed()) {
@@ -189,10 +189,7 @@ $this->pageTitle=Yii::app()->name;
                 } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {
                     return "<a href='".$this->createUrl('/use/fixAttempt', array('id' => $releaseRequest->obj_id))."'>Make stable</a>";
                 } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
-                    $oldReleaseRequest = ReleaseRequest::model()->findByAttributes(array(
-                        'rr_build_version' => $releaseRequest->rr_old_version,
-                        'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
-                    ));
+                    $oldReleaseRequest = $releaseRequest->getOldReleaseRequest();
                     if ($oldReleaseRequest && $oldReleaseRequest->canBeUsed()) {
                         return "<a href='".$this->createUrl('/use/create', array('id' => $oldReleaseRequest->obj_id))."'>Revert to $releaseRequest->rr_old_version</a>";
                     }

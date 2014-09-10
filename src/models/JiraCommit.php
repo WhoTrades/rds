@@ -9,7 +9,7 @@
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
- * @property string $jira_commit_release_request_obj_id
+ * @property string $jira_commit_build_tag
  * @property string $jira_commit_hash
  * @property string $jira_commit_author
  * @property string $jira_commit_comment

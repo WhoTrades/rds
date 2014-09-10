@@ -12,6 +12,7 @@
  * @property string $rr_comment
  * @property string $rr_project_obj_id
  * @property string $rr_status
+ * @property string $rr_old_version
  * @property string $rr_build_version
  * @property string $rr_project_owner_code
  * @property string $rr_release_engineer_code
@@ -228,6 +229,24 @@ class ReleaseRequest extends CActiveRecord
         return Build::model()->count($c);
     }
 
+    /** @return ReleaseRequest|null */
+    public function getOldReleaseRequest()
+    {
+        return self::model()->findByAttributes(array(
+            'rr_build_version' => $this->rr_old_version,
+            'rr_project_obj_id' => $this->rr_project_obj_id,
+        ));
+    }
+
+    /** @return ReleaseRequest|null */
+    public function getUsedReleaseRequest()
+    {
+        return self::model()->findByAttributes(array(
+            'rr_status' => self::STATUS_USED,
+            'rr_project_obj_id' => $this->rr_project_obj_id,
+        ));
+    }
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * Please note that you should have this exact method in all your CActiveRecord descendants!
@@ -268,9 +287,19 @@ class ReleaseRequest extends CActiveRecord
         return in_array($this->rr_status, self::getInstalledStatuses());
     }
 
+    public function isUsedStatus()
+    {
+        return in_array($this->rr_status, self::getUsedStatuses());
+    }
+
     public static function getInstalledStatuses()
     {
         return [self::STATUS_INSTALLED, self::STATUS_OLD, self::STATUS_USED, self::STATUS_USED_ATTEMPT];
+    }
+
+    public static function getUsedStatuses()
+    {
+        return [self::STATUS_USED, self::STATUS_USED_ATTEMPT];
     }
 
     public function getBuildTag()
