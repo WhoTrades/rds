@@ -29,6 +29,7 @@
  * @property string $rr_post_migration_status
  * @property string $rr_built_time
  * @property string $rr_cron_config
+ * @property string $rr_tickets_count
  */
 class ReleaseRequest extends CActiveRecord
 {

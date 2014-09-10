@@ -141,8 +141,8 @@ $this->pageTitle=Yii::app()->name;
         array(
             'value' => function(ReleaseRequest $releaseRequest){
                 //an: 2014-09-10 06:13:13-04 - это дата, с которой мы начали отслеживать тикеты
-                if ($releaseRequest->isInstalledStatus() && $releaseRequest->obj_created > '2014-09-10 06:13:13-04') {
-                    echo "<a href='".$this->createUrl('/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты</a><br />";
+                if ($releaseRequest->rr_tickets_count) {
+                    echo "<a href='".$this->createUrl('/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты ($releaseRequest->rr_tickets_count)</a><br />";
                 }
 
                 if ($releaseRequest->canBeUsed()) {
