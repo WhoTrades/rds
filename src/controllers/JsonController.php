@@ -87,8 +87,6 @@ class JsonController extends Controller
                         ];
 
                         $commit->save();
-
-                        var_dump($commit->errors);
                     }
                 }
             }
