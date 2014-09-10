@@ -21,7 +21,7 @@ class JiraController extends Controller
         list($from, $to) = [min($rr->getBuildTag(), $rr2->getBuildTag()), max($rr->getBuildTag(), $rr2->getBuildTag())];
 
         $c = new CDbCriteria();
-        $c->compare('jira_commit_build_tag', ">=".$from);
+        $c->compare('jira_commit_build_tag', ">".$from);
         $c->compare('jira_commit_build_tag', "<=".$to);
 
         $list = JiraCommit::model()->findAll($c);
