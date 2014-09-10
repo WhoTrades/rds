@@ -3,13 +3,19 @@
  * Консьюмер, который разгребает очередь создания версия в jira
  *
  * @author Artem Naumenko
- * @example sphp dev/services/rds/misc/tools/db/pgq/process.php --event-processor=RdsJiraCreateVersion  --queue-name=rds_jira_create_version --consumer-name=rds_jira_create_version_consumer --partition=1  --dsn-name=DSN_DB4  --strategy=simple  -v process_queue
+ * @example sphp dev/services/rds/misc/tools/db/pgq/process.php --event-processor=RdsJiraCreateVersion  --queue-name=rds_jira_create_version --consumer-name=rds_jira_create_version_consumer --partition=1  --dsn-name=DSN_DB4  --strategy=simple -vvv process_queue
  */
 
 class PgQ_EventProcessor_RdsJiraCreateVersion extends PgQ\EventProcessor\EventProcessorBase
 {
     public function processEvent(PgQ_Event $event)
     {
+        //an: скипаем работу с жирой на всех контурах, кроме прода
+        if (!\Config::getInstance()->serviceRds['jira']['tagTickets']) {
+            $this->debugLogger->message("Skip processing event as disabled in config");
+            return;
+        }
+
         $jira = new JiraApi($this->debugLogger);
         $this->debugLogger->message("Creating version {$event->getData()['jira_name']} at project {$event->getData()['jira_project']}");
         $jira->createProjectVersion(
