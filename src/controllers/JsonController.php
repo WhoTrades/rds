@@ -54,11 +54,14 @@ class JsonController extends Controller
 
     public function actionSendBuildPatch($project, $version, $output)
     {
+//        $project = \Request::getPost('project');
+//        $version = \Request::getPost('version');
+//        $output = \Request::getPost('output');
+
         if (!$Project = Project::model()->findByAttributes(['project_name' => $project])) {
             throw new CHttpException(404, "Project $project not found");
         }
 
-        /** @var $releaseRequest ReleaseRequest */
         $releaseRequest = \ReleaseRequest::model()->findByAttributes([
             'rr_project_obj_id' => $Project->obj_id,
             'rr_build_version' => $version,
@@ -70,13 +73,11 @@ class JsonController extends Controller
 
         $lines = explode("\n", str_replace("\r", "", $output));
 
-        $tickets = [];
         foreach ($lines as $line) {
             if (preg_match('~^\s*(?<hash>\w+)\|(?<comment>.*)\|/(?<author>.*?)/$~', $line, $matches)) {
                 $commit = new JiraCommit();
                 if (preg_match_all('~#(WT\w-\d+)~', $matches['comment'], $ans)) {
                     foreach ($ans[1] as $val2) {
-                        $tickets[] = $val2;
                         $commit->attributes = [
                             'jira_commit_build_tag' => $releaseRequest->getBuildTag(),
                             'jira_commit_hash' => $matches['hash'],
@@ -91,9 +92,6 @@ class JsonController extends Controller
                 }
             }
         }
-        $tickets = array_unique($tickets);
-        $releaseRequest->rr_tickets_count += count($tickets);
-        $releaseRequest->save();
 
         echo json_encode(['ok' => true]);
     }
