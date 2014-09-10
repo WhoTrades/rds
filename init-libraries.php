@@ -10,6 +10,7 @@ set_include_path(join(PATH_SEPARATOR, array_merge($includePaths, array(
 	dirname(__FILE__) . '/misc/cron/',
 	//an: prod
 	dirname(__FILE__) . '/lib',
+	dirname(__FILE__) . '/lib/creole',
 	// developer's
 	dirname(__FILE__) . '/../../lib/',
 	dirname(__FILE__) . '/../../lib/libcore/',
@@ -18,38 +19,4 @@ set_include_path(join(PATH_SEPARATOR, array_merge($includePaths, array(
 ))));
 
 require_once 'Autoload.php';
-
-function __autoload__foreign($className)
-{
-    $locations = array();
-
-    if ($relativeLocation = __autoload__foreign_relativeLocation($className)) {
-        $locations[] = dirname(__FILE__) . '/' . $relativeLocation; // vdm: in nested lib directory
-        $locations[] = dirname(__FILE__) . '/../../../lib/' . $relativeLocation; // vdm: in dev lib directory
-    }
-    return $locations;
-}
-
-function __autoload__foreign_relativeLocation($className)
-{
-    if ($className === 'Creole') {
-        return 'creole/Creole.php';
-    }
-    if ($className === 'Connection') {
-        return 'creole/Connection.php';
-    }
-
-    if ($className === 'CreoleTypes') {
-        return 'creole/CreoleTypes.php';
-    }
-    if ($className === 'PgSQLTypes') {
-        return 'creole/drivers/pgsql/PgSQLTypes.php';
-    }
-    if ($className === 'SQLException') {
-        return 'creole/SQLException.php';
-    }
-    return null;
-}
-Autoload::registerAutoload('__autoload__foreign');
-
 
