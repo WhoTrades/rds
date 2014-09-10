@@ -34,6 +34,7 @@ class JsonController extends Controller
             $c = new CDbCriteria();
             $c->compare('rr_build_version', '<'.$task->releaseRequest->rr_build_version);
             $c->compare('rr_status', ReleaseRequest::getInstalledStatuses());
+            $c->compare('rr_project_obj_id', $task->releaseRequest->rr_project_obj_id);
             $c->order = 'rr_build_version desc';
             $lastSuccess = ReleaseRequest::model()->find($c);
 
