@@ -45,12 +45,13 @@ class JiraApi
             ] + $this->globalCurlSettings
         );
 
+        //an: пустой ответ - значит все хорошо
+        if (empty($json)) {
+            return true;
+        }
+
         $data = json_decode($json, true);
 
-        //an: пустой ответ - значит все хорошо
-        if (empty($data)) {
-            return;
-        }
 
         if (!$data) {
             \CoreLight::getInstance()->getServiceBaseDebugLogger()->dump()->message('an', 'invalid_json_received', true, ['json' => $json])->save();
@@ -73,18 +74,27 @@ class JiraApi
             ],
         ];
 
-        $json = $this->httpSender->postRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/", json_encode($request), 10,
-            [
-                CURLOPT_CUSTOMREQUEST => 'PUT',
-            ] + $this->globalCurlSettings
-        );
+        try {
+            $json = $this->httpSender->postRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/", json_encode($request), 10,
+                [
+                    CURLOPT_CUSTOMREQUEST => 'PUT',
+                ] + $this->globalCurlSettings
+            );
+       } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+            if ($e->getHttpCode() == 404) {
+                //an: Такого тикета просто не существует
+                return false;
+            }
+            throw $e;
+        }
+
+        //an: пустой ответ - значит все хорошо
+        if (empty($json)) {
+            return true;
+        }
 
         $data = json_decode($json, true);
 
-        //an: пустой ответ - значит все хорошо
-        if (empty($data)) {
-            return;
-        }
 
         if (!$data) {
             \CoreLight::getInstance()->getServiceBaseDebugLogger()->dump()->message('an', 'invalid_json_received', true, ['json' => $json])->save();
@@ -95,5 +105,7 @@ class JiraApi
             \CoreLight::getInstance()->getServiceBaseDebugLogger()->dump()->message('an', 'jira_error_cant_create_version', true, ['data' => $data])->save();
             throw new ApplicationException('jira_error_cant_create_version');
         }
+
+        return true;
     }
 }
