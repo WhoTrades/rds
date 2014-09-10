@@ -10,8 +10,8 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
 {
     public function processEvent(PgQ_Event $event)
     {
-        if ($event->getData()['jira_commit_project'] != 'WTA') {
-            $this->debugLogger->message("Skip project ".$event->getData()['jira_commit_project']);
+        if (!preg_match('~^WT~', $event->getData()['jira_commit_project'])) {
+            $this->debugLogger->message("Skip project ".$event->getData()['jira_commit_project']." as not WT* project");
             return;
         }
         $jiraApi = new JiraApi($this->debugLogger);

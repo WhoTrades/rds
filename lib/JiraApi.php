@@ -2,7 +2,7 @@
 class JiraApi
 {
     const DEFAULT_JIRA_URL = 'http://msk-bls1.office.finam.ru:9380';
-    const DEFAULT_JIRA_USER_PASSWORD = 'githook:githook';
+    const DEFAULT_JIRA_USER_PASSWORD = 'RDS:yz7119agyh';
 
     /** @var ServiceBase_IDebugLogger */
     private $debugLogger;
