@@ -16,11 +16,6 @@ class PgQ_EventProcessor_RdsJiraUse extends PgQ\EventProcessor\EventProcessorBas
             return;
         }
 
-        if (!in_array($event->getData()['jira_commit_project'], Yii::app()->params['jiraProjects'])) {
-            $this->debugLogger->message("Skip project ".$event->getData()['jira_commit_project']." as not in project list (".json_encode(Yii::app()->params['jiraProjects']).")");
-            return;
-        }
-
         $tagFrom = $event->getData()['jira_use_from_build_tag'];
         $tagTo = $event->getData()['jira_use_to_build_tag'];
 
