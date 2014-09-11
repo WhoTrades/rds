@@ -1,27 +1,25 @@
+
 <?php
 
 /**
- * This is the model class for table "rds.jira_create_version".
+ * This is the model class for table "rds.jira_use".
  *
- * The followings are the available columns in table 'rds.jira_create_version':
+ * The followings are the available columns in table 'rds.jira_use':
  * @property string $obj_id
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
- * @property string $jira_version
- * @property string $jira_name
- * @property string $jira_project
- * @property boolean $jira_archived
- * @property boolean $jira_released
+ * @property string $jira_use_from_build_tag
+ * @property string $jira_use_to_build_tag
  */
-class JiraCreateVersion extends CActiveRecord
+class JiraUse extends CActiveRecord
 {
     /**
      * @return string the associated database table name
      */
     public function tableName()
     {
-        return 'rds.jira_create_version';
+        return 'rds.jira_use';
     }
 
     public function afterConstruct() {
@@ -40,12 +38,12 @@ class JiraCreateVersion extends CActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-                array('obj_created, obj_modified, jira_name, jira_description, jira_project, jira_archived, jira_released', 'required'),
+                array('obj_created, obj_modified, jira_use_from_build_tag, jira_use_to_build_tag', 'required'),
                 array('obj_status_did', 'numerical', 'integerOnly'=>true),
-                array('jira_version, jira_name, jira_project', 'length', 'max'=>128),
+                array('jira_use_from_build_tag, jira_use_to_build_tag', 'length', 'max'=>64),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-                array('obj_id, obj_created, obj_modified, obj_status_did, jira_version, jira_name, jira_project, jira_archived, jira_released', 'safe', 'on'=>'search'),
+                array('obj_id, obj_created, obj_modified, obj_status_did, jira_use_from_build_tag, jira_use_to_build_tag', 'safe', 'on'=>'search'),
         );
     }
 
@@ -70,11 +68,8 @@ class JiraCreateVersion extends CActiveRecord
                 'obj_created' => 'Obj Created',
                 'obj_modified' => 'Obj Modified',
                 'obj_status_did' => 'Obj Status Did',
-                'jira_version' => 'Jira Version',
-                'jira_name' => 'Jira Name',
-                'jira_project' => 'Jira Project',
-                'jira_archived' => 'Jira Archived',
-                'jira_released' => 'Jira Released',
+                'jira_use_from_build_tag' => 'Jira Use From Build Tag',
+                'jira_use_to_build_tag' => 'Jira Use To Build Tag',
         );
     }
 
@@ -100,14 +95,11 @@ class JiraCreateVersion extends CActiveRecord
         $criteria->compare('obj_created',$this->obj_created,true);
         $criteria->compare('obj_modified',$this->obj_modified,true);
         $criteria->compare('obj_status_did',$this->obj_status_did);
-        $criteria->compare('jira_version',$this->jira_version,true);
-        $criteria->compare('jira_name',$this->jira_name,true);
-        $criteria->compare('jira_project',$this->jira_project,true);
-        $criteria->compare('jira_archived',$this->jira_archived);
-        $criteria->compare('jira_released',$this->jira_released);
+        $criteria->compare('jira_use_from_build_tag',$this->jira_use_from_build_tag,true);
+        $criteria->compare('jira_use_to_build_tag',$this->jira_use_to_build_tag,true);
 
         return new CActiveDataProvider($this, array(
-                'criteria'=>$criteria,
+            'criteria'=>$criteria,
         ));
     }
 
@@ -115,7 +107,7 @@ class JiraCreateVersion extends CActiveRecord
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!
      * @param string $className active record class name.
-     * @return JiraCreateVersion the static model class
+     * @return JiraUse the static model class
      */
     public static function model($className=__CLASS__)
     {

@@ -140,6 +140,13 @@ class UseController extends Controller
 
         if ($releaseRequest->save()) {
             Log::createLogMessage("Помечен стабильным {$releaseRequest->getTitle()}");
+
+            $jiraUse = new JiraUse();
+            $jiraUse->attributes = [
+                'jira_use_from_build_tag' => $releaseRequest->project->project_name."-".$releaseRequest->rr_old_version,
+                'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
+            ];
+            $jiraUse->save();
         }
 
         $this->redirect('/');

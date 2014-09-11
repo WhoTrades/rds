@@ -69,4 +69,5 @@ if (empty($requestHandlerClass)) {
     $Core->getServiceBaseDebugLogger()->error('$requestHandlerClass not specified');
     exit(Cronjob\ICronjob::EXIT_SIGNAL_UNSPECIFIED_ERROR);
 }
+
 $Core->processRequest($requestHandlerClass);

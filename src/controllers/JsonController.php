@@ -352,6 +352,7 @@ class JsonController extends Controller
 
         $transaction = $project->dbConnection->beginTransaction();
 
+        /** @var $releaseRequest ReleaseRequest */
         $releaseRequest = \ReleaseRequest::model()->findByAttributes(array(
             'rr_build_version' => $version,
             'rr_project_obj_id' => $project->obj_id,
@@ -399,6 +400,7 @@ class JsonController extends Controller
 
         if ($ok) {
             $oldVersion = $project->project_current_version;
+            $project->updateCurrentVersion($version);
             $project->project_current_version = $version;
             $project->save(false);
 
@@ -420,6 +422,15 @@ class JsonController extends Controller
             if ($releaseRequest) {
                 $releaseRequest->rr_status = $status;
                 $releaseRequest->save(false);
+
+                if ($status == \ReleaseRequest::STATUS_USED) {
+                    $jiraUse = new JiraUse();
+                    $jiraUse->attributes = [
+                        'jira_use_from_build_tag' => $project->project_name.'-'.$oldVersion,
+                        'jira_use_to_build_tag' => $project->project_name.'-'.$version,
+                    ];
+                    $jiraUse->save();
+                }
             }
 
             if ($oldVersion < $version) {
@@ -499,7 +510,7 @@ class JsonController extends Controller
                             'jira_name' => $project->project_name."-".$build->releaseRequest->rr_build_version,
                             'jira_description' => 'Сборка #'.$build->build_release_request_obj_id.', '.$build->releaseRequest->rr_user.' [auto]',
                             'jira_project' => $jiraProject,
-                            'jira_archived' => false,
+                            'jira_archived' => true,
                             'jira_released' => false,
                         ];
 

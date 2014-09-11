@@ -16,6 +16,11 @@ class PgQ_EventProcessor_RdsJiraCreateVersion extends PgQ\EventProcessor\EventPr
             return;
         }
 
+        if (!in_array($event->getData()['jira_commit_project'], Yii::app()->params['jiraProjects'])) {
+            $this->debugLogger->message("Skip project ".$event->getData()['jira_commit_project']." as not in project list (".json_encode(Yii::app()->params['jiraProjects']).")");
+            return;
+        }
+
         $jira = new JiraApi($this->debugLogger);
         $this->debugLogger->message("Creating version {$event->getData()['jira_name']} at project {$event->getData()['jira_project']}");
         $jira->createProjectVersion(

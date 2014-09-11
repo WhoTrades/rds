@@ -169,4 +169,10 @@ class Project extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+    public function updateCurrentVersion($version)
+    {
+        $this->project_current_version = $version;
+        $this->save(false);
+    }
 }

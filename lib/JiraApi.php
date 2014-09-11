@@ -4,6 +4,8 @@ class JiraApi
     const DEFAULT_JIRA_URL = 'http://msk-bls1.office.finam.ru:9380';
     const DEFAULT_JIRA_USER_PASSWORD = 'RDS:yz7119agyh';
 
+    const TIMEOUT = 10;
+
     /** @var ServiceBase_IDebugLogger */
     private $debugLogger;
 
@@ -30,20 +32,13 @@ class JiraApi
         );
     }
 
-    public function createProjectVersion($project, $name, $description, $archived, $released)
+    private function sendRequest($url, $method, $request)
     {
-        $request = [
-            'project' => $project,
-            'description' => $description,
-            'name' => $name,
-            "archived" => $archived,
-            "released" => $released,
-        ];
-        $json = $this->httpSender->postRequest("$this->jiraUrl/rest/api/latest/version/", json_encode($request), 10,
-            [
-                CURLOPT_CUSTOMREQUEST => 'POST',
-            ] + $this->globalCurlSettings
-        );
+        if (strtoupper($method) == 'GET') {
+            $json = $this->httpSender->getRequest($url, $request, self::TIMEOUT, $this->globalCurlSettings);
+        } else {
+            $json = $this->httpSender->postRequest($url, json_encode($request), self::TIMEOUT,[CURLOPT_CUSTOMREQUEST => $method,] + $this->globalCurlSettings);
+        }
 
         //an: пустой ответ - значит все хорошо
         if (empty($json)) {
@@ -51,7 +46,6 @@ class JiraApi
         }
 
         $data = json_decode($json, true);
-
 
         if (!$data) {
             \CoreLight::getInstance()->getServiceBaseDebugLogger()->dump()->message('an', 'invalid_json_received', true, ['json' => $json])->save();
@@ -62,6 +56,43 @@ class JiraApi
             \CoreLight::getInstance()->getServiceBaseDebugLogger()->dump()->message('an', 'jira_error_cant_create_version', true, ['data' => $data])->save();
             throw new ApplicationException('jira_error_cant_create_version');
         }
+
+        return $data;
+    }
+
+    public function createProjectVersion($project, $name, $description, $archived, $released)
+    {
+        $request = [
+            'project' => $project,
+            'description' => $description,
+            'name' => $name,
+            "archived" => $archived,
+            "released" => $released,
+        ];
+
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/version/", 'POST', $request);
+    }
+
+    public function addTicketLabel($ticket, $label)
+    {
+        $request = [
+            'update' => [
+                'labels' => [
+                    ['add' => $label],
+                ],
+            ],
+        ];
+
+        try {
+            $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/", 'PUT', $request);
+        } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+            if ($e->getHttpCode() == 404) {
+                //an: Такого тикета просто не существует
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function addTicketFixVersion($ticket, $fixVersion)
@@ -75,37 +106,43 @@ class JiraApi
         ];
 
         try {
-            $json = $this->httpSender->postRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/", json_encode($request), 10,
-                [
-                    CURLOPT_CUSTOMREQUEST => 'PUT',
-                ] + $this->globalCurlSettings
-            );
-       } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+            $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/", 'PUT', $request);
+        } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
             if ($e->getHttpCode() == 404) {
                 //an: Такого тикета просто не существует
                 return false;
             }
-            throw $e;
         }
+    }
 
-        //an: пустой ответ - значит все хорошо
-        if (empty($json)) {
-            return true;
-        }
+    public function getTicketInfo($ticket)
+    {
+        return $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket", 'GET', ['expand' => 'transitions']);
+    }
 
-        $data = json_decode($json, true);
+    public function updateTicketTransition($ticket, $transitionId)
+    {
+        $request = ['transition' => ["id" => $transitionId],];
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/transitions", 'POST', $request);
+    }
 
+    public function addCommend($ticket, $text)
+    {
+        $request = ['body' => $text];
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/comment", 'POST', $request);
+    }
 
-        if (!$data) {
-            \CoreLight::getInstance()->getServiceBaseDebugLogger()->dump()->message('an', 'invalid_json_received', true, ['json' => $json])->save();
-            throw new ApplicationException('invalid_json_received');
-        }
+    public function getAllVersions($project)
+    {
+        return $this->sendRequest("$this->jiraUrl/rest/api/latest/project/$project/versions", 'GET', []);
+    }
 
-        if (!empty($data['errors'])) {
-            \CoreLight::getInstance()->getServiceBaseDebugLogger()->dump()->message('an', 'jira_error_cant_create_version', true, ['data' => $data])->save();
-            throw new ApplicationException('jira_error_cant_create_version');
-        }
+    public function getTicketsByVersions($versions)
+    {
+        if (empty($versions)) return [];
 
-        return true;
+        $versions = array_map(function($version){return preg_replace('~[^\w.-]~', '', $version);}, $versions);
+        $jql = 'fixVersion IN ('.implode(", ", $versions).')';
+        return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
     }
 }

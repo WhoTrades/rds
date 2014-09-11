@@ -1,4 +1,4 @@
 <?php
 
-$requestHandlerClass = 'Cronjob\RequestHandler\Console';
+$requestHandlerClass = 'YiiConsole';
 require(dirname(__FILE__) . "/bootstrap.php");
