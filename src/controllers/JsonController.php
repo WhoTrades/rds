@@ -52,11 +52,11 @@ class JsonController extends Controller
         echo json_encode($result);
     }
 
-    public function actionSendBuildPatch($project, $version, $output)
+    public function actionSendBuildPatch()
     {
-//        $project = \Request::getPost('project');
-//        $version = \Request::getPost('version');
-//        $output = \Request::getPost('output');
+        $project = \Request::getPost('project');
+        $version = \Request::getPost('version');
+        $output = \Request::getPost('output');
 
         if (!$Project = Project::model()->findByAttributes(['project_name' => $project])) {
             throw new CHttpException(404, "Project $project not found");
