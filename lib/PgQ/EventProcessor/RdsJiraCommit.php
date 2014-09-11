@@ -25,6 +25,45 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
 
         $ticket = $event->getData()['jira_commit_ticket'];
         $fixVersion = $event->getData()['jira_commit_build_tag'];
+
+        list($jiraProject) = explode('-', $ticket);
+
+        if (!preg_match("~^(.*)-(.*?)$~", $fixVersion, $ans)) {
+            throw new Exception("Invalid fixVersion $fixVersion");
+        }
+
+        list(,$project, $version) = $ans;
+
+        $this->debugLogger->message("Detected project=$project, version=$version");
+
+        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        $releaseRequest = \ReleaseRequest::model()->findByAttributes([
+            'rr_project_obj_id' => $Project->obj_id,
+            'rr_build_version' => $version,
+        ]);
+
+
+        if (!$releaseRequest) {
+            $this->debugLogger->message("Skip creating tag of version $fixVersion because release request was deleted");
+            return;
+        }
+
+
+        $build = $releaseRequest->builds[0];
+        $this->debugLogger->message("Creating version $fixVersion at project $jiraProject");
+        try {
+            $jiraApi->createProjectVersion(
+                 $jiraProject,
+                 $fixVersion,
+                 'Сборка #'.$build->build_release_request_obj_id.', '.$releaseRequest->rr_user.' [auto]',
+                 true,
+                 false
+            );
+        } catch (ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+
+        }
+
+
         $this->debugLogger->message("Adding fixVersion $fixVersion to ticket $ticket");
         $jiraApi->addTicketFixVersion($ticket, $fixVersion);
     }

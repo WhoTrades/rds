@@ -28,8 +28,7 @@ class PgQ_EventProcessor_RdsJiraTicketStatus extends PgQ\EventProcessor\EventPro
 
         if ($info['fields']['status']['name'] != 'Готово к выкладке') {
             $this->debugLogger->message("Marking ticket $ticket as invalid status");
-            $jiraApi->addTicketLabel($ticket, 'Выложено в неправильном статусе '.$info['fields']['status']['name']);
-            $jiraApi->addCommend($ticket, 'Выложено в неправильном статусе '.$info['fields']['status']['name']);
+            $jiraApi->addTicketLabel($ticket, 'deployed-at-invalid-status');
         }
     }
 }

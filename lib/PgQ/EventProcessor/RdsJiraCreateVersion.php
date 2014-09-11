@@ -10,25 +10,6 @@ class PgQ_EventProcessor_RdsJiraCreateVersion extends PgQ\EventProcessor\EventPr
 {
     public function processEvent(PgQ_Event $event)
     {
-        //an: скипаем работу с жирой на всех контурах, кроме прода
-        if (!\Config::getInstance()->serviceRds['jira']['tagTickets']) {
-            $this->debugLogger->message("Skip processing event as disabled in config");
-            return;
-        }
-
-        if (!in_array($event->getData()['jira_commit_project'], Yii::app()->params['jiraProjects'])) {
-            $this->debugLogger->message("Skip project ".$event->getData()['jira_commit_project']." as not in project list (".json_encode(Yii::app()->params['jiraProjects']).")");
-            return;
-        }
-
-        $jira = new JiraApi($this->debugLogger);
-        $this->debugLogger->message("Creating version {$event->getData()['jira_name']} at project {$event->getData()['jira_project']}");
-        $jira->createProjectVersion(
-             $event->getData()['jira_project'],
-             $event->getData()['jira_name'],
-             $event->getData()['jira_description'],
-             $event->getData()['jira_archived'] == 'True',
-             $event->getData()['jira_released'] == 'True'
-        );
+        
     }
 }
