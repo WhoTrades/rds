@@ -17,7 +17,7 @@ class ServiceRdsProdTL1
         $allCommands = [
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraCreateVersion::getPgqConsumer('rds_jira_create_version', 'rds_jira_create_version_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraCommit::getPgqConsumer('rds_jira_commit', 'rds_jira_commit_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
-            new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraCommit::getPgqConsumer('rds_jira_commit', 'rds_jira_ticket_status_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
+            new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraTicketStatus::getPgqConsumer('rds_jira_commit', 'rds_jira_ticket_status_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraUse::getPgqConsumer('rds_jira_use', 'rds_jira_use_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
         ];
 
