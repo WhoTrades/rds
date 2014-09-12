@@ -63,8 +63,14 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
 
         }
 
-
         $this->debugLogger->message("Adding fixVersion $fixVersion to ticket $ticket");
         $jiraApi->addTicketFixVersion($ticket, $fixVersion);
+
+        $info = $jiraApi->getTicketInfo($ticket);
+        if (!empty($info['fields']['parent']['key'])) {
+            $parent = $info['fields']['parent']['key'];
+            $this->debugLogger->message("Ticket $ticket has parent $parent, adding fixVersion to parent too");
+            $jiraApi->addTicketFixVersion($parent, $fixVersion);
+        }
     }
 }
