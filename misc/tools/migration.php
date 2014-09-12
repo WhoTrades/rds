@@ -5,7 +5,7 @@ class Config
 
     function __construct($configLocations)
     {
-        $path = __DIR__.'/';
+        $path = __DIR__.'/../../';
 
         foreach (array(
                 'config/config.db.php', // vdm: подключил т.к. он используется внутри config.pgq
@@ -37,13 +37,13 @@ class Config
     }
 }
 
-require_once __DIR__ . '/init-libraries.php';
+require_once __DIR__ . '/../../init-libraries.php';
 
 //an: Эта конструкция нужна для корректной работы кода на деве
-set_include_path(get_include_path().PATH_SEPARATOR.__DIR__.'/../../');
+set_include_path(get_include_path().PATH_SEPARATOR.__DIR__.'/../../../../');
 
 // change the following paths if necessary
 $yiic='lib/MigrationSystem/yiic.php';
-$config=dirname(__FILE__).'/config/console.php';
+$config=dirname(__FILE__).'/../config/console.php';
 
 require_once($yiic);
