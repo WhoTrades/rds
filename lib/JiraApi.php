@@ -73,6 +73,30 @@ class JiraApi
         $this->sendRequest("$this->jiraUrl/rest/api/latest/version/", 'POST', $request);
     }
 
+    public function archiveProjectVersion($versionId, $archived = true)
+    {
+        $request = [
+            "archived" => $archived,
+        ];
+
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/version/$versionId", 'PUT', $request);
+    }
+
+    public function releaseProjectVersion($versionId, $released = true, $userReleaseDate  = null)
+    {
+        $request = [
+            'released' => $released,
+            'releaseDate' => date('Y-m-d H:i:s', $userReleaseDate ? strtotime($userReleaseDate) : time()),
+        ];
+
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/version/$versionId", 'PUT', $request);
+    }
+
+    public function removeProjectVersion($versionId)
+    {
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/version/$versionId", 'DELETE', '');
+    }
+
     public function addTicketLabel($ticket, $label)
     {
         $request = [
@@ -143,6 +167,13 @@ class JiraApi
 
         $versions = array_map(function($version){return preg_replace('~[^\w.-]~', '', $version);}, $versions);
         $jql = 'fixVersion IN ('.implode(", ", $versions).')';
+        return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
+    }
+
+    public function getTicketsByVersion($version)
+    {
+        $version= preg_replace('~[^\w.-]~', '', $version);
+        $jql = "fixVersion = $version";
         return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
     }
 }
