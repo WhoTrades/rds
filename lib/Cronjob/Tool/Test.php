@@ -21,14 +21,6 @@ class Cronjob_Tool_Test extends Cronjob\Tool\ToolBase
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $jiraApi = new JiraApi($this->debugLogger);
-
-        $jiraApi->addCommend('WTA-26', 'Каммент!');
-
-
-        return;
-        $jira->updateTicketTransition('WTI-422', 211);
-        $jira->addTicketFixVersion('WTI-422', '62.x');
-        $jira->addTicketFixVersion('WTI-422', 'comon-62.00.032.367');
+        $rdsSystem = new RdsSystem\Factory($this->debugLogger);
     }
 }
