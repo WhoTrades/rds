@@ -69,7 +69,7 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
         try {
             $info = $jiraApi->getTicketInfo($ticket);
         } catch (ServiceBase\HttpRequest\Exception\ResponseCode $e) {
-            if ($e->getCode() != 404) {
+            if ($e->getHttpCode() != 404) {
                 throw $e;
             }
         }
