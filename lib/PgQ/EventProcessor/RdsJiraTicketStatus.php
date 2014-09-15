@@ -24,8 +24,15 @@ class PgQ_EventProcessor_RdsJiraTicketStatus extends PgQ\EventProcessor\EventPro
         $jiraApi = new JiraApi($this->debugLogger);
 
         $ticket = $event->getData()['jira_commit_ticket'];
-        $info = $jiraApi->getTicketInfo($ticket);
 
+        try {
+            $info = $jiraApi->getTicketInfo($ticket);
+        } catch (ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+            if ($e->getCode() != 404) {
+                throw $e;
+            }
+        }
+        
         if (!in_array($info['fields']['status']['name'], ['Готово к выкладке', 'Закрыт'])) {
             $this->debugLogger->message("Marking ticket $ticket as invalid status");
             $jiraApi->addTicketLabel($ticket, 'deployed-at-invalid-status');
