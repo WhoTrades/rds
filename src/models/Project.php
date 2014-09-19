@@ -14,6 +14,7 @@
  * @property string $project_current_version
  * @property string $project_pre_migration_version
  * @property string $project_post_migration_version
+ * @property ReleaseRequest[] $releaseRequests
  */
 class Project extends CActiveRecord
 {

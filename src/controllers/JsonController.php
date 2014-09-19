@@ -595,6 +595,29 @@ class JsonController extends Controller
         echo json_encode($result);
     }
 
+    public function actionGetReleaseRequests($project)
+    {
+        /** @var $Project Project */
+        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        if (!$Project) {
+            throw new CHttpException(404, 'Project not found');
+        }
+
+        $releaseRequests = $Project->releaseRequests;
+
+        $result = [];
+        foreach ($releaseRequests as $releaseRequest) {
+            /** @var $project Project */
+            $result[] = array(
+                'project' => $project,
+                'version' => $releaseRequest->rr_build_version,
+                'old_version' => $releaseRequest->rr_old_version,
+            );
+        }
+
+        echo json_encode($result);
+    }
+
     /**
      * Метод, который анализирует сборки проектов на возможность их удаления из системы
      */
