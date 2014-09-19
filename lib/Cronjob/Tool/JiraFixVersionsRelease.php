@@ -42,7 +42,6 @@ class Cronjob_Tool_JiraFixVersionsRelease extends Cronjob\Tool\ToolBase
             array_pop($versions);
 
             foreach ($versions as $version) {
-
                 $this->debugLogger->message("Checking version {$version['name']}, id: {$version['id']}");
                 $tickets = $jiraApi->getTicketsByVersion($version['id']);
 
@@ -64,6 +63,8 @@ class Cronjob_Tool_JiraFixVersionsRelease extends Cronjob\Tool\ToolBase
                         if (!$dryRun) $jiraApi->releaseProjectVersion($version['id']);
                     }
                 }
+
+                $cronJob->ensureStillCanRun();
             }
         }
     }

@@ -1,5 +1,5 @@
 <?php
-use \Cronjob\ConfigGenerator;
+use RdsSystem\Message;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=Test -vv
@@ -12,7 +12,13 @@ class Cronjob_Tool_Test extends Cronjob\Tool\ToolBase
      */
     public static function getCommandLineSpec()
     {
-        return array();
+        return array(
+            'action' => [
+                'desc' => '',
+                'useForBaseName' => true,
+                'valueRequired' => true,
+            ],
+        );
     }
 
 
@@ -22,5 +28,17 @@ class Cronjob_Tool_Test extends Cronjob\Tool\ToolBase
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $rdsSystem = new RdsSystem\Factory($this->debugLogger);
+        $model  = $rdsSystem->getMessagingRdsMsModel();
+
+        if ($cronJob->getOption('action') == 'send') {
+            $model->sendStatusChange(new Message\ReleaseRequestStatusChanged(12, 'success'));
+        } else {
+            for (;;) {
+                $model->readStatusChange(function(Message\ReleaseRequestStatusChanged $message) use ($model) {
+                    var_export($message);
+                    $model->acceptMessage($message);
+                });
+            }
+        }
     }
 }
