@@ -60,7 +60,22 @@ class Cronjob_Tool_JiraFixVersionsRelease extends Cronjob\Tool\ToolBase
 
                     if (!$existsNotClosed) {
                         $this->debugLogger->message("[*] Version {$version['name']} has no non-closed tickets, releasing it");
-                        if (!$dryRun) $jiraApi->releaseProjectVersion($version['id']);
+
+                        $releaseRequest = null;
+                        preg_match('~^(.*)-(.*?)$~', $version['name'], $ans);
+                        list(,$projectName, $buildVersion) = $ans;
+                        /** @var $Project Project */
+                        $Project = Project::model()->findByAttributes(['project_name' => $projectName]);
+
+                        if ($Project) {
+                            /** @var $releaseRequest ReleaseRequest */
+                            $releaseRequest = ReleaseRequest::model()->findByAttributes([
+                                'rr_project_obj_id' => $Project->obj_id,
+                                'rr_build_version' => $buildVersion,
+                            ]);
+                        }
+
+                        if (!$dryRun) $jiraApi->releaseProjectVersion($version['id'], $releaseRequest ? $releaseRequest->obj_created : null);
                     }
                 }
 
