@@ -9,7 +9,20 @@ class WebApplication extends CWebApplication
         if ($exit) {
             CoreLight::getInstance()->getFatalWatcher()->stop();
         }
+
         return parent::end();
+    }
+
+    /**
+     * Метод используется в частности при авторизации для формирования имени сессии
+     * Так как по дефолту для определения идентификатора приложения используется абсолютный путь - то при каждом релизе происходило вылогинивание
+     *
+     * @since WTA-45
+     * @return string
+     */
+    public function getId()
+    {
+        return \Config::getInstance()->project;
     }
 
     public function setRuntimePath($path)

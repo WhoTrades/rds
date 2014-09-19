@@ -22,7 +22,7 @@ class Config
                 require $path . $configLocation;
             }
         }
-        $this->project = 'phplogs';
+        $this->project = 'rds';
     }
 
     public static function createInstance($config = array())
