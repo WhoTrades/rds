@@ -75,7 +75,7 @@ class Cronjob_Tool_JiraFixVersionsRelease extends Cronjob\Tool\ToolBase
                             ]);
                         }
 
-                        if (!$dryRun) $jiraApi->releaseProjectVersion($version['id'], $releaseRequest ? $releaseRequest->obj_created : null);
+                        if (!$dryRun) $jiraApi->releaseProjectVersion($version['id'], true, $releaseRequest ? $releaseRequest->obj_created : null);
                     }
                 }
 
