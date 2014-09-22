@@ -62,6 +62,7 @@ class SiteController extends Controller
                     $list = Project2worker::model()->findAllByAttributes(array(
                         'project_obj_id' => $model->rr_project_obj_id,
                     ));
+                    $tasks = [];
                     foreach ($list as $val) {
                         /** @var $val Project2worker */
                         $task = new Build();
@@ -69,6 +70,10 @@ class SiteController extends Controller
                         $task->build_worker_obj_id = $val->worker_obj_id;
                         $task->build_project_obj_id = $val->project_obj_id;
                         $task->save();
+
+                        $tasks[] = $task;
+
+
                     }
 
                     Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRequestNotification'}($model->rr_user, $model->project->project_name, $model->rr_comment);
@@ -81,6 +86,21 @@ class SiteController extends Controller
                     Log::createLogMessage("Создан {$model->getTitle()}");
 
                     $transaction->commit();
+
+                    foreach ($tasks as $task) {
+                        $c = new CDbCriteria();
+                        $c->compare('rr_build_version', '<'.$task->releaseRequest->rr_build_version);
+                        $c->compare('rr_status', ReleaseRequest::getInstalledStatuses());
+                        $c->compare('rr_project_obj_id', $task->releaseRequest->rr_project_obj_id);
+                        $c->order = 'rr_build_version desc';
+                        $lastSuccess = ReleaseRequest::model()->find($c);
+
+                        //an: Отправляем задачу в Rabbit на сборку
+                        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($task->worker->worker_name, new \RdsSystem\Message\BuildTask(
+                            $task->obj_id, $task->project->project_name, $task->releaseRequest->rr_build_version, $task->releaseRequest->rr_release_version,
+                            $lastSuccess ? $lastSuccess->project->project_name.'-'.$lastSuccess->rr_build_version : null
+                        ));
+                    }
 
                     $this->redirect(array('index'));
                 }
@@ -127,12 +147,20 @@ class SiteController extends Controller
             return;
         }
 
+        $messageModel = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+
         $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/
         foreach ($model->builds as $build) {
+            echo 12;
             if (in_array($build->build_status, array(Build::STATUS_BUILDING, Build::STATUS_BUILT))) {
                 $model->rr_status = ReleaseRequest::STATUS_CANCELLING;
                 $model->save();
+
+                $messageModel->sendKillTask($build->worker->worker_name, new \RdsSystem\Message\KillTask(
+                    $model->project->project_name, $build->obj_id
+                ));
+
                 Log::createLogMessage("Отменен {$model->getTitle()}");
                 $transaction->commit();
                 return;

@@ -1,6 +1,8 @@
 <?php
 class StatisticController extends Controller
 {
+    const LAST_PACKAGE_REMOVE_CALL_TIME_KEY = 'RDS::actionGetProjectBuildsToDelete::last_call_time';
+
     public function actionGetLastBuildTime($projectName)
     {
         $project = Project::model()->findByAttributes(array('project_name' => $projectName));
@@ -24,7 +26,6 @@ class StatisticController extends Controller
 
     public function actionGetProjectBuildsToDeleteLastCallTime()
     {
-        include('JsonController.php');
-        echo time() - CoreLight::getInstance()->getServiceBaseCacheKvdpp()->get(JsonController::LAST_PACKAGE_REMOVE_CALL_TIME_KEY);
+        echo time() - CoreLight::getInstance()->getServiceBaseCacheKvdpp()->get(self::LAST_PACKAGE_REMOVE_CALL_TIME_KEY);
     }
 }

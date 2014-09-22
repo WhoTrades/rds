@@ -1,7 +1,7 @@
 <?php
 class YiiBridge
 {
-    public static function init()
+    public static function init($debugLogger)
     {
         static $inited = false;
         if ($inited) return;
@@ -13,5 +13,6 @@ class YiiBridge
         include("yii/yii.php");
         require_once(__DIR__ . '/../protected/components/ExternalApplication.php');
         $application = \Yii::createApplication('ExternalApplication', $config);
+        $application->debugLogger = $debugLogger;
     }
 }

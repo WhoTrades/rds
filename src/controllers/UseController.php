@@ -45,6 +45,20 @@ class UseController extends Controller
             $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
             if ($releaseRequest->save()) {
                 Log::createLogMessage("USE {$releaseRequest->getTitle()}");
+
+                foreach (Worker::model()->findAll() as $worker) {
+                    (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
+                        $worker->worker_name,
+                        new \RdsSystem\Message\UseTask(
+                            $releaseRequest->project->project_name,
+                            $releaseRequest->obj_id,
+                            $releaseRequest->rr_build_version,
+                            $releaseRequest->rr_build_version > $releaseRequest->project->project_current_version
+                                ? \ReleaseRequest::STATUS_USED_ATTEMPT
+                                : \ReleaseRequest::STATUS_USED
+                        )
+                    );
+                }
             }
             $this->redirect('/');
         }
@@ -87,6 +101,14 @@ class UseController extends Controller
             $logMessage = "Запущены post миграции {$releaseRequest->getTitle()}";
         }
 
+        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendMigrationTask(
+            new \RdsSystem\Message\MigrationTask(
+                $releaseRequest->project->project_name,
+                $releaseRequest->rr_build_version,
+                $type
+            )
+        );
+
         if ($releaseRequest->save()) {
             Log::createLogMessage($logMessage);
         }
@@ -119,6 +141,20 @@ class UseController extends Controller
                 $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
                 $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
                 Log::createLogMessage("USE {$releaseRequest->getTitle()}");
+
+                foreach (Worker::model()->findAll() as $worker) {
+                    (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
+                        $worker->worker_name,
+                        new \RdsSystem\Message\UseTask(
+                            $releaseRequest->project->project_name,
+                            $releaseRequest->obj_id,
+                            $releaseRequest->rr_build_version,
+                            $releaseRequest->rr_build_version > $releaseRequest->project->project_current_version
+                                ? \ReleaseRequest::STATUS_USED_ATTEMPT
+                                : \ReleaseRequest::STATUS_USED
+                        )
+                    );
+                }
             }
             $releaseRequest->save();
             $this->redirect('/');
