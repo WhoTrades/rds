@@ -109,11 +109,7 @@ class ReleaseRequest extends CActiveRecord
     public function checkForTeamCityHasNoErrors($attribute, $params)
     {
         //an: Правило действует только для новых запросов на релиз
-        if (!$this->isNewRecord || !$this->rr_build_version) {
-            return;
-        }
-
-        if ($this->rr_release_version == 60) {
+        if (!$this->isNewRecord || !$this->rr_build_version || empty(Yii::app()->params['checkCiHasNoErrors'])) {
             return;
         }
 
