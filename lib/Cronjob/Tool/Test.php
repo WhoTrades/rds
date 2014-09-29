@@ -27,12 +27,19 @@ class Cronjob_Tool_Test extends Cronjob\Tool\ToolBase
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $rdsSystem = new RdsSystem\Factory($this->debugLogger);
-        $model  = $rdsSystem->getMessagingRdsMsModel();
+//        $comet = Yii::app()->realplexor;
+//        $comet->send('progressbar_change', ['rr_id' => 118, 'point' => 'git pull comon', 'progress' => '18.12']);
 
-        if ($cronJob->getOption('action') == 'send') {
-            $this->debugLogger->message("Sended");
-            $model->sendTaskStatusChanged(new Message\TaskStatusChanged(12, 'success'));
-        }
+        $id = 276;
+        Yii::app()->assetManager->setBasePath('/tmp');
+        $row = Yii::getPathOfAlias('application.views.site._releaseRequestRow.php');
+        $rr = ReleaseRequest::model()->findByPk($id);
+        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'bootstrap.widgets.TbGridView', [
+            'dataProvider'=>new CActiveDataProvider(ReleaseRequest::model(), ['id' => $id]),
+            'columns'=>include($row),
+        ]);
+        $widget->init();
+        echo $widget->run();
+        echo 2;
     }
 }

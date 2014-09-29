@@ -10,6 +10,7 @@
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 
 	<?php Yii::app()->bootstrap->register(); ?>
+    <? Yii::app()->realplexor->registerScripts()?>
 </head>
 
 <body>
@@ -50,5 +51,12 @@ $this->widget('bootstrap.widgets.TbNavbar',array(
 
 </div><!-- page -->
 
+<script>
+    console.log('progressbar_change');
+    realplexor.subscribe('progressbar_change', function(event){
+        console.log(event);
+    });
+    realplexor.execute();
+</script>
 </body>
 </html>
