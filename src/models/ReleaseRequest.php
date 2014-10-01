@@ -141,7 +141,7 @@ class ReleaseRequest extends CActiveRecord
                 curl_setopt($ch, CURLOPT_USERPWD, "rest:rest123");
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 $text = curl_exec($ch);
-                if (preg_match('~<title>[^<]*PHPUnit_composer[^<]*</title>~', $text)) {
+                if (preg_match('~<title>[^<]*(PHPUnit_composer|acceptance-testing-tst)[^<]*</title>~', $text)) {
                     $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
                 }
             }
