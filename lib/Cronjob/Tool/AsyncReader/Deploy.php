@@ -550,7 +550,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             /** @var $project Project */
             $project = Project::model()->findByAttributes(['project_name' => $build['project']]);
             if (!$project) {
-                //an: непонятно чтои зачем нам прислали, лучше не будем удалять
+                //an: непонятно что и зачем это нам прислали, лучше не будем удалять
                 continue;
             }
 
@@ -564,7 +564,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 'rr_build_version' => $build['version'],
             ]);
 
-            if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime('-1 month'))) {
+            if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime('-1 week'))) {
                 //an: Не удаляем те билды, что были на проде меньше месяца назад
                 continue;
             }
@@ -575,15 +575,15 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $numbersOfCurrent = explode(".", $project->project_current_version);
             if ($numbersOfCurrent[0] == 2014) array_shift($numbersOfCurrent);
 
-            if ($numbersOfCurrent[0] - 2 > $numbersOfTest[0]) {
-                //an: если релиз отличается на 2 и больше от того что сейчас на проде, тогда удаляем
+            if ($numbersOfCurrent[0] - 1 > $numbersOfTest[0]) {
+                //an: если релиз отличается на 1 и больше от того что сейчас на проде, тогда удаляем
                 $c = new CDbCriteria();
                 $c->compare('rr_project_obj_id', $project->obj_id);
                 $c->compare('rr_build_version', '>'.$build['version']);
                 $c->compare('rr_build_version', '<'.$project->project_current_version);
                 $count = \ReleaseRequest::model()->count($c);
 
-                if ($count > 2) {
+                if ($count > 5) {
                     //an: Нужно наличие минимум 2 версий от текущей, что бы было куда откатываться
                     $result[] = $build;
                 }
