@@ -134,4 +134,36 @@ class Build extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+    public function getProgressbarInfo()
+    {
+        $c = new CDbCriteria();
+        $c->compare('build_status', [Build::STATUS_INSTALLED, Build::STATUS_USED]);
+        $c->compare('build_project_obj_id', $this->build_project_obj_id);
+        $c->compare('build_worker_obj_id', $this->build_worker_obj_id);
+        $c->order = 'obj_id desc';
+        $prev = \Build::model()->find($c);
+
+
+        $dataCurrent = array_reverse(array_keys(json_decode($this->build_time_log, true)));
+
+        $data = json_decode($prev->build_time_log, true);
+        if (!$data) {
+            return null;
+        }
+        $lastPrev = end($data);
+
+        $currentTime = 0;
+        $currentKey = '';
+        foreach ($dataCurrent as $currentKey) {
+            if (isset($data[$currentKey])) {
+                $currentTime = $data[$currentKey];
+                break;
+            }
+        }
+
+        $percent = 100*$currentTime/$lastPrev;
+
+        return [$percent, $currentKey];
+    }
 }

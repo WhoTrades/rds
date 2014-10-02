@@ -25,8 +25,18 @@ class SiteController extends Controller
         );
     }
 
+    public function actionTest($a = null)
+    {
+        /** @var $comet PxRealplexor */
+        $comet = Yii::app()->realplexor;
+        $comet->send('progressbar_change', ['rr_id' => 118, 'point' => 'git pull comon', 'progress' => '18.12']);
+
+        echo 'OK';
+    }
+
 	public function actionIndex()
 	{
+        Yii::app()->realplexor->init();
         $releaseRequestSearchModel=new ReleaseRequest('search');
         $releaseRequestSearchModel->unsetAttributes();  // clear any default values
         if(isset($_GET['ReleaseRequest']))

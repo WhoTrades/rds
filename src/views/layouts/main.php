@@ -10,6 +10,7 @@
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 
 	<?php Yii::app()->bootstrap->register(); ?>
+    <? Yii::app()->realplexor->registerScripts()?>
 </head>
 
 <body>
