@@ -51,7 +51,7 @@ $this->pageTitle=Yii::app()->name;
     });
     realplexor.subscribe('progressbarChanged', function(event){
         $('.progress-'+event.build_id+' .bar').css({width: event.percent+'%'});
-        $('.progress-'+event.build_id+' .bar').html('<b>'+event.percent.round(2)+'%:</b> '+event.key);
+        $('.progress-'+event.build_id+' .bar').html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
         console.log(event);
     });
     realplexor.execute();
