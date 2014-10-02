@@ -51,12 +51,5 @@ $this->widget('bootstrap.widgets.TbNavbar',array(
 
 </div><!-- page -->
 
-<script>
-    console.log('progressbar_change');
-    realplexor.subscribe('progressbar_change', function(event){
-        console.log(event);
-    });
-    realplexor.execute();
-</script>
 </body>
 </html>

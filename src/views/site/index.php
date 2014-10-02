@@ -43,19 +43,22 @@ $this->pageTitle=Yii::app()->name;
 </small>
 
 <script>
-    var timer = setInterval(function(){
-        var element = $('.reload-block .seconds:first');
-        var val = parseInt(element.html());
-        val--;
-        if (val == -1) {
-            $.fn.yiiGridView.update("release-reject-grid");
-            $.fn.yiiGridView.update("release-request-grid");
-            element.html(10);
-        } else {
-            element.html(val);
-        }
-    }, 1000);
+    realplexor.subscribe('releaseRequestChanged', function(event){
+        var html = event.html;
+        var trHtmlCode = $(html).find('tr.rowItem').first().html()
+        $('.release-request-'+event.rr_id).html(trHtmlCode);
+        console.log('Release request '+event.rr_id+' updated');
+    });
+    realplexor.subscribe('progressbarChanged', function(event){
+        $('.progress-'+event.build_id+' .bar').css({width: event.percent+'%'});
+        $('.progress-'+event.build_id+' .bar').html('<b>'+event.percent.round(2)+'%:</b> '+event.key);
+        console.log(event);
+    });
+    realplexor.execute();
 </script>
+
+
+
 <style>
     .grid-view .filter-container input {
         max-width: 100px;

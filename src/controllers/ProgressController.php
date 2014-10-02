@@ -16,6 +16,18 @@ class ProgressController extends Controller
         $build->build_time_log = json_encode($data);
         $build->save();
 
+        $this->sendProgressbarChanged($build);
+
         echo json_encode(['ok' => true]);
+    }
+
+    private function sendProgressbarChanged(Build $build)
+    {
+        $info = $build->getProgressbarInfo();
+        if ($info) {
+            list($percent, $key) = $info;
+            $comet = Yii::app()->realplexor;
+            $comet->send('progressbarChanged', ['build_id' => $build->obj_id, 'percent' => $percent, 'key' => $key]);
+        }
     }
 }

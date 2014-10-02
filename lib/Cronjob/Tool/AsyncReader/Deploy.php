@@ -180,6 +180,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 break;
         }
 
+        $this->sendReleaseRequestUpdated($build->build_release_request_obj_id);
+
         $message->accepted();
     }
 
@@ -226,6 +228,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             }
         }
 
+        $this->sendReleaseRequestUpdated($releaseRequest->obj_id);
+
         $message->accepted();
     }
 
@@ -257,6 +261,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         $releaseRequest->save(false);
 
+        $this->sendReleaseRequestUpdated($releaseRequest->obj_id);
+
         $message->accepted();
     }
 
@@ -281,6 +287,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $releaseRequest->rr_cron_config = $message->text;
 
         $releaseRequest->save(false);
+
+        $this->sendReleaseRequestUpdated($releaseRequest->obj_id);
+
         $message->accepted();
     }
 
@@ -295,6 +304,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $releaseRequest->rr_use_text = $message->text;
         $releaseRequest->rr_status = \ReleaseRequest::STATUS_FAILED;
         $releaseRequest->save();
+
+        $this->sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();
     }
@@ -312,6 +323,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         if (!$releaseRequest->rr_old_version) {
             $releaseRequest->rr_old_version = $message->version;
             $releaseRequest->save(false);
+
+            $this->sendReleaseRequestUpdated($releaseRequest->obj_id);
         }
 
         $message->accepted();
@@ -407,6 +420,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 $oldUsed->rr_last_time_on_prod = date("r");
                 $oldUsed->rr_revert_after_time = null;
                 $oldUsed->save(false);
+
+                $this->sendReleaseRequestUpdated($oldUsed->obj_id);
             }
 
             if ($releaseRequest) {
@@ -436,6 +451,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         }
 
         $transaction->commit();
+
+        $this->sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();
     }
@@ -493,6 +510,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         $text = json_encode(array('ok' => $releaseRequest->save()));
         $transaction->commit();
+
+        $this->sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();
     }
@@ -573,5 +592,39 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $model->sendGetProjectBuildsToDeleteRequestReply(new Message\ProjectBuildsToDeleteReply($result));
 
         $message->accepted();
+    }
+
+    private function sendReleaseRequestUpdated($id)
+    {
+        $this->debugLogger->message("Sending to comet new data of releaseRequest $id");
+        Yii::app()->assetManager->setBasePath('/tmp');
+        Yii::app()->assetManager->setBaseUrl('/assets');
+        Yii::app()->urlManager->setBaseUrl('');
+        $filename = Yii::getPathOfAlias('application.views.site._releaseRequestRow').'.php';
+        $rowTemplate = include($filename);
+
+        list($controller, $action) = Yii::app()->createController('/');
+        $controller->setAction($controller->createAction($action));
+        Yii::app()->setController($controller);
+        $rr = ReleaseRequest::model();
+        $rr->obj_id = $id;
+        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'bootstrap.widgets.TbGridView', [
+            'dataProvider'=>new CActiveDataProvider($rr, $rr->search()),
+            'columns'=>$rowTemplate,
+            'rowCssClassExpression' => function(){return 'rowItem';},
+        ]);
+        $widget->init();
+        ob_start();
+        $widget->run();
+        $html = ob_get_clean();
+
+        $comet = Yii::app()->realplexor;
+        $comet->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
+        $this->debugLogger->message("Sended");
+    }
+
+    public function createUrl($route, $params)
+    {
+        return Yii::app()->createUrl($route, $params);
     }
 }
