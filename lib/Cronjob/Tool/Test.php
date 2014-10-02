@@ -27,6 +27,8 @@ class Cronjob_Tool_Test extends Cronjob\Tool\ToolBase
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
+        $id = 345;
+
         $url = "http://rds.an.whotrades.net/progress/setTime?action=fetcher::repository-copy-to-buildroot::lib-message-system-git&time=".rand(35, 45).'&taskId='.$id;
         echo $url."\n";
         echo file_get_contents($url);
