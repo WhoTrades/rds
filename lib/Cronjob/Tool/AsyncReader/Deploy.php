@@ -80,6 +80,10 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $this->actionReplyProjectsBuildsToDelete($message, $model);
         });
 
+        $model->readRemoveReleaseRequest(false, function(Message\RemoveReleaseRequest $message) use ($model) {
+            $this->actionRemoveReleaseRequest($message, $model);
+        });
+
         $this->debugLogger->message("Start listening");
 
         $this->waitForMessages($model, $cronJob);
@@ -590,6 +594,29 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         CoreLight::getInstance()->getServiceBaseCacheKvdpp()->set(StatisticController::LAST_PACKAGE_REMOVE_CALL_TIME_KEY, time());
 
         $model->sendGetProjectBuildsToDeleteRequestReply(new Message\ProjectBuildsToDeleteReply($result));
+
+        $message->accepted();
+    }
+
+    public function actionRemoveReleaseRequest(Message\RemoveReleaseRequest $message, MessagingRdsMs $model)
+    {
+        $project = Project::model()->findByAttributes(['project_name' => $message->projectName]);
+        if (!$project) {
+            $message->accepted();
+            $this->debugLogger->message("Skipped removing release request $message->projectName-$message->version as project not exists");;
+            return;
+        }
+
+        $rr = ReleaseRequest::model()->findByAttributes([
+            'rr_project_obj_id' => $project->obj_id,
+            'rr_build_version' => $message->version,
+        ]);
+
+        if ($rr) {
+            $this->debugLogger->message("Removed release request $message->projectName-$message->version");;
+            $rr->delete();
+        }
+        $this->debugLogger->message("Skipped removing release request $message->projectName-$message->version as not exists");;
 
         $message->accepted();
     }

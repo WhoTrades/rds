@@ -24,23 +24,16 @@ class JsonController extends Controller
         echo json_encode($result);
     }
 
-    public function actionRemoveReleaseRequest($projectName, $version)
+    public function actionGetAllowedReleaseBranches()
     {
-        $project = Project::model()->findByAttributes(['project_name' => $projectName]);
-        if (!$project) {
-            throw new CHttpException(404, 'Build not found');
+        $versions = ReleaseVersion::model()->findAll();
+
+        $result = [];
+        foreach ($versions as $version) {
+            $result[] = 'release-'.$version->rv_version;
         }
 
-        $rr = ReleaseRequest::model()->findByAttributes([
-            'rr_project_obj_id' => $project->obj_id,
-            'rr_build_version' => $version,
-        ]);
-
-        if ($rr) {
-            $rr->delete();
-        }
-
-        echo json_encode(array('ok' => true));
+        echo json_encode($result, JSON_PRETTY_PRINT);
     }
 }
 
