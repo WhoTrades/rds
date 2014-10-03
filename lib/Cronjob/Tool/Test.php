@@ -27,21 +27,13 @@ class Cronjob_Tool_Test extends Cronjob\Tool\ToolBase
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $id = 345;
+        $statuses = ['installed', 'used', 'using', 'used_attempt'];
 
-        $url = "http://rds.an.whotrades.net/progress/setTime?action=fetcher::repository-copy-to-buildroot::lib-message-system-git&time=".rand(35, 45).'&taskId='.$id;
-        echo $url."\n";
-        echo file_get_contents($url);
-
-
-        return;
-        $statuses = ['installed'];
-
-        $id = 280;
+        $id = 281;
 
         $rr = ReleaseRequest::model()->updateByPk($id, ['rr_status' => $statuses[array_rand($statuses)]]);
 
-        Yii::app()->assetManager->setBasePath('/tmp');
+        Yii::app()->assetManager->setBasePath(dirname(Yii::getPathOfAlias('application'))."/main/www/assets");
         Yii::app()->assetManager->setBaseUrl('/assets');
         Yii::app()->urlManager->setBaseUrl('');
         $filename = Yii::getPathOfAlias('application.views.site._releaseRequestRow').'.php';

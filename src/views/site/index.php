@@ -38,9 +38,16 @@ $this->pageTitle=Yii::app()->name;
     'columns'=>include('_releaseRequestRow.php'),
 )); ?>
 
-<small style="text-align: center; color: grey" class="reload-block">
-    <span>Таблицы обновятся через <span class="seconds">0</span> сек.</span><br /><br />
-</small>
+<script type="text/javascript">
+    //an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на realplexor.
+    // А такое случается часто, когда мы заказываем сборку
+    $(document).ready(function(){
+        setTimeout(function(){
+            $.fn.yiiGridView.update("release-reject-grid");
+            $.fn.yiiGridView.update("release-request-grid");
+        }, 0);
+    });
+</script>
 
 <script>
     realplexor.subscribe('releaseRequestChanged', function(event){
@@ -53,6 +60,18 @@ $this->pageTitle=Yii::app()->name;
         $('.progress-'+event.build_id+' .bar').css({width: event.percent+'%'});
         $('.progress-'+event.build_id+' .bar').html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
         console.log(event);
+    });
+    realplexor.subscribe('refresh', function(event){
+        document.location += '';
+        console.log('got refresh event');
+    });
+    realplexor.subscribe('updateAllReleaseRequests', function(event){
+        $.fn.yiiGridView.update("release-request-grid");
+        console.log('got update all release requests event');
+    });
+    realplexor.subscribe('updateAllReleaseRejects', function(event){
+        $.fn.yiiGridView.update("release-reject-grid");
+        console.log('got update all release rejects event');
     });
     realplexor.execute();
 </script>
