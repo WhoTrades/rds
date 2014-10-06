@@ -162,8 +162,7 @@ class SiteController extends Controller
         $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/
         foreach ($model->builds as $build) {
-            echo 12;
-            if (in_array($build->build_status, array(Build::STATUS_BUILDING, Build::STATUS_BUILT))) {
+            if (in_array($build->build_status, Build::getInstallingStatuses())) {
                 $model->rr_status = ReleaseRequest::STATUS_CANCELLING;
                 $model->save();
 
