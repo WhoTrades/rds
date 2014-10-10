@@ -17,7 +17,7 @@ return array(
     [
         'name' => 'migration_name',
         'value' => function(HardMigration $migration){
-            return  "<a href='http://sources:8060/brwse/migration-{$migration->releaseRequest->project->project_name}/hard/$migration->migration_name.php?hb=true' target='_blank' title='Посмотреть исходный код миграции'>$migration->migration_name</a><br />";
+            return  "<a href='http://sources:8060/browse/migration-{$migration->releaseRequest->project->project_name}/hard/$migration->migration_name.php?hb=true' target='_blank' title='Посмотреть исходный код миграции'>$migration->migration_name</a><br />";
         },
         'type' => 'html',
     ],

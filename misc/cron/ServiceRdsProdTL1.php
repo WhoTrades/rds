@@ -21,6 +21,7 @@ class ServiceRdsProdTL1
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraUse::getPgqConsumer('rds_jira_use', 'rds_jira_use_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_JiraFixVersionsRelease::getToolCommand([], $verbosity=1), $delay=60)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_Deploy::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1)),
+            new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_HardMigrationProgress::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1)),
         ];
 
         $allCommands = new MultiCronCommand($allCommands);
