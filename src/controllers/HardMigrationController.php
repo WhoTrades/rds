@@ -46,6 +46,10 @@ class HardMigrationController extends Controller
     {
         $migration = $this->loadModel($id);
 
+        if (!$migration->canBeStarted() && !$migration->canBeRestarted()) {
+            throw new Exception("Invalid migration status");
+        }
+
         $migration->migration_status = HardMigration::MIGRATION_STATUS_STARTED;
         $migration->save(false);
 
@@ -59,6 +63,35 @@ class HardMigrationController extends Controller
     public function actionRestart($id)
     {
         $this->actionStart($id);
+    }
+
+    public function actionPause($id)
+    {
+        $this->sendUnixSignalAndRedirect($id, 10, HardMigration::MIGRATION_STATUS_PAUSED);
+    }
+
+    public function actionResume($id)
+    {
+        $this->sendUnixSignalAndRedirect($id, 12, HardMigration::MIGRATION_STATUS_IN_PROGRESS);
+    }
+
+    public function actionStop($id)
+    {
+        $this->sendUnixSignalAndRedirect($id, 20, HardMigration::MIGRATION_STATUS_STOPPED);
+    }
+
+    private function sendUnixSignalAndRedirect($id, $signal, $newStatus = null)
+    {
+        $migration = $this->loadModel($id);
+
+        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendUnixSignal(new \RdsSystem\Message\UnixSignal(
+            $migration->migration_pid, $signal
+        ));
+
+        $migration->migration_status = $newStatus;
+        $migration->save(false);
+
+        $this->redirect('/hardMigration/index');
     }
 
     public function actionLog($id)

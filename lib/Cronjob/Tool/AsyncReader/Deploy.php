@@ -662,6 +662,24 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $migration->migration_log = $message->text;
         $migration->save(false);
 
+        if (\Config::getInstance()->serviceRds['jira']['repostMigrationStatus']) {
+            $jira = new JiraApi($this->debugLogger);
+            switch ($message->status) {
+                case HardMigration::MIGRATION_STATUS_IN_PROGRESS:
+                    $jira->addCommend($migration->migration_ticket, "Запущена миграция $message->migration");
+                    break;
+                case HardMigration::MIGRATION_STATUS_DONE:
+                    $jira->addCommend($migration->migration_ticket, "Выполнена миграция $message->migration");
+                    break;
+                case HardMigration::MIGRATION_STATUS_FAILED:
+                    $jira->addCommend($migration->migration_ticket, "Завершилась с ошибкой миграция $message->migration");
+                    break;
+                default:
+                    $jira->addCommend($migration->migration_ticket, "Статус миграции $message->migration изменился на $message->status");
+                    break;
+            }
+        }
+
         $this->sendHardMigrationUpdated($migration->obj_id);
         $message->accepted();
     }

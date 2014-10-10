@@ -17,6 +17,7 @@
  * @property double $migration_progress
  * @property string $migration_progress_action
  * @property string $migration_log
+ * @property string $migration_pid
  *
  * The followings are the available model relations:
  * @property ReleaseRequest $releaseRequest
@@ -146,6 +147,14 @@ class HardMigration extends CActiveRecord
         ));
     }
 
+    public function getNotDoneMigrationCountForTicket($ticket)
+    {
+        return $this->countByAttributes([
+            'ticket' => $ticket,
+            'migration_status' != self::MIGRATION_STATUS_DONE,
+        ]);
+    }
+
     /**
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!
@@ -159,7 +168,12 @@ class HardMigration extends CActiveRecord
 
     public function canBeStarted()
     {
-        return in_array($this->migration_status, [HardMigration::MIGRATION_STATUS_NEW, HardMigration::MIGRATION_STATUS_PAUSED, HardMigration::MIGRATION_STATUS_STOPPED]);
+        return in_array($this->migration_status, [HardMigration::MIGRATION_STATUS_NEW, HardMigration::MIGRATION_STATUS_STOPPED]);
+    }
+
+    public function canBeResumed()
+    {
+        return in_array($this->migration_status, [HardMigration::MIGRATION_STATUS_PAUSED]);
     }
 
     public function canBeStopped()

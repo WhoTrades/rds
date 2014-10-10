@@ -42,7 +42,7 @@ return array(
     [
         'name' => 'migration_progress',
         'value' => function(HardMigration $migration){
-            if ($migration->migration_status != \HardMigration::MIGRATION_STATUS_IN_PROGRESS) {
+            if (!in_array($migration->migration_status, [\HardMigration::MIGRATION_STATUS_IN_PROGRESS, \HardMigration::MIGRATION_STATUS_PAUSED])) {
                 return false;
             }
             return '<div class="progress progress-'.$migration->obj_id.'" style="margin: 0; width: 250px;">
@@ -63,7 +63,7 @@ return array(
 
     array(
         'class'=>'CButtonColumn',
-        'template' => '{start} {stop} {pause} {restart}',
+        'template' => '{start} {stop} {pause} {restart} {resume}',
         'buttons' => [
             'start' => [
                 'visible' => '$data->canBeStarted()',
@@ -87,6 +87,14 @@ return array(
                 'label' => '<span class="icon-pause" style="color: #32cd32"></span>',
                 'options' => [
                     'title' => 'Поставить на паузу',
+                ],
+            ],
+            'resume' => [
+                'visible' => '$data->canBeResumed()',
+                'url' => 'Yii::app()->controller->createUrl("/hardMigration/resume",array("id"=>$data->primaryKey))',
+                'label' => '<span class="icon-play" style="color: #32cd32"></span>',
+                'options' => [
+                    'title' => 'Запустить миграцию',
                 ],
             ],
             'restart' => [
