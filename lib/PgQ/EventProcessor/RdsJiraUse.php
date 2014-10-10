@@ -46,7 +46,8 @@ class PgQ_EventProcessor_RdsJiraUse extends PgQ\EventProcessor\EventProcessorBas
             $transitionId = null;
 
             if ($count = HardMigration::model()->getNotDoneMigrationCountForTicket($ticket)) {
-                $this->debugLogger->message("Found $count not finished hard migration for ticket #$ticket, skip it");
+                $this->debugLogger->message("Found $count not finished hard migration for ticket #$ticket, retry it in 60 seconds");
+                $event->retry(60);
                 continue;
             }
 

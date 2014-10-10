@@ -54,7 +54,7 @@ class HardMigrationController extends Controller
         $migration->save(false);
 
         (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendHardMigrationTask(new \RdsSystem\Message\HardMigrationTask(
-           $migration->migration_name, $migration->releaseRequest->project->project_name, $migration->releaseRequest->project->project_current_version
+           $migration->migration_name, $migration->project->project_name, $migration->project->project_current_version
         ));
 
         $this->redirect('/hardMigration/index');

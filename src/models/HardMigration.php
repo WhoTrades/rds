@@ -18,6 +18,8 @@
  * @property string $migration_progress_action
  * @property string $migration_log
  * @property string $migration_pid
+ * @property string $migration_project_obj_id
+ * @property Project $project
  *
  * The followings are the available model relations:
  * @property ReleaseRequest $releaseRequest
@@ -34,7 +36,6 @@ class HardMigration extends CActiveRecord
 
 
     //an: Эти свойства используются только для поиска
-    public $project_obj_id;
     public $build_version;
 
     /**
@@ -67,10 +68,10 @@ class HardMigration extends CActiveRecord
             array('migration_name', 'unique'),
             array('migration_type, migration_ticket, migration_status', 'length', 'max'=>16),
             array('migration_name, migration_progress_action', 'length', 'max'=>255),
-            array('migration_release_request_obj_id, migration_retry_count', 'safe'),
+            array('migration_release_request_obj_id, migration_project_obj_id, migration_retry_count', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, migration_release_request_obj_id, migration_type, migration_name, migration_ticket, migration_status, migration_retry_count, migration_progress, migration_progress_action, project_obj_id, build_version', 'safe', 'on'=>'search'),
+            array('obj_id, obj_created, obj_modified, obj_status_did, migration_release_request_obj_id, migration_project_obj_id, migration_type, migration_name, migration_ticket, migration_status, migration_retry_count, migration_progress, migration_progress_action, project_obj_id, build_version', 'safe', 'on'=>'search'),
         );
     }
 
@@ -83,6 +84,7 @@ class HardMigration extends CActiveRecord
         // class name for the relations automatically generated below.
         return array(
             'releaseRequest' => array(self::BELONGS_TO, 'ReleaseRequest', 'migration_release_request_obj_id'),
+            'project' => array(self::BELONGS_TO, 'Project', 'migration_project_obj_id'),
         );
     }
 
@@ -97,6 +99,7 @@ class HardMigration extends CActiveRecord
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
             'migration_release_request_obj_id' => 'Release Request ID',
+            'migration_project_obj_id' => 'Project',
             'migration_type' => 'Migration Type',
             'migration_name' => 'Migration Name',
             'migration_ticket' => 'Migration Ticket',
@@ -132,6 +135,7 @@ class HardMigration extends CActiveRecord
         $criteria->compare('obj_modified',$this->obj_modified,true);
         $criteria->compare('obj_status_did',$this->obj_status_did);
         $criteria->compare('migration_release_request_obj_id',$this->migration_release_request_obj_id);
+        $criteria->compare('migration_project_obj_id',$this->migration_project_obj_id);
         $criteria->compare('migration_type',$this->migration_type,true);
         $criteria->compare('migration_name',$this->migration_name,true);
         $criteria->compare('migration_ticket',$this->migration_ticket,true);
@@ -139,7 +143,6 @@ class HardMigration extends CActiveRecord
         $criteria->compare('migration_retry_count',$this->migration_retry_count,true);
         $criteria->compare('migration_progress',$this->migration_progress);
         $criteria->compare('migration_progress_action',$this->migration_progress_action,true);
-        $criteria->compare('rr_project_obj_id',$this->project_obj_id);
         $criteria->compare('rr_build_version',$this->build_version, true);
 
         return new CActiveDataProvider($this, array(

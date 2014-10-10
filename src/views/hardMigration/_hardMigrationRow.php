@@ -2,11 +2,11 @@
 /** @var $model HardMigration */
 return array(
     [
-        'name' => 'releaseRequest.rr_project_obj_id',
+        'name' => 'migration_project_obj_id',
         'value' => function(HardMigration $migration){
-            return $migration->releaseRequest->project->project_name;
+            return $migration->project->project_name;
         },
-        'filter' => CHtml::activeDropDownList($model, 'project_obj_id', Project::model()->forList()),
+        'filter' => Project::model()->forList(),
     ],
     [
         'name' => 'releaseRequest.rr_build_version',

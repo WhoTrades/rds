@@ -274,6 +274,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 $hm = new HardMigration();
                 $hm->attributes = [
                     'migration_release_request_obj_id' => $releaseRequest->obj_id,
+                    'migration_project_obj_id' => $releaseRequest->rr_project_obj_id,
                     'migration_type' => 'hard',
                     'migration_name' => $migration,
                     'migration_ticket' => str_replace('#', '', $ticket),
