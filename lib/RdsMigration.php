@@ -1,0 +1,24 @@
+<?php
+class RdsMigration extends Cronjob\RequestHandler\Migration
+{
+    public function __construct(\ServiceBase_IDebugLogger $debugLogger)
+    {
+        $config=dirname(__FILE__).'/../protected/config/main.php';
+        defined('YII_DEBUG') or define('YII_DEBUG',true);
+        defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL',3);
+
+        include("yii/yii.php");
+        $filename = __DIR__ . '/../../../lib/MigrationSystem/components/ConsoleApplication.php';
+        $debugLogger->message($filename);
+        require_once($filename);
+        $application = \Yii::createApplication('\MigrationSystem\components\ConsoleApplication', $config);
+        $application->debugLogger = $debugLogger;
+
+        Yii::setPathOfAlias('MigrationSystem', __DIR__ . '/../../../lib/MigrationSystem');
+
+        Yii::import('MigrationSystem.components.*');
+
+        parent::__construct($debugLogger);
+    }
+}
+

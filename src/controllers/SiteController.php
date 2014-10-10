@@ -2,6 +2,8 @@
 
 class SiteController extends Controller
 {
+    public $pageTitle = 'Релизы и запреты';
+
     public function filters()
     {
         return array(

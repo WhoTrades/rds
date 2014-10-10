@@ -1,4 +1,5 @@
 <?php /* @var $this Controller */ ?>
+<?php /* @var $content string */ ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -7,7 +8,7 @@
 
     <link rel="stylesheet" type="text/css" href="/css/styles.css" />
 
-	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
+	<title>RDS: <?php echo CHtml::encode($this->pageTitle); ?></title>
 
 	<?php Yii::app()->bootstrap->register(); ?>
     <? Yii::app()->realplexor->registerScripts()?>
@@ -23,6 +24,7 @@ $this->widget('bootstrap.widgets.TbNavbar',array(
             'class'=>'bootstrap.widgets.TbMenu',
             'items'=>array(
                 array('label'=>'Главная', 'url'=>array('/site/index')),
+                array('label'=>'Миграции', 'url'=>array('/hardMigration/index'), 'visible'=>!Yii::app()->user->isGuest),
                 array('label'=>'Проекты', 'url'=>array('/project/admin'), 'visible'=>!Yii::app()->user->isGuest),
                 array('label'=>'Сборщики', 'url'=>array('/worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
                 array('label'=>'Версии', 'url'=>array('/releaseVersion/admin'), 'visible'=>!Yii::app()->user->isGuest),

@@ -1,0 +1,1 @@
+<pre><?=$migration->migration_log?></pre>

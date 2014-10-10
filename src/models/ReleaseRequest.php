@@ -19,6 +19,8 @@
  * @property string $rr_project_owner_code_entered
  * @property string $rr_release_engineer_code_entered
  * @property Build[] $builds
+ * @property Project $project
+ * @property HardMigration[] $hardMigrations
  * @property string $rr_last_time_on_prod
  * @property string $rr_revert_after_time
  * @property string $rr_release_version
@@ -158,6 +160,7 @@ class ReleaseRequest extends CActiveRecord
 		return array(
             'project' => array(self::BELONGS_TO, 'Project', 'rr_project_obj_id'),
             'builds' => array(self::HAS_MANY, 'Build', 'build_release_request_obj_id'),
+            'hardMigrations' => array(self::HAS_MANY, 'HardMigration', 'migration_release_request_obj_id'),
 		);
 	}
 

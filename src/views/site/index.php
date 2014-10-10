@@ -2,7 +2,6 @@
 /* @var $this SiteController */
 /* @var $releaseRejectSearchModel ReleaseReject */
 /* @var $releaseRequestSearchModel ReleaseRequest */
-$this->pageTitle=Yii::app()->name;
 ?>
 
 
