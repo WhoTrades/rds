@@ -1,5 +1,5 @@
 <?php
-class ServiceRdsDevTL1 extends ServiceRdsTestTL1
+class ServiceRdsDevTL2 extends ServiceRdsTestTL2
 {
    protected function getEnv()
     {
