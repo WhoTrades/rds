@@ -718,8 +718,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     {
         $this->debugLogger->message("Sending to comet new data of hard migration #$id");
         Yii::app()->assetManager->setBasePath('/tmp');
-        Yii::app()->assetManager->setBaseUrl('/assets');
-        Yii::app()->urlManager->setBaseUrl('');
+        Yii::app()->assetManager->setBaseUrl(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::app()->urlManager->setBaseUrl('/');
         $filename = Yii::getPathOfAlias('application.views.hardMigration._hardMigrationRow').'.php';
 
         list($controller, $action) = Yii::app()->createController('/');

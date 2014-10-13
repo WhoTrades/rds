@@ -118,7 +118,9 @@ class SiteController extends Controller
                 }
             }
         } catch (Exception $e) {
-            $transaction->rollback();
+            if ($transaction->active) {
+                $transaction->rollback();
+            }
             throw $e;
         }
 
