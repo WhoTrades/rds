@@ -84,6 +84,7 @@ class ReleaseRequest extends CActiveRecord
 			array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on'=>'use'),
             array('rr_release_version', 'checkForReleaseReject'),
             array('rr_release_version', 'checkForTeamCityHasNoErrors'),
+            array('rr_release_version', 'checkNotExistsHardMigrationOfPreviousRelease'),
 		);
 	}
 
@@ -147,6 +148,23 @@ class ReleaseRequest extends CActiveRecord
                     $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
                 }
             }
+        }
+    }
+
+    public function checkNotExistsHardMigrationOfPreviousRelease($attribute, $params)
+    {
+        $c = new CDbCriteria();
+        $c->with = 'releaseRequest';
+        $c->compare("rr_release_version", "<".$this->rr_release_version);
+        $c->compare("migration_status", "<>".HardMigration::MIGRATION_STATUS_DONE);
+        $c->compare("migration_project_obj_id", $this->rr_project_obj_id);
+        $count = HardMigration::model()->count($c);
+        if ($count) {
+            $this->addError($attribute, "Есть невыполненные тяжелая миграции ($count шт) от предыдущего релиза: <a href='".Yii::app()->createUrl('hardMigration/index', [
+                'HardMigration[build_version]' => '<='.$this->rr_release_version,
+                'HardMigration[migration_status]' => '<>'.HardMigration::MIGRATION_STATUS_DONE,
+                'HardMigration[migration_project_obj_id]' => $this->rr_project_obj_id,
+            ])."' target='_blank'>Посмотреть</a>");
         }
     }
 

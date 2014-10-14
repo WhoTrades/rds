@@ -667,16 +667,16 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $jira = new JiraApi($this->debugLogger);
             switch ($message->status) {
                 case HardMigration::MIGRATION_STATUS_IN_PROGRESS:
-                    $jira->addCommend($migration->migration_ticket, "Запущена миграция $message->migration");
+                    $jira->addCommend($migration->migration_ticket, "Запущена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                     break;
                 case HardMigration::MIGRATION_STATUS_DONE:
-                    $jira->addCommend($migration->migration_ticket, "Выполнена миграция $message->migration");
+                    $jira->addCommend($migration->migration_ticket, "Выполнена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                     break;
                 case HardMigration::MIGRATION_STATUS_FAILED:
-                    $jira->addCommend($migration->migration_ticket, "Завершилась с ошибкой миграция $message->migration");
+                    $jira->addCommend($migration->migration_ticket, "Завершилась с ошибкой миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                     break;
                 default:
-                    $jira->addCommend($migration->migration_ticket, "Статус миграции $message->migration изменился на $message->status");
+                    $jira->addCommend($migration->migration_ticket, "Статус миграции $message->migration изменился на $message->status. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                     break;
             }
         }
@@ -688,8 +688,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     private function sendReleaseRequestUpdated($id)
     {
         $this->debugLogger->message("Sending to comet new data of releaseRequest $id");
-        Yii::app()->assetManager->setBasePath('/tmp');
-        Yii::app()->assetManager->setBaseUrl('/assets');
+        Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::app()->assetManager->setBaseUrl("/assets/");
         Yii::app()->urlManager->setBaseUrl('');
         $filename = Yii::getPathOfAlias('application.views.site._releaseRequestRow').'.php';
         $rowTemplate = include($filename);
@@ -717,8 +717,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     private function sendHardMigrationUpdated($id)
     {
         $this->debugLogger->message("Sending to comet new data of hard migration #$id");
-        Yii::app()->assetManager->setBasePath('/tmp');
-        Yii::app()->assetManager->setBaseUrl(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::app()->assetManager->setBaseUrl("/assets/");
         Yii::app()->urlManager->setBaseUrl('/');
         $filename = Yii::getPathOfAlias('application.views.hardMigration._hardMigrationRow').'.php';
 
@@ -746,6 +746,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
     public function createUrl($route, $params)
     {
-        return Yii::app()->createUrl($route, $params);
+        Yii::app()->urlManager->setBaseUrl('');
+        return Yii::app()->createAbsoluteUrl($route, $params);
     }
 }
