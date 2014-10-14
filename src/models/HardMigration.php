@@ -154,7 +154,7 @@ class HardMigration extends CActiveRecord
     {
         return $this->countByAttributes([
             'migration_ticket' => $ticket,
-            'migration_status' => self::MIGRATION_STATUS_DONE,
+            'migration_status' => '<>'.self::MIGRATION_STATUS_DONE,
         ]);
     }
 
