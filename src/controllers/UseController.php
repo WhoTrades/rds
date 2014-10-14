@@ -116,6 +116,24 @@ class UseController extends Controller
         $this->redirect('/');
     }
 
+    /**
+     * Проверки смс кодов
+     *
+     * @param $model
+     * @param $releaseRequest
+     */
+    private function checkReleaseCode($model, $releaseRequest)
+    {
+        if ($model->rr_project_owner_code == $releaseRequest->rr_project_owner_code) {
+            Log::createLogMessage("Введен правильный Project Owner код {$releaseRequest->getTitle()}");
+            $releaseRequest->rr_project_owner_code_entered = true;
+        }
+        if ($model->rr_release_engineer_code == $releaseRequest->rr_release_engineer_code) {
+            Log::createLogMessage("Введен правильный Release Engineer код {$releaseRequest->getTitle()}");
+            $releaseRequest->rr_release_engineer_code_entered = true;
+        }
+    }
+
 	/**
 	 * Lists all models.
 	 */
@@ -129,14 +147,20 @@ class UseController extends Controller
         $model = new ReleaseRequest('use');
         if (isset($_POST['ReleaseRequest'])) {
             $model->attributes = $_POST['ReleaseRequest'];
-            if ($model->rr_project_owner_code == $releaseRequest->rr_project_owner_code) {
-                Log::createLogMessage("Введен правильный Project Owner код {$releaseRequest->getTitle()}");
-                $releaseRequest->rr_project_owner_code_entered = true;
+
+            // проверяем правильность ввода смс
+            $this->checkReleaseCode($model, $releaseRequest);
+
+            // если обе смс введены неправильно, то может быть их просто перепутали местами?
+            if (!$releaseRequest->rr_release_engineer_code_entered && !$releaseRequest->rr_project_owner_code_entered) {
+                // поменяем местами и проверим
+                $temp = $model->rr_project_owner_code;
+                $model->rr_project_owner_code = $model->rr_release_engineer_code;
+                $model->rr_release_engineer_code = $temp;
+
+                $this->checkReleaseCode($model, $releaseRequest);
             }
-            if ($model->rr_release_engineer_code == $releaseRequest->rr_release_engineer_code) {
-                Log::createLogMessage("Введен правильный Release Engineer код {$releaseRequest->getTitle()}");
-                $releaseRequest->rr_release_engineer_code_entered = true;
-            }
+
             if ($releaseRequest->rr_project_owner_code_entered && $releaseRequest->rr_release_engineer_code_entered) {
                 $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
                 $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
