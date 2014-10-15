@@ -33,7 +33,7 @@ return array(
         'value' => function(HardMigration $migration){
             echo "<b>$migration->migration_status</b><br />";
             if ($migration->migration_log) {
-                echo "<a href='".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])."'>LOG</a>";
+                echo "<a href='".Yii::app()->createAbsoluteUrl('/hardMigration/log', ['id' => $migration->obj_id])."'>LOG</a>";
             }
         },
         'type' => 'html',
@@ -67,7 +67,7 @@ return array(
         'buttons' => [
             'start' => [
                 'visible' => '$data->canBeStarted()',
-                'url' => 'Yii::app()->controller->createUrl("/hardMigration/start",array("id"=>$data->primaryKey))',
+                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/start",array("id"=>$data->primaryKey))',
                 'label' => '<span class="icon-play" style="color: #32cd32"></span>',
                 'options' => [
                     'title' => 'Запустить миграцию',
@@ -75,7 +75,7 @@ return array(
             ],
             'stop' => [
                 'visible' => '$data->canBeStopped()',
-                'url' => 'Yii::app()->controller->createUrl("/hardMigration/stop",array("id"=>$data->primaryKey))',
+                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/stop",array("id"=>$data->primaryKey))',
                 'label' => '<span class="icon-stop" style="color: #32cd32"></span>',
                 'options' => [
                     'title' => 'Остановить миграцию',
@@ -83,7 +83,7 @@ return array(
             ],
             'pause' => [
                 'visible' => '$data->canBePaused()',
-                'url' => 'Yii::app()->controller->createUrl("/hardMigration/pause",array("id"=>$data->primaryKey))',
+                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/pause",array("id"=>$data->primaryKey))',
                 'label' => '<span class="icon-pause" style="color: #32cd32"></span>',
                 'options' => [
                     'title' => 'Поставить на паузу',
@@ -91,7 +91,7 @@ return array(
             ],
             'resume' => [
                 'visible' => '$data->canBeResumed()',
-                'url' => 'Yii::app()->controller->createUrl("/hardMigration/resume",array("id"=>$data->primaryKey))',
+                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/resume",array("id"=>$data->primaryKey))',
                 'label' => '<span class="icon-play" style="color: #32cd32"></span>',
                 'options' => [
                     'title' => 'Запустить миграцию',
@@ -99,7 +99,7 @@ return array(
             ],
             'restart' => [
                 'visible' => '$data->canBeRestarted()',
-                'url' => 'Yii::app()->controller->createUrl("/hardMigration/restart",array("id"=>$data->primaryKey))',
+                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/restart",array("id"=>$data->primaryKey))',
                 'label' => '<span class="icon-play" style="color: #32cd32"></span>',
                 'options' => [
                     'title' => 'Перезапустить миграцию',
