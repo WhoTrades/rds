@@ -114,6 +114,8 @@ class SiteController extends Controller
                         ));
                     }
 
+                    Yii::app()->realplexor->send('updateAllReleaseRequests', []);
+
                     $this->redirect(array('index'));
                 }
             }

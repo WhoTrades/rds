@@ -44,6 +44,7 @@ class UseController extends Controller
             $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
             $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
             if ($releaseRequest->save()) {
+                Yii::app()->realplexor->send('updateAllReleaseRequests', []);
                 Log::createLogMessage("USE {$releaseRequest->getTitle()}");
 
                 foreach (Worker::model()->findAll() as $worker) {
@@ -80,6 +81,7 @@ class UseController extends Controller
         }
 
         if ($releaseRequest->save()) {
+            Yii::app()->realplexor->send('updateAllReleaseRequests', []);
             Log::createLogMessage("CODES {$releaseRequest->getTitle()}");
         }
 
@@ -110,6 +112,7 @@ class UseController extends Controller
         );
 
         if ($releaseRequest->save()) {
+            Yii::app()->realplexor->send('updateAllReleaseRequests', []);
             Log::createLogMessage($logMessage);
         }
 
@@ -157,6 +160,7 @@ class UseController extends Controller
                 }
             }
             $releaseRequest->save();
+            Yii::app()->realplexor->send('updateAllReleaseRequests', []);
             $this->redirect('/');
         }
         $this->render('index', array(
@@ -175,6 +179,7 @@ class UseController extends Controller
         $releaseRequest->rr_status = \ReleaseRequest::STATUS_USED;
 
         if ($releaseRequest->save()) {
+            Yii::app()->realplexor->send('updateAllReleaseRequests', []);
             Log::createLogMessage("Помечен стабильным {$releaseRequest->getTitle()}");
 
             $jiraUse = new JiraUse();

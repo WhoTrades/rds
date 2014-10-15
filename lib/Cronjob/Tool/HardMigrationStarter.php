@@ -19,6 +19,21 @@ class Cronjob_Tool_HardMigrationStarter extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
+        $rdsSystem = new RdsSystem\Factory($this->debugLogger);
+        $model  = $rdsSystem->getMessagingRdsMsModel();
 
+        $c = new CDbCriteria();
+        $c->compare('migration_status', [HardMigration::MIGRATION_STATUS_NEW, HardMigration::MIGRATION_STATUS_FAILED]);
+        $c->limit = 1;
+
+        /** @var $migration \HardMigration */
+        if (!$migration = \HardMigration::model()->find($c)) {
+            $this->debugLogger->message("Nothing to stars, exiting");
+            return;
+        }
+
+        $model->sendHardMigrationTask(new \RdsSystem\Message\HardMigrationTask($migration->migration_name, $migration->project->project_name, $migration->project->project_current_version));
+
+        Cronjob_Tool_AsyncReader_Deploy::sendHardMigrationUpdated($migration->obj_id);
     }
 }

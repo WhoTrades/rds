@@ -714,9 +714,10 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $this->debugLogger->message("Sended");
     }
 
-    private function sendHardMigrationUpdated($id)
+    public static function sendHardMigrationUpdated($id)
     {
-        $this->debugLogger->message("Sending to comet new data of hard migration #$id");
+        $debugLogger = Yii::app()->debugLogger;
+        $debugLogger->message("Sending to comet new data of hard migration #$id");
         Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
         Yii::app()->assetManager->setBaseUrl("/assets/");
         Yii::app()->urlManager->setBaseUrl('/');
@@ -737,11 +738,11 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         ob_start();
         $widget->run();
         $html = ob_get_clean();
-        $this->debugLogger->message("html code generated");
+        $debugLogger->message("html code generated");
 
         $comet = Yii::app()->realplexor;
         $comet->send('hardMigrationChanged', ['rr_id' => $id, 'html' => $html]);
-        $this->debugLogger->message("Sended");
+        $debugLogger->message("Sended");
     }
 
     public function createUrl($route, $params)

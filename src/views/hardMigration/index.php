@@ -23,7 +23,7 @@ $this->breadcrumbs=['Hard Migrations'];
     $(document).ready(function(){
         setTimeout(function(){
             $.fn.yiiGridView.update("hard-migration-grid");
-        }, 0);
+        }, 1);
     });
 </script>
 
