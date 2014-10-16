@@ -45,6 +45,15 @@ class Dispatcher implements \ServiceBase\IRequestHandler
         try {
             $application = \Yii::createApplication('WebApplication', $config);
             $application->debugLogger = $debugLogger;
+
+            if (is_dir(__DIR__.'/../lib/MigrationSystem')) {
+                \Yii::setPathOfAlias('MigrationSystem', __DIR__.'/../lib/MigrationSystem');
+            } else {
+                \Yii::setPathOfAlias('MigrationSystem', __DIR__ . '/../../../lib/MigrationSystem');
+            }
+
+            \Yii::import('MigrationSystem.components.*');
+
             $application->run();
         } catch (\Exception $e) {
             \Yii::app()->handleException($e);
