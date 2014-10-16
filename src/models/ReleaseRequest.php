@@ -19,6 +19,8 @@
  * @property string $rr_project_owner_code_entered
  * @property string $rr_release_engineer_code_entered
  * @property Build[] $builds
+ * @property Project $project
+ * @property HardMigration[] $hardMigrations
  * @property string $rr_last_time_on_prod
  * @property string $rr_revert_after_time
  * @property string $rr_release_version
@@ -82,6 +84,7 @@ class ReleaseRequest extends CActiveRecord
 			array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on'=>'use'),
             array('rr_release_version', 'checkForReleaseReject'),
             array('rr_release_version', 'checkForTeamCityHasNoErrors'),
+            array('rr_release_version', 'checkNotExistsHardMigrationOfPreviousRelease'),
 		);
 	}
 
@@ -148,6 +151,23 @@ class ReleaseRequest extends CActiveRecord
         }
     }
 
+    public function checkNotExistsHardMigrationOfPreviousRelease($attribute, $params)
+    {
+        $c = new CDbCriteria();
+        $c->with = 'releaseRequest';
+        $c->compare("rr_release_version", "<".$this->rr_release_version);
+        $c->compare("migration_status", "<>".HardMigration::MIGRATION_STATUS_DONE);
+        $c->compare("migration_project_obj_id", $this->rr_project_obj_id);
+        $count = HardMigration::model()->count($c);
+        if ($count) {
+            $this->addError($attribute, "Есть невыполненные тяжелая миграции ($count шт) от предыдущего релиза: <a href='".Yii::app()->createUrl('hardMigration/index', [
+                'HardMigration[build_version]' => '<='.$this->rr_release_version,
+                'HardMigration[migration_status]' => '<>'.HardMigration::MIGRATION_STATUS_DONE,
+                'HardMigration[migration_project_obj_id]' => $this->rr_project_obj_id,
+            ])."' target='_blank'>Посмотреть</a>");
+        }
+    }
+
 	/**
 	 * @return array relational rules.
 	 */
@@ -158,6 +178,7 @@ class ReleaseRequest extends CActiveRecord
 		return array(
             'project' => array(self::BELONGS_TO, 'Project', 'rr_project_obj_id'),
             'builds' => array(self::HAS_MANY, 'Build', 'build_release_request_obj_id'),
+            'hardMigrations' => array(self::HAS_MANY, 'HardMigration', 'migration_release_request_obj_id'),
 		);
 	}
 

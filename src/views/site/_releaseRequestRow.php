@@ -2,7 +2,17 @@
     'obj_id',
     'obj_created',
     'rr_user',
-    'rr_comment',
+    [
+        'name' => 'rr_comment',
+        'value' => function(ReleaseRequest $releaseRequest){
+            echo $releaseRequest->rr_comment."<br />";
+
+            if ($releaseRequest->isInstalledStatus()) {
+                echo "<a href='".$this->createUrl('/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты</a><br />";
+            }
+        }
+
+    ],
     array(
         'value' => function(ReleaseRequest $releaseRequest){
             $map = array(
@@ -88,10 +98,7 @@
     ),
     array(
         'value' => function(ReleaseRequest $releaseRequest){
-                //an: 2014-09-10 06:13:13-04 - это дата, с которой мы начали отслеживать тикеты
-                if ($releaseRequest->isInstalledStatus() && $releaseRequest->obj_created > '2014-09-10 06:13:13-04') {
-                    echo "<a href='".$this->createUrl('/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты</a><br />";
-                }
+
 
                 if ($releaseRequest->canBeUsed()) {
                 static $currentUsedCache = [];
@@ -112,6 +119,10 @@
             </a><br />";
                 }
 
+                if ($releaseRequest->hardMigrations) {
+                    echo "<a href='".$this->createUrl('hardMigration/index', ['HardMigration[migration_release_request_obj_id]'=>$releaseRequest->obj_id])."'>Show hard migrations (".count($releaseRequest->hardMigrations).")</a><br />";
+                }
+
                 if ($releaseRequest->rr_new_migration_count) {
                     if ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_UPDATING) {
                         return "updating migrations";
@@ -119,8 +130,8 @@
                         return "updating migrations failed";
                     } else {
                         $text =
-                            "<a href='".$this->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre'))."'>pre migrate</a><br />".
-                            "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show migrations</a>
+                            "<a href='".$this->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre'))."'>RUN pre migrations</a><br />".
+                            "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show pre migrations</a>
                             <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                         foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
                             $text .= "<a href='http://sources:8060/browse/migration-{$releaseRequest->project->project_name}/pre/$migration.php?hb=true'>$migration</a><br />";

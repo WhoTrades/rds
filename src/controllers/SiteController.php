@@ -2,6 +2,8 @@
 
 class SiteController extends Controller
 {
+    public $pageTitle = 'Релизы и запреты';
+
     public function filters()
     {
         return array(
@@ -112,11 +114,15 @@ class SiteController extends Controller
                         ));
                     }
 
+                    Yii::app()->realplexor->send('updateAllReleaseRequests', []);
+
                     $this->redirect(array('index'));
                 }
             }
         } catch (Exception $e) {
-            $transaction->rollback();
+            if ($transaction->active) {
+                $transaction->rollback();
+            }
             throw $e;
         }
 

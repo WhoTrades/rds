@@ -2,6 +2,7 @@
 
 class LogController extends Controller
 {
+    public $pageTitle = 'Журнал';
     public $layout = '//layouts/main';
 
     public function filters()

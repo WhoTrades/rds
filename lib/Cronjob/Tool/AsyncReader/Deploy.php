@@ -80,7 +80,13 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         });
 
         $model->readRemoveReleaseRequest(false, function(Message\RemoveReleaseRequest $message) use ($model) {
+            $this->debugLogger->message("Received remove release request message: ".json_encode($message));
             $this->actionRemoveReleaseRequest($message, $model);
+        });
+
+        $model->readHardMigrationStatus(false, function(Message\HardMigrationStatus $message) use ($model) {
+            $this->debugLogger->message("Received changing status of hard migration: ".json_encode($message));
+            $this->actionUpdateHardMigrationStatus($message, $model);
         });
 
         $this->debugLogger->message("Start listening");
@@ -238,7 +244,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
     public function actionSetMigrations(Message\ReleaseRequestMigrations $message, MessagingRdsMs $model)
     {
-
         /** @var $project Project */
         $project = Project::model()->findByAttributes(['project_name' => $message->project]);
         if (!$project) {
@@ -246,6 +251,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $message->accepted();
             return;
         }
+
+        /** @var $releaseRequest ReleaseRequest */
         $releaseRequest = ReleaseRequest::model()->findByAttributes(array(
             'rr_project_obj_id' => $project->obj_id,
             'rr_build_version' => $message->version,
@@ -258,8 +265,28 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         if ($message->type == 'pre') {
             $releaseRequest->rr_new_migration_count = count($message->migrations);
             $releaseRequest->rr_new_migrations = json_encode($message->migrations);
-        } else {
+        } elseif ($message->type == 'post') {
             $releaseRequest->rr_new_post_migrations = json_encode($message->migrations);
+        } else {
+            foreach ($message->migrations as $migration) {
+                list($migration, $ticket) = preg_split('~\s+~', $migration);
+                $hm = new HardMigration();
+                $hm->attributes = [
+                    'migration_release_request_obj_id' => $releaseRequest->obj_id,
+                    'migration_project_obj_id' => $releaseRequest->rr_project_obj_id,
+                    'migration_type' => 'hard',
+                    'migration_name' => $migration,
+                    'migration_ticket' => str_replace('#', '', $ticket),
+                    'migration_status' => HardMigration::MIGRATION_STATUS_NEW,
+                ];
+                if (!$hm->save()) {
+                    if (count($hm->errors) != 1 || !isset($hm->errors["migration_name"])) {
+                        $this->debugLogger->error("Can't save HardMigration: ".json_encode($hm->errors));
+                    } else {
+                        $this->debugLogger->message("Skip migration $migration as already exists in DB (".json_encode($hm->errors).")");
+                    }
+                }
+            }
         }
 
         $releaseRequest->save(false);
@@ -472,7 +499,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
     public function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message, MessagingRdsMs $model)
     {
-        $transaction = ReleaseRequest::model()->getDbConnection()->beginTransaction();
         $projectObj = Project::model()->findByAttributes(array('project_name' => $message->project));
 
         if (!$projectObj) {
@@ -488,6 +514,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
+        $transaction = ReleaseRequest::model()->getDbConnection()->beginTransaction();
         if ($message->type == 'pre') {
             $releaseRequest->rr_migration_status = $message->status;
 
@@ -620,11 +647,48 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    public function actionUpdateHardMigrationStatus(Message\HardMigrationStatus $message, MessagingRdsMs $model)
+    {
+        /** @var $migration HardMigration */
+        $migration = HardMigration::model()->findByAttributes(['migration_name' => $message->migration]);
+
+        if (!$migration) {
+            $this->debugLogger->error("Can't find migration $message->migration");
+            $message->accepted();
+            return;
+        }
+
+        $migration->migration_status = $message->status;
+        $migration->migration_log = $message->text;
+        $migration->save(false);
+
+        if (\Config::getInstance()->serviceRds['jira']['repostMigrationStatus']) {
+            $jira = new JiraApi($this->debugLogger);
+            switch ($message->status) {
+                case HardMigration::MIGRATION_STATUS_IN_PROGRESS:
+                    $jira->addCommend($migration->migration_ticket, "Запущена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                    break;
+                case HardMigration::MIGRATION_STATUS_DONE:
+                    $jira->addCommend($migration->migration_ticket, "Выполнена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                    break;
+                case HardMigration::MIGRATION_STATUS_FAILED:
+                    $jira->addCommend($migration->migration_ticket, "Завершилась с ошибкой миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                    break;
+                default:
+                    $jira->addCommend($migration->migration_ticket, "Статус миграции $message->migration изменился на $message->status. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                    break;
+            }
+        }
+
+        $this->sendHardMigrationUpdated($migration->obj_id);
+        $message->accepted();
+    }
+
     private function sendReleaseRequestUpdated($id)
     {
         $this->debugLogger->message("Sending to comet new data of releaseRequest $id");
-        Yii::app()->assetManager->setBasePath('/tmp');
-        Yii::app()->assetManager->setBaseUrl('/assets');
+        Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::app()->assetManager->setBaseUrl("/assets/");
         Yii::app()->urlManager->setBaseUrl('');
         $filename = Yii::getPathOfAlias('application.views.site._releaseRequestRow').'.php';
         $rowTemplate = include($filename);
@@ -632,10 +696,10 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         list($controller, $action) = Yii::app()->createController('/');
         $controller->setAction($controller->createAction($action));
         Yii::app()->setController($controller);
-        $rr = ReleaseRequest::model();
-        $rr->obj_id = $id;
+        $model = ReleaseRequest::model();
+        $model->obj_id = $id;
         $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'bootstrap.widgets.TbGridView', [
-            'dataProvider'=>new CActiveDataProvider($rr, $rr->search()),
+            'dataProvider'=>new CActiveDataProvider($model, $model->search()),
             'columns'=>$rowTemplate,
             'rowCssClassExpression' => function(){return 'rowItem';},
         ]);
@@ -649,8 +713,40 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $this->debugLogger->message("Sended");
     }
 
+    public static function sendHardMigrationUpdated($id)
+    {
+        $debugLogger = Yii::app()->debugLogger;
+        $debugLogger->message("Sending to comet new data of hard migration #$id");
+        Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::app()->assetManager->setBaseUrl("/assets/");
+        Yii::app()->urlManager->setBaseUrl('/');
+        $filename = Yii::getPathOfAlias('application.views.hardMigration._hardMigrationRow').'.php';
+
+        list($controller, $action) = Yii::app()->createController('/');
+        $controller->setAction($controller->createAction($action));
+        Yii::app()->setController($controller);
+        $model = HardMigration::model();
+        $model->obj_id = $id;
+        $rowTemplate = include($filename);
+        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'bootstrap.widgets.TbGridView', [
+            'dataProvider'=>new CActiveDataProvider($model, $model->search()),
+            'columns'=>$rowTemplate,
+            'rowCssClassExpression' => function(){return 'rowItem';},
+        ]);
+        $widget->init();
+        ob_start();
+        $widget->run();
+        $html = ob_get_clean();
+        $debugLogger->message("html code generated");
+
+        $comet = Yii::app()->realplexor;
+        $comet->send('hardMigrationChanged', ['rr_id' => $id, 'html' => $html]);
+        $debugLogger->message("Sended");
+    }
+
     public function createUrl($route, $params)
     {
-        return Yii::app()->createUrl($route, $params);
+        Yii::app()->urlManager->setBaseUrl('');
+        return Yii::app()->createAbsoluteUrl($route, $params);
     }
 }
