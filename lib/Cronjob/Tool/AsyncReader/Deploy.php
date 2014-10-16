@@ -500,7 +500,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
     public function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message, MessagingRdsMs $model)
     {
-        $transaction = ReleaseRequest::model()->getDbConnection()->beginTransaction();
         $projectObj = Project::model()->findByAttributes(array('project_name' => $message->project));
 
         if (!$projectObj) {
@@ -516,6 +515,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
+        $transaction = ReleaseRequest::model()->getDbConnection()->beginTransaction();
         if ($message->type == 'pre') {
             $releaseRequest->rr_migration_status = $message->status;
 
