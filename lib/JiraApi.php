@@ -167,6 +167,11 @@ class JiraApi
 
         $versions = array_map(function($version){return preg_replace('~[^\w.-]~', '', $version);}, $versions);
         $jql = 'fixVersion IN ('.implode(", ", $versions).')';
+        return $this->getTicketsByJql($jql);
+    }
+
+    public function getTicketsByJql($jql)
+    {
         return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
     }
 
@@ -174,6 +179,7 @@ class JiraApi
     {
         $version= preg_replace('~[^\w.-]~', '', $version);
         $jql = "fixVersion = $version";
-        return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
+
+        return $this->getTicketsByJql($jql);
     }
 }

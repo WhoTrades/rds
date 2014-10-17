@@ -29,7 +29,7 @@ $this->widget('bootstrap.widgets.TbNavbar',array(
                 array('label'=>'Сборщики', 'url'=>array('/worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
                 array('label'=>'Версии', 'url'=>array('/releaseVersion/admin'), 'visible'=>!Yii::app()->user->isGuest),
                 array('label'=>'Журнал', 'url'=>array('/log/index'), 'visible'=>!Yii::app()->user->isGuest),
-                //array('label'=>'Project Workers', 'url'=>array('/project2worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
+                array('label'=>'JIRA', 'url'=>array('/jira'), 'visible'=>!Yii::app()->user->isGuest),
                 array('label'=>'Выйти ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
             ),
         ),
