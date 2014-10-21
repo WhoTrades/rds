@@ -13,7 +13,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public static function getCommandLineSpec()
     {
-        return array();
+        return array() + parent::getCommandLineSpec();
     }
 
 
@@ -22,8 +22,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $rdsSystem = new RdsSystem\Factory($this->debugLogger);
-        $model  = $rdsSystem->getMessagingRdsMsModel();
+        $model  = $this->getMessagingModel($cronJob);
 
         $model->readTaskStatusChanged(false, function(Message\TaskStatusChanged $message) use ($model) {
             $this->debugLogger->message("Received status changed message: ".json_encode($message));
@@ -174,7 +173,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 ));
                 $c->compare('project2workers.worker_obj_id', $build->build_worker_obj_id);
                 $c->compare('rr_status', array(\ReleaseRequest::STATUS_CANCELLING));
-                $c->compare('build_status', array(\Build::STATUS_BUILDING, \Build::STATUS_BUILT));
+                $c->compare('build_status', Build::getInstallingStatuses());
                 $task = \ReleaseRequest::model()->find($c);
                 if (!$task && $build->releaseRequest) {
                     $releaseRequest = $build->releaseRequest;

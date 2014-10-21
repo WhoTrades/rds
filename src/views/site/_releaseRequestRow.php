@@ -39,7 +39,9 @@
                     Build::STATUS_BUILT => array('upload', 'Раскладывается по серверам', 'orange'),
                     Build::STATUS_INSTALLED => array('ok', 'Скопировано на сервер', 'black'),
                     Build::STATUS_USED=> array('ok', 'Установлено', '#32cd32'),
-                    ReleaseRequest::STATUS_CANCELLED=> array('remove', 'Отменено', 'red'),
+                    Build::STATUS_CANCELLED=> array('remove', 'Отменено', 'red'),
+                    Build::STATUS_PREPROD_USING=> array('refresh', 'Устанавливаем на preprod', 'orange'),
+                    Build::STATUS_PREPROD_MIGRATIONS=> array('refresh', 'Устанавливаем на preprod', 'orange'),
                 );
                 list($icon, $text, $color) = $map[$val->build_status];
                 $result[] =  "<a href='".$this->createUrl('build/view', array('id' => $val->obj_id))."' title='{$text}' style='color: $color'><span class='icon-$icon'></span>{$val->worker->worker_name} - {$val->build_status} {$val->project->project_name} {$val->build_version}</a>";

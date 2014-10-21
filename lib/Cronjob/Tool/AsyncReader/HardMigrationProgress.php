@@ -22,8 +22,7 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $rdsSystem = new RdsSystem\Factory($this->debugLogger);
-        $model  = $rdsSystem->getMessagingRdsMsModel();
+        $model  = $this->getMessagingModel($cronJob);
 
         $model->readHardMigrationProgress(false, function(Message\HardMigrationProgress $message) use ($model) {
             $this->debugLogger->message("Received harm migration progress changed: ".json_encode($message));

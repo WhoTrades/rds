@@ -29,6 +29,8 @@ class Build extends CActiveRecord
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_USED = 'used';
+    const STATUS_PREPROD_USING = 'preprod_using';
+    const STATUS_PREPROD_MIGRATIONS = 'preprod_migrations';
 
 	/**
 	 * @return string the associated database table name
@@ -165,5 +167,10 @@ class Build extends CActiveRecord
         $percent = 100*$currentTime/$lastPrev;
 
         return [$percent, $currentKey];
+    }
+
+    public static function getInstallingStatuses()
+    {
+        return [self::STATUS_BUILDING, self::STATUS_BUILT, self::STATUS_PREPROD_USING, self::STATUS_PREPROD_MIGRATIONS];
     }
 }
