@@ -79,6 +79,11 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $this->actionRemoveReleaseRequest($message, $model);
         });
 
+        $model->readMigrationStatus(false, function(Message\ReleaseRequestMigrationStatus $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received request of release request status: ".json_encode($message));
+            $this->actionSetMigrationStatus($message, $model);
+        });
+
         $this->debugLogger->message("Start listening");
 
         $this->waitForMessages($model, $cronJob);
@@ -591,6 +596,55 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $rr->delete();
         }
         $this->debugLogger->message("Skipped removing release request $message->projectName-$message->version as not exists");;
+
+        $message->accepted();
+    }
+
+    public function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message, MessagingRdsMs $model)
+    {
+        $projectObj = Project::model()->findByAttributes(array('project_name' => $message->project));
+
+        if (!$projectObj) {
+            $this->debugLogger->error('unknown project '.$message->project);
+            $message->accepted();
+            return;
+        }
+        $releaseRequest = ReleaseRequest::model()->findByAttributes(array('rr_build_version' => $message->version, 'rr_project_obj_id' => $projectObj->obj_id));
+
+        if (!$releaseRequest) {
+            $this->debugLogger->error('unknown release request: project='.$message->project.", build_version=".$message->version);
+            $message->accepted();
+            return;
+        }
+
+        $transaction = ReleaseRequest::model()->getDbConnection()->beginTransaction();
+        if ($message->type == 'pre') {
+            $releaseRequest->rr_migration_status = $message->status;
+
+            if ($message->status == \ReleaseRequest::MIGRATION_STATUS_UP) {
+                $releaseRequest->rr_new_migration_count = 0;
+                $c = new CDbCriteria();
+                $c->compare('rr_build_version', "<=$message->version");
+                $c->compare('rr_project_obj_id', $projectObj->obj_id);
+
+                ReleaseRequest::model()->updateAll(array('rr_migration_status' => $message->status, 'rr_new_migration_count' => 0), $c);
+            }
+        } else {
+            $releaseRequest->rr_post_migration_status = $message->status;
+
+            if ($message->status == \ReleaseRequest::MIGRATION_STATUS_UP) {
+                $c = new CDbCriteria();
+                $c->compare('rr_build_version', "<=$message->version");
+                $c->compare('rr_project_obj_id', $projectObj->obj_id);
+
+                ReleaseRequest::model()->updateAll(array('rr_migration_status' => $message->status), $c);
+            }
+        }
+
+        $text = json_encode(array('ok' => $releaseRequest->save()));
+        $transaction->commit();
+
+        \Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();
     }
