@@ -67,17 +67,17 @@ class HardMigrationController extends Controller
 
     public function actionPause($id)
     {
-        $this->sendUnixSignalAndRedirect($id, 10, HardMigration::MIGRATION_STATUS_PAUSED);
+        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_PAUSE, HardMigration::MIGRATION_STATUS_PAUSED);
     }
 
     public function actionResume($id)
     {
-        $this->sendUnixSignalAndRedirect($id, 12, HardMigration::MIGRATION_STATUS_IN_PROGRESS);
+        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_RESUME, HardMigration::MIGRATION_STATUS_IN_PROGRESS);
     }
 
     public function actionStop($id)
     {
-        $this->sendUnixSignalAndRedirect($id, 20, HardMigration::MIGRATION_STATUS_STOPPED);
+        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_STOP, HardMigration::MIGRATION_STATUS_STOPPED);
     }
 
     private function sendUnixSignalAndRedirect($id, $signal, $newStatus = null)

@@ -4,7 +4,7 @@ class JiraApi
     const DEFAULT_JIRA_URL = 'http://msk-bls1.office.finam.ru:9380';
     const DEFAULT_JIRA_USER_PASSWORD = 'RDS:yz7119agyh';
 
-    const TIMEOUT = 10;
+    const TIMEOUT = 30;
 
     /** @var ServiceBase_IDebugLogger */
     private $debugLogger;
@@ -167,6 +167,11 @@ class JiraApi
 
         $versions = array_map(function($version){return preg_replace('~[^\w.-]~', '', $version);}, $versions);
         $jql = 'fixVersion IN ('.implode(", ", $versions).')';
+        return $this->getTicketsByJql($jql);
+    }
+
+    public function getTicketsByJql($jql)
+    {
         return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
     }
 
@@ -174,6 +179,7 @@ class JiraApi
     {
         $version= preg_replace('~[^\w.-]~', '', $version);
         $jql = "fixVersion = $version";
-        return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
+
+        return $this->getTicketsByJql($jql);
     }
 }
