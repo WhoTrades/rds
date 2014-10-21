@@ -53,7 +53,7 @@ class HardMigrationController extends Controller
         $migration->migration_status = HardMigration::MIGRATION_STATUS_STARTED;
         $migration->save(false);
 
-        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendHardMigrationTask(new \RdsSystem\Message\HardMigrationTask(
+        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendHardMigrationTask(new \RdsSystem\Message\HardMigrationTask(
            $migration->migration_name, $migration->project->project_name, $migration->project->project_current_version
         ));
 
@@ -84,7 +84,7 @@ class HardMigrationController extends Controller
     {
         $migration = $this->loadModel($id);
 
-        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendUnixSignal(new \RdsSystem\Message\UnixSignal(
+        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendUnixSignal(new \RdsSystem\Message\UnixSignal(
             $migration->migration_pid, $signal
         ));
 

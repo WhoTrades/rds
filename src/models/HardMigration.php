@@ -20,6 +20,7 @@
  * @property string $migration_pid
  * @property string $migration_project_obj_id
  * @property Project $project
+ * @property string $migration_environment
  *
  * The followings are the available model relations:
  * @property ReleaseRequest $releaseRequest
@@ -62,17 +63,31 @@ class HardMigration extends CActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, migration_type, migration_name', 'required'),
+            array('obj_created, obj_modified, migration_type, migration_name, migration_environment', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly'=>true),
             array('migration_progress', 'numerical'),
-            array('migration_name', 'unique'),
+            array('migration_name', 'checkMigrationNameIsUnique'),
             array('migration_type, migration_ticket, migration_status', 'length', 'max'=>16),
             array('migration_name, migration_progress_action', 'length', 'max'=>255),
             array('migration_release_request_obj_id, migration_project_obj_id, migration_retry_count', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, migration_release_request_obj_id, migration_project_obj_id, migration_type, migration_name, migration_ticket, migration_status, migration_retry_count, migration_progress, migration_progress_action, project_obj_id, build_version', 'safe', 'on'=>'search'),
+            array('obj_id, obj_created, obj_modified, obj_status_did, migration_release_request_obj_id, migration_project_obj_id, migration_type, migration_name, migration_ticket, migration_status, migration_retry_count, migration_progress, migration_progress_action, project_obj_id, build_version, migration_environment', 'safe', 'on'=>'search'),
         );
+    }
+
+    public function checkMigrationNameIsUnique($attribute, $params)
+    {
+        $c = new CDbCriteria();
+        $c->compare("migration_name", $this->migration_name);
+        $c->compare("migration_environment", $this->migration_environment);
+        if ($this->obj_id) {
+            $c->compare("obj_id", '<>'.$this->obj_id);
+        }
+        $c->limit = 1;
+        if (self::model()->find($c)) {
+            $this->addError($attribute, "Migration $this->migration_name:$this->migration_environment already exists in DB");
+        }
     }
 
     /**
@@ -144,6 +159,7 @@ class HardMigration extends CActiveRecord
         $criteria->compare('migration_progress',$this->migration_progress);
         $criteria->compare('migration_progress_action',$this->migration_progress_action,true);
         $criteria->compare('rr_build_version',$this->build_version, true);
+        $criteria->compare('migration_environment',$this->migration_environment, true);
 
         return new CActiveDataProvider($this, array(
             'criteria'=>$criteria,
