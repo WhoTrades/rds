@@ -33,6 +33,6 @@ class Cronjob_Tool_HardMigrationStarter extends RdsSystem\Cron\RabbitDaemon
 
         $model->sendHardMigrationTask(new \RdsSystem\Message\HardMigrationTask($migration->migration_name, $migration->project->project_name, $migration->project->project_current_version));
 
-        Cronjob_Tool_AsyncReader_Deploy::sendHardMigrationUpdated($migration->obj_id);
+        Cronjob_Tool_AsyncReader_HardMigration::sendHardMigrationUpdated($migration->obj_id);
     }
 }

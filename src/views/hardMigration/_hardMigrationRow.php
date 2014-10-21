@@ -2,6 +2,10 @@
 /** @var $model HardMigration */
 return array(
     [
+        'name' => 'migration_environment',
+        'filter' => ['main' => 'main', 'preprod' => 'preprod'],
+    ],
+    [
         'name' => 'migration_project_obj_id',
         'value' => function(HardMigration $migration){
             return $migration->project->project_name;
