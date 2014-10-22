@@ -35,11 +35,23 @@ return array(
     [
         'name' => 'migration_status',
         'value' => function(HardMigration $migration){
-            echo "<b>$migration->migration_status</b><br />";
+            $map = array(
+                HardMigration::MIGRATION_STATUS_NEW => array('time', 'Миграция ожидает запуска, ручного или автоматического', 'black'),
+                HardMigration::MIGRATION_STATUS_IN_PROGRESS => array('refresh', 'Миграция выполняется', 'orange'),
+                HardMigration::MIGRATION_STATUS_STARTED => array('refresh', 'Отправлен сигнал на запуск миграции, ожидаем пока скрипты отработают и миграция запустится', 'orange'),
+                HardMigration::MIGRATION_STATUS_DONE=> array('ok', 'Миграция была успешно выполнена', '#32cd32'),
+                HardMigration::MIGRATION_STATUS_FAILED => array('remove', 'Миграция была запущена и заверилась с ошибкой', 'red'),
+                HardMigration::MIGRATION_STATUS_PAUSED=> array('time', 'Миграция была поставлена на паузу и может быть в любой момент снова запущена', 'blue'),
+                HardMigration::MIGRATION_STATUS_STOPPED => array('remove', 'Миграция была остановлена отправкой сигнала KILL', 'red'),
+            );
+
+            list($icon, $text, $color) = $map[$migration->migration_status];
+            echo "<span title='{$text}' style='color: $color; font-weight: bold'><span class='icon-$icon'></span>$migration->migration_status</span><br />";
             if ($migration->migration_log) {
                 echo "<a href='".Yii::app()->createAbsoluteUrl('/hardMigration/log', ['id' => $migration->obj_id])."'>LOG</a>";
             }
         },
+        'filter' => array_combine(HardMigration::getAllStatuses(), HardMigration::getAllStatuses()),
         'type' => 'html',
     ],
     'migration_retry_count',

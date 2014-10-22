@@ -161,6 +161,10 @@ class HardMigration extends CActiveRecord
         $criteria->compare('rr_build_version',$this->build_version, true);
         $criteria->compare('migration_environment',$this->migration_environment, true);
 
+        if (empty($_GET['HardMigration_sort'])) {
+            $criteria->order = 't.obj_created desc';
+        }
+
         return new CActiveDataProvider($this, array(
             'criteria'=>$criteria,
         ));
@@ -208,5 +212,18 @@ class HardMigration extends CActiveRecord
     public function canBeRestarted()
     {
         return in_array($this->migration_status, [HardMigration::MIGRATION_STATUS_FAILED]);
+    }
+
+    public static function getAllStatuses()
+    {
+        return $map = array(
+            HardMigration::MIGRATION_STATUS_NEW,
+            HardMigration::MIGRATION_STATUS_IN_PROGRESS,
+            HardMigration::MIGRATION_STATUS_STARTED,
+            HardMigration::MIGRATION_STATUS_DONE,
+            HardMigration::MIGRATION_STATUS_FAILED,
+            HardMigration::MIGRATION_STATUS_PAUSED,
+            HardMigration::MIGRATION_STATUS_STOPPED,
+        );
     }
 }
