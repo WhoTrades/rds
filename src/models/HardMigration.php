@@ -191,7 +191,7 @@ class HardMigration extends CActiveRecord
 
     public function canBeStarted()
     {
-        return in_array($this->migration_status, [HardMigration::MIGRATION_STATUS_NEW, HardMigration::MIGRATION_STATUS_STOPPED]);
+        return in_array($this->migration_status, [HardMigration::MIGRATION_STATUS_NEW, HardMigration::MIGRATION_STATUS_STOPPED]) && $this->doesMigrationReleased();
     }
 
     public function canBeResumed()
@@ -211,7 +211,12 @@ class HardMigration extends CActiveRecord
 
     public function canBeRestarted()
     {
-        return in_array($this->migration_status, [HardMigration::MIGRATION_STATUS_FAILED]);
+        return in_array($this->migration_status, [HardMigration::MIGRATION_STATUS_FAILED]) && $this->doesMigrationReleased();
+    }
+
+    public function doesMigrationReleased()
+    {
+        return $this->project->project_current_version >= $this->releaseRequest->rr_build_version;
     }
 
     public static function getAllStatuses()

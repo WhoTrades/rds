@@ -79,7 +79,7 @@ return array(
 
     array(
         'class'=>'CButtonColumn',
-        'template' => '{start} {stop} {pause} {restart} {resume}',
+        'template' => '{warning} {start} {stop} {pause} {restart} {resume}',
         'buttons' => [
             'start' => [
                 'visible' => '$data->canBeStarted()',
@@ -119,6 +119,13 @@ return array(
                 'label' => '<span class="icon-play" style="color: #32cd32"></span>',
                 'options' => [
                     'title' => 'Перезапустить миграцию',
+                ],
+            ],
+            'warning' => [
+                'visible' => '!$data->doesMigrationReleased()',
+                'label' => '<span class="icon-lock" style="color: #32cd32; cursor: default"></span>',
+                'options' => [
+                    'title' => 'Проект ещё не выложен, миграции пока нет на серверах, потому её нельзя накатить',
                 ],
             ],
         ],
