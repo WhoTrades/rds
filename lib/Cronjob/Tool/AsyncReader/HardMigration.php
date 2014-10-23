@@ -150,6 +150,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
 
     public function createUrl($route, $params)
     {
-        return Yii::app()->createUrl($route, $params);
+        Yii::app()->urlManager->setBaseUrl('');
+        return Yii::app()->createAbsoluteUrl($route, $params);
     }
 }
