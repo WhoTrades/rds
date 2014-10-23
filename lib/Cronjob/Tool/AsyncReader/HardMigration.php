@@ -76,15 +76,15 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
-        $migration->migration_status = $message->status;
-        $migration->migration_log = $message->text;
-        $migration->save(false);
 
         //an: В жиру пишем только факт накатывания миграций на прод
-        if ($model->getEnv() == 'main') {
+        if ($model->getEnv() == 'main' && $migration->migration_status != $message->status) {
             if (\Config::getInstance()->serviceRds['jira']['repostMigrationStatus']) {
                 $jira = new JiraApi($this->debugLogger);
                 switch ($message->status) {
+                    case HardMigration::MIGRATION_STATUS_NEW:
+                        //an: Это означает что миграцию пытались запустить, но миграция оказалась ещё не готова к запуску. Просто ничего не делаем
+                        break;
                     case HardMigration::MIGRATION_STATUS_IN_PROGRESS:
                         $jira->addCommend($migration->migration_ticket, "Запущена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                         break;
@@ -100,6 +100,10 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
                 }
             }
         }
+
+        $migration->migration_status = $message->status;
+        $migration->migration_log = $message->text;
+        $migration->save(false);
 
         $this->sendHardMigrationUpdated($migration->obj_id);
         $message->accepted();
