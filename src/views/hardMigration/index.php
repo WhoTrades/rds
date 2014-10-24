@@ -29,14 +29,13 @@ $this->breadcrumbs=['Hard Migrations'];
 
 <script>
     realplexor.subscribe('hardMigrationChanged', function(event){
+        console.log('Hard migration '+event.rr_id+' updated');
         var html = event.html;
         var trHtmlCode = $(html).find('tr.rowItem').first().html()
         $('.hard-migration-'+event.rr_id).html(trHtmlCode);
-        console.log('Hard migration '+event.rr_id+' updated');
     });
     realplexor.subscribe('migrationProgressbarChanged', function(event){
         $('.progress-'+event.migration+' .bar').css({width: event.percent+'%'});
-        console.log(event);
         var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
         $('.progress-'+event.migration+' .bar').html(html);
         $('.progress-action-'+event.migration).html(event.key);

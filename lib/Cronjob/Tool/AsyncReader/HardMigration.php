@@ -34,6 +34,11 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
             $this->actionUpdateHardMigrationStatus($message, $model);
         });
 
+        $model->readHardMigrationLogChunk(false, function(Message\HardMigrationLogChunk $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received next log chunk: ".json_encode($message));
+            $this->actionProcessHardMigrationLogChunk($message, $model);
+        });
+
         $this->debugLogger->message("Start listening");
 
         $this->waitForMessages($model, $cronJob);
@@ -102,10 +107,32 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         }
 
         $migration->migration_status = $message->status;
-        $migration->migration_log = $message->text;
         $migration->save(false);
 
         $this->sendHardMigrationUpdated($migration->obj_id);
+        $message->accepted();
+    }
+
+    public function actionProcessHardMigrationLogChunk(Message\HardMigrationLogChunk $message, MessagingRdsMs $model)
+    {
+        /** @var $migration HardMigration */
+        $migration = HardMigration::model()->findByAttributes([
+            'migration_name' => $message->migration,
+            'migration_environment' => $model->getEnv(),
+        ]);
+
+        if (!$migration) {
+            $this->debugLogger->error("Can't find migration $message->migration, environment={$model->getEnv()}");
+            $message->accepted();
+            return;
+        }
+
+        $migration->migration_log .= $message->text;
+        $migration->save(false);
+
+        echo "\n\nmigrationLogChunk_$migration->obj_id\n\n";
+        Yii::app()->realplexor->send('migrationLogChunk_'.$migration->obj_id, ['text' => $message->text]);
+
         $message->accepted();
     }
 
