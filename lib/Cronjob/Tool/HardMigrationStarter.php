@@ -19,6 +19,8 @@ class Cronjob_Tool_HardMigrationStarter extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
+        //an: Временно отключил, так как не совсем понятно как скрипту работать
+        return;
         $c = new CDbCriteria();
         $c->compare('migration_status', [HardMigration::MIGRATION_STATUS_NEW, HardMigration::MIGRATION_STATUS_FAILED]);
         $c->compare('migration_environment', \Config::getInstance()->hardMigration['autoStartEnvironments']);
