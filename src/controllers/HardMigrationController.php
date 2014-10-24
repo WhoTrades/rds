@@ -88,8 +88,7 @@ class HardMigrationController extends Controller
             $migration->migration_pid, $signal
         ));
 
-        $migration->migration_status = $newStatus;
-        $migration->save(false);
+        HardMigration::model()->updateByPk($id, ['migration_status' => $newStatus]);
 
         $this->redirect('/hardMigration/index');
     }

@@ -106,8 +106,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
             }
         }
 
-        $migration->migration_status = $message->status;
-        $migration->save(false);
+        HardMigration::model()->updateByPk($migration->obj_id, ['migration_status' => $message->status]);
 
         $this->sendHardMigrationUpdated($migration->obj_id);
         $message->accepted();
@@ -127,7 +126,8 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
-        $migration->migration_log .= $message->text;
+        HardMigration::model()->updateByPk($migration->obj_id, ['migration_log' => $migration->migration_log.$message->text]);
+
         $migration->save(false);
 
         echo "\n\nmigrationLogChunk_$migration->obj_id\n\n";
