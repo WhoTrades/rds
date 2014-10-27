@@ -45,6 +45,7 @@ class HardMigrationController extends Controller
     public function actionStart($id)
     {
         $migration = $this->loadModel($id);
+        Log::createLogMessage("Запущена {$migration->getTitle()}");
 
         if (!$migration->canBeStarted() && !$migration->canBeRestarted()) {
             throw new Exception("Invalid migration status");
@@ -62,21 +63,29 @@ class HardMigrationController extends Controller
 
     public function actionRestart($id)
     {
+        $migration = $this->loadModel($id);
+        Log::createLogMessage("Перезапущена {$migration->getTitle()}");
         $this->actionStart($id);
     }
 
     public function actionPause($id)
     {
+        $migration = $this->loadModel($id);
+        Log::createLogMessage("ПОставлена на паузу {$migration->getTitle()}");
         $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_PAUSE, HardMigration::MIGRATION_STATUS_PAUSED);
     }
 
     public function actionResume($id)
     {
+        $migration = $this->loadModel($id);
+        Log::createLogMessage("Снята с паузы {$migration->getTitle()}");
         $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_RESUME, HardMigration::MIGRATION_STATUS_IN_PROGRESS);
     }
 
     public function actionStop($id)
     {
+        $migration = $this->loadModel($id);
+        Log::createLogMessage("Остановлена {$migration->getTitle()}");
         $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_STOP, HardMigration::MIGRATION_STATUS_STOPPED);
     }
 

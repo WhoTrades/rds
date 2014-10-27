@@ -231,4 +231,9 @@ class HardMigration extends CActiveRecord
             HardMigration::MIGRATION_STATUS_STOPPED,
         );
     }
+
+    public function getTitle()
+    {
+        return "Миграция $this->migration_name, окружение $this->migration_environment";
+    }
 }
