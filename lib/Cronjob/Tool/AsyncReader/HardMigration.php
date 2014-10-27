@@ -128,9 +128,6 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
 
         HardMigration::model()->updateByPk($migration->obj_id, ['migration_log' => $migration->migration_log.$message->text]);
 
-        $migration->save(false);
-
-        echo "\n\nmigrationLogChunk_$migration->obj_id\n\n";
         Yii::app()->realplexor->send('migrationLogChunk_'.$migration->obj_id, ['text' => $message->text]);
 
         $message->accepted();
