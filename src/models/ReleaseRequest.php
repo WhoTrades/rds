@@ -41,16 +41,16 @@ class ReleaseRequest extends CActiveRecord
     const STATUS_INSTALLED           = 'installed';
     const STATUS_CODES               = 'codes';
     const STATUS_USING               = 'using';
-    const STATUS_USED_ATTEMPT       = 'used_attempt';
+    const STATUS_USED_ATTEMPT        = 'used_attempt';
     const STATUS_USED                = 'used';
     const STATUS_OLD                 = 'old';
     const STATUS_CANCELLING          = 'cancelling';
-    const STATUS_CANCELLED          = 'cancelled';
+    const STATUS_CANCELLED           = 'cancelled';
 
-    const MIGRATION_STATUS_NONE     = 'none';
-    const MIGRATION_STATUS_UPDATING = 'updating';
-    const MIGRATION_STATUS_FAILED   = 'failed';
-    const MIGRATION_STATUS_UP       = 'up';
+    const MIGRATION_STATUS_NONE      = 'none';
+    const MIGRATION_STATUS_UPDATING  = 'updating';
+    const MIGRATION_STATUS_FAILED    = 'failed';
+    const MIGRATION_STATUS_UP        = 'up';
 
 	/**
 	 * @return string the associated database table name
