@@ -32,6 +32,11 @@ class JiraApi
         );
     }
 
+    public function getUserName()
+    {
+        return explode(":", $this->jiraUserPassword)[0];
+    }
+
     private function sendRequest($url, $method, $request)
     {
         if (strtoupper($method) == 'GET') {
@@ -150,10 +155,16 @@ class JiraApi
         $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/transitions", 'POST', $request);
     }
 
-    public function addCommend($ticket, $text)
+    public function addComment($ticket, $text)
     {
         $request = ['body' => $text];
         $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/comment", 'POST', $request);
+    }
+
+    public function updateComment($ticket, $commentId, $text)
+    {
+        $request = ['body' => $text];
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/comment/$commentId", 'PUT', $request);
     }
 
     public function getAllVersions($project)

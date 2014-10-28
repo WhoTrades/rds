@@ -91,16 +91,16 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
                         //an: Это означает что миграцию пытались запустить, но миграция оказалась ещё не готова к запуску. Просто ничего не делаем
                         break;
                     case HardMigration::MIGRATION_STATUS_IN_PROGRESS:
-                        $jira->addCommend($migration->migration_ticket, "Запущена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                        $this->addCommentOrAppendMyComment($jira, $migration->migration_ticket, "Запущена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                         break;
                     case HardMigration::MIGRATION_STATUS_DONE:
-                        $jira->addCommend($migration->migration_ticket, "Выполнена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                        $this->addCommentOrAppendMyComment($jira, $migration->migration_ticket, "Выполнена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                         break;
                     case HardMigration::MIGRATION_STATUS_FAILED:
-                        $jira->addCommend($migration->migration_ticket, "Завершилась с ошибкой миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                        $this->addCommentOrAppendMyComment($jira, $migration->migration_ticket, "Завершилась с ошибкой миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                         break;
                     default:
-                        $jira->addCommend($migration->migration_ticket, "Статус миграции $message->migration изменился на $message->status. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                        $this->addCommentOrAppendMyComment($jira, $migration->migration_ticket, "Статус миграции $message->migration изменился на $message->status. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
                         break;
                 }
             }
@@ -110,6 +110,26 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
 
         $this->sendHardMigrationUpdated($migration->obj_id);
         $message->accepted();
+    }
+
+    /**
+     * Метод смотрит последний комментарий в тикете и смотрит его владельца. И в зависимости от того является ли автором RDS либо изменяет комментарий, либо добавляет новый
+     *
+     * @param JiraApi $jira
+     * @param string $ticket
+     * @param string $text
+     */
+    private function addCommentOrAppendMyComment(JiraApi $jira, $ticket, $text)
+    {
+        $text = date("d.m.Y H:i").": ".$text;
+        $lastComment = end($jira->getTicketInfo($ticket)['fields']['comment']['comments']);
+        if ($lastComment['author']['name'] == $jira->getUserName()) {
+            $this->debugLogger->debug("Updating last comment {$lastComment['self']}");
+            $jira->updateComment($ticket, $lastComment['id'], $lastComment['body']."\n".$text);
+        } else {
+            $this->debugLogger->debug("Adding new comment with text=$text");
+            $jira->addComment($ticket, $text);
+        }
     }
 
     public function actionProcessHardMigrationLogChunk(Message\HardMigrationLogChunk $message, MessagingRdsMs $model)

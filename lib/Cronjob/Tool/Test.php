@@ -13,9 +13,17 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $rdsSystem = new RdsSystem\Factory($this->debugLogger);
-        $model  = $this->getMessagingModel($cronJob);
-        $migrations = ["Y2014_2/m140804_121502_rds_test #WTA-67"];
-        $model->sendMigrations(new Message\ReleaseRequestMigrations('service-mailer', '62.00.042.42', $migrations, 'hard'));
+        $ticket = "WTA-69";
+        $jira = new JiraApi($this->debugLogger);
+        $text = uniqid();
+        $this->debugLogger->message("Adding text $text");
+        $lastComment = end($jira->getTicketInfo($ticket)['fields']['comment']['comments']);
+        if ($lastComment['author']['name'] == $jira->getUserName()) {
+            $this->debugLogger->message("Updating last comment {$lastComment['self']}");
+            $jira->updateComment($ticket, $lastComment['id'], $lastComment['body']."\n".date("d.m.Y H:i:s").": ".$text);
+        } else {
+            $this->debugLogger->message("Adding new comment");
+            $jira->addComment($ticket, $text);
+        }
     }
 }

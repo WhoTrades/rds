@@ -172,10 +172,10 @@ class HardMigration extends CActiveRecord
 
     public function getNotDoneMigrationCountForTicket($ticket)
     {
-        return $this->countByAttributes([
-            'migration_ticket' => $ticket,
-            'migration_status' => '<>'.self::MIGRATION_STATUS_DONE,
-        ]);
+        $c = new CDbCriteria();
+        $c->compare('migration_ticket', $ticket);
+        $c->compare('migration_status', '<>'.self::MIGRATION_STATUS_DONE);
+        return $this->count($c);
     }
 
     /**

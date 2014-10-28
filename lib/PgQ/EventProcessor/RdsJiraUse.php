@@ -45,8 +45,9 @@ class PgQ_EventProcessor_RdsJiraUse extends PgQ\EventProcessor\EventProcessorBas
             $this->debugLogger->message("Processing ticket {$ticket['key']}, status={$ticket['fields']['status']['name']}");
             $transitionId = null;
 
-            if ($count = HardMigration::model()->getNotDoneMigrationCountForTicket($ticket)) {
-                $this->debugLogger->message("Found $count not finished hard migration for ticket #$ticket, retry it in 60 seconds");
+            if ($count = HardMigration::model()->getNotDoneMigrationCountForTicket($ticket['key'])) {
+                $jira->addTicketLabel($ticket['key'], "ticket-with-migration");
+                $this->debugLogger->message("Found $count not finished hard migration for ticket #{$ticket['key']}, retry it in 60 seconds");
                 $event->retry(60);
                 continue;
             }
