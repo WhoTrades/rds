@@ -2,9 +2,9 @@
 use RdsSystem\Message;
 
 /**
- * @example dev/services/rds/misc/tools/runner.php --tool=Test -vv
+ * @example dev/services/rds/misc/tools/runner.php --tool=CiBuildStatus -vv
  */
-class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
+class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
 {
     public static function getCommandLineSpec()
     {
@@ -78,10 +78,10 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 
                 if ($status != AlertLog::STATUS_OK) {
                     $this->debugLogger->message("Sending alert email");
-                    mail("anaumenko@corp.finam.ru", "Ошибки в тестах, через 5 минут загорится лампа", "Ошибки: $text", "From: RDS alerts\r\n");
+                    mail(\Config::getInstance()->serviceRds['alerts']['lampOnEmail'], "Ошибки в тестах, через 5 минут загорится лампа", "Ошибки: $text", "From: RDS alerts\r\n");
                 } else {
                     $this->debugLogger->message("Sending ok email");
-                    mail("anaumenko@corp.finam.ru", "Ошибки в тестах исправлены, лампа выключена", "Ошибки были тут: ".$alertLog->alert_text, "From: RDS alerts\r\n");
+                    mail(\Config::getInstance()->serviceRds['alerts']['lampOffEmail'], "Ошибки в тестах исправлены, лампа выключена", "Ошибки были тут: ".$alertLog->alert_text, "From: RDS alerts\r\n");
                 }
             }
         }

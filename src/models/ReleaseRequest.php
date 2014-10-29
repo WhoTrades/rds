@@ -116,37 +116,14 @@ class ReleaseRequest extends CActiveRecord
             return;
         }
 
-        $url = "http://ci.whotrades.net:8111/httpAuth/app/rest/builds/?count=10000&locator=branch:release-$this->rr_release_version";
-
-        $analyzedBuildTypeIds = [];
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_USERPWD, "rest:rest123");
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $text = curl_exec($ch);
-
-        if (curl_errno($ch)) {
-            return;
-        }
-
-        $xml = simplexml_load_string($text);
-        foreach ($xml->build as $build) {
-            //an: Выше эта сборка уже была проанализирована, игнорируем
-            if (in_array($build['buildTypeId'], $analyzedBuildTypeIds)) {
-                continue;
-            }
-            if ($build['status'] == 'UNKNOWN') {
-                continue;
-            }
-            $analyzedBuildTypeIds[] = (string)$build['buildTypeId'];
-            if ($build['status'] == 'FAILURE') {
-                $ch = curl_init($build['webUrl']);
-                curl_setopt($ch, CURLOPT_USERPWD, "rest:rest123");
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                $text = curl_exec($ch);
-                if (preg_match('~<title>[^<]*(PHPUnit_composer|acceptance-testing-tst)[^<]*</title>~', $text)) {
-                    $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$build['webUrl'].'">'.$build['webUrl']."</a>");
-                }
+        $c = new CDbCriteria();
+        $c->compare('alert_version', $this->rr_release_version);
+        $c->compare('alert_name', AlertLog::WTS_LAMP_NAME);
+        $c->order = 'obj_id desc';
+        $one = AlertLog::model()->find($c);
+        if ($one && $one->alert_status == AlertLog::STATUS_ERROR) {
+            foreach (explode(", ", $one->alert_text) as $url) {
+                $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$url.'">'.$url."</a>");
             }
         }
     }
