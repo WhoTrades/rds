@@ -95,6 +95,19 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
                         break;
                     case HardMigration::MIGRATION_STATUS_DONE:
                         $this->addCommentOrAppendMyComment($jira, $migration->migration_ticket, "Выполнена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+
+                        $jiraMove = new JiraMoveTicket();
+                        $jiraMove->attributes = [
+                            'jira_ticket' => $migration->migration_ticket,
+                            'jira_direction' => JiraMoveTicket::DIRECTION_UP,
+                        ];
+
+                        $this->debugLogger->message("Adding ticket {$migration->migration_ticket} for moving up");
+
+                        if (!$jiraMove->save()) {
+                            $this->debugLogger->error("Can't save JiraMoveTicket, errors: ".json_encode($jiraMove->errors));
+                        }
+
                         break;
                     case HardMigration::MIGRATION_STATUS_FAILED:
                         $this->addCommentOrAppendMyComment($jira, $migration->migration_ticket, "Завершилась с ошибкой миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));

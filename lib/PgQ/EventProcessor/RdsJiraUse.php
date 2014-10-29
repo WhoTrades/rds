@@ -40,29 +40,27 @@ class PgQ_EventProcessor_RdsJiraUse extends PgQ\EventProcessor\EventProcessorBas
 
         $tickets = $jira->getTicketsByVersions($names);
 
-
         foreach ($tickets['issues'] as $ticket) {
             $this->debugLogger->message("Processing ticket {$ticket['key']}, status={$ticket['fields']['status']['name']}");
             $transitionId = null;
 
-            if ($count = HardMigration::model()->getNotDoneMigrationCountForTicket($ticket['key'])) {
+            if ($tagFrom < $tagTo && $count = HardMigration::model()->getNotDoneMigrationCountForTicket($ticket['key'])) {
                 $jira->addTicketLabel($ticket['key'], "ticket-with-migration");
-                $this->debugLogger->message("Found $count not finished hard migration for ticket #{$ticket['key']}, retry it in 60 seconds");
-                $event->retry(60);
-                continue;
+                $this->debugLogger->message("Found $count not finished hard migration for ticket #{$ticket['key']}, skip this ticket");
             }
 
-            $nextStatus = $tagFrom < $tagTo ? 'Deployed' : 'Rolled back';
-            foreach ($ticket['transitions'] as $transition) {
-                if ($transition['name'] == $nextStatus) {
-                    $transitionId = $transition['id'];
-                }
-            }
-            if ($transitionId) {
-                $this->debugLogger->message("Moving ticket {$ticket['key']} to $nextStatus status");
-                $jira->updateTicketTransition($ticket['key'], $transitionId);
-            } else {
-                $this->debugLogger->message("Invalid ticket {$ticket['key']} status, can't move to $nextStatus");
+            $direction = $tagFrom < $tagTo ? JiraMoveTicket::DIRECTION_UP : JiraMoveTicket::DIRECTION_DOWN;
+            $jiraMove = new JiraMoveTicket();
+            $jiraMove->attributes = [
+                'jira_ticket' => $ticket['key'],
+                'jira_direction' => $direction,
+            ];
+
+            $this->debugLogger->message("Adding ticket {$ticket['key']} for moving $direction");
+
+            if (!$jiraMove->save()) {
+                $this->debugLogger->error("Can't save JiraMoveTicket, errors: ".json_encode($jiraMove->errors));
+                $event->retry(60);
             }
         }
     }
