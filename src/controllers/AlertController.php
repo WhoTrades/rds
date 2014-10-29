@@ -38,6 +38,16 @@ class AlertController extends Controller
 
     private function getLampStatus($lampName)
     {
+        //an: Лампа всегда выключена до 10 утра МСК и после 20:00 МСК
+        $prev = date_default_timezone_get();
+        date_default_timezone_set("Europe/Moscow");
+        $hourAtMoscow = (int)date("H");
+        date_default_timezone_set($prev);
+
+        if ($hourAtMoscow < 10 || $hourAtMoscow > 20) {
+            return false;
+        }
+
         $result = false;
         $versions = ReleaseVersion::model()->findAll();
         foreach ($versions as $version) {
