@@ -216,7 +216,7 @@ class HardMigration extends CActiveRecord
 
     public function doesMigrationReleased()
     {
-        return $this->project->project_current_version >= $this->releaseRequest->rr_build_version;
+        return empty($this->releaseRequest) || $this->project->project_current_version >= $this->releaseRequest->rr_build_version;
     }
 
     public static function getAllStatuses()
