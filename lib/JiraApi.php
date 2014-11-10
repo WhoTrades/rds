@@ -52,7 +52,7 @@ class JiraApi
 
         $data = json_decode($json, true);
 
-        if (!$data) {
+        if ($data === null && $data != 'null') {
             \CoreLight::getInstance()->getServiceBaseDebugLogger()->dump()->message('an', 'invalid_json_received', true, ['json' => $json])->save();
             throw new ApplicationException('invalid_json_received');
         }
