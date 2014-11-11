@@ -14,27 +14,16 @@ class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $versions = ReleaseVersion::model()->findAll();
+        $client = new \TeamcityClient\WtTeamCityClient();
+
         foreach ($versions as $version) {
             $this->debugLogger->message("Processing release-$version->rv_version");
             /** @var $version ReleaseVersion */
-            $url = "http://ci.whotrades.net:8111/httpAuth/app/rest/builds/?count=10000&locator=branch:release-$version->rv_version";
 
             $analyzedBuildTypeIds = [];
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_USERPWD, "rest:rest123");
-            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            $text = curl_exec($ch);
-
-            if (curl_errno($ch)) {
-                $error = curl_error($ch);
-                $this->debugLogger->error("Can't fetch url $url: $error");
-                continue;
-            }
-
-            $xml = simplexml_load_string($text);
+            $builds = $client->getBuildsByBranch("release-$version->rv_version");
             $errors = [];
-            foreach ($xml->build as $build) {
+            foreach ($builds as $build) {
                 //an: Выше эта сборка уже была проанализирована, игнорируем
                 if (in_array($build['buildTypeId'], $analyzedBuildTypeIds)) {
                     continue;

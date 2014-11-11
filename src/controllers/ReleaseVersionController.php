@@ -61,9 +61,12 @@ class ReleaseVersionController extends Controller
 		if(isset($_POST['ReleaseVersion']))
 		{
 			$model->attributes=$_POST['ReleaseVersion'];
-			if($model->save())
+			if($model->save()) {
+                $this->updateVersionsAtTeamCity();
 				$this->redirect(array('view','id'=>$model->obj_id));
+            }
 		}
+
 
 		$this->render('create',array(
 			'model'=>$model,
@@ -85,9 +88,12 @@ class ReleaseVersionController extends Controller
 		if(isset($_POST['ReleaseVersion']))
 		{
 			$model->attributes=$_POST['ReleaseVersion'];
-			if($model->save())
+			if($model->save()) {
+                $this->updateVersionsAtTeamCity();
 				$this->redirect(array('view','id'=>$model->obj_id));
+            }
 		}
+
 
 		$this->render('update',array(
 			'model'=>$model,
@@ -102,6 +108,8 @@ class ReleaseVersionController extends Controller
 	public function actionDelete($id)
 	{
 		$this->loadModel($id)->delete();
+
+        $this->updateVersionsAtTeamCity();
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))
@@ -158,4 +166,23 @@ class ReleaseVersionController extends Controller
 			Yii::app()->end();
 		}
 	}
+
+    private function updateVersionsAtTeamCity()
+    {
+        if (!Yii::app()->params['syncVersionsWithCi']) {
+            return;
+        }
+
+        $versions = ["+:refs/heads/(master)"];
+        foreach (ReleaseVersion::model()->findAll() as $version) {
+            /** @var $version ReleaseVersion */
+            $versions[] = "+:refs/heads/(release-$version->rv_version)";
+        }
+
+        $client = new \TeamcityClient\WtTeamCityClient();
+
+        foreach ($client->getVcsRootsList() as $vcsRoot) {
+            $client->updateVcsRootProperty($vcsRoot['id'], 'teamcity:branchSpec', implode("\n", $versions));
+        }
+    }
 }
