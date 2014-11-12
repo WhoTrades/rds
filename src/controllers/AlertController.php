@@ -2,10 +2,14 @@
 
 class AlertController extends Controller
 {
+    const TIMEZONE = "Europe/Moscow";
+
     public $pageTitle = 'Сигнализация';
 
-    const ALERT_TIMEOUT = '5 minutes';
+    const ALERT_TIMEOUT = '5 minute';
     const ALERT_WAIT_TIMEOUT = '10 minutes';
+    const ALERT_START_HOUR = 15;
+    const ALERT_END_HOUR = 20;
 
     public function actionIndex()
     {
@@ -35,19 +39,22 @@ class AlertController extends Controller
         echo json_encode($result, JSON_PRETTY_PRINT);
     }
 
-
-    private function getLampStatus($lampName)
+    public static function canBeLampLightedByTimeRanges()
     {
         //an: Лампа всегда выключена до 10 утра МСК и после 20:00 МСК
         $prev = date_default_timezone_get();
-        date_default_timezone_set("Europe/Moscow");
+        date_default_timezone_set(self::TIMEZONE);
         $hourAtMoscow = (int)date("H");
         date_default_timezone_set($prev);
 
-        if ($hourAtMoscow < 10 || $hourAtMoscow > 20) {
+        return $hourAtMoscow > self::ALERT_START_HOUR && $hourAtMoscow < self::ALERT_END_HOUR;
+    }
+
+    private function getLampStatus($lampName)
+    {
+        if (!self::canBeLampLightedByTimeRanges()) {
             return false;
         }
-
         $result = false;
         $versions = ReleaseVersion::model()->findAll();
         foreach ($versions as $version) {

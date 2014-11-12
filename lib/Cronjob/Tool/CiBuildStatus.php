@@ -6,8 +6,6 @@ use RdsSystem\Message;
  */
 class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
 {
-    const TIMEZONE = "Europe/Moscow";
-
     public static function getCommandLineSpec()
     {
         return [] + parent::getCommandLineSpec();
@@ -67,23 +65,42 @@ class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
                     $this->debugLogger->error("Can't save alertLog: ".json_encode($new->errors));
                 }
 
-                $mailHeaders = "From: RDS alerts\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=UTF-8";
+                $receiver = $status == AlertLog::STATUS_OK
+                    ? \Config::getInstance()->serviceRds['alerts']['lampOffEmail']
+                    : \Config::getInstance()->serviceRds['alerts']['lampOnEmail'];
+
+                $mailHeaders = "From: $receiver\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=UTF-8";
 
                 if ($status != AlertLog::STATUS_OK) {
                     $subject = "Ошибка в тестах номер № $new->obj_id, лампочка $new->alert_name";
                     $prev = date_default_timezone_get();
-                    date_default_timezone_set(self::TIMEZONE);
-                    $text = "Ошибки: $text, лампа загорится через 5 минут в ".date("Y.m.d H:i:s", strtotime(AlertController::ALERT_TIMEOUT))." МСК";
+                    date_default_timezone_set(AlertController::TIMEZONE);
+                    $text = "Ошибки: $text<br />\n";
+                    if (AlertController::canBeLampLightedByTimeRanges()) {
+                        $text .= "Лампа загорится через 5 минут в ".date("Y.m.d H:i:s", strtotime(AlertController::ALERT_TIMEOUT))." МСК<br />\n";
+                    } else {
+                        $text .= "Лампа загорится в ".AlertController::ALERT_START_HOUR.":00 МСК<br />\n";
+                    }
                     date_default_timezone_set($prev);
                     //an: Вырезаем номер билда, так как он будет постоянно меняться
                     if (preg_replace('~\?buildId=\d+~', '', $text) != preg_replace('~\?buildId=\d+~', '', $alertLog->alert_text)) {
                         $this->debugLogger->message("Sending alert email");
-                        mail(\Config::getInstance()->serviceRds['alerts']['lampOnEmail'], $subject, $text, $mailHeaders);
+                        mail($receiver, $subject, $text, $mailHeaders);
                     }
                 } else {
                     $subject = "Ошибка в тестах номер № $alertLog->obj_id, лампочка $alertLog->alert_name";
                     $this->debugLogger->message("Sending ok email");
-                    mail(\Config::getInstance()->serviceRds['alerts']['lampOffEmail'], $subject, "Ошибки были тут: $alertLog->alert_text, лампа загорится через 5 минут", $mailHeaders);
+                    $secondsTotal = time() - strtotime($alertLog->obj_created." ".AlertController::ALERT_TIMEOUT);
+                    echo $secondsTotal."\n";
+                    $text = "Лампа выключена, ошибок больше нет<br />\n";
+                    if ($secondsTotal > 0) {
+                        date_default_timezone_set("GMT");
+                        $text .= "Лампа горела на протяжении ".date("H:i:s", $secondsTotal)." часов <br />\n";
+                        date_default_timezone_set($prev);
+                    } else {
+                        $text .= "Лампа была потушена ещё до зажигания!<br />\n";
+                    }
+                    mail($receiver, $subject, $text, $mailHeaders);
                 }
             }
         }
