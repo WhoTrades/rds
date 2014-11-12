@@ -52,7 +52,8 @@ class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
             /** @var $alertLog AlertLog */
             $alertLog = AlertLog::model()->find($c);
 
-            if (empty($alertLog) || $alertLog->alert_text != $text || $alertLog->alert_status != $status) {
+            //an: Вырезаем номер билда, так как он будет постоянно меняться
+            if (empty($alertLog) || preg_replace('~\?buildId=\d+~', '', $alertLog->alert_text) != preg_replace('~\?buildId=\d+~', '', $text) || $alertLog->alert_status != $status) {
                 $this->debugLogger->message("Adding new record, status=$status, text=$text");
                 $new = new AlertLog();
                 $new->attributes = [
@@ -82,7 +83,6 @@ class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
                         $text .= "Лампа загорится в ".AlertController::ALERT_START_HOUR.":00 МСК<br />\n";
                     }
                     date_default_timezone_set($prev);
-                    //an: Вырезаем номер билда, так как он будет постоянно меняться
                     if (preg_replace('~\?buildId=\d+~', '', $text) != preg_replace('~\?buildId=\d+~', '', $alertLog->alert_text)) {
                         $this->debugLogger->message("Sending alert email");
                         mail($receiver, $subject, $text, $mailHeaders);
