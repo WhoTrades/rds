@@ -8,7 +8,7 @@ class AlertController extends Controller
 
     const ALERT_TIMEOUT = '5 minute';
     const ALERT_WAIT_TIMEOUT = '10 minutes';
-    const ALERT_START_HOUR = 15;
+    const ALERT_START_HOUR = 10;
     const ALERT_END_HOUR = 20;
 
     public function actionIndex()
@@ -47,7 +47,7 @@ class AlertController extends Controller
         $hourAtMoscow = (int)date("H");
         date_default_timezone_set($prev);
 
-        return $hourAtMoscow > self::ALERT_START_HOUR && $hourAtMoscow < self::ALERT_END_HOUR;
+        return $hourAtMoscow >= self::ALERT_START_HOUR && $hourAtMoscow < self::ALERT_END_HOUR;
     }
 
     private function getLampStatus($lampName)
