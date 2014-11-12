@@ -215,7 +215,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         foreach ($lines as $line) {
             if (preg_match('~^\s*(?<hash>\w+)\|(?<comment>.*)\|/(?<author>.*?)/$~', $line, $matches)) {
                 $commit = new JiraCommit();
-                if (preg_match_all('~#(WT\w-\d+)~', $matches['comment'], $ans)) {
+                if (preg_match_all('~#(WT\w+-\d+)~', $matches['comment'], $ans)) {
                     foreach ($ans[1] as $val2) {
                         $commit->attributes = [
                             'jira_commit_build_tag' => $releaseRequest->getBuildTag(),
