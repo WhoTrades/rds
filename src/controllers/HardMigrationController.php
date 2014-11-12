@@ -79,14 +79,14 @@ class HardMigrationController extends Controller
     {
         $migration = $this->loadModel($id);
         Log::createLogMessage("Снята с паузы {$migration->getTitle()}");
-        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_RESUME, HardMigration::MIGRATION_STATUS_IN_PROGRESS);
+        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_RESUME);
     }
 
     public function actionStop($id)
     {
         $migration = $this->loadModel($id);
         Log::createLogMessage("Остановлена {$migration->getTitle()}");
-        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_STOP, HardMigration::MIGRATION_STATUS_STOPPED);
+        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_STOP);
     }
 
     private function sendUnixSignalAndRedirect($id, $signal, $newStatus = null)
@@ -97,7 +97,9 @@ class HardMigrationController extends Controller
             $migration->migration_pid, $signal
         ));
 
-        HardMigration::model()->updateByPk($id, ['migration_status' => $newStatus]);
+        if ($newStatus) {
+            HardMigration::model()->updateByPk($id, ['migration_status' => $newStatus]);
+        }
 
         $this->redirect('/hardMigration/index');
     }

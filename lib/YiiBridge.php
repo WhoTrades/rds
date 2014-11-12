@@ -14,5 +14,6 @@ class YiiBridge
         require_once(__DIR__ . '/../protected/components/ExternalApplication.php');
         $application = \Yii::createApplication('ExternalApplication', $config);
         $application->debugLogger = $debugLogger;
+        Yii::import("application.controllers.*");
     }
 }

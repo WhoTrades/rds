@@ -6,6 +6,8 @@ use RdsSystem\Message;
  */
 class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
 {
+    const TIMEZONE = "Europe/Moscow";
+
     public static function getCommandLineSpec()
     {
         return [] + parent::getCommandLineSpec();
@@ -65,12 +67,23 @@ class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
                     $this->debugLogger->error("Can't save alertLog: ".json_encode($new->errors));
                 }
 
+                $mailHeaders = "From: RDS alerts\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=UTF-8";
+
                 if ($status != AlertLog::STATUS_OK) {
-                    $this->debugLogger->message("Sending alert email");
-                    mail(\Config::getInstance()->serviceRds['alerts']['lampOnEmail'], "Ошибки в тестах, через 5 минут загорится лампа", "Ошибки: $text", "From: RDS alerts\r\n");
+                    $subject = "Ошибка в тестах номер № $new->obj_id, лампочка $new->alert_name";
+                    $prev = date_default_timezone_get();
+                    date_default_timezone_set(self::TIMEZONE);
+                    $text = "Ошибки: $text, лампа загорится через 5 минут в ".date("Y.m.d H:i:s", strtotime(AlertController::ALERT_TIMEOUT))." МСК";
+                    date_default_timezone_set($prev);
+                    //an: Вырезаем номер билда, так как он будет постоянно меняться
+                    if (preg_replace('~\?buildId=\d+~', '', $text) != preg_replace('~\?buildId=\d+~', '', $alertLog->alert_text)) {
+                        $this->debugLogger->message("Sending alert email");
+                        mail(\Config::getInstance()->serviceRds['alerts']['lampOnEmail'], $subject, $text, $mailHeaders);
+                    }
                 } else {
+                    $subject = "Ошибка в тестах номер № $alertLog->obj_id, лампочка $alertLog->alert_name";
                     $this->debugLogger->message("Sending ok email");
-                    mail(\Config::getInstance()->serviceRds['alerts']['lampOffEmail'], "Ошибки в тестах исправлены, лампа выключена", "Ошибки были тут: ".$alertLog->alert_text, "From: RDS alerts\r\n");
+                    mail(\Config::getInstance()->serviceRds['alerts']['lampOffEmail'], $subject, "Ошибки были тут: $alertLog->alert_text, лампа загорится через 5 минут", $mailHeaders);
                 }
             }
         }
