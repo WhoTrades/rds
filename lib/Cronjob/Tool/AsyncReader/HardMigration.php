@@ -24,48 +24,12 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readHardMigrationProgress(false, function(Message\HardMigrationProgress $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received harm migration progress changed: ".json_encode($message));
-            $this->actionHardMigrationProgressChanged($message, $model);
-        });
-
-        $model->readHardMigrationStatus(false, function(Message\HardMigrationStatus $message) use ($model) {
+        $model->readHardMigrationStatus(true, function(Message\HardMigrationStatus $message) use ($model) {
             $this->debugLogger->message("env={$model->getEnv()}, Received changing status of hard migration: ".json_encode($message));
             $this->actionUpdateHardMigrationStatus($message, $model);
         });
-
-        $model->readHardMigrationLogChunk(false, function(Message\HardMigrationLogChunk $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received next log chunk: ".json_encode($message));
-            $this->actionProcessHardMigrationLogChunk($message, $model);
-        });
-
-        $this->debugLogger->message("Start listening");
-
-        $this->waitForMessages($model, $cronJob);
     }
 
-
-    public function actionHardMigrationProgressChanged(Message\HardMigrationProgress $message, MessagingRdsMs $model)
-    {
-        $message->accepted();
-        /** @var $migration HardMigration */
-        if (!$migration = HardMigration::model()->findByAttributes([
-            'migration_name' => $message->migration,
-            'migration_environment' => $model->getEnv(),
-        ])) {
-            $this->debugLogger->error("Can't find migration $message->migration, environment={$model->getEnv()}");
-            return;
-        }
-        $migration->migration_progress = $message->progress;
-        $migration->migration_progress_action = $message->action;
-        $migration->migration_pid = $message->pid;
-        $migration->save(false);
-
-        $this->sendMigrationProgressbarChanged($migration->obj_id, $migration->migration_progress, $migration->migration_progress_action);
-
-        $this->debugLogger->message("Progress of migration $message->migration updated ($message->progress%)");
-
-    }
 
     public function actionUpdateHardMigrationStatus(Message\HardMigrationStatus $message, MessagingRdsMs $model)
     {
@@ -145,27 +109,6 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         }
     }
 
-    public function actionProcessHardMigrationLogChunk(Message\HardMigrationLogChunk $message, MessagingRdsMs $model)
-    {
-        /** @var $migration HardMigration */
-        $migration = HardMigration::model()->findByAttributes([
-            'migration_name' => $message->migration,
-            'migration_environment' => $model->getEnv(),
-        ]);
-
-        if (!$migration) {
-            $this->debugLogger->error("Can't find migration $message->migration, environment={$model->getEnv()}");
-            $message->accepted();
-            return;
-        }
-
-        HardMigration::model()->updateByPk($migration->obj_id, ['migration_log' => $migration->migration_log.$message->text]);
-
-        Yii::app()->realplexor->send('migrationLogChunk_'.$migration->obj_id, ['text' => $message->text]);
-
-        $message->accepted();
-    }
-
     public static function sendHardMigrationUpdated($id)
     {
         /** @var $debugLogger \ServiceBase_IDebugLogger */
@@ -197,12 +140,6 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         $comet = Yii::app()->realplexor;
         $comet->send('hardMigrationChanged', ['rr_id' => $id, 'html' => $html]);
         $debugLogger->message("Sended");
-    }
-
-    private function sendMigrationProgressbarChanged($id, $percent, $key)
-    {
-        $this->debugLogger->message("Sending migraion progressbar to comet");
-        Yii::app()->realplexor->send('migrationProgressbarChanged', ['migration' => $id, 'percent' => (float)$percent, 'key' => $key]);
     }
 
     public function createUrl($route, $params)

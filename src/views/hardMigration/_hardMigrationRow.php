@@ -61,7 +61,7 @@ return array(
             if (!in_array($migration->migration_status, [\HardMigration::MIGRATION_STATUS_IN_PROGRESS, \HardMigration::MIGRATION_STATUS_PAUSED])) {
                 return false;
             }
-            return '<div class="progress progress-'.$migration->obj_id.'" style="margin: 0; width: 250px;">
+            return '<div class="progress progress-'.str_replace("/", "", $migration->migration_name).'-'.$migration->migration_environment.'" style="margin: 0; width: 250px;">
                         <div class="bar" role="progressbar"style="width: '.$migration->migration_progress.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
                             <b>'.sprintf("%.2f", $migration->migration_progress).'%:</b> '.$migration->migration_progress_action.'
                         </div>

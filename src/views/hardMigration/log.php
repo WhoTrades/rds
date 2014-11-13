@@ -13,7 +13,7 @@
 </div>
 
 <script type="text/javascript">
-    realplexor.subscribe('migrationLogChunk_<?=$migration->obj_id?>', function(event){
+    realplexor.subscribe('migrationLogChunk_<?=str_replace("/", "", $migration->migration_name)?>_<?=$migration->migration_environment?>', function(event){
         $('#pre').append('<span>' + event.text + '</span>');
         var span = $('#pre span:last');
         span.css({fontWeight: 'bold'});
