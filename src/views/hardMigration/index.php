@@ -11,7 +11,7 @@ $this->breadcrumbs=['Hard Migrations'];
     'dataProvider'=>$model->search(),
     'filter'=>$model,
     'rowCssClassExpression' => function($index, $rr){
-        return 'hard-migration-'.$rr->obj_id;
+        return 'hard-migration-'.str_replace("/", "", $rr->migration_name).'_'.$rr->migration_environment;
     },
     'columns'=>include('_hardMigrationRow.php'),
 )); ?>
