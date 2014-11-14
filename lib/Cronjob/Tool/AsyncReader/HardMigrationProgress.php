@@ -24,10 +24,13 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readHardMigrationProgress(true, function(Message\HardMigrationProgress $message) use ($model) {
+        $model->readHardMigrationProgress(false, function(Message\HardMigrationProgress $message) use ($model) {
             $this->debugLogger->message("env={$model->getEnv()}, Received harm migration progress changed: ".json_encode($message));
             $this->actionHardMigrationProgressChanged($message, $model);
         });
+
+        $this->debugLogger->message("Start listening");
+        $this->waitForMessages($model, $cronJob);
     }
 
 
@@ -39,7 +42,7 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
         SET migration_progress=:progress, migration_progress_action=:action, migration_pid=:pid
         WHERE migration_name=:name and migration_environment=:env";
 
-        HardMigration::model()->getDbConnection()->createCommand($sql)->execute([
+        \HardMigration::model()->getDbConnection()->createCommand($sql)->execute([
             'progress' => $message->progress,
             'action' => $message->action,
             'pid' => $message->pid,
@@ -47,7 +50,7 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
             'env' => $model->getEnv(),
         ]);
 
-        $this->sendMigrationProgressbarChanged(str_replace("/", "", "$message->migration-{$model->getEnv()}"), $message->progress, $message->action);
+        $this->sendMigrationProgressbarChanged(str_replace("/", "", "{$message->migration}_{$model->getEnv()}"), $message->progress, $message->action);
 
         $this->debugLogger->message("Progress of migration $message->migration updated ($message->progress%)");
         $this->debugLogger->message("Executing progress got ".sprintf("%.2f", 1000 * (microtime(true) - $t))." ms");

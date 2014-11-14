@@ -24,10 +24,13 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readHardMigrationStatus(true, function(Message\HardMigrationStatus $message) use ($model) {
+        $model->readHardMigrationStatus(false, function(Message\HardMigrationStatus $message) use ($model) {
             $this->debugLogger->message("env={$model->getEnv()}, Received changing status of hard migration: ".json_encode($message));
             $this->actionUpdateHardMigrationStatus($message, $model);
         });
+
+        $this->debugLogger->message("Start listening");
+        $this->waitForMessages($model, $cronJob);
     }
 
 
@@ -137,8 +140,10 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         $html = ob_get_clean();
         $debugLogger->message("html code generated");
 
+        /** @var $migration HardMigration */
+        $migration = HardMigration::model()->findByPk($id);
         $comet = Yii::app()->realplexor;
-        $comet->send('hardMigrationChanged', ['rr_id' => $id, 'html' => $html]);
+        $comet->send('hardMigrationChanged', ['rr_id' => str_replace("/", "", "{$migration->migration_name}_$model->migration_environment"), 'html' => $html]);
         $debugLogger->message("Sended");
     }
 

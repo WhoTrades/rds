@@ -7,6 +7,7 @@ use \RdsSystem\Model\Rabbit\MessagingRdsMs;
  */
 class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\RabbitDaemon
 {
+    const MAX_TEXT_SIZE = 8000;
     const SYNC_INTERVAL = 3;
 
     private $logAppend = [];
@@ -29,10 +30,13 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readHardMigrationLogChunk(true, function(Message\HardMigrationLogChunk $message) use ($model) {
+        $model->readHardMigrationLogChunk(false, function(Message\HardMigrationLogChunk $message) use ($model) {
             $this->debugLogger->message("env={$model->getEnv()}, Received next log chunk: ".json_encode($message));
             $this->actionProcessHardMigrationLogChunk($message, $model);
         });
+
+        $this->debugLogger->message("Start listening");
+        $this->waitForMessages($model, $cronJob);
     }
 
 
@@ -48,8 +52,12 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
         ]);
 
         $id = str_replace("/", "", $message->migration)."_".$model->getEnv();
+        $this->debugLogger->message("id=$id");
 
-        Yii::app()->realplexor->send("migrationLogChunk_$id", ['text' => $message->text]);
+        //an: Максимальный размер пакета, который умещается в comet - 8KB. Потому и нам нужно разбивать
+        foreach (str_split($message->text, self::MAX_TEXT_SIZE) as $chunk) {
+            Yii::app()->realplexor->send("migrationLogChunk_$id", ['text' => $chunk]);
+        }
 
         $message->accepted();
 
