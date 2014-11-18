@@ -159,7 +159,7 @@
         'type' => 'raw'
     ),
     array(
-        'class'=>'CButtonColumn',
+        'class'=>'bootstrap.widgets.TbButtonColumn',
         'template' => '{delete}',
         'deleteButtonUrl' => 'Yii::app()->controller->createUrl("deleteReleaseRequest",array("id"=>$data->primaryKey))',
     ),

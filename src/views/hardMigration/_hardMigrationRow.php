@@ -78,7 +78,7 @@ return array(
     ],
 
     array(
-        'class'=>'CButtonColumn',
+        'class'=>'bootstrap.widgets.TbButtonColumn',
         'template' => '{warning} {start} {stop} {pause} {restart} {resume}',
         'buttons' => [
             'start' => [

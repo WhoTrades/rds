@@ -41,6 +41,11 @@ class ServiceRdsProdTL1
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_HardMigrationLogChunk::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_HardMigrationLogChunk::getToolCommand(['--max-duration=60 --env=preprod'], $verbosity=1), $delay=1)),
 
+            new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_MaintenanceTool::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1)),
+            new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_MaintenanceTool::getToolCommand(['--max-duration=60 --env=preprod'], $verbosity=1), $delay=1)),
+
+            new CronCommand(Cronjob_Tool_MaintenanceToolRun::getToolCommand(['--tool=ImportDataFromProdToPreprod --env=preprod'], $verbosity=1), '1 1 * * 6 *'),     //an: каждую субботу утром
+
             new CronCommand(Cronjob_Tool_HardMigrationStarter::getToolCommand([], $verbosity=1)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_CiBuildStatus::getToolCommand([], $verbosity=1), $delay = 5)),
         ];

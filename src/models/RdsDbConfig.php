@@ -9,6 +9,7 @@
  * @property string $obj_modified
  * @property integer $obj_status_did
  * @property string $red_lamp_wts_timeout
+ * @property string $preprod_online
  */
 class RdsDbConfig extends CActiveRecord
 {
@@ -44,7 +45,7 @@ class RdsDbConfig extends CActiveRecord
         return array(
             array('obj_created, obj_modified', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('red_lamp_wts_timeout', 'safe'),
+            array('red_lamp_wts_timeout, preprod_online', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array('obj_id, obj_created, obj_modified, obj_status_did, red_lamp_wts_timeout', 'safe', 'on'=>'search'),

@@ -101,7 +101,8 @@ class SiteController extends Controller
                         //an: Отправляем задачу в Rabbit на сборку
                         (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($task->worker->worker_name, new \RdsSystem\Message\BuildTask(
                             $task->obj_id, $task->project->project_name, $task->releaseRequest->rr_build_version, $task->releaseRequest->rr_release_version,
-                            $lastSuccess ? $lastSuccess->project->project_name.'-'.$lastSuccess->rr_build_version : null
+                            $lastSuccess ? $lastSuccess->project->project_name.'-'.$lastSuccess->rr_build_version : null,
+                            RdsDbConfig::get()->preprod_online
                         ));
                     }
 

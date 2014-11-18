@@ -19,7 +19,7 @@
         'rr_release_version',
         'project.project_name',
         array(
-            'class'=>'CButtonColumn',
+            'class'=>'bootstrap.widgets.TbButtonColumn',
             'template' => '{delete}',
             'deleteButtonUrl' => 'Yii::app()->controller->createUrl("deleteReleaseReject",array("id"=>$data->primaryKey))',
         ),
