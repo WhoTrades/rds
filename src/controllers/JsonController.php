@@ -35,5 +35,30 @@ class JsonController extends Controller
 
         echo json_encode($result, JSON_PRETTY_PRINT);
     }
+
+    public function actionGetSecondsAfterLastSuccessfulRunOfMaintenanceTool($toolName)
+    {
+        $tool = MaintenanceTool::model()->findByAttributes([
+            'mt_name' => $toolName,
+        ]);
+
+        if (!$tool) {
+            throw new CHttpException(404, "Tool $toolName not found");
+        }
+
+        $c = new CDbCriteria();
+        $c->limit = 1;
+        $c->order = 'obj_created desc';
+        $c->compare('mtr_maintenance_tool_obj_id', $tool->obj_id);
+        $c->compare('mtr_status', MaintenanceToolRun::STATUS_DONE);
+        $mtr = MaintenanceToolRun::model()->find($c);
+
+        //an: если тул ни разу не запускали - считаем что его запустили в начале времен
+        if (!$mtr) {
+            return time();
+        }
+
+        echo time() - strtotime($mtr->obj_created);
+    }
 }
 
