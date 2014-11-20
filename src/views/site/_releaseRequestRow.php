@@ -56,7 +56,7 @@
                         list($percent, $currentKey) = $info;
                         $result[] = '
                             <div class="progress progress-'.$val->obj_id.'" style="margin: 0; width: 250px;">
-                            <div class="bar" role="progressbar"style="width: '.$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
+                            <div class="progress-bar" style="width: '.$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
                                 <b>'.sprintf("%.2f", $percent).'%:</b> '.$currentKey.'
                             </div>
                             </div>';
