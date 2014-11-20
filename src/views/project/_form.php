@@ -4,9 +4,9 @@
 /* @var $form TbActiveForm */
 ?>
 
-<div class="form">
+<div class="form" style="width: 400px; margin: auto">
 
-<?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+<?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
 	'id'=>'project-form',
 	'enableAjaxValidation'=>false,
 )); ?>
@@ -15,7 +15,7 @@
 
 	<?php echo $form->errorSummary($model); ?>
 
-    <?php echo $form->textFieldRow($model,'project_name'); ?>
+    <?php echo $form->textFieldControlGroup($model,'project_name'); ?>
 
 
     <br />

@@ -6,8 +6,7 @@
 
 <div class="form" style="width: 400px; margin: auto">
 
-    <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
-        'type' => 'horizontal',
+    <?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
         'enableAjaxValidation' => false,
         'htmlOptions' => array(
             'enctype' => 'multipart/form-data',
@@ -19,10 +18,10 @@
 
     <?php echo $form->errorSummary($model); ?>
 
-    <?php echo $form->textFieldRow($model,'rr_comment'); ?>
+    <?php echo $form->textFieldControlGroup($model,'rr_comment'); ?>
 
-    <?php echo $form->dropDownListRow($model, 'rr_project_obj_id', \Project::model()->forList()); ?>
-    <?php echo $form->dropDownListRow($model, 'rr_release_version', \ReleaseVersion::model()->forList()); ?>
+    <?php echo $form->dropDownListControlGroup($model, 'rr_project_obj_id', \Project::model()->forList()); ?>
+    <?php echo $form->dropDownListControlGroup($model, 'rr_release_version', \ReleaseVersion::model()->forList()); ?>
 
     <div class="row buttons">
         <?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

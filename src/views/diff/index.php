@@ -6,7 +6,7 @@ Yii::app()->jsdifflib->register();
 
 ?>
 <div class="diff">
-    <div style="float: right;border: solid 1px #eee; cursor: pointer" class="icon-minus" onclick="togglePanelMode();"></div>
+    <?=TbHtml::icon(TbHtml::ICON_MINUS, ['style' => 'float: right ;border: solid 1px #eee; cursor: pointer', 'onclick' => 'togglePanelMode()',], 'div');?>
     <div class="item">
         <input type="checkbox" id="inline" style="float: left" onchange="diffUsingJS();" />
         <label for="inline">В одну колонку</label>

@@ -4,9 +4,9 @@
 /* @var $form CActiveForm */
 ?>
 
-<div class="form">
+<div class="form" style="width: 400px; margin: auto">
 
-<?php $form=$this->beginWidget('CActiveForm', array(
+<?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
 	'id'=>'release-version-form',
 	// Please note: When you enable ajax validation, make sure the corresponding
 	// controller action is handling ajax validation correctly.
@@ -19,17 +19,9 @@
 
 	<?php echo $form->errorSummary($model); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'rv_version'); ?>
-		<?php echo $form->textField($model,'rv_version'); ?>
-		<?php echo $form->error($model,'rv_version'); ?>
-	</div>
+    <?php echo $form->textFieldControlGroup($model,'rv_version'); ?>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'rv_name'); ?>
-		<?php echo $form->textField($model,'rv_name'); ?>
-		<?php echo $form->error($model,'rv_name'); ?>
-	</div>
+    <?php echo $form->textFieldControlGroup($model,'rv_name'); ?>
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

@@ -212,6 +212,8 @@ class UseController extends Controller
                 'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
             ];
             $jiraUse->save();
+
+            Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($id);
         }
 
         $this->redirect('/');

@@ -58,7 +58,7 @@ $this->menu=array(
                                 <td><?=$prevName?></td>
                                 <td>
                                     <div class="progress" style="margin: 0">
-                                        <div class="bar" role="progressbar" style="width: <?=100*($time - $prev)/$max?>%; color: black">
+                                        <div class="progress-bar" style="width: <?=100*($time - $prev)/$max?>%; color: black">
                                             <?=sprintf("%.2f", $time - $prev)?>
                                         </div>
                                     </div>

@@ -21,7 +21,7 @@ return [
 
             list($percent, $key) = $toolRun->getProgressPercentAndKey();
             return '<div class="progress progress-'.$toolRun->obj_id.'" style="margin: 0; width: 250px;">
-                            <div class="bar" role="progressbar"style="width: '.(int)$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
+                            <div class="progress-bar" style="width: '.(int)$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
                                 <b>'.sprintf("%.2f", $percent).'%</b>: '.$key.'
                             </div>
                         </div>';
@@ -37,21 +37,21 @@ return [
         'type' => 'html',
     ],
     [
-        'class'=>'bootstrap.widgets.TbButtonColumn',
-        'template' => '{start} {delete}',
+        'class'=>'yiistrap.widgets.TbButtonColumn',
+        'template' => '{start} {stop}',
         'buttons' => [
             'start' => [
                 'visible' => '$data->canBeStarted()',
                 'url' => 'Yii::app()->controller->createAbsoluteUrl("/maintenanceTool/start",array("id"=>$data->primaryKey))',
-                'label' => '<span class="icon-play" style="color: #32cd32"></span>',
+                'label' => TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Запустить команду',
                 ],
             ],
-            'delete' => [
+            'stop' => [
                 'visible' => '$data->canBeKilled()',
                 'url' => 'Yii::app()->controller->createAbsoluteUrl("/maintenanceTool/stop",array("id"=>$data->primaryKey))',
-                'label' => '<span class="icon-play" style="color: #32cd32"></span>',
+                'label' => TbHtml::icon(TbHtml::ICON_STOP, ['style' => 'color: red']),
                 'options' => [
                     'title' => 'Остановить команду',
                 ],

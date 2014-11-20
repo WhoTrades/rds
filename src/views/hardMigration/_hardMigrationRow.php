@@ -36,17 +36,19 @@ return array(
         'name' => 'migration_status',
         'value' => function(HardMigration $migration){
             $map = array(
-                HardMigration::MIGRATION_STATUS_NEW => array('time', 'Миграция ожидает запуска, ручного или автоматического', 'black'),
-                HardMigration::MIGRATION_STATUS_IN_PROGRESS => array('refresh', 'Миграция выполняется', 'orange'),
-                HardMigration::MIGRATION_STATUS_STARTED => array('refresh', 'Отправлен сигнал на запуск миграции, ожидаем пока скрипты отработают и миграция запустится', 'orange'),
-                HardMigration::MIGRATION_STATUS_DONE=> array('ok', 'Миграция была успешно выполнена', '#32cd32'),
-                HardMigration::MIGRATION_STATUS_FAILED => array('remove', 'Миграция была запущена и заверилась с ошибкой', 'red'),
-                HardMigration::MIGRATION_STATUS_PAUSED=> array('time', 'Миграция была поставлена на паузу и может быть в любой момент снова запущена', 'blue'),
-                HardMigration::MIGRATION_STATUS_STOPPED => array('remove', 'Миграция была остановлена отправкой сигнала KILL', 'red'),
+                HardMigration::MIGRATION_STATUS_NEW => array(TbHtml::ICON_TIME, 'Миграция ожидает запуска, ручного или автоматического', 'black'),
+                HardMigration::MIGRATION_STATUS_IN_PROGRESS => array(TbHtml::ICON_REFRESH, 'Миграция выполняется', 'orange'),
+                HardMigration::MIGRATION_STATUS_STARTED => array(TbHtml::ICON_REFRESH, 'Отправлен сигнал на запуск миграции, ожидаем пока скрипты отработают и миграция запустится', 'orange'),
+                HardMigration::MIGRATION_STATUS_DONE=> array(TbHtml::ICON_OK, 'Миграция была успешно выполнена', '#32cd32'),
+                HardMigration::MIGRATION_STATUS_FAILED => array(TbHtml::ICON_BAN_CIRCLE, 'Миграция была запущена и заверилась с ошибкой', 'red'),
+                HardMigration::MIGRATION_STATUS_PAUSED=> array(TbHtml::ICON_TIME, 'Миграция была поставлена на паузу и может быть в любой момент снова запущена', 'blue'),
+                HardMigration::MIGRATION_STATUS_STOPPED => array(TbHtml::ICON_BAN_CIRCLE, 'Миграция была остановлена отправкой сигнала KILL', 'red'),
             );
 
             list($icon, $text, $color) = $map[$migration->migration_status];
-            echo "<span title='{$text}' style='color: $color; font-weight: bold'><span class='icon-$icon'></span>$migration->migration_status</span><br />";
+            echo "<span title='{$text}' style='color: $color; font-weight: bold'>".
+            TbHtml::icon($icon, ['style' => 'margin-right: 1px;']).
+            "$migration->migration_status</span><br />";
             if ($migration->migration_log) {
                 echo "<a href='".Yii::app()->createAbsoluteUrl('/hardMigration/log', ['id' => $migration->obj_id])."'>LOG</a>";
             }
@@ -62,7 +64,7 @@ return array(
                 return false;
             }
             return '<div class="progress progress-'.str_replace("/", "", $migration->migration_name).'_'.$migration->migration_environment.'" style="margin: 0; width: 250px;">
-                        <div class="bar" role="progressbar"style="width: '.$migration->migration_progress.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
+                        <div class="progress-bar" style="width: '.$migration->migration_progress.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
                             <b>'.sprintf("%.2f", $migration->migration_progress).'%:</b> '.$migration->migration_progress_action.'
                         </div>
                     </div>';
@@ -78,13 +80,13 @@ return array(
     ],
 
     array(
-        'class'=>'bootstrap.widgets.TbButtonColumn',
+        'class'=>'yiistrap.widgets.TbButtonColumn',
         'template' => '{warning} {start} {stop} {pause} {restart} {resume}',
         'buttons' => [
             'start' => [
                 'visible' => '$data->canBeStarted()',
                 'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/start",array("id"=>$data->primaryKey))',
-                'label' => '<span class="icon-play" style="color: #32cd32"></span>',
+                'label' => TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Запустить миграцию',
                 ],
@@ -92,7 +94,7 @@ return array(
             'stop' => [
                 'visible' => '$data->canBeStopped()',
                 'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/stop",array("id"=>$data->primaryKey))',
-                'label' => '<span class="icon-stop" style="color: #32cd32"></span>',
+                'label' => TbHtml::icon(TbHtml::ICON_STOP, ['style' => 'color: red']),
                 'options' => [
                     'title' => 'Остановить миграцию',
                 ],
@@ -100,7 +102,7 @@ return array(
             'pause' => [
                 'visible' => '$data->canBePaused()',
                 'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/pause",array("id"=>$data->primaryKey))',
-                'label' => '<span class="icon-pause" style="color: #32cd32"></span>',
+                'label' => TbHtml::icon(TbHtml::ICON_PAUSE, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Поставить на паузу',
                 ],
@@ -108,7 +110,7 @@ return array(
             'resume' => [
                 'visible' => '$data->canBeResumed()',
                 'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/resume",array("id"=>$data->primaryKey))',
-                'label' => '<span class="icon-play" style="color: #32cd32"></span>',
+                'label' => TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Запустить миграцию',
                 ],
@@ -116,14 +118,14 @@ return array(
             'restart' => [
                 'visible' => '$data->canBeRestarted()',
                 'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/restart",array("id"=>$data->primaryKey))',
-                'label' => '<span class="icon-play" style="color: #32cd32"></span>',
+                'label' => TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Перезапустить миграцию',
                 ],
             ],
             'warning' => [
                 'visible' => '!$data->doesMigrationReleased()',
-                'label' => '<span class="icon-lock" style="color: #32cd32; cursor: default"></span>',
+                'label' => TbHtml::icon(TbHtml::ICON_LOCK, ['style' => 'color: #32cd32; cursor: default']),
                 'options' => [
                     'title' => 'Проект ещё не выложен, миграции пока нет на серверах, потому её нельзя накатить',
                 ],

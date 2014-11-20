@@ -2,7 +2,6 @@
 /** @var $model MaintenanceToolRun */
 $this->breadcrumbs=array(
     'Maintenance Tool Runs'=>array('index'),
-    $model->obj_id,
 );
 
 $this->pageTitle = "Выполнение процесса ".$model->mtrMaintenanceTool->mt_name;
@@ -18,7 +17,7 @@ $this->menu=array(
 
     <h1>View MaintenanceToolRun #<?php echo $model->obj_id; ?></h1>
 
-<?php $this->widget('bootstrap.widgets.TbDetailView',array(
+<?php $this->widget('yiistrap.widgets.TbDetailView',array(
     'data'=>$model,
     'attributes'=>array(
         'obj_id',
@@ -41,7 +40,7 @@ $this->menu=array(
 
                 list($percent, $key) = $toolRun->getProgressPercentAndKey();
                 return '<div class="progress progress-'.$toolRun->obj_id.'" style="margin: 0; width: 250px;">
-                            <div class="bar" role="progressbar"style="width: '.(int)$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
+                            <div class="progress-bar" style="width: '.(int)$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
                                 <b>'.sprintf("%.2f", $percent).'%</b>: '.$key.'
                             </div>
                         </div>';

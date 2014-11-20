@@ -18,7 +18,7 @@ $this->menu=array(
     or <b>=</b>) at the beginning of each of your search values to specify how the comparison should be done.
 </p>
 
-<?php $this->widget('bootstrap.widgets.TbGridView',array(
+<?php $this->widget('yiistrap.widgets.TbGridView',array(
     'id'=>'maintenance-tool-run-grid',
     'dataProvider'=>$model->search(),
     'filter'=>$model,
@@ -30,7 +30,7 @@ $this->menu=array(
         'mtr_pid',
         'mtr_status',
         array(
-            'class'=>'bootstrap.widgets.TbButtonColumn',
+            'class'=>'yiistrap.widgets.TbButtonColumn',
             'template' => '{view}'
         ),
     ),

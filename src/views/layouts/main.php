@@ -11,47 +11,29 @@
 	<title>RDS: <?php echo CHtml::encode($this->pageTitle); ?></title>
 
 	<?php Yii::app()->bootstrap->register(); ?>
-    <? Yii::app()->realplexor->registerScripts()?>
+    <?php Yii::app()->realplexor->registerScripts()?>
 </head>
 
 <body>
 
-<?php
-$this->widget('bootstrap.widgets.TbNavbar',array(
-    'fixed' => false,
-    'items'=>array(
-        array(
-            'class'=>'bootstrap.widgets.TbMenu',
-            'items'=>array(
-                array('label'=>'Главная', 'url'=>array('/site/index')),
-                array('label'=>'Миграции', 'url'=>array('/hardMigration/index'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Проекты', 'url'=>array('/project/admin'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Сборщики', 'url'=>array('/worker/admin'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Версии', 'url'=>array('/releaseVersion/admin'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Журнал', 'url'=>array('/log/index'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'JIRA', 'url'=>array('/jira/index'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Обслуживание', 'url'=>array('/maintenanceTool/index'), 'visible'=>!Yii::app()->user->isGuest),
-                array('label'=>'Выйти ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
-            ),
-        ),
-    ),
+<?=TbHtml::tabs(array(
+    array('label'=>'Главная', 'url'=>array('/site/index'), 'active' => $this->getId() == 'site'),
+    array('label'=>'Миграции', 'url'=>array('/hardMigration/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'hardMigration'),
+    array('label'=>'Проекты', 'url'=>array('/project/admin'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'project'),
+    array('label'=>'Сборщики', 'url'=>array('/worker/admin'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'worker'),
+    array('label'=>'Версии', 'url'=>array('/releaseVersion/admin'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'releaseVersion'),
+    array('label'=>'Журнал', 'url'=>array('/log/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'log'),
+    array('label'=>'JIRA', 'url'=>array('/jira/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'jira'),
+    array('label'=>'Обслуживание', 'url'=>array('/maintenanceTool/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'maintenanceTool'),
+    array('label'=>'Выйти ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
 )); ?>
 
 <?$this->widget('PostMigration', [])?>
 
 
 <div id="page" class="container-fluid">
-
-	<?php if(isset($this->breadcrumbs)):?>
-		<?php $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
-			'links'=>$this->breadcrumbs,
-		)); ?><!-- breadcrumbs -->
-	<?php endif?>
-
 	<?php echo $content; ?>
-
 	<div class="clear"></div>
-
 </div><!-- page -->
 
 </body>

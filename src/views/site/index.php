@@ -4,10 +4,9 @@
 /* @var $releaseRequestSearchModel ReleaseRequest */
 ?>
 
-
 <h1>Запреты релиза</h1>
 <a href="<?=$this->createUrl('createReleaseReject')?>">Создать</a>
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'release-reject-grid',
     'dataProvider'=>$releaseRejectSearchModel->search(),
     'filter'=>$releaseRejectSearchModel,
@@ -19,7 +18,7 @@
         'rr_release_version',
         'project.project_name',
         array(
-            'class'=>'bootstrap.widgets.TbButtonColumn',
+            'class'=>'yiistrap.widgets.TbButtonColumn',
             'template' => '{delete}',
             'deleteButtonUrl' => 'Yii::app()->controller->createUrl("deleteReleaseReject",array("id"=>$data->primaryKey))',
         ),
@@ -27,12 +26,12 @@
 <hr />
 <h2>Запрос релиза</h2>
 <a href="<?=$this->createUrl('createReleaseRequest')?>">Создать</a>
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'release-request-grid',
     'dataProvider'=>$releaseRequestSearchModel->search(),
     'filter'=>$releaseRequestSearchModel,
     'rowCssClassExpression' => function($index, $rr){
-        return 'release-request-'.$rr->obj_id;
+        return 'release-request-'.$rr->obj_id." release-request-".$rr->rr_status;
     },
     'columns'=>include('_releaseRequestRow.php'),
 )); ?>
@@ -51,13 +50,15 @@
 <script>
     realplexor.subscribe('releaseRequestChanged', function(event){
         var html = event.html;
+        console.log($(html).find('tr.rowItem').first().attr('class'));
         var trHtmlCode = $(html).find('tr.rowItem').first().html()
         $('.release-request-'+event.rr_id).html(trHtmlCode);
+        $('.release-request-'+event.rr_id).attr('class', $(html).find('tr.rowItem').first().attr('class'));
         console.log('Release request '+event.rr_id+' updated');
     });
     realplexor.subscribe('progressbarChanged', function(event){
-        $('.progress-'+event.build_id+' .bar').css({width: event.percent+'%'});
-        $('.progress-'+event.build_id+' .bar').html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
+        $('.progress-'+event.build_id+' .progress-bar').css({width: event.percent+'%'});
+        $('.progress-'+event.build_id+' .progress-bar').html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
         console.log(event);
     });
     realplexor.subscribe('refresh', function(event){
@@ -78,7 +79,7 @@
 
 
 <style>
-    .grid-view .filter-container input {
-        max-width: 100px;
+    .release-request-used {
+        background: #EEFFEE;
     }
 </style>

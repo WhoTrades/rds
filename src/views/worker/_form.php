@@ -4,7 +4,7 @@
 /* @var $form CActiveForm */
 ?>
 
-<div class="form">
+<div class="form" style="width: 400px; margin: auto">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'worker-form',

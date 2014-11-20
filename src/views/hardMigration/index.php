@@ -6,7 +6,7 @@ $this->breadcrumbs=['Hard Migrations'];
 <h1>Управление тяжелыми миграциями</h1>
 <p> Можно использовать дополнительные операторы сравнения (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b> or <b>=</b>) </p>
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'hard-migration-grid',
     'dataProvider'=>$model->search(),
     'filter'=>$model,
@@ -35,9 +35,9 @@ $this->breadcrumbs=['Hard Migrations'];
         $('.hard-migration-'+event.rr_id).html(trHtmlCode);
     });
     realplexor.subscribe('migrationProgressbarChanged', function(event){
-        $('.progress-'+event.migration+' .bar').css({width: event.percent+'%'});
+        $('.progress-'+event.migration+' .progress-bar').css({width: event.percent+'%'});
         var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
-        $('.progress-'+event.migration+' .bar').html(html);
+        $('.progress-'+event.migration+' .progress-bar').html(html);
         $('.progress-action-'+event.migration).html(event.key);
     });
     realplexor.execute();

@@ -6,7 +6,7 @@ $this->breadcrumbs=array(
     'Maintenance Tools',
 );
 $this->pageTitle = "Обслуживание";
-$this->widget('bootstrap.widgets.TbGridView', array(
+$this->widget('yiistrap.widgets.TbGridView', array(
     'dataProvider'=>$model->search(),
     'rowCssClassExpression' => function($index, MaintenanceTool $tool){
         return 'maintenance-tool-'.$tool->obj_id;
@@ -25,9 +25,9 @@ $this->widget('bootstrap.widgets.TbGridView', array(
         $('.maintenance-tool-'+event.id).html(trHtmlCode);
     });
     realplexor.subscribe('maintenanceToolProgressbarChanged', function(event){
-        $('.progress-'+event.id+' .bar').css({width: event.percent+'%'});
+        $('.progress-'+event.id+' .progress-bar').css({width: event.percent+'%'});
         var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
-        $('.progress-'+event.id+' .bar').html(html);
+        $('.progress-'+event.id+' .progress-bar').html(html);
         $('.progress-action-'+event.id).html(event.key);
     });
     realplexor.execute();

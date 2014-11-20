@@ -654,6 +654,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         /** @var $debugLogger \ServiceBase_IDebugLogger */
         $debugLogger = Yii::app()->debugLogger;
 
+        $releaseRequest = ReleaseRequest::model()->findByPk($id);
+        if (!$releaseRequest){ return;}
+
         $debugLogger->message("Sending to comet new data of releaseRequest $id");
         Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
         Yii::app()->assetManager->setBaseUrl("/assets/");
@@ -666,10 +669,10 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         Yii::app()->setController($controller);
         $model = ReleaseRequest::model();
         $model->obj_id = $id;
-        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'bootstrap.widgets.TbGridView', [
+        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'yiistrap.widgets.TbGridView', [
             'dataProvider'=>new CActiveDataProvider($model, $model->search()),
             'columns'=>$rowTemplate,
-            'rowCssClassExpression' => function(){return 'rowItem';},
+            'rowCssClassExpression' => function() use ($releaseRequest) {return 'rowItem release-request-'.$releaseRequest->obj_id.' release-request-'.$releaseRequest->rr_status;},
         ]);
         $widget->init();
         ob_start();

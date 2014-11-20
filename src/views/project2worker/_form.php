@@ -4,9 +4,9 @@
 /* @var $form CActiveForm */
 ?>
 
-<div class="form">
+<div class="form" style="width: 400px; margin: auto">
 
-<?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+<?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
 	'id'=>'project2worker-form',
 	// Please note: When you enable ajax validation, make sure the corresponding
 	// controller action is handling ajax validation correctly.
@@ -19,8 +19,8 @@
 
 	<?php echo $form->errorSummary($model); ?>
 
-    <?php echo $form->dropDownListRow($model, 'worker_obj_id', \Worker::model()->forList()); ?>
-    <?php echo $form->dropDownListRow($model, 'project_obj_id', \Project::model()->forList()); ?>
+    <?php echo $form->dropDownListControlGroup($model, 'worker_obj_id', \Worker::model()->forList()); ?>
+    <?php echo $form->dropDownListControlGroup($model, 'project_obj_id', \Project::model()->forList()); ?>
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

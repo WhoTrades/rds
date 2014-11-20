@@ -36,7 +36,7 @@ $('.search-form form').submit(function(){
 )); ?>
 </div><!-- search-form -->
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'log-grid',
     'dataProvider'=>$model->search(),
     'filter'=>$model,

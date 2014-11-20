@@ -134,7 +134,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $model->obj_id = $mtr->mtr_maintenance_tool_obj_id;
 
         $rowTemplate = include($filename);
-        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'bootstrap.widgets.TbGridView', [
+        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'yiistrap.widgets.TbGridView', [
             'dataProvider'=>new CActiveDataProvider($model, $model->search()),
             'columns'=>$rowTemplate,
             'rowCssClassExpression' => function(){return 'rowItem';},

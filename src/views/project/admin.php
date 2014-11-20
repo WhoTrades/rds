@@ -40,7 +40,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 )); ?>
 </div><!-- search-form -->
 
-<?php $this->widget('bootstrap.widgets.TbGridView', array(
+<?php $this->widget('yiistrap.widgets.TbGridView', array(
 	'id'=>'project-grid',
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
@@ -63,7 +63,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
             'filter' => 'Workers',
         ),
 		array(
-            'class'=>'bootstrap.widgets.TbButtonColumn',
+            'class'=>'yiistrap.widgets.TbButtonColumn',
 		),
 	),
 )); ?>
