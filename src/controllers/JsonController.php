@@ -36,6 +36,18 @@ class JsonController extends Controller
         echo json_encode($result, JSON_PRETTY_PRINT);
     }
 
+    /**
+     * Метод используется git хуком update.php, который проверяет можно ли команде CRM пушить в хотрелизную ветку после кодфриза и до релиза
+     * @param string $projectName
+     */
+    public function actionGetProjectCurrentVersion($projectName)
+    {
+        /** @var $project Project */
+        $project = Project::model()->findByAttributes(['project_name' => $projectName]);
+
+        echo $project ? $project->project_current_version : null;
+    }
+
     public function actionGetSecondsAfterLastSuccessfulRunOfMaintenanceTool($toolName)
     {
         $tool = MaintenanceTool::model()->findByAttributes([
