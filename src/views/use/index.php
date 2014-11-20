@@ -1,6 +1,5 @@
 <h2>Ввод кодов для релиза</h2>
 <?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
-        'type' => 'horizontal',
         'enableAjaxValidation' => false,
         'htmlOptions' => array(
             'enctype' => 'multipart/form-data',
