@@ -70,7 +70,7 @@ class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
                     ? \Config::getInstance()->serviceRds['alerts']['lampOffEmail']
                     : \Config::getInstance()->serviceRds['alerts']['lampOnEmail'];
 
-                $mailHeaders = "From: $receiver\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=UTF-8";
+                $mailHeaders = "From: $receiver\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=utf-8";
 
                 if ($status != AlertLog::STATUS_OK) {
                     $subject = "Ошибка в тестах номер № $new->obj_id, лампочка $new->alert_name";
