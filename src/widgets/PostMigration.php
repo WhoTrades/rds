@@ -20,6 +20,8 @@ class PostMigration extends CWidget
         $ids = Yii::app()->db->createCommand($sql)->queryColumn();
         $c = new CDbCriteria();
         $c->compare('t.obj_id', $ids);
+        $c->compare('t.rr_post_migration_status', '<>'.ReleaseRequest::MIGRATION_STATUS_UP);
+        $c->addCondition("rr_new_post_migrations != '' and rr_new_post_migrations != '[]' and not rr_new_post_migrations is null");
         $c->with = ['project'];
         $releaseRequests = ReleaseRequest::model()->findAll($c);
 
