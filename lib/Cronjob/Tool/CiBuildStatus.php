@@ -78,7 +78,9 @@ class Cronjob_Tool_CiBuildStatus extends RdsSystem\Cron\RabbitDaemon
                     date_default_timezone_set(AlertController::TIMEZONE);
                     $text = "Ошибки: $text<br />\n";
                     if (AlertController::canBeLampLightedByTimeRanges()) {
-                        $text .= "Лампа загорится через 5 минут в ".date("Y.m.d H:i:s", strtotime(AlertController::ALERT_TIMEOUT))." МСК<br />\n";
+                        $text .= "Лампа загорится через 5 минут в ".date("Y.m.d H:i:s", strtotime(AlertController::ALERT_TIMEOUT))." МСК<br />
+                        Взять ошибку в работу - http://rds.whotrades.net/alert/ (лампа погаснет на 10 минут)
+                        \n";
                     } else {
                         $text .= "Лампа загорится в ".AlertController::ALERT_START_HOUR.":00 МСК<br />\n";
                     }
