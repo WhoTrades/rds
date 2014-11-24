@@ -10,7 +10,7 @@
                 Updating migrations
             <?} elseif ($rr->rr_post_migration_status == \ReleaseRequest::MIGRATION_STATUS_FAILED) {?>
                 Migrations failed
-            <?} else {?>
+            <?} elseif ($rr->rr_post_migration_status == \ReleaseRequest::MIGRATION_STATUS_NONE) {?>
                 <a href="/use/migrate/?id=<?=$rr->obj_id?>&type=post">Накатить</a>
                 <div style="clear: both"></div>
                 <?foreach (json_decode($rr->rr_new_post_migrations) as $migration) {?>
