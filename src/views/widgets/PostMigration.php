@@ -4,6 +4,7 @@
     <div style="float: right; margin: 20px;">
         <h4>POST миграции</h4>
         <?foreach($releaseRequests as $rr) {?>
+            <?if (!$rr->rr_new_post_migrations || !json_encode($rr->rr_new_post_migrations)) { continue;} ?>
             <h5 style="float: left; margin: 0 20px 0 0"><?=$rr->project->project_name?> :: <?=$rr->rr_build_version?> (<?=count(json_decode($rr->rr_new_post_migrations))?>)</h5>
             <?if ($rr->rr_post_migration_status == \ReleaseRequest::MIGRATION_STATUS_UPDATING) {?>
                 Updating migrations

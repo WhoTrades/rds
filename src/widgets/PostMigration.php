@@ -6,30 +6,22 @@ class PostMigration extends CWidget
         if (Yii::app()->user->isGuest) {
             return;
         }
-        $projects = Project::model()->findAll();
+        $sql = "select * from (
+                    select (
+                        select obj_id from rds.release_request where
+                        rr_status IN ('old', 'installed')
+                        and rr_project_obj_id=project.obj_id
+                        and rr_build_version <= ((string_to_array(project_current_version,'.'))[1])::varchar
+                        order by rr_build_version desc
+                        limit 1
+                    ) as rr_obj_id from rds.project
+                )  as subquery where not rr_obj_id is null";
 
-        $releaseRequests = [];
-
-        foreach ($projects as $project) {
-            /** @var $project Project */
-            $version = $project->project_current_version;
-            list($release) = explode(".", $version);
-
-            $c = new CDbCriteria();
-            $c->compare('rr_project_obj_id', $project->obj_id);
-            $c->compare('rr_build_version', "<=".($version-1));
-            $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
-            $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
-
-            $c->order = 'rr_build_version desc';
-            $c->limit = 1;
-
-            if ($rr = ReleaseRequest::model()->find($c)) {
-                if ($rr->rr_post_migration_status != ReleaseRequest::MIGRATION_STATUS_UP && json_decode($rr->rr_new_post_migrations)) {
-                    $releaseRequests[] = $rr;
-                }
-            }
-        }
+        $ids = Yii::app()->db->createCommand($sql)->queryColumn();
+        $c = new CDbCriteria();
+        $c->compare('t.obj_id', $ids);
+        $c->with = ['project'];
+        $releaseRequests = ReleaseRequest::model()->findAll($c);
 
         $this->render('application.views.widgets.PostMigration', [
             'releaseRequests' => $releaseRequests,

@@ -670,7 +670,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $model = ReleaseRequest::model();
         $model->obj_id = $id;
         $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'yiistrap.widgets.TbGridView', [
-            'dataProvider'=>new CActiveDataProvider($model, $model->search()),
+            'dataProvider'=>$model->search(),
             'columns'=>$rowTemplate,
             'rowCssClassExpression' => function() use ($releaseRequest) {return 'rowItem release-request-'.$releaseRequest->obj_id.' release-request-'.$releaseRequest->rr_status;},
         ]);

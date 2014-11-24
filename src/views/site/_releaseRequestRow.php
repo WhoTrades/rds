@@ -101,65 +101,58 @@
         'type' => 'html',
     ),
     array(
-        'value' => function(ReleaseRequest $releaseRequest){
+        'value' => function(ReleaseRequest $releaseRequest, $rowIndex, TbDataColumn $column){
+            /** @var $provider ReleaseRequestSearchDataProvider*/
+            $provider = $column->grid->dataProvider;
 
+            if ($releaseRequest->canBeUsed()) {
 
-                if ($releaseRequest->canBeUsed()) {
-                static $currentUsedCache = [];
+            $currentUsed = $provider->getCurrentUsedReleaseRequest($releaseRequest->rr_project_obj_id);
 
-                $currentUsed = isset($currentUsedCache[$releaseRequest->rr_project_obj_id])
-                    ? $currentUsedCache[$releaseRequest->rr_project_obj_id]
-                    : \ReleaseRequest::model()->findByAttributes([
-                            'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
-                            'rr_status' => [\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT],
-                        ]);
+            if ($currentUsed && $currentUsed->rr_cron_config != $releaseRequest->rr_cron_config) {
+                $diffStat = Yii::app()->diffStat->getDiffStat($currentUsed->rr_cron_config, $releaseRequest->rr_cron_config);
+                $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
+                $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
+                echo "<a href='".Yii::app()->createUrl('/diff/index/', ['id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id])."'>CRON changed<br />$diffStat</a><br />";
+            }
 
-                if ($currentUsed && $currentUsed->rr_cron_config != $releaseRequest->rr_cron_config) {
-                    $diffStat = Yii::app()->diffStat->getDiffStat($currentUsed->rr_cron_config, $releaseRequest->rr_cron_config);
-                    $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
-                    $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
-                    echo "<a href='".Yii::app()->createUrl('/diff/index/', ['id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id])."'>
-                CRON changed<br />$diffStat
-            </a><br />";
-                }
+            if ($releaseRequest->hardMigrations) {
+                echo "<a href='".Yii::app()->createUrl('hardMigration/index', ['HardMigration[migration_release_request_obj_id]'=>$releaseRequest->obj_id])."'>Show hard migrations (".count($releaseRequest->hardMigrations).")</a><br />";
+            }
 
-                if ($releaseRequest->hardMigrations) {
-                    echo "<a href='".Yii::app()->createUrl('hardMigration/index', ['HardMigration[migration_release_request_obj_id]'=>$releaseRequest->obj_id])."'>Show hard migrations (".count($releaseRequest->hardMigrations).")</a><br />";
-                }
-
-                if ($releaseRequest->rr_new_migration_count) {
-                    if ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_UPDATING) {
-                        return "updating migrations";
-                    } elseif ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_FAILED) {
-                        return "updating migrations failed";
-                    } else {
-                        $text =
-                            "<a href='".Yii::app()->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre'))."'>RUN pre migrations</a><br />".
-                            "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show pre migrations</a>
-                            <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
-                        foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                            $text .= "<a href='http://sources:8060/browse/migration-{$releaseRequest->project->project_name}/pre/$migration.php?hb=true'>$migration</a><br />";
-                        }
-                        $text .= "</div>";
-
-                        return $text;
-                    }
+            if ($releaseRequest->rr_new_migration_count) {
+                if ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_UPDATING) {
+                    return "updating migrations";
+                } elseif ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_FAILED) {
+                    return "updating migrations failed";
                 } else {
-                    return "<a href='".Yii::app()->createUrl('/use/create', array('id' => $releaseRequest->obj_id))."'>USE</a>";
-                }
-                } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_CODES) {
-                    return "<a href='".Yii::app()->createUrl('/use/index', array('id' => $releaseRequest->obj_id))."'>Enter codes</a>";
-                } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {
-                    return "<a href='".Yii::app()->createUrl('/use/fixAttempt', array('id' => $releaseRequest->obj_id))."'>Make stable</a>";
-                } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
-                    $oldReleaseRequest = $releaseRequest->getOldReleaseRequest();
-                    if ($oldReleaseRequest && $oldReleaseRequest->canBeUsed()) {
-                        return "<a href='".Yii::app()->createUrl('/use/create', array('id' => $oldReleaseRequest->obj_id))."'>Revert to $releaseRequest->rr_old_version</a>";
+                    $text =
+                        "<a href='".Yii::app()->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre'))."'>RUN pre migrations</a><br />".
+                        "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show pre migrations</a>
+                        <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
+                    foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
+                        $text .= "<a href='http://sources:8060/browse/migration-{$releaseRequest->project->project_name}/pre/$migration.php?hb=true'>$migration</a><br />";
                     }
-                }
+                    $text .= "</div>";
 
-                return null;
-            },
+                    return $text;
+                }
+            } else {
+                return "<a href='".Yii::app()->createUrl('/use/create', array('id' => $releaseRequest->obj_id))."'>USE</a>";
+            }
+            } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_CODES) {
+                return "<a href='".Yii::app()->createUrl('/use/index', array('id' => $releaseRequest->obj_id))."'>Enter codes</a>";
+            } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {
+                return "<a href='".Yii::app()->createUrl('/use/fixAttempt', array('id' => $releaseRequest->obj_id))."'>Make stable</a>";
+            } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
+                $oldReleaseRequest = $releaseRequest->getOldReleaseRequest($releaseRequest->rr_project_obj_id, $releaseRequest->rr_old_version);
+                if ($oldReleaseRequest && $oldReleaseRequest->canBeUsed()) {
+                    return "<a href='".Yii::app()->createUrl('/use/create', array('id' => $oldReleaseRequest->obj_id))."'>Revert to $releaseRequest->rr_old_version</a>";
+                }
+            }
+
+            return null;
+        },
         'type' => 'raw'
     ),
     array(

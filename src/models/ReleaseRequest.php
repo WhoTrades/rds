@@ -208,9 +208,9 @@ class ReleaseRequest extends CActiveRecord
 		$criteria->compare('t.rr_project_obj_id',$this->rr_project_obj_id);
 		$criteria->compare('t.rr_build_version',$this->rr_build_version, true);
         $criteria->order = 't.obj_created desc';
-        $criteria->with = array('builds', 'builds.worker', 'builds.project');
+        $criteria->with = array('builds', 'builds.worker', 'builds.project', 'hardMigrations');
 
-		return new CActiveDataProvider($this, array(
+		return new ReleaseRequestSearchDataProvider($this, array(
 			'criteria'=>$criteria,
 		));
 	}
