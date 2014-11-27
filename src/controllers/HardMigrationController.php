@@ -79,7 +79,7 @@ class HardMigrationController extends Controller
     {
         $migration = $this->loadModel($id);
         Log::createLogMessage("Снята с паузы {$migration->getTitle()}");
-        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_RESUME);
+        $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_RESUME, HardMigration::MIGRATION_STATUS_IN_PROGRESS);
     }
 
     public function actionStop($id)
