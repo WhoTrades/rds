@@ -544,7 +544,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             ]);
 
             if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime('-1 week'))) {
-                //an: Не удаляем те билды, что были на проде меньше месяца назад
+                //an: Не удаляем те билды, что были на проде меньше недели назад
                 continue;
             }
 
@@ -560,10 +560,23 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 $c->compare('rr_project_obj_id', $project->obj_id);
                 $c->compare('rr_build_version', '>'.$build['version']);
                 $c->compare('rr_build_version', '<'.$project->project_current_version);
+                $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
                 $count = \ReleaseRequest::model()->count($c);
 
                 if ($count > 5) {
                     //an: Нужно наличие минимум 2 версий от текущей, что бы было куда откатываться
+                    $result[] = $build;
+                }
+            } elseif($numbersOfCurrent[0] - 1 == $numbersOfTest[0]) {
+                $c = new CDbCriteria();
+                $c->compare('rr_project_obj_id', $project->obj_id);
+                $c->compare('rr_build_version', '>'.$build['version']);
+                $c->compare('rr_build_version', '<'.$numbersOfCurrent[0].".00.000.000");
+                $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
+                $count = \ReleaseRequest::model()->count($c);
+
+                if ($count > 5) {
+                    //an: Нужно наличие минимум 2 версий в текущем релизе, что бы точно могли откатиться
                     $result[] = $build;
                 }
             }
