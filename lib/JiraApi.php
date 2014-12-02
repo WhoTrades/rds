@@ -17,6 +17,8 @@ class JiraApi
 
     private $globalCurlSettings;
 
+    private $needSessionClose = false;
+
     public function __construct(\ServiceBase_IDebugLogger $debugLogger, $jiraUrl = self::DEFAULT_JIRA_URL, $userPassword = self::DEFAULT_JIRA_USER_PASSWORD)
     {
         $this->debugLogger = $debugLogger;
@@ -39,6 +41,8 @@ class JiraApi
 
     private function sendRequest($url, $method, $request)
     {
+        $this->needSessionClose = true;
+
         if (strtoupper($method) == 'GET') {
             $json = $this->httpSender->getRequest($url, $request, self::TIMEOUT, $this->globalCurlSettings);
         } else {
@@ -192,5 +196,13 @@ class JiraApi
         $jql = "fixVersion = $version";
 
         return $this->getTicketsByJql($jql);
+    }
+
+    public function __destruct()
+    {
+        if ($this->needSessionClose) {
+            $this->debugLogger->message("Destroing JIRA auth session");
+            $this->sendRequest("$this->jiraUrl/rest/auth/latest/session", 'DELETE', []);
+        }
     }
 }
