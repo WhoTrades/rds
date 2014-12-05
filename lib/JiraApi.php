@@ -145,6 +145,8 @@ class JiraApi
                 //an: Такого тикета просто не существует
                 return false;
             }
+
+            throw $e;
         }
     }
 
