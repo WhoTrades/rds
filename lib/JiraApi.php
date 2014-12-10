@@ -119,6 +119,8 @@ class JiraApi
                 //an: Такого тикета просто не существует
                 return false;
             }
+
+            throw $e;
         }
 
         return true;
@@ -146,12 +148,15 @@ class JiraApi
 
     public function getTicketInfo($ticket)
     {
-        return $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket", 'GET', ['expand' => 'transitions']);
+        return $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket", 'GET', ['expand' => 'transitions,changelog']);
     }
 
-    public function updateTicketTransition($ticket, $transitionId)
+    public function updateTicketTransition($ticket, $transitionId, $comment = null)
     {
-        $request = ['transition' => ["id" => $transitionId],];
+        $request = ['transition' => ["id" => $transitionId]];
+        if ($comment) {
+            $request['update'] = ['comment' => [['add' => ['body' => $comment]]]];
+        }
         $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/transitions", 'POST', $request);
     }
 
@@ -181,6 +186,11 @@ class JiraApi
         return $this->getTicketsByJql($jql);
     }
 
+    public function getTicketsByStatus($status)
+    {
+        return $this->getTicketsByJql("status=\"$status\"");
+    }
+
     public function getTicketsByJql($jql)
     {
         return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
@@ -192,5 +202,79 @@ class JiraApi
         $jql = "fixVersion = $version";
 
         return $this->getTicketsByJql($jql);
+    }
+
+    public function __destruct()
+    {
+        if ($this->needSessionClose) {
+            $this->debugLogger->message("Destroing JIRA auth session");
+            $this->sendRequest("$this->jiraUrl/rest/auth/latest/session", 'DELETE', []);
+        }
+    }
+
+    public function assign($ticket, $email)
+    {
+        $request = ['name' => static::getUserNameByEmail($email)];
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/assignee", 'PUT', $request);
+        $info = $this->getTicketInfo($ticket);
+
+        if ($info['fields']['assignee']['emailAddress'] != strtolower($email)) {
+            throw new ApplicationException("Can't change email to $email for ticket $ticket");
+        }
+    }
+
+    /**
+     * Метод двигает задачу по статусам, на основании наших транзишенов
+     *
+     * @param array $ticketInfo - информация о тикете, возвращаемая методом getTicketInfo()
+     * @param string $transition - элемент из констант класса Jira\Transition, например Jira\Transition::START_PROGRESS
+     */
+    public function transitionTicket($ticketInfo, $transition, $comment = null)
+    {
+        if (!isset(Jira\Transition::$transitionMap[$transition])) {
+            throw new ApplicationException("Unknown tramsition '$transition'");
+        }
+
+        list($from, $to) = Jira\Transition::$transitionMap[$transition];
+
+        if ($ticketInfo["fields"]["status"]["name"] != $from) {
+            throw new ApplicationException("Can't apply transition '$transition', because ticket is in {$ticketInfo["fields"]["status"]["name"]} status, but $from needed");
+        }
+
+        $transitionId = null;
+        $availableStatuses = [];
+        foreach ($ticketInfo['transitions'] as $transitionItem) {
+            $availableStatuses[] = $transitionItem['to']['name'];
+            if ($transitionItem['to']['name'] == $to) {
+                $transitionId = $transitionItem['id'];
+            }
+        }
+
+        if (empty($transitionId)) {
+            throw new ApplicationException("Can't apply transition $transition to ticket {$ticketInfo['key']}, despite the fact status of ticket=$from and is correct. Check JIRA roles for this project. Available statuses: ".implode(", ", $availableStatuses));
+        }
+
+        $this->updateTicketTransition($ticketInfo['key'], $transitionId, $comment);
+    }
+
+    public function getLastDeveloper($ticketInfo)
+    {
+        foreach (array_reverse($ticketInfo['changelog']) as $val) {
+            foreach ($val as $val2) {
+                foreach ($val2['items'] as $item) {
+                    if ($item['field'] != 'assignee') {
+                        continue;
+                    }
+                    return $item['to'].'@corp.finam.ru';
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static function getUserNameByEmail($email)
+    {
+        return preg_replace('~@.*~', '', $email);
     }
 }

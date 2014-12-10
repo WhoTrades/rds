@@ -37,8 +37,25 @@ class JiraController extends Controller
         $this->render('index', ['projects' => Yii::app()->params['jiraProjects']]);
     }
 
+    public function actionTriggerView()
+    {
+        echo "<pre><b>LAST 1Kb</b>\n";
+        $text = file_get_contents("/tmp/jira.txt");
+
+        echo substr($text, -1000);
+    }
+
+    public function actionTrigger($key)
+    {
+        echo $key;
+        file_put_contents("/tmp/jira.txt", var_export($_REQUEST, 1)."\n", FILE_APPEND);
+        file_put_contents("/tmp/jira.txt", file_get_contents("php://stdin"), FILE_APPEND);
+        file_put_contents("/tmp/jira.txt", "==========\n\n", FILE_APPEND);
+    }
+
     public function actionTicketHide($project)
     {
+        ob_get_clean();
         $jiraApi = new JiraApi(Yii::app()->debugLogger);
 
         $jql = "project=$project and fixVersion is not empty and status != Closed";

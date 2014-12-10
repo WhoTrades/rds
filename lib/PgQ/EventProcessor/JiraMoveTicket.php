@@ -13,26 +13,13 @@ class PgQ_EventProcessor_JiraMoveTicket extends PgQ\EventProcessor\EventProcesso
         $ticket = $event->getData()['jira_ticket'];
         $direction = $event->getData()['jira_direction'];
 
-
-        $nextStatus = $direction == JiraMoveTicket::DIRECTION_UP ? 'Deployed' : 'Rolled back';
+        $transition = $direction == JiraMoveTicket::DIRECTION_UP ? Jira\Transition::DEPLOYED : Jira\Transition::ROLL_BACK;
 
         $jira = new JiraApi($this->debugLogger);
 
         $ticketInfo = $jira->getTicketInfo($ticket);
         $this->debugLogger->message("Processing ticket {$ticket}, status={$ticketInfo['fields']['status']['name']}");
 
-        $transitionId = null;
-        foreach ($ticketInfo['transitions'] as $transition) {
-            if ($transition['name'] == $nextStatus) {
-                $transitionId = $transition['id'];
-            }
-        }
-
-        if ($transitionId) {
-            $this->debugLogger->message("Moving ticket {$ticketInfo['key']} to $nextStatus status");
-            $jira->updateTicketTransition($ticketInfo['key'], $transitionId);
-        } else {
-            $this->debugLogger->message("Invalid ticket {$ticketInfo['key']} status, can't move to $nextStatus");
-        }
+        $jira->transitionTicket($ticketInfo, $transition);
     }
 }

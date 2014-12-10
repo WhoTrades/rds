@@ -30,7 +30,7 @@
             list($icon, $text, $color) = $map[$releaseRequest->rr_status];
             echo "<span title='{$text}' style='color: ".$color."'>".
                     TbHtml::icon($icon).
-                    "{$releaseRequest->rr_status}</span><hr />";
+                    " {$releaseRequest->rr_status}</span><hr />";
 
             $result = array();
             foreach ($releaseRequest->builds as $val) {

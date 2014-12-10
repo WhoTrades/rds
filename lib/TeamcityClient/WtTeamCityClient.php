@@ -69,6 +69,32 @@ class TeamCityClient
         }
     }
 
+    /**********************************************     Builds        **************************************************/
+
+    /**
+     * @param $buildConfId
+     * @param $branch
+     * @param null $comment
+     * @return \SimpleXMLElement
+     */
+    public function startBuild($buildConfId, $branch, $comment = null)
+    {
+        $body = '<build personal="true" branchName="'.$branch.'">
+        <buildType id="'.$buildConfId.'"/>
+        <comment><text>'.htmlspecialchars($comment).'</text></comment>
+        </build>
+        ';
+        return $result = $this->post('/buildQueue/', $body);
+    }
+
+    public function getBuildInfo($id)
+    {
+        $id = (int)$id;
+        return $this->get('builds/id:'.$id);
+    }
+
+
+    /**********************************************     eof: Builds   **************************************************/
 
     /**********************************************     BuildTypes    **************************************************/
     public function attachBuildTypeToTemplate($buildTypeId, $templateId)

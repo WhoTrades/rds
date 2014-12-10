@@ -31,6 +31,10 @@ class ServiceRdsProdTL1
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraTicketStatus::getPgqConsumer('rds_jira_commit', 'rds_jira_ticket_status_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraUse::getPgqConsumer('rds_jira_use', 'rds_jira_use_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_JiraMoveTicket::getPgqConsumer('rds_jira_move_ticket', 'rds_jira_move_ticket_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
+            new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsTeamCityRunTest::getPgqConsumer('rds_teamcity_run_test', 'rds_teamcity_run_test_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
+            new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsMergeTask::getPgqConsumer('rds_merge_task', 'rds_merge_task_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
+            new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsTeamCityBuildComplete::getPgqConsumer('rds_teamcity_build_complete', 'rds_teamcity_build_complete_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *'),
+
             new CronCommand(new PeriodicCommand(Cronjob_Tool_JiraFixVersionsRelease::getToolCommand([], $verbosity=1), $delay=60)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_Deploy::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1)),
 
@@ -49,6 +53,8 @@ class ServiceRdsProdTL1
 
             new CronCommand(Cronjob_Tool_HardMigrationStarter::getToolCommand([], $verbosity=1)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_CiBuildStatus::getToolCommand([], $verbosity=1), $delay = 5)),
+            new CronCommand(Cronjob_Tool_JiraMergeTasks::getToolCommand([], $verbosity=1)),
+            new CronCommand(Cronjob_Tool_JiraCloseFeatures::getToolCommand([], $verbosity=1), '*/10 * * * *'),
         ];
     }
 
