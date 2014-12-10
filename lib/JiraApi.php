@@ -17,6 +17,8 @@ class JiraApi
 
     private $globalCurlSettings;
 
+    private $needSessionClose = false;
+
     public function __construct(\ServiceBase_IDebugLogger $debugLogger, $jiraUrl = self::DEFAULT_JIRA_URL, $userPassword = self::DEFAULT_JIRA_USER_PASSWORD)
     {
         $this->debugLogger = $debugLogger;
@@ -39,6 +41,8 @@ class JiraApi
 
     private function sendRequest($url, $method, $request)
     {
+        $this->needSessionClose = true;
+
         if (strtoupper($method) == 'GET') {
             $json = $this->httpSender->getRequest($url, $request, self::TIMEOUT, $this->globalCurlSettings);
         } else {
@@ -143,6 +147,8 @@ class JiraApi
                 //an: Такого тикета просто не существует
                 return false;
             }
+
+            throw $e;
         }
     }
 
