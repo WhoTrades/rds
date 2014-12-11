@@ -125,7 +125,7 @@ return array(
             ],
             'warning' => [
                 'visible' => '!$data->doesMigrationReleased()',
-                'label' => TbHtml::icon(TbHtml::ICON_LOCK, ['style' => 'color: #32cd32; cursor: default']),
+                'label' => TbHtml::icon(TbHtml::ICON_LOCK, ['style' => 'color: black; cursor: default']),
                 'options' => [
                     'title' => 'Проект ещё не выложен, миграции пока нет на серверах, потому её нельзя накатить',
                 ],
