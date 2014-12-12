@@ -60,7 +60,8 @@ class JiraJsonController extends Controller
                     $this->jiraApi->transitionTicket($data, \Jira\Transition::START_PROGRESS);
                 } elseif ($data['fields']['status']['name'] != \Jira\Status::STATUS_IN_PROGRESS) {
                     $result['errors'][] = 'Cant start work for ticket '.$ticket.' as it\'s status in Jira not "In progress" or "Ready for development"';
-                } else {
+                }
+                if (empty($result['errors'])) {
                     $branch = "feature/$ticket";
 
                     /** @var $existingFeature JiraFeature */
