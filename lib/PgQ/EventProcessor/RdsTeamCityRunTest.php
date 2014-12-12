@@ -8,9 +8,6 @@
 
 class PgQ_EventProcessor_RdsTeamCityRunTest extends PgQ\EventProcessor\EventProcessorBase
 {
-    //an: Вынети это в БД с админкой управления, так как планируется децентрализировать проверки
-    public static $enabledBuildTypes = ['PHPUnit_composer_debug'];
-
     public function processEvent(PgQ_Event $event)
     {
         $teamCity = new TeamcityClient\WtTeamCityClient();
@@ -23,7 +20,7 @@ class PgQ_EventProcessor_RdsTeamCityRunTest extends PgQ\EventProcessor\EventProc
         $transaction = \TeamcityBuild::model()->getDbConnection()->beginTransaction();
         foreach ($teamCity->getBuildTypesList() as $buildType) {
             /** @var $buildType SimpleXMLElement*/
-            if (in_array($buildType['name'], self::$enabledBuildTypes)) {
+            if (in_array($buildType['name'], Yii::app()->params['teamCityEnabledBuildTypes'])) {
                 $data = $buildType->attributes();
 
                 $this->debugLogger->message("Starting build {$buildType['id']}");

@@ -58,31 +58,32 @@ class JiraJsonController extends Controller
                 if ($data['fields']['status']['name'] == \Jira\Status::STATUS_READY_FOR_DEVELOPMENT) {
                     $result['messages'][] = 'Ticket '.$ticket.' moved to status "In progress"';
                     $this->jiraApi->transitionTicket($data, \Jira\Transition::START_PROGRESS);
-                }
-
-                $branch = "feature/$ticket";
-
-                /** @var $existingFeature JiraFeature */
-                $existingFeature = JiraFeature::model()->findByAttributes([
-                    'jf_developer_id'   => $developer->obj_id,
-                    'jf_ticket'         => $ticket
-                ]);
-                if ($existingFeature) {
-                    $existingFeature->jf_status = JiraFeature::STATUS_IN_PROGRESS;
-                    $existingFeature->resetMergeConditions();
-                    $existingFeature->save();
-
-                    $result['branch'] = $existingFeature->jf_branch;
+                } elseif ($data['fields']['status']['name'] != \Jira\Status::STATUS_IN_PROGRESS) {
+                    $result['errors'][] = 'Cant start work for ticket '.$ticket.' as it\'s status in Jira not "In progress" or "Ready for development"';
                 } else {
-                    $feature = new JiraFeature();
-                    $feature->attributes = [
-                        'jf_developer_id' => $developer->obj_id,
-                        'jf_ticket' => $ticket,
-                        'jf_branch' => $branch,
-                    ];
-                    $feature->save();
-                }
+                    $branch = "feature/$ticket";
 
+                    /** @var $existingFeature JiraFeature */
+                    $existingFeature = JiraFeature::model()->findByAttributes([
+                        'jf_developer_id'   => $developer->obj_id,
+                        'jf_ticket'         => $ticket
+                    ]);
+                    if ($existingFeature) {
+                        $existingFeature->jf_status = JiraFeature::STATUS_IN_PROGRESS;
+                        $existingFeature->resetMergeConditions();
+                        $existingFeature->save();
+
+                        $result['branch'] = $existingFeature->jf_branch;
+                    } else {
+                        $feature = new JiraFeature();
+                        $feature->attributes = [
+                            'jf_developer_id' => $developer->obj_id,
+                            'jf_ticket' => $ticket,
+                            'jf_branch' => $branch,
+                        ];
+                        $feature->save();
+                    }
+                }
             }
         } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
             $result['errors'][] = 'Ticket not found, '.$e->getResponse();
@@ -123,6 +124,10 @@ class JiraJsonController extends Controller
                 'jf_ticket'         => $ticket
             ]);
 
+            if (!in_array($data['fields']['status']['name'], [\Jira\Status::STATUS_READY_FOR_DEVELOPMENT, \Jira\Status::STATUS_IN_PROGRESS])) {
+                $result['errors'][] = "Ticket status is \"{$data['fields']['status']['name']}\", but only 'In progress' or 'ready for development' is allowed to finish job";
+            }
+
             //an: Проверяем что фича существует и в правильном статусе
             if (!$existingFeature) {
                 $result['errors'][] = "Unknown feature $ticket, please run `php wtflow.php start $ticket` first";
@@ -145,6 +150,11 @@ class JiraJsonController extends Controller
 
             if (empty($result['errors'])) {
                 /** @var $existingFeature JiraFeature */
+                //an: если статус тикета "готово к разработке" - то просто двигаем его сначала в "в работе", а потом и в "Continuous integration"
+                if ($data['fields']['status']['name'] == \Jira\Status::STATUS_READY_FOR_DEVELOPMENT) {
+                    $this->jiraApi->transitionTicket($data, \Jira\Transition::START_PROGRESS);
+                    $data = $this->jiraApi->getTicketInfo($ticket);
+                }
                 if ($data['fields']['status']['name'] == \Jira\Status::STATUS_IN_PROGRESS) {
                     $this->jiraApi->transitionTicket($data, \Jira\Transition::FINISH_DEVELOPMENT, "Разработчик [~".JiraApi::getUserNameByEmail($developer->finam_email)."] завершил работу над этой задачей");
                     $result['messages'][] = 'Ticket '.$ticket.' moved to status "Continuous integration"';

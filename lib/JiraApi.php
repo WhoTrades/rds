@@ -178,6 +178,46 @@ class JiraApi
         $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/comment/$commentId", 'PUT', $request);
     }
 
+    /**
+     * Метод смотрит последний комментарий в тикете и смотрит его владельца. И в зависимости от того является ли автором RDS либо изменяет комментарий, либо добавляет новый
+     *
+     * @param string $ticket
+     * @param string $text
+     */
+    public function addCommentOrAppendMyComment($ticket, $text)
+    {
+        $lastComment = end($this->getTicketInfo($ticket)['fields']['comment']['comments']);
+        if ($lastComment['author']['name'] == $this->getUserName()) {
+            $this->debugLogger->debug("Updating last comment {$lastComment['self']}");
+            $this->updateComment($ticket, $lastComment['id'], $lastComment['body']."\n".$text);
+        } else {
+            $this->debugLogger->debug("Adding new comment with text=$text");
+            $this->addComment($ticket, $text);
+        }
+    }
+
+    /**
+     * Метод смотрит последний комментарий в тикете и смотрит его владельца. И в зависимости от того является ли автором RDS либо изменяет комментарий, либо добавляет новый
+     *
+     * @param string $ticket
+     * @param string $text
+     */
+    public function addCommentOrModifyMyComment($ticket, $text)
+    {
+        $lastComment = end($this->getTicketInfo($ticket)['fields']['comment']['comments']);
+        if ($lastComment['author']['name'] == $this->getUserName()) {
+            if ($lastComment['body'] != $text) {
+                $this->debugLogger->debug("Updating last comment {$lastComment['self']}");
+                $this->updateComment($ticket, $lastComment['id'], $text);
+            } else {
+                $this->debugLogger->debug("Skip updating last comment {$lastComment['self']}, as it is not modified");
+            }
+        } else {
+            $this->debugLogger->debug("Adding new comment with text=$text");
+            $this->addComment($ticket, $text);
+        }
+    }
+
     public function getAllVersions($project)
     {
         return $this->sendRequest("$this->jiraUrl/rest/api/latest/project/$project/versions", 'GET', []);
