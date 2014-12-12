@@ -20,6 +20,11 @@ class PgQ_EventProcessor_JiraMoveTicket extends PgQ\EventProcessor\EventProcesso
         $ticketInfo = $jira->getTicketInfo($ticket);
         $this->debugLogger->message("Processing ticket {$ticket}, status={$ticketInfo['fields']['status']['name']}");
 
+
+        if (!in_array($ticketInfo["fields"]["status"]["name"], [\Jira\Status::STATUS_READY_FOR_DEPLOYMENT, \Jira\Status::STATUS_READY_FOR_ACCEPTANCE])) {
+            $this->debugLogger->message("Skip transition ticket $ticket, as it is not in valid status");
+        }
+
         $jira->transitionTicket($ticketInfo, $transition);
     }
 }
