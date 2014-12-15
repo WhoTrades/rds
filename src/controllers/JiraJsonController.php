@@ -134,7 +134,7 @@ class JiraJsonController extends Controller
                 $result['errors'][] = "Unknown feature $ticket, please run `php wtflow.php start $ticket` first";
             } elseif ($existingFeature->jf_status != JiraFeature::STATUS_IN_PROGRESS && $existingFeature->jf_status != JiraFeature::STATUS_PAUSED) {
                 if ($existingFeature->jf_status == JiraFeature::STATUS_CHECKING) {
-                    if ($data['fields']['status']['name'] == \Jira\Status::STATUS_IN_PROGRESS) {
+                    if (in_array($data['fields']['status']['name'], [\Jira\Status::STATUS_IN_PROGRESS, \Jira\Status::STATUS_READY_FOR_DEVELOPMENT])) {
                         //an: Задачу вернули на доработку, обновляем статус у себя
                         $existingFeature->jf_status = JiraFeature::STATUS_IN_PROGRESS;
                         $existingFeature->save();

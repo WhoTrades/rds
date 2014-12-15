@@ -22,12 +22,28 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
         $c->order = 'obj_id desc';
         $c->compare('tb_build_type_id', $buildTypeId);
         $c->compare('tb_branch', $branch);
-        $c->limit = 1;
 
-        /** @var $teamCityBuild TeamCityBuild */
-        $teamCityBuild = TeamcityBuild::model()->find($c);
+        $teamcity = new \TeamcityClient\WtTeamCityClient();
 
-        $debugLogger->message("Received message of completion build #$id (http://ci.whotrades.net:8111/viewLog.html?buildId=$id)");
+        /** @var $teamCityBuilds TeamCityBuild[] */
+        $teamCityBuilds = TeamcityBuild::model()->findAll($c);
+        foreach ($teamCityBuilds as $build) {
+            /** @var $build TeamCityBuild */
+            if (preg_match('~itemId=(\d+)~', $build->tb_url, $ans)) {
+                $info = $teamcity->getQueuedBuildInfo($ans[1]);
+                if ($id == $info['id']) {
+                    /** @var $teamCityBuild TeamCityBuild */
+                    $teamCityBuild = $build;
+                }
+            }
+        }
+
+        if (empty($teamCityBuild)) {
+            $this->debugLogger->error("Unknown build received, skip it");
+            return;
+        }
+
+        $debugLogger->message("Received message of completion build #$id (http://ci.whotrades.net:8111/viewLog.html?buildId=$id). Build info: ".json_encode($teamCityBuild->attributes));
 
         if (empty($teamCityBuild)) {
             $debugLogger->message("Build not found at database, skip message");
@@ -35,7 +51,6 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
             return;
         }
 
-        $teamcity = new \TeamcityClient\WtTeamCityClient();
         $info = $teamcity->getBuildInfo($id);
         if ($info['state'] != 'finished') {
             $debugLogger->message("Build is not finished yet, retry message in 5 seconds");
@@ -72,11 +87,11 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
             if (empty($failedBuilds)) {
                 //an: все успешные, двигаем задачу на кодревью
                 $debugLogger->message("All build are success, move ticket to code review");
-                $jiraApi->transitionTicket($ticketInfo, \Jira\Transition::FINISH_INTEGRATION_TESTING);
+                $jiraApi->transitionTicket($ticketInfo, \Jira\Transition::FINISH_INTEGRATION_TESTING, null, true);
             } else {
                 //an: не все отработало успешно, пишем об этом в жире и отправляем задачу на доработку
                 $debugLogger->message("Not all build are success, move ticket back to developer");
-                $jiraApi->transitionTicket($ticketInfo, \Jira\Transition::FAILED_INTEGRATION_TESTING);
+                $jiraApi->transitionTicket($ticketInfo, \Jira\Transition::FAILED_INTEGRATION_TESTING, null, true);
 
                 $comment = "Не все тесты прошли успешно. Неуспешные тесты: ";
                 foreach ($failedBuilds as $build) {

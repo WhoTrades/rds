@@ -275,7 +275,7 @@ class JiraApi
      * @param array $ticketInfo - информация о тикете, возвращаемая методом getTicketInfo()
      * @param string $transition - элемент из констант класса Jira\Transition, например Jira\Transition::START_PROGRESS
      */
-    public function transitionTicket($ticketInfo, $transition, $comment = null)
+    public function transitionTicket($ticketInfo, $transition, $comment = null, $ignoreIncorrectStatus = false)
     {
         if (!isset(Jira\Transition::$transitionMap[$transition])) {
             throw new ApplicationException("Unknown tramsition '$transition'");
@@ -284,6 +284,10 @@ class JiraApi
         list($from, $to) = Jira\Transition::$transitionMap[$transition];
 
         if ($ticketInfo["fields"]["status"]["name"] != $from) {
+            if ($ignoreIncorrectStatus) {
+                $this->debugLogger->error("Can't apply transition '$transition', because ticket is in {$ticketInfo["fields"]["status"]["name"]} status, but $from needed, skip exception");
+                return;
+            }
             throw new ApplicationException("Can't apply transition '$transition', because ticket is in {$ticketInfo["fields"]["status"]["name"]} status, but $from needed");
         }
 

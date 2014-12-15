@@ -93,6 +93,12 @@ class TeamCityClient
         return $this->get('builds/id:'.$id);
     }
 
+    public function getQueuedBuildInfo($queuedId)
+    {
+        $queuedId = (int)$queuedId;
+        return $this->get('buildQueue/taskId:'.$queuedId);
+    }
+
 
     /**********************************************     eof: Builds   **************************************************/
 
