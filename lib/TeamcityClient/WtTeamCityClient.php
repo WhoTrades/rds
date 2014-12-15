@@ -293,7 +293,7 @@ class TeamCityClient
         }
 
         if ($response->getStatus() >= 400) {
-            throw new \Exception($response->getBody());
+            throw new \Exception($response->getBody(), $response->getStatus());
         }
 
         return $plainTextResponse ? $response->getBody() : $this->createXmlElement($response->getBody());

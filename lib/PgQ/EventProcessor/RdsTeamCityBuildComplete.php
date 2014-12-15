@@ -29,12 +29,19 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
         $teamCityBuilds = TeamcityBuild::model()->findAll($c);
         foreach ($teamCityBuilds as $build) {
             /** @var $build TeamCityBuild */
-            if (preg_match('~itemId=(\d+)~', $build->tb_url, $ans)) {
-                $info = $teamcity->getQueuedBuildInfo($ans[1]);
+            try {
+                $info = $teamcity->getQueuedBuildInfo($build->getQueuedId());
                 if ($id == $info['id']) {
                     /** @var $teamCityBuild TeamCityBuild */
                     $teamCityBuild = $build;
                 }
+            } catch (Exception $e) {
+                if ($e->getCode() == 404) {
+                    //an: эта задачу в очереди удалили, пропускаем
+                    continue;
+                }
+
+                throw $e;
             }
         }
 

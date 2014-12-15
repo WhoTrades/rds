@@ -129,4 +129,11 @@ class TeamCityBuild extends CActiveRecord
     {
         return parent::model($className);
     }
+
+    public function getQueuedId()
+    {
+        preg_match('~itemId=(\d+)~', $this->tb_url, $ans);
+
+        return $ans[1];
+    }
 }
