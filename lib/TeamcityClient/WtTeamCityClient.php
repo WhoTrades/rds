@@ -79,7 +79,7 @@ class TeamCityClient
      */
     public function startBuild($buildConfId, $branch, $comment = null)
     {
-        $body = '<build personal="true" branchName="'.$branch.'">
+        $body = '<build branchName="'.$branch.'">
         <buildType id="'.$buildConfId.'"/>
         <comment><text>'.htmlspecialchars($comment).'</text></comment>
         </build>

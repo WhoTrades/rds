@@ -49,7 +49,10 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
         $ticketInfo = $jiraApi->getTicketInfo($ticket);
 
         $teamCityBuild->tb_status = $info['status'] == 'SUCCESS' ? TeamCityBuild::STATUS_SUCCESS :  TeamCityBuild::STATUS_FAILED;
-        $teamCityBuild->save(false);
+        $this->debugLogger->message("New build status is $teamCityBuild->tb_status, saving");
+        if (!$teamCityBuild->save(false)) {
+            $this->debugLogger->error("Can't save: " . json_encode($teamCityBuild->errors));
+        }
 
         //an: Считаем сколько ещё осталось незавершенных билдов
         $count = TeamCityBuild::model()->countByAttributes([
