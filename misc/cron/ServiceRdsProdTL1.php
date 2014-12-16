@@ -37,6 +37,8 @@ class ServiceRdsProdTL1
 
             new CronCommand(new PeriodicCommand(Cronjob_Tool_JiraFixVersionsRelease::getToolCommand([], $verbosity=1), $delay=60)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_Deploy::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1)),
+            new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_Merge::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1)),
+            
 
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_HardMigration::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_HardMigration::getToolCommand(['--max-duration=60 --env=preprod'], $verbosity=1), $delay=1)),
