@@ -19,6 +19,10 @@ class Cronjob_Tool_JiraMergeTasks extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
+        if (!\Config::getInstance()->serviceRds['jira']['mergeTasks']) {
+            $this->debugLogger->message("Tool disabled by config");
+            return;
+        }
         $model = $this->getMessagingModel($cronJob);
         $jira = new JiraApi($this->debugLogger);
         $map = [

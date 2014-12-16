@@ -4,7 +4,6 @@
  */
 
 use RdsSystem\Message;
-use RdsSystem\lib\CommandExecutor;
 
 class Cronjob_Tool_TeamCityCheckQueuedTasks extends RdsSystem\Cron\RabbitDaemon
 {

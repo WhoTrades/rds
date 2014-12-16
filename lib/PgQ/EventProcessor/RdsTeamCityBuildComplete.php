@@ -46,7 +46,17 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
         }
 
         if (empty($teamCityBuild)) {
-            $this->debugLogger->error("Unknown build received, skip it");
+            $this->debugLogger->error("Build with branch=$branch and buildType=$buildTypeId not found");
+            return;
+        }
+
+        $count = TeamCityBuild::model()->countByAttributes([
+            'tb_run_test_obj_id' => $teamCityBuild->tb_run_test_obj_id,
+            'tb_status' => TeamCityBuild::STATUS_QUEUED
+        ]);
+
+        if ($count == 0) {
+            $this->debugLogger->message("This tests are already finished, skip event");
             return;
         }
 
@@ -54,7 +64,6 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
 
         if (empty($teamCityBuild)) {
             $debugLogger->message("Build not found at database, skip message");
-            $this->debugLogger->error("Build with branch=$branch and buildType=$buildTypeId not found");
             return;
         }
 
