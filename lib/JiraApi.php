@@ -284,6 +284,7 @@ class JiraApi
         list($from, $to) = Jira\Transition::$transitionMap[$transition];
 
         if ($ticketInfo["fields"]["status"]["name"] != $from) {
+            $this->debugLogger->message("Ignore ticket status: $ignoreIncorrectStatus");
             if ($ignoreIncorrectStatus) {
                 $this->debugLogger->error("Can't apply transition '$transition', because ticket is in {$ticketInfo["fields"]["status"]["name"]} status, but $from needed, skip exception");
                 return;

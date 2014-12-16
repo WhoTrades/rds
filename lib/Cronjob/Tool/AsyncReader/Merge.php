@@ -56,7 +56,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 //an: Если мерж прошел успешно - двигаем задачу в след. статус
                 $this->debugLogger->message("Branch was merged successful, transition ticket to next status");
                 $transition = $transitionMap[$message->targetBranch];
-                $jira->transitionTicket($ticketInfo, $transition, "Задача была успешно слита в ветку $message->targetBranch", null, true);
+                $jira->transitionTicket($ticketInfo, $transition, "Задача была успешно слита в ветку $message->targetBranch", true);
             } else {
                 //an: Если не смержилась - просто пишем комент с ошибками мержа
                 $this->debugLogger->message("Branch was merged fail, sending comment");
