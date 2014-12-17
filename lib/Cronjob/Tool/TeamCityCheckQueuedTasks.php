@@ -35,11 +35,11 @@ class Cronjob_Tool_TeamCityCheckQueuedTasks extends RdsSystem\Cron\RabbitDaemon
                     'tbc_build_type_id' => $info['buildTypeId'],
                 ];
                 $tbc->save();
+                $build->tb_notified = true;
+                $build->save();
             } else {
                 $this->debugLogger->message("Status of build is {$info['state']}, skip it");
             }
-            $build->tb_notified = true;
-            $build->save();
         }
         $this->debugLogger->message("Finished");
     }
