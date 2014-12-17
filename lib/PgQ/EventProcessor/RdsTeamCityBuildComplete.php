@@ -34,6 +34,7 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
                 if ($id == $info['id']) {
                     /** @var $teamCityBuild TeamCityBuild */
                     $teamCityBuild = $build;
+                    break;
                 }
             } catch (Exception $e) {
                 if ($e->getCode() == 404) {
