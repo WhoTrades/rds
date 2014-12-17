@@ -18,7 +18,10 @@ class Cronjob_Tool_TeamCityCheckQueuedTasks extends RdsSystem\Cron\RabbitDaemon
     {
         $this->debugLogger->message("Starting");
         $teamcity = new \TeamcityClient\WtTeamCityClient();
-        $builds = TeamcityBuild::model()->findAllByAttributes(['tb_status' => TeamCityBuild::STATUS_QUEUED]);
+        $builds = TeamcityBuild::model()->findAllByAttributes([
+            'tb_status' => TeamCityBuild::STATUS_QUEUED,
+            'tb_notified' => false,
+        ]);
         foreach ($builds as $build) {
             /** @var $build TeamCityBuild */
             $this->debugLogger->message("Checking queued build #{$build->getQueuedId()}, http://ci.whotrades.net:8111/viewQueued.html?itemId={$build->getQueuedId()}");
@@ -35,6 +38,8 @@ class Cronjob_Tool_TeamCityCheckQueuedTasks extends RdsSystem\Cron\RabbitDaemon
             } else {
                 $this->debugLogger->message("Status of build is {$info['state']}, skip it");
             }
+            $build->tb_notified = true;
+            $build->save();
         }
         $this->debugLogger->message("Finished");
     }

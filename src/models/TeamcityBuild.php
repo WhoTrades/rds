@@ -13,6 +13,7 @@
  * @property string $tb_branch
  * @property string $tb_status
  * @property string $tb_url
+ * @property string $tb_notified
  *
  * The followings are the available model relations:
  * @property TeamcityRunTest $teamCityRunTest
@@ -52,7 +53,7 @@ class TeamCityBuild extends CActiveRecord
                 array('tb_url', 'length', 'max'=>128),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-                array('obj_id, obj_created, obj_modified, obj_status_did, tb_run_test_obj_id, tb_build_type_id, tb_branch, tb_status, tb_url', 'safe', 'on'=>'search'),
+                array('obj_id, obj_created, obj_modified, obj_status_did, tb_run_test_obj_id, tb_build_type_id, tb_branch, tb_status, tb_url, tb_notified', 'safe', 'on'=>'search'),
         );
     }
 
@@ -83,6 +84,7 @@ class TeamCityBuild extends CActiveRecord
                 'tb_branch' => 'Tb Branch',
                 'tb_status' => 'Tb Status',
                 'tb_url' => 'Tb Url',
+                'tb_notified' => 'Notified',
         );
     }
 
@@ -113,6 +115,7 @@ class TeamCityBuild extends CActiveRecord
         $criteria->compare('tb_branch',$this->tb_branch,true);
         $criteria->compare('tb_status',$this->tb_status,true);
         $criteria->compare('tb_url',$this->tb_url,true);
+        $criteria->compare('tb_notified',$this->tb_notified);
 
         return new CActiveDataProvider($this, array(
                 'criteria'=>$criteria,
