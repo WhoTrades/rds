@@ -64,7 +64,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             }
 
             //an: И в любом случае отправляем задачу обратно разработчику (если не смержилась - пусто мержит, если смержилась - пусть дальше работает:) )
-            $lastDeveloper = $jira->getLastDeveloper($ticketInfo);
+            $lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo);
             $jira->assign($feature->jf_ticket, $lastDeveloper);
         } else {
             $this->debugLogger->error("Unknown target branch, skip jira integration");
