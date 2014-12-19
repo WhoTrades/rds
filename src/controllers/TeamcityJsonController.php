@@ -11,6 +11,18 @@ class TeamcityJsonController extends Controller
 
     }
 
+    public function actionAddModifiedRepository($branch, $repo)
+    {
+        $jiraFeatures = JiraFeature::model()->findAllByAttributes(['jf_branch' => $branch]);
+        foreach ($jiraFeatures as $jiraFeature) {
+            /** @var $jiraFeature JiraFeature */
+            $jiraFeature->addAffectedRepository($repo);
+            $jiraFeature->save();
+        }
+
+        $this->printJson(['ok' => true]);
+    }
+
     //an: Находящийся тут код нужно дополнить поллингом teamcity на предмет завершеиня всех билдов
     public function actionBuildComplete($id, $branch, $buildTypeId)
     {
@@ -23,11 +35,6 @@ class TeamcityJsonController extends Controller
         $tbc->save();
 
         $this->printJson(['ok' => true]);
-
-
-
-
-
     }
 
     public function printJson($data)
