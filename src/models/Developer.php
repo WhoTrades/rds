@@ -107,6 +107,9 @@ class Developer extends CActiveRecord
 
         return new CActiveDataProvider($this, array(
             'criteria'=>$criteria,
+            'pagination' => [
+                'pageSize' => 100,
+            ],
         ));
     }
 
