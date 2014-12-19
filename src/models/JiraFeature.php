@@ -16,6 +16,7 @@
  * @property string $jf_last_merge_request_to_master_time
  * @property string $jf_last_merge_request_to_develop_time
  * @property string $jf_last_merge_request_to_staging_time
+ * @property string $jf_affected_repositories
  *
  * The followings are the available model relations:
  * @property Developer $jfDeveloper
@@ -52,7 +53,7 @@ class JiraFeature extends CActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, jf_developer_id, jf_ticket, jf_branch', 'required'),
+            array('obj_created, obj_modified, jf_developer_id, jf_ticket, jf_branch, jf_affected_repositories', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly'=>true),
             array('jf_ticket, jf_status', 'length', 'max'=>16),
             array('jf_branch', 'length', 'max'=>64),
@@ -138,13 +139,14 @@ class JiraFeature extends CActiveRecord
         return parent::model($className);
     }
 
-    public function countNonClosedJiraFeatures($developerId)
+    public function getNonClosedJiraFeatures($developerId, $exceptTicket)
     {
         $c = new CDbCriteria();
         $c->compare('jf_developer_id', $developerId);
         $c->compare('jf_status', '<>'.self::STATUS_CLOSED);
+        $c->compare('jf_ticket', '<>'.$exceptTicket);
 
-        return self::count($c);
+        return self::model()->findAll($c);
     }
 
     public function resetMergeConditions()
@@ -152,5 +154,14 @@ class JiraFeature extends CActiveRecord
         $this->jf_last_merge_request_to_develop_time = null;
         $this->jf_last_merge_request_to_master_time = null;
         $this->jf_last_merge_request_to_staging_time = null;
+    }
+
+    public function addAffectedRepository($repository)
+    {
+        $list = json_decode($this->jf_affected_repositories, true);
+        $list[] = $repository;
+        $list = array_unique($list);
+        sort($list);
+        $this->jf_affected_repositories = json_encode($list);
     }
 }

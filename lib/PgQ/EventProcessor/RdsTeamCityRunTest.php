@@ -14,6 +14,13 @@ class PgQ_EventProcessor_RdsTeamCityRunTest extends PgQ\EventProcessor\EventProc
 
         $teamCityRunTest = TeamcityRunTest::model()->findByPk($event->getData()['obj_id']);
 
+        $jiraFeature = $teamCityRunTest->jiraFeature;
+        $affectedRepositories = json_decode($jiraFeature->jf_affected_repositories);
+        //an: всегда проверяем comon, lib-crm-system, trade-system
+        $affectedRepositories[] = "comon";
+        $affectedRepositories[] = "lib-crm-system";
+        $affectedRepositories[] = "trade-system";
+
         $this->debugLogger->message("Processing test run with attributes: ".json_encode($teamCityRunTest->attributes));
 
         /** @var $transaction CDbTransaction*/
@@ -22,6 +29,23 @@ class PgQ_EventProcessor_RdsTeamCityRunTest extends PgQ\EventProcessor\EventProc
             /** @var $buildType SimpleXMLElement*/
             if (in_array($buildType['name'], Yii::app()->params['teamCityEnabledBuildTypes'])) {
                 $data = $buildType->attributes();
+
+                $this->debugLogger->message("Testing build {$buildType['id']}");
+                $buildTypeFull = $teamCity->getBuildType($data['id']);
+
+                $ok = false;
+
+                foreach ($buildTypeFull->children()->{'vcs-root-entries'}->children()->children() as $entry) {
+                    if (in_array($entry['name'], $affectedRepositories)) {
+                        $ok = true;
+                        break;
+                    }
+                }
+
+                if (!$ok){
+                    $this->debugLogger->message("Skip build root {$buildType['id']}, as it is not affected");
+                    continue;
+                }
 
                 $this->debugLogger->message("Starting build {$buildType['id']}");
                 $result = $teamCity->startBuild($buildType['id'], $teamCityRunTest->trt_branch, "Plan test of feature");

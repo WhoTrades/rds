@@ -36,9 +36,14 @@ class JiraJsonController extends Controller
             /** @var $developer Developer */
             $developer = Developer::getByWhoTradesEmail($user);
             if ($developer) {
-                $nonClosedFeaturesCount = JiraFeature::model()->countNonClosedJiraFeatures($developer->obj_id);
-                if ($nonClosedFeaturesCount >= self::MAX_FEATURES_PER_DEVELOPER) {
-                    $result['errors'][] = "You have to many not closed features, deploy them to prod first";
+                $nonClosedFeatures = JiraFeature::model()->getNonClosedJiraFeatures($developer->obj_id, $ticket);
+                if (count($nonClosedFeatures) >= self::MAX_FEATURES_PER_DEVELOPER) {
+                    $list = [];
+                    foreach ($nonClosedFeatures as $feature) {
+                        $list[] = $feature->jf_ticket;
+                    }
+                    sort($list);
+                    $result['errors'][] = "You have to many not closed features, deploy them to prod first: ".implode(", ", $list);
                 } else {
                     if ($data['fields']['assignee']['emailAddress'] == null) {
                         //an: если задача ничья - переводим на разработчика, что начал работу над ней
