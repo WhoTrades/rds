@@ -173,7 +173,10 @@ class ReleaseVersionController extends Controller
             return;
         }
 
-        $versions = ["+:refs/heads/(master)"];
+        $versions = [
+            "+:refs/heads/(master)",
+            "+:refs/heads/(feature/*)",
+        ];
         foreach (ReleaseVersion::model()->findAll() as $version) {
             /** @var $version ReleaseVersion */
             $versions[] = "+:refs/heads/(release-$version->rv_version)";
