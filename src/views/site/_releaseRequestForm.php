@@ -4,6 +4,10 @@
 /* @var $form TbActiveForm */
 ?>
 
+<div style="font-size: 1.3em; text-align: center">
+    <?php echo TbHtml::labelTb('Внимание! В переходной период до релиза 70 ветки, изменения сделаные с помощью branch per feature нужно мержить в релизную ветку руками! (gta checkout release-70 && gta merge master)', array('color' => TbHtml::LABEL_COLOR_WARNING)); ?>
+</div>
+
 <div class="form" style="width: 400px; margin: auto">
 
     <?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
