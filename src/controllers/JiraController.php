@@ -111,4 +111,16 @@ class JiraController extends Controller
             'blocked'   => $blocked,
         ]);
     }
+
+    public function actionVersions($project, $released = null)
+    {
+        ob_get_clean();
+        $jiraApi = new JiraApi(Yii::app()->debugLogger);
+        $versions = $jiraApi->getAllVersions($project);
+
+        $this->render('versions', [
+            'versions' => $versions,
+            'released' => $released,
+        ]);
+    }
 }
