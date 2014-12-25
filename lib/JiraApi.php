@@ -310,17 +310,15 @@ class JiraApi
 
     public function getLastDeveloperNotRds($ticketInfo)
     {
-        foreach (array_reverse($ticketInfo['changelog']) as $val) {
-            foreach ($val as $val2) {
-                foreach ($val2['items'] as $item) {
-                    if ($item['field'] != 'assignee') {
-                        continue;
-                    }
-                    if (strtolower($item['to']) == 'rds') {
-                        return $item['from'].'@corp.finam.ru';
-                    }
-                    return $item['to'].'@corp.finam.ru';
+        foreach (array_reverse($ticketInfo['changelog']['histories']) as $val) {
+            foreach ($val['items'] as $item) {
+                if ($item['field'] != 'assignee') {
+                    continue;
                 }
+                if (strtolower($item['to']) == 'rds') {
+                    return $item['from'].'@corp.finam.ru';
+                }
+                return $item['to'].'@corp.finam.ru';
             }
         }
 
