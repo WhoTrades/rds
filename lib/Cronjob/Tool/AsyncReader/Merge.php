@@ -60,7 +60,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             } else {
                 //an: Если не смержилась - просто пишем комент с ошибками мержа
                 $this->debugLogger->message("Branch was merged fail, sending comment");
-                $jira->addCommentOrModifyMyComment($feature->jf_ticket, "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. Разрешите эти ошибки путем мержа $message->sourceBranch в $message->targetBranch :\n{code:collapse=true}".implode("\n", $message->errors))."{code}";
+                $jira->addCommentOrModifyMyComment($feature->jf_ticket, "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. Разрешите эти ошибки путем мержа $message->sourceBranch в $message->targetBranch :\n{code:collapse=true}".implode("\n", $message->errors)."{code}");
             }
 
             //an: И в любом случае отправляем задачу обратно разработчику (если не смержилась - пусто мержит, если смержилась - пусть дальше работает:) )
