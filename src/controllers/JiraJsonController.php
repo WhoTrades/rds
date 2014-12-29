@@ -1,7 +1,7 @@
 <?php
 class JiraJsonController extends Controller
 {
-    const MAX_FEATURES_PER_DEVELOPER = 5;
+    const MAX_FEATURES_PER_DEVELOPER = 10;
     /** @var JiraApi */
     private $jiraApi;
 
@@ -162,7 +162,7 @@ class JiraJsonController extends Controller
                     $data = $this->jiraApi->getTicketInfo($ticket);
                 }
                 if ($data['fields']['status']['name'] == \Jira\Status::STATUS_IN_PROGRESS) {
-                    $this->jiraApi->transitionTicket($data, \Jira\Transition::FINISH_DEVELOPMENT, "Разработчик [~".JiraApi::getUserNameByEmail($developer->finam_email)."] завершил работу над этой задачей");
+                    $this->jiraApi->transitionTicket($data, \Jira\Transition::FINISH_DEVELOPMENT, "Разработчик ".JiraApi::getUserNameByEmail($developer->finam_email)." завершил работу над этой задачей");
                     $result['messages'][] = 'Ticket '.$ticket.' moved to status "Continuous integration"';
                 }
 

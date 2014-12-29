@@ -17,8 +17,6 @@ class JiraApi
 
     private $globalCurlSettings;
 
-    private $needSessionClose = false;
-
     public function __construct(\ServiceBase_IDebugLogger $debugLogger, $jiraUrl = self::DEFAULT_JIRA_URL, $userPassword = self::DEFAULT_JIRA_USER_PASSWORD)
     {
         $this->debugLogger = $debugLogger;
@@ -41,8 +39,6 @@ class JiraApi
 
     private function sendRequest($url, $method, $request)
     {
-        $this->needSessionClose = true;
-
         if (strtoupper($method) == 'GET') {
             $json = $this->httpSender->getRequest($url, $request, self::TIMEOUT, $this->globalCurlSettings);
         } else {
@@ -178,6 +174,11 @@ class JiraApi
         $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/comment/$commentId", 'PUT', $request);
     }
 
+    public function deleteComment($ticket, $commentId)
+    {
+        $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/comment/$commentId", 'DELETE', []);
+    }
+
     /**
      * Метод смотрит последний комментарий в тикете и смотрит его владельца. И в зависимости от того является ли автором RDS либо изменяет комментарий, либо добавляет новый
      *
@@ -239,7 +240,7 @@ class JiraApi
 
     public function getTicketsByJql($jql)
     {
-        return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions']);
+        return $this->sendRequest("$this->jiraUrl/rest/api/latest/search", 'GET', ['jql' => $jql, 'expand' => 'transitions,changelog']);
     }
 
     public function getTicketsByVersion($version)
@@ -248,14 +249,6 @@ class JiraApi
         $jql = "fixVersion = $version";
 
         return $this->getTicketsByJql($jql);
-    }
-
-    public function __destruct()
-    {
-        if ($this->needSessionClose) {
-            $this->debugLogger->message("Destroing JIRA auth session");
-            $this->sendRequest("$this->jiraUrl/rest/auth/latest/session", 'DELETE', []);
-        }
     }
 
     public function assign($ticket, $email)

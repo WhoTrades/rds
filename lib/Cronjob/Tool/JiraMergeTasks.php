@@ -30,6 +30,11 @@ class Cronjob_Tool_JiraMergeTasks extends RdsSystem\Cron\RabbitDaemon
             \Jira\Status::STATUS_MERGE_TO_STAGING => "staging",
             \Jira\Status::STATUS_MERGE_TO_MASTER => "master",
         ];
+        $transitionMap = [
+            "develop" => \Jira\Transition::MERGED_TO_DEVELOP,
+            "master" => \Jira\Transition::MERGED_TO_MASTER,
+            "staging" => \Jira\Transition::MERGED_TO_STAGING,
+        ];
 
         foreach ($map as $status => $branch) {
             $this->debugLogger->message("Processing branch $branch");
@@ -37,9 +42,20 @@ class Cronjob_Tool_JiraMergeTasks extends RdsSystem\Cron\RabbitDaemon
 
             foreach ($list['issues'] as $ticketInfo) {
                 $ticket = $ticketInfo['key'];
+                $this->debugLogger->message("Processing ticket $ticket as branch $branch");
+
                 $jiraFeatures = JiraFeature::model()->findAllByAttributes(['jf_ticket' => $ticket]);
                 if (empty($jiraFeatures)) {
-                    $jira->addComment($ticket, "Задача не была слита, так как по ней никто не стартовал фичу с помощью wtflow");
+                    $this->debugLogger->message("Ticket was moved to merge without wtflow, move it to next status without merge");
+                    $transition = $transitionMap[$branch];
+                    $jira->addTicketLabel($ticket, "no-wtflow");
+                    $jira->transitionTicket($ticketInfo, $transition, null, true);
+                    $jira->addComment($ticket, "(!) Задача была сделана по старой схеме, не с помощью wtflow. Она не была слита в ветки develop/staging, так как нет веток. При не попадании кода на dev/tst/prod контура обращайтесь к разработчику, ответственному за задачу");
+                    $lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo);
+
+                    $this->debugLogger->message("Assign back to $lastDeveloper");
+
+                    $jira->assign($ticket, $lastDeveloper);
                     continue;
                 }
 
