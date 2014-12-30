@@ -40,15 +40,24 @@ class SiteController extends Controller
         if(isset($_GET['ReleaseRequest']))
             $releaseRejectSearchModel->attributes=$_GET['ReleaseRequest'];
 
+        $mainProjects = Project::model()->findAllByAttributes(['project_name' => ['comon', 'service-crm', 'dictionary']]);
+
 		$this->render('index', array(
             'releaseRequestSearchModel' => $releaseRequestSearchModel,
             'releaseRejectSearchModel' => $releaseRejectSearchModel,
+            'mainProjects' => $mainProjects,
+            'releaseRequest' => $this->createReleaseRequest(),
         ));
 	}
 
     public function actionCreateReleaseRequest()
     {
-        $model=new ReleaseRequest;
+        $this->render('createReleaseRequest', $this->createReleaseRequest());
+    }
+
+    private function createReleaseRequest()
+    {
+        $model=new ReleaseRequest();
 
         $transaction=$model->dbConnection->beginTransaction();
 
@@ -60,6 +69,7 @@ class SiteController extends Controller
                 if ($model->rr_project_obj_id) {
                     $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
                 }
+                $this->performAjaxValidation($model);
                 if($model->save()) {
                     $model->project->incrementBuildVersion($model->rr_release_version);
                     $list = Project2worker::model()->findAllByAttributes(array(
@@ -118,20 +128,17 @@ class SiteController extends Controller
             throw $e;
         }
 
-        $this->render('createReleaseRequest',array(
-            'model'=>$model,
-        ));
+        return ['model' => $model];
     }
 
     public function actionCreateReleaseReject()
     {
         $model=new ReleaseReject;
 
-        if(isset($_POST['ReleaseReject']))
-        {
-            $model->attributes=$_POST['ReleaseReject'];
+        if(isset($_POST['ReleaseReject'])) {
+            $model->attributes = $_POST['ReleaseReject'];
             $model->rr_user = \Yii::app()->user->name;
-            if($model->save()) {
+            if ($model->save()) {
                 Log::createLogMessage("Создан {$model->getTitle()}");
                 $text = "{$model->rr_user} rejected {$model->project->project_name}. {$model->rr_comment}";
                 foreach (explode(",", \Yii::app()->params['notify']['releaseReject']['phones']) as $phone) {
@@ -238,4 +245,14 @@ class SiteController extends Controller
 		Yii::app()->user->logout();
 		$this->redirect(Yii::app()->homeUrl);
 	}
+
+    protected function performAjaxValidation($model)
+    {
+        file_put_contents("/tmp/file.txt", var_export($_POST, 1));
+        if(isset($_POST['ajax']) && $_POST['ajax']==='release-request-form')
+        {
+            echo CActiveForm::validate($model);
+            Yii::app()->end();
+        }
+    }
 }

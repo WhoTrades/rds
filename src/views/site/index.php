@@ -4,6 +4,12 @@
 /* @var $releaseRequestSearchModel ReleaseRequest */
 ?>
 
+<?php $this->widget('yiistrap.widgets.TbModal', array(
+    'id' => 'release-request-form-modal',
+    'header' => 'Release request',
+    'content' => $this->renderPartial('createReleaseRequest', ['model' => $releaseRequest['model']], true),
+)); ?>
+
 <h1>Запреты релиза</h1>
 <a href="<?=$this->createUrl('createReleaseReject')?>">Создать</a>
 <?php $this->widget('yiistrap.widgets.TbGridView', array(
@@ -24,8 +30,26 @@
         ),
 ))); ?>
 <hr />
-<h2>Запрос релиза</h2>
-<a href="<?=$this->createUrl('createReleaseRequest')?>">Создать</a>
+<h2>
+    Запрос релиза
+    <?php echo TbHtml::button('Собрать проект', array(
+        'data-toggle' => 'modal',
+        'data-target' => '#release-request-form-modal',
+    )); ?>
+
+    <div style="float: right">
+        <?foreach ($mainProjects as $project) {?>
+            <?/** @var $project Project */?>
+            <?php echo TbHtml::button('Собрать '.$project->project_name, array(
+                'data-toggle' => 'modal',
+                'data-target' => '#release-request-form-modal',
+                'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id})",
+            )); ?>
+        <?}?>
+    </div>
+</h2>
+
+<div style="clear: both"></div>
 <?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'release-request-grid',
     'dataProvider'=>$releaseRequestSearchModel->search(),

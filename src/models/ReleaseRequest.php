@@ -77,7 +77,7 @@ class ReleaseRequest extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_release_version', 'required'),
-			array('obj_status_did', 'numerical', 'integerOnly'=>true),
+			array('obj_status_did, rr_project_obj_id', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_status', 'safe', 'on'=>'search'),
@@ -91,9 +91,10 @@ class ReleaseRequest extends CActiveRecord
     public function checkForReleaseReject($attribute, $params)
     {
         //an: Правило действует только для новых запросов на релиз
-        if (!$this->isNewRecord) {
+        if (!$this->isNewRecord || !$this->rr_project_obj_id) {
             return;
         }
+
         $rejects = ReleaseReject::model()->findAllByAttributes([
             'rr_project_obj_id' => $this->rr_project_obj_id,
             'rr_release_version' => $this->rr_release_version,

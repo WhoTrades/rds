@@ -3,22 +3,25 @@
 /* @var $model ReleaseRequest */
 /* @var $form TbActiveForm */
 ?>
-
-<div style="font-size: 1.3em; text-align: center">
-    <?php echo TbHtml::labelTb('Внимание! В переходной период до релиза 70 ветки, изменения сделаные с помощью branch per feature нужно мержить в релизную ветку руками! (gta checkout release-70 && gta merge master)', array('color' => TbHtml::LABEL_COLOR_WARNING)); ?>
-</div>
-
 <div class="form" style="width: 400px; margin: auto">
 
     <?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
-        'enableAjaxValidation' => false,
-        'htmlOptions' => array(
-            'enctype' => 'multipart/form-data',
-        )
-        ));
+        'enableAjaxValidation'=>true,
+        'id' => 'release-request-form',
+        'clientOptions'=>array(
+            'afterSend' => 'js:function(){alert(12);}',
+                'validateOnSubmit'=>true,
+                'validateOnChange'=>false,
+                'afterValidate' => 'js:function(form, data, hasError){
+                    if (!hasError) {
+                        $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(){
+                            $("#release-request-form-modal").modal("hide");
+                        });
+                    }
+                }',
+        ),
+    ));
     ?>
-
-    <p class="note">Fields with <span class="required">*</span> are required.</p>
 
     <?php echo $form->errorSummary($model); ?>
 
@@ -28,7 +31,7 @@
     <?php echo $form->dropDownListControlGroup($model, 'rr_release_version', \ReleaseVersion::model()->forList()); ?>
 
     <div class="row buttons">
-        <?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+        <?php echo TbHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
     </div>
 
     <?php $this->endWidget(); ?>

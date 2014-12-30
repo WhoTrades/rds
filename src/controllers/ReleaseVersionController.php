@@ -62,7 +62,6 @@ class ReleaseVersionController extends Controller
 		{
 			$model->attributes=$_POST['ReleaseVersion'];
 			if($model->save()) {
-                $this->updateVersionsAtTeamCity();
 				$this->redirect(array('view','id'=>$model->obj_id));
             }
 		}
@@ -89,7 +88,6 @@ class ReleaseVersionController extends Controller
 		{
 			$model->attributes=$_POST['ReleaseVersion'];
 			if($model->save()) {
-                $this->updateVersionsAtTeamCity();
 				$this->redirect(array('view','id'=>$model->obj_id));
             }
 		}
@@ -108,8 +106,6 @@ class ReleaseVersionController extends Controller
 	public function actionDelete($id)
 	{
 		$this->loadModel($id)->delete();
-
-        $this->updateVersionsAtTeamCity();
 
 		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 		if(!isset($_GET['ajax']))
