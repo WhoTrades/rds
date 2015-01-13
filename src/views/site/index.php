@@ -9,6 +9,11 @@
     'header' => 'Release request',
     'content' => $this->renderPartial('createReleaseRequest', ['model' => $releaseRequest['model']], true),
 )); ?>
+<?php $this->widget('yiistrap.widgets.TbModal', array(
+    'id' => 'release-request-use-form-modal',
+    'header' => 'USE',
+    'content' => '',
+)); ?>
 
 <h1>Запреты релиза</h1>
 <a href="<?=$this->createUrl('createReleaseReject')?>">Создать</a>
@@ -99,7 +104,35 @@
     });
     realplexor.execute();
 </script>
+<script>
+    $('body').on('click', '.ajax-url', function(e){
+        $.ajax({url: this.href});
+        e.preventDefault();
+    });
+    $('body').on('click', '.use-button', function(e){
+        var obj = this;
+        $.ajax({url: this.href, data: {"ajax": 1}}).done(function(html, b, c, d){
+            if (html == "using" || html == 'used') {
+                return;
+            }
 
+            showForm($(obj).attr('--data-id'));
+        });
+        e.preventDefault();
+    });
+
+    function showForm(id)
+    {
+        $.ajax({url: "/use/index/" + id}).done(function(html){
+            if (html == "using") {
+                return;
+            }
+            $('#release-request-use-form-modal .modal-body').html($("#use-form", $(html)).html());
+            $('body').append($(html).filter('script:last'))
+            $("#release-request-use-form-modal").modal("show");
+        });
+    }
+</script>
 
 
 <style>

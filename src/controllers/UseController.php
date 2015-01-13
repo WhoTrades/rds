@@ -37,7 +37,7 @@ class UseController extends Controller
 	{
         $releaseRequest = $this->loadModel($id);
         if (!$releaseRequest->canBeUsed()) {
-            throw new CHttpException(500,'Wrong release request status');
+            throw new CHttpException(500, 'Wrong release request status');
         }
 
         if ($releaseRequest->canByUsedImmediately()) {
@@ -61,7 +61,12 @@ class UseController extends Controller
                     );
                 }
             }
-            $this->redirect('/');
+            if (!empty($_GET['ajax'])) {
+                echo "using";
+                return;
+            } else {
+                $this->redirect('/');
+            }
         }
 
         $code1 = rand(pow(10, 5), pow(10, 6)-1);
@@ -69,19 +74,14 @@ class UseController extends Controller
         $releaseRequest->rr_project_owner_code = $code1;
         $releaseRequest->rr_release_engineer_code = $code2;
         $releaseRequest->rr_project_owner_code_entered = false;
-        $releaseRequest->rr_release_engineer_code_entered = false;
+        $releaseRequest->rr_release_engineer_code_entered = true;
         $releaseRequest->rr_status = \ReleaseRequest::STATUS_CODES;
 
         $text ="Project owner use {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}. Code: %s";
         Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}(Yii::app()->user->phone, sprintf($text, $code1));
 
-        $text ="Release engineer use {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}. Code: %s";
-        foreach (explode(",", \Yii::app()->params['notify']['releaseEngineers']['phones']) as $phone) {
-            Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, sprintf($text, $code2));
-        }
-
         if ($releaseRequest->save()) {
-            Yii::app()->realplexor->send('updateAllReleaseRequests', []);
+            Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
             Log::createLogMessage("CODES {$releaseRequest->getTitle()}");
         }
 
@@ -112,7 +112,7 @@ class UseController extends Controller
         );
 
         if ($releaseRequest->save()) {
-            Yii::app()->realplexor->send('updateAllReleaseRequests', []);
+            Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
             Log::createLogMessage($logMessage);
         }
 
@@ -125,11 +125,13 @@ class UseController extends Controller
      * @param $model
      * @param $releaseRequest
      */
-    private function checkReleaseCode($model, $releaseRequest)
+    private function checkReleaseCode(ReleaseRequest $model, $releaseRequest)
     {
         if ($model->rr_project_owner_code == $releaseRequest->rr_project_owner_code) {
             Log::createLogMessage("Введен правильный Project Owner код {$releaseRequest->getTitle()}");
             $releaseRequest->rr_project_owner_code_entered = true;
+        } else {
+            $model->addError('rr_project_owner_code', "Код не подошел");
         }
         if ($model->rr_release_engineer_code == $releaseRequest->rr_release_engineer_code) {
             Log::createLogMessage("Введен правильный Release Engineer код {$releaseRequest->getTitle()}");
@@ -154,17 +156,9 @@ class UseController extends Controller
             // проверяем правильность ввода смс
             $this->checkReleaseCode($model, $releaseRequest);
 
-            // если обе смс введены неправильно, то может быть их просто перепутали местами?
-            if (!$releaseRequest->rr_release_engineer_code_entered && !$releaseRequest->rr_project_owner_code_entered) {
-                // поменяем местами и проверим
-                $temp = $model->rr_project_owner_code;
-                $model->rr_project_owner_code = $model->rr_release_engineer_code;
-                $model->rr_release_engineer_code = $temp;
+            $this->performAjaxValidation($model);
 
-                $this->checkReleaseCode($model, $releaseRequest);
-            }
-
-            if ($releaseRequest->rr_project_owner_code_entered && $releaseRequest->rr_release_engineer_code_entered) {
+            if ($releaseRequest->rr_project_owner_code_entered) {
                 $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
                 $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
                 Log::createLogMessage("USE {$releaseRequest->getTitle()}");
@@ -182,9 +176,9 @@ class UseController extends Controller
                         )
                     );
                 }
+                Yii::app()->realplexor->send('updateAllReleaseRequests', []);
             }
             $releaseRequest->save();
-            Yii::app()->realplexor->send('updateAllReleaseRequests', []);
             $this->redirect('/');
         }
         $this->render('index', array(
@@ -231,5 +225,18 @@ class UseController extends Controller
         if($model===null)
             throw new CHttpException(404,'The requested page does not exist.');
         return $model;
+    }
+
+    protected function performAjaxValidation($model)
+    {
+        if(isset($_POST['ajax']) && $_POST['ajax']==='release-request-use-form')
+        {
+            $result = [];
+            foreach($model->getErrors() as $attribute=>$errors) {
+                $result[CHtml::activeId($model,$attribute)]=$errors;
+            }
+            echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
+            Yii::app()->end();
+        }
     }
 }
