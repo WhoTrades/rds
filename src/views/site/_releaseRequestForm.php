@@ -1,24 +1,21 @@
-<?php
-/* @var $this ReleaseRequestController */
-/* @var $model ReleaseRequest */
-/* @var $form TbActiveForm */
-?>
+<? /* @var $this ReleaseRequestController */ ?>
+<? /* @var $model ReleaseRequest */ ?>
+<? /* @var $form TbActiveForm */ ?>
 <div class="form" style="width: 400px; margin: auto">
-
+    <?/** @var $form TbActiveForm */?>
     <?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
-        'enableAjaxValidation'=>true,
+        'enableAjaxValidation' => true,
         'id' => 'release-request-form',
         'clientOptions'=>array(
-            'afterSend' => 'js:function(){alert(12);}',
-                'validateOnSubmit'=>true,
-                'validateOnChange'=>false,
-                'afterValidate' => 'js:function(form, data, hasError){
-                    if (!hasError) {
-                        $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(){
-                            $("#release-request-form-modal").modal("hide");
-                        });
-                    }
-                }',
+            'validateOnSubmit'=>true,
+            'validateOnChange'=>false,
+            'afterValidate' => 'js:function(form, data, hasError){
+                if (!hasError) {
+                    $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(){
+                        $("#release-request-form-modal").modal("hide");
+                    });
+                }
+            }',
         ),
     ));
     ?>

@@ -451,7 +451,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 $oldUsed->rr_revert_after_time = null;
                 $oldUsed->save(false);
 
-                self::sendReleaseRequestUpdated($oldUsed->obj_id);
+                //self::sendReleaseRequestUpdated($oldUsed->obj_id);
             }
 
             if ($releaseRequest) {
@@ -482,7 +482,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         $transaction->commit();
 
-        self::sendReleaseRequestUpdated($releaseRequest->obj_id);
+        //self::sendReleaseRequestUpdated($releaseRequest->obj_id);
+
+        Yii::app()->realplexor->send('updateAllReleaseRequests', []);
 
         $message->accepted();
     }

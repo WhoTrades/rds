@@ -248,7 +248,6 @@ class SiteController extends Controller
 
     protected function performAjaxValidation($model)
     {
-        file_put_contents("/tmp/file.txt", var_export($_POST, 1));
         if(isset($_POST['ajax']) && $_POST['ajax']==='release-request-form')
         {
             echo CActiveForm::validate($model);
