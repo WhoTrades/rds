@@ -14,7 +14,7 @@
             <b><?=$project?></b>
             <a href="<?=$this->createUrl('jira/versions', ['project' => $project])?>">Все</a>
             <a href="<?=$this->createUrl('jira/versions', ['project' => $project, 'released' => true])?>">Выпущенные</a>
-            <a href="<?=$this->createUrl('jira/versions', ['project' => $project, 'released' => false])?>">Не выпущенныя</a>
+            <a href="<?=$this->createUrl('jira/versions', ['project' => $project, 'released' => false])?>">Не выпущенные</a>
         </li>
     <?}?>
 </ul>
