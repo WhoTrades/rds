@@ -26,6 +26,8 @@ class JiraFeature extends CActiveRecord
     const STATUS_IN_PROGRESS    = 'progress';
     const STATUS_CHECKING       = 'checking';
     const STATUS_CLOSED         = 'closed';
+    const STATUS_REMOVING       = 'removing';
+    const STATUS_REMOVED        = 'removed';
     const STATUS_PAUSED         = 'paused';
     const STATUS_CANCELLED      = 'cancelled';
 
@@ -144,6 +146,8 @@ class JiraFeature extends CActiveRecord
         $c = new CDbCriteria();
         $c->compare('jf_developer_id', $developerId);
         $c->compare('jf_status', '<>'.self::STATUS_CLOSED);
+        $c->compare('jf_status', '<>'.self::STATUS_REMOVED);
+        $c->compare('jf_status', '<>'.self::STATUS_REMOVING);
         $c->compare('jf_ticket', '<>'.$exceptTicket);
 
         return self::model()->findAll($c);

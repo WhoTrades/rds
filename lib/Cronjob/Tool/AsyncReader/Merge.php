@@ -29,11 +29,26 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             $this->actionProcessMergeResult($message, $model);
         });
 
+        $model->readDroppedBranches(false, function(Message\Merge\DroppedBranches $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received merge result: ".json_encode($message));
+            $this->actionProcessDroppedBranches($message, $model);
+        });
+
         $this->debugLogger->message("Start listening");
 
         $this->waitForMessages($model, $cronJob);
     }
 
+    private function actionProcessDroppedBranches(Message\Merge\DroppedBranches $message, MessagingRdsMs $model)
+    {
+        $c = new CDbCriteria();
+        $c->compare("jf_branch", $message->branch);
+        $c->compare('jf_status', JiraFeature::STATUS_REMOVING);
+        JiraFeature::model()->updateAll(['jf_status' => JiraFeature::STATUS_REMOVED], $c);
+
+        $message->accepted();
+        $this->debugLogger->message("Message accepted");
+    }
 
     public function actionProcessMergeResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
     {
