@@ -9,12 +9,20 @@
         'clientOptions'=>array(
             'validateOnSubmit' => true,
             'validateOnChange' => false,
+            'beforeValidate' => 'js:function(form, data, hasError){
+                $("button", $(form)).attr("disabled", true);
+
+                return true;
+            }',
             'afterValidate' => 'js:function(form, data, hasError){
-            console.log(form, data, hasError);
                 if (!hasError) {
+                    $("button", $(form)).attr("disabled", true);
                     $.post($("#release-request-use-form").attr("action"), $("#release-request-use-form").serialize()).done(function(){
                         $("#release-request-use-form-modal").modal("hide");
+                        $("button", $(form)).attr("disabled", false);
                     });
+                } else {
+                    $("button", $(form)).attr("disabled", false);
                 }
             }',
         ),
@@ -24,7 +32,7 @@
     <?=$form->errorSummary($model)?>
 
     <?if (!$releaseRequest->rr_project_owner_code_entered) {?>
-        <?php echo $form->textFieldControlGroup($model,'rr_project_owner_code'); ?>
+        <?php echo $form->numberFieldControlGroup($model,'rr_project_owner_code'); ?>
     <?}?>
 
     <?php echo TbHtml::submitButton('USE'); ?>

@@ -21,6 +21,11 @@ class Cronjob_Tool_GitDropFeatureBranch extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
+        if (!\Config::getInstance()->serviceRds['jira']['mergeTasks']) {
+            $this->debugLogger->message("Tool disabled by config");
+            return;
+        }
+
         $jira = new JiraApi($this->debugLogger);
         $model = $this->getMessagingModel($cronJob);
 
