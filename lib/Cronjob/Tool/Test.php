@@ -17,11 +17,8 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $jira = new JiraApi($this->debugLogger);
-        $ticket = 'WTTES-20';
-        $ticketInfo = $jira->getTicketInfo($ticket);
-        $lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo);
-        $this->debugLogger->message($lastDeveloper);
+        $model = $this->getMessagingModel($cronJob);
+        $model->sendMergeTask(new Message\Merge\Task(1, "test", "test"));
     }
 }
 
