@@ -7,13 +7,22 @@
         'enableAjaxValidation' => true,
         'id' => 'release-request-form',
         'clientOptions'=>array(
-            'validateOnSubmit'=>true,
-            'validateOnChange'=>false,
+            'validateOnSubmit' => true,
+            'validateOnChange' => false,
+            'beforeValidate' => 'js:function(form, data, hasError){
+                $("button", $(form)).attr("disabled", true);
+
+                return true;
+            }',
             'afterValidate' => 'js:function(form, data, hasError){
                 if (!hasError) {
+                    $("button", $(form)).attr("disabled", true);
                     $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(){
                         $("#release-request-form-modal").modal("hide");
+                        $("button", $(form)).attr("disabled", false);
                     });
+                } else {
+                    $("button", $(form)).attr("disabled", false);
                 }
             }',
         ),
