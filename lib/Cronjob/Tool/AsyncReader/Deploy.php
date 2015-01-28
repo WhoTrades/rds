@@ -635,6 +635,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $transaction = ReleaseRequest::model()->getDbConnection()->beginTransaction();
         if ($message->type == 'pre') {
             $releaseRequest->rr_migration_status = $message->status;
+            $releaseRequest->rr_migration_error = $message->errorText;
 
             if ($message->status == \ReleaseRequest::MIGRATION_STATUS_UP) {
                 $releaseRequest->rr_new_migration_count = 0;

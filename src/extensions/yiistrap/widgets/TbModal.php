@@ -134,7 +134,7 @@ class TbModal extends CWidget
         $this->initEvents();
 
         echo TbHtml::openTag('div', $this->htmlOptions) . PHP_EOL;
-        echo TbHtml::openTag('div', array('class' => 'modal-dialog')) . PHP_EOL;
+        echo TbHtml::openTag('div', array('class' => 'modal-dialog modal-lg')) . PHP_EOL;
         echo TbHtml::openTag('div', array('class' => 'modal-content')) . PHP_EOL;
         echo TbHtml::modalHeader($this->header);
 
