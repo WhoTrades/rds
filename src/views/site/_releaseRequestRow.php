@@ -124,7 +124,21 @@
                 if ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_UPDATING) {
                     return "updating migrations";
                 } elseif ($releaseRequest->rr_migration_status == \ReleaseRequest::MIGRATION_STATUS_FAILED) {
-                    return "updating migrations failed";
+                    echo "updating migrations failed<br />";
+                    $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(), 'yiistrap.widgets.TbModal', array(
+                        'id' => 'release-request-migration-error-'.$releaseRequest->obj_id,
+                        'header' => 'Errors of migration applying',
+                        'content' => "<pre>$releaseRequest->rr_migration_error</pre>",
+                        'footer' => array(
+                            TbHtml::button('Close', array('data-dismiss' => 'modal')),
+                        ),
+                    ));
+                    $widget->init();
+                    $widget->run();
+
+                    echo '<a href="" style="info" data-toggle="modal" data-target="#release-request-migration-error-419" onclick="return false;">view error</a> | ';
+                    echo "<a href='".Yii::app()->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre'))."' class='ajax-url'>Retry</a><br />";
+                    return;
                 } else {
                     $text =
                         "<a href='".Yii::app()->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre'))."' class='ajax-url'>RUN pre migrations</a><br />".
