@@ -1,7 +1,7 @@
 <?php
 class JiraJsonController extends Controller
 {
-    const MAX_FEATURES_PER_DEVELOPER = 10;
+    const MAX_FEATURES_PER_DEVELOPER = 15;
     /** @var JiraApi */
     private $jiraApi;
 
