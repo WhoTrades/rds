@@ -308,7 +308,7 @@ class JiraApi
                 if ($item['field'] != 'assignee') {
                     continue;
                 }
-                if (strtolower($item['to']) == 'rds') {
+                if (strtolower($item['to']) == 'rds' && $item['from'] != '') {
                     return $item['from'].'@corp.finam.ru';
                 }
                 return $item['to'].'@corp.finam.ru';
