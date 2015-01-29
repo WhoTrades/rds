@@ -18,7 +18,7 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $model = $this->getMessagingModel($cronJob);
-        $model->sendMergeTask(new Message\Merge\Task(1, "test", "test"));
+        $model->sendDropBranches(new Message\Merge\DropBranches('test'));
     }
 }
 
