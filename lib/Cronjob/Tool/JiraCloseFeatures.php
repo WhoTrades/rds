@@ -23,6 +23,8 @@ class Cronjob_Tool_JiraCloseFeatures extends RdsSystem\Cron\RabbitDaemon
         $jira = new JiraApi($this->debugLogger);
         $c = new CDbCriteria();
         $c->compare("jf_status", '<>'.JiraFeature::STATUS_CLOSED);
+        $c->compare("jf_status", '<>'.JiraFeature::STATUS_REMOVED);
+        $c->compare("jf_status", '<>'.JiraFeature::STATUS_REMOVING);
         $nonClosedFeatures = JiraFeature::model()->findAll($c);
         $tickets = [];
         foreach ($nonClosedFeatures as $feature) {
