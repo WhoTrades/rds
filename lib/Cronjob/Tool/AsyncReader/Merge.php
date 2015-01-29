@@ -56,7 +56,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
         JiraFeature::model()->updateAll($update, $c);
 
-        //$message->accepted();
+        $message->accepted();
         $this->debugLogger->message("Message accepted");
     }
 
