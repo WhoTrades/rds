@@ -41,12 +41,22 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
     private function actionProcessDroppedBranches(Message\Merge\DroppedBranches $message, MessagingRdsMs $model)
     {
+        $this->debugLogger->message("Received removed branches: branch=$message->branch, skippedRepositories: ".json_encode($message->skippedRepositories));
         $c = new CDbCriteria();
         $c->compare("jf_branch", $message->branch);
         $c->compare('jf_status', JiraFeature::STATUS_REMOVING);
-        JiraFeature::model()->updateAll(['jf_status' => JiraFeature::STATUS_REMOVED], $c);
 
-        $message->accepted();
+        $update = [
+            'jf_blocker_commits' => json_encode($message->skippedRepositories, JSON_PRETTY_PRINT),
+        ];
+
+        if (!$message->skippedRepositories) {
+            $update['jf_status'] = JiraFeature::STATUS_REMOVED;
+        }
+
+        JiraFeature::model()->updateAll($update, $c);
+
+        //$message->accepted();
         $this->debugLogger->message("Message accepted");
     }
 
@@ -61,6 +71,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         $feature = JiraFeature::model()->findByPk($message->featureId);
         if (!$feature) {
             $this->debugLogger->error("Feature #$message->featureId not found");
+            $message->accepted();
             return;
         }
         $jira = new JiraApi($this->debugLogger);
@@ -79,8 +90,9 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             }
 
             //an: И в любом случае отправляем задачу обратно разработчику (если не смержилась - пусто мержит, если смержилась - пусть дальше работает:) )
-            $lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo);
-            $jira->assign($feature->jf_ticket, $lastDeveloper);
+            if ($lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo)) {
+                $jira->assign($feature->jf_ticket, $lastDeveloper);
+            }
         } else {
             $this->debugLogger->error("Unknown target branch, skip jira integration");
         }
