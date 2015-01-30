@@ -207,7 +207,7 @@ class JiraApi
     {
         $lastComment = end($this->getTicketInfo($ticket)['fields']['comment']['comments']);
         if ($lastComment['author']['name'] == $this->getUserName()) {
-            if ($lastComment['body'] != $text) {
+            if (str_replace("\r", "", $lastComment['body']) != str_replace("\r", "", $text)) {
                 $this->debugLogger->debug("Updating last comment {$lastComment['self']}");
                 $this->updateComment($ticket, $lastComment['id'], $text);
             } else {
