@@ -257,7 +257,7 @@ class JiraApi
         $this->sendRequest("$this->jiraUrl/rest/api/latest/issue/$ticket/assignee", 'PUT', $request);
         $info = $this->getTicketInfo($ticket);
 
-        if ($info['fields']['assignee']['emailAddress'] != strtolower($email)) {
+        if (preg_replace('~@.*~', '', strtolower($info['fields']['assignee']['emailAddress'])) != preg_replace('~@.*~', '', strtolower($email))) {
             throw new ApplicationException("Can't change email to $email for ticket $ticket");
         }
     }
