@@ -5,7 +5,7 @@
     [
         'name' => 'rr_comment',
         'value' => function(ReleaseRequest $releaseRequest){
-            echo $releaseRequest->rr_comment."<br />";
+            echo strip_tags($releaseRequest->rr_comment)."<br />";
 
             if ($releaseRequest->isInstalledStatus()) {
                 echo "<a href='".Yii::app()->createUrl('/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты</a><br />";
