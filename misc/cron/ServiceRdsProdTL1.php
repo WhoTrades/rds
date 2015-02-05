@@ -55,7 +55,7 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_HardMigrationStarter::getToolCommand([], $verbosity=1)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_CiBuildStatus::getToolCommand([], $verbosity=1), $delay = 5)),
             new CronCommand(Cronjob_Tool_JiraMergeTasks::getToolCommand(['--max-duration=60'], $verbosity=1)),
-            new CronCommand(Cronjob_Tool_JiraCloseFeatures::getToolCommand([], $verbosity=1), '*/10 * * * *'),
+            new CronCommand(Cronjob_Tool_JiraCloseFeatures::getToolCommand([], $verbosity=1), '10 * * * *'),
             new CronCommand(Cronjob_Tool_TeamCityCheckQueuedTasks::getToolCommand([], $verbosity=1), '* * * * *'),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity=1), $delay = 30)),
             new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity=3), '10 0 * * *'),
