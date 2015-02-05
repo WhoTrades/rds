@@ -67,6 +67,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             "master" => \Jira\Transition::MERGED_TO_MASTER,
             "staging" => \Jira\Transition::MERGED_TO_STAGING,
         ];
+
         /** @var $feature JiraFeature */
         $feature = JiraFeature::model()->findByPk($message->featureId);
         if (!$feature) {
@@ -74,6 +75,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             $message->accepted();
             return;
         }
+
         $jira = new JiraApi($this->debugLogger);
         $ticketInfo = $jira->getTicketInfo($feature->jf_ticket);
 
@@ -86,7 +88,22 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             } else {
                 //an: Если не смержилась - просто пишем комент с ошибками мержа
                 $this->debugLogger->message("Branch was merged fail, sending comment");
-                $jira->addCommentOrModifyMyComment($feature->jf_ticket, "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. Разрешите эти ошибки путем мержа $message->sourceBranch в $message->targetBranch:\n".implode("\n", $message->errors));
+                $mergeFix = $message->targetBranch == 'master' ? "$message->targetBranch в $message->sourceBranch" : "$message->sourceBranch в $message->targetBranch";
+                $text = "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. Разрешите эти ошибки путем мержа $mergeFix:\n".implode("\n", $message->errors);
+                if ($jira->addCommentOrModifyMyComment($feature->jf_ticket, $text)) {
+
+                    $text = str_replace("\r", "", $text);
+                    $text = preg_replace('~^h\d\.(.*)~', '<b>$1</b>', $text);
+                    $text = preg_replace('~\nh\d\.(.*)~', "\n<b>$1</b>", $text);
+                    $text = preg_replace('~{quote}(.*?){quote}~sui', '<pre>$1</pre>', $text);
+
+                    Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsConflictNotification'}(
+                        $feature->developer->finam_email,
+                        strtolower(preg_replace('~(\w+)\-\d+~', '$1', $feature->jf_ticket)).'@whotrades.org',
+                        'Merge conflict at '.$feature->jf_ticket,
+                        $text
+                    );
+                }
             }
 
             //an: И в любом случае отправляем задачу обратно разработчику (если не смержилась - пусто мержит, если смержилась - пусть дальше работает:) )
