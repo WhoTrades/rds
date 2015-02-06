@@ -26,7 +26,12 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
         $model->readMergeTaskResult(false, function(Message\Merge\TaskResult $message) use ($model) {
             $this->debugLogger->message("env={$model->getEnv()}, Received merge result: ".json_encode($message));
-            $this->actionProcessMergeResult($message, $model);
+
+            if ($message->type == Message\Merge\Task::MERGE_TYPE_BUILD) {
+                $this->actionProcessMergeBuildResult($message, $model);
+            } else {
+                $this->actionProcessMergeFeatureResult($message, $model);
+            }
         });
 
         $model->readDroppedBranches(false, function(Message\Merge\DroppedBranches $message) use ($model) {
@@ -60,7 +65,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         $this->debugLogger->message("Message accepted");
     }
 
-    public function actionProcessMergeResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
+    public function actionProcessMergeFeatureResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
     {
         $transitionMap = [
             "develop" => \Jira\Transition::MERGED_TO_DEVELOP,
@@ -100,7 +105,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                     Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsConflictNotification'}(
                         $feature->developer->finam_email,
                         strtolower(preg_replace('~(\w+)\-\d+~', '$1', $feature->jf_ticket)).'@whotrades.org',
-                        'Merge conflict at '.$feature->jf_ticket,
+                        'Merge conflict at '.$feature->jf_ticket.", branch=$message->targetBranch, developer={$feature->developer->finam_email}",
                         $text
                     );
                 }
@@ -113,6 +118,43 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         } else {
             $this->debugLogger->error("Unknown target branch, skip jira integration");
         }
+        $message->accepted();
+    }
+
+    public function actionProcessMergeBuildResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
+    {
+        $gitBuild = GitBuild::model()->findByPk($message->featureId);
+        if (!$gitBuild) {
+            $this->debugLogger->message("Can't find build $message->featureId, skip message");
+            $message->accepted();
+            return;
+        }
+
+        /** @var $gitBuildBranch GitBuildBranch */
+        $gitBuildBranch = GitBuildBranch::model()->findByAttributes([
+            'git_build_id' => $gitBuild->obj_id,
+            'branch' => $message->sourceBranch,
+        ]);
+
+        $gitBuildBranch->status = $message->status ? GitBuildBranch::STATUS_SUCCESS : GitBuildBranch::STATUS_ERROR;
+        $gitBuildBranch->errors = implode("\n", $message->errors);
+        $gitBuildBranch->save();
+
+
+        if (0 == GitBuildBranch::model()->countByAttributes([
+            'git_build_id' => $gitBuild->obj_id,
+            'status' => GitBuild::STATUS_NEW,
+        ])) {
+            $this->debugLogger->message("Build #$gitBuild->obj_id finished");
+            //an: Если смержили (с ошибками или успешно) все ветки, но билд считаем завершенным
+
+            $gitBuild->status = GitBuild::STATUS_FINISHED;
+            $gitBuild->save();
+        } else {
+            $this->debugLogger->message("Build #$gitBuild->obj_id NOT finished");
+        }
+
+        $this->debugLogger->message("Message accepted");
         $message->accepted();
     }
 }
