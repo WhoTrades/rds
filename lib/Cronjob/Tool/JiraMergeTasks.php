@@ -23,6 +23,13 @@ class Cronjob_Tool_JiraMergeTasks extends RdsSystem\Cron\RabbitDaemon
             $this->debugLogger->message("Tool disabled by config");
             return;
         }
+
+        if (GitBuild::model()->countByAttributes(['status' => GitBuild::STATUS_NEW])) {
+            $this->debugLogger->message("Skip merge tasks as exists build in progress");
+
+            return;
+        }
+
         $model = $this->getMessagingModel($cronJob);
         $jira = new JiraApi($this->debugLogger);
         $map = [
