@@ -202,6 +202,8 @@ class JiraApi
      *
      * @param string $ticket
      * @param string $text
+     *
+     * @return bool. true if comment was updated or false if not
      */
     public function addCommentOrModifyMyComment($ticket, $text)
     {
@@ -212,11 +214,14 @@ class JiraApi
                 $this->updateComment($ticket, $lastComment['id'], $text);
             } else {
                 $this->debugLogger->debug("Skip updating last comment {$lastComment['self']}, as it is not modified");
+                return false;
             }
         } else {
             $this->debugLogger->debug("Adding new comment with text=$text");
             $this->addComment($ticket, $text);
         }
+
+        return true;
     }
 
     public function getAllVersions($project)
