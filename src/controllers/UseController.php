@@ -2,7 +2,7 @@
 
 class UseController extends Controller
 {
-    const USE_ATTEMPT_TIME = 40;
+
 	/**
 	 * @return array action filters
 	 */
@@ -41,25 +41,11 @@ class UseController extends Controller
         }
 
         if ($releaseRequest->canByUsedImmediately()) {
-            $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
-            $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
-            if ($releaseRequest->save()) {
-                Yii::app()->realplexor->send('updateAllReleaseRequests', []);
-                Log::createLogMessage("USE {$releaseRequest->getTitle()}");
-
-                foreach (Worker::model()->findAll() as $worker) {
-                    (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
-                        $worker->worker_name,
-                        new \RdsSystem\Message\UseTask(
-                            $releaseRequest->project->project_name,
-                            $releaseRequest->obj_id,
-                            $releaseRequest->rr_build_version,
-                            $releaseRequest->rr_build_version > $releaseRequest->project->project_current_version
-                                ? \ReleaseRequest::STATUS_USED_ATTEMPT
-                                : \ReleaseRequest::STATUS_USED
-                        )
-                    );
-                }
+            $slaveList = ReleaseRequest::model()->findAllByAttributes(['rr_leading_id' => $releaseRequest->obj_id]);
+            $releaseRequest->sendUseTasks();
+            foreach ($slaveList as $slave) {
+                /** @var $slave ReleaseRequest */
+                $slave->sendUseTasks();
             }
             if (!empty($_GET['ajax'])) {
                 echo "using";
@@ -159,24 +145,13 @@ class UseController extends Controller
             $this->performAjaxValidation($model);
 
             if ($releaseRequest->rr_project_owner_code_entered) {
-                $releaseRequest->rr_status = \ReleaseRequest::STATUS_USING;
-                $releaseRequest->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
-                Log::createLogMessage("USE {$releaseRequest->getTitle()}");
+                $releaseRequest->sendUseTasks();
 
-                foreach (Worker::model()->findAll() as $worker) {
-                    (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
-                        $worker->worker_name,
-                        new \RdsSystem\Message\UseTask(
-                            $releaseRequest->project->project_name,
-                            $releaseRequest->obj_id,
-                            $releaseRequest->rr_build_version,
-                            $releaseRequest->rr_build_version > $releaseRequest->project->project_current_version
-                                ? \ReleaseRequest::STATUS_USED_ATTEMPT
-                                : \ReleaseRequest::STATUS_USED
-                        )
-                    );
+                $slaveList = ReleaseRequest::model()->findAllByAttributes(['rr_leader_id' => $releaseRequest->obj_id]);
+                foreach ($slaveList as $slave) {
+                    /** @var $slave ReleaseRequest */
+                    $slave->sendUseTasks();
                 }
-                Yii::app()->realplexor->send('updateAllReleaseRequests', []);
             }
             $releaseRequest->save();
             $this->redirect('/');

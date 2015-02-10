@@ -71,51 +71,31 @@ class SiteController extends Controller
                 }
                 $this->performAjaxValidation($model);
                 if($model->save()) {
-                    $model->project->incrementBuildVersion($model->rr_release_version);
-                    $list = Project2worker::model()->findAllByAttributes(array(
-                        'project_obj_id' => $model->rr_project_obj_id,
-                    ));
-                    $tasks = [];
-                    foreach ($list as $val) {
-                        /** @var $val Project2worker */
-                        $task = new Build();
-                        $task->build_release_request_obj_id = $model->obj_id;
-                        $task->build_worker_obj_id = $val->worker_obj_id;
-                        $task->build_project_obj_id = $val->project_obj_id;
-                        $task->save();
+                    //an: Для comon мы выкладываем паралельно и dictionary. В данный момент это реализовано на уровне хардкода тут. В будущем, когда появится больше
+                    // взаимосвязанныъ проектов - нужно подумать как это объединить в целостную систему
 
-                        $tasks[] = $task;
+                    if ($model->project->project_name == 'comon' && $dictionaryProject = Project::model()->findByAttributes(['project_name' => 'dictionary'])) {
+                        $dictionary = new ReleaseRequest();
+                        $dictionary->rr_user = $model->rr_user;
+                        $dictionary->rr_project_obj_id = $dictionaryProject->obj_id;
+                        $dictionary->rr_comment = $model->rr_comment." [slave for comon-$model->rr_build_version]";
+                        $dictionary->rr_release_version = $model->rr_release_version;
+                        $dictionary->rr_build_version = $dictionary->project->getNextVersion($dictionary->rr_release_version);
+                        $dictionary->rr_leading_id = $model->obj_id;
+                        $dictionary->save();
+                        $dictionary->save();
 
-
+                        $model->rr_comment = "$model->rr_comment [+dictionary-$dictionary->rr_build_version]";
+                        $model->save();
                     }
 
-                    Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRequestNotification'}($model->rr_user, $model->project->project_name, $model->rr_comment);
-                    $text = "{$model->rr_user} requested {$model->project->project_name}. {$model->rr_comment}";
-                    foreach (explode(",", \Yii::app()->params['notify']['releaseRequest']['phones']) as $phone) {
-                        if (!$phone) continue;
-                        Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+                    //an: Отправку задач в rabbit делаем по-ближе к комиту транзакции, что бы не получилось что задачи уже
+                    // начали выполняться, а транзакция ещё не отправлена и билда у нас в базе ещё нет
+                    $model->createAndSendBuildTasks();
+                    if (!empty($dictionary)) {
+                        $dictionary->createAndSendBuildTasks();
                     }
-
-                    Log::createLogMessage("Создан {$model->getTitle()}");
-
                     $transaction->commit();
-
-                    foreach ($tasks as $task) {
-                        $c = new CDbCriteria();
-                        $c->compare('rr_build_version', '<'.$task->releaseRequest->rr_build_version);
-                        $c->compare('rr_status', ReleaseRequest::getInstalledStatuses());
-                        $c->compare('rr_project_obj_id', $task->releaseRequest->rr_project_obj_id);
-                        $c->order = 'rr_build_version desc';
-                        $lastSuccess = ReleaseRequest::model()->find($c);
-
-                        //an: Отправляем задачу в Rabbit на сборку
-                        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($task->worker->worker_name, new \RdsSystem\Message\BuildTask(
-                            $task->obj_id, $task->project->project_name, $task->releaseRequest->rr_build_version, $task->releaseRequest->rr_release_version,
-                            $lastSuccess ? $lastSuccess->project->project_name.'-'.$lastSuccess->rr_build_version : null,
-                            RdsDbConfig::get()->preprod_online
-                        ));
-                    }
-
                     Yii::app()->realplexor->send('updateAllReleaseRequests', []);
 
                     $this->redirect(array('index'));
