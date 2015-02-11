@@ -18,7 +18,7 @@ class StatisticController extends Controller
         $releaseRequest = ReleaseRequest::model()->find($c);
 
         if ($releaseRequest && $releaseRequest->rr_built_time) {
-            echo strtotime($releaseRequest->rr_built_time) - strtotime($releaseRequest->obj_created);
+            echo strtotime($releaseRequest->rr_built_time) - strtotime($releaseRequest->rr_build_started ?: $releaseRequest->obj_created);
         } else {
             echo "unknown";
         }

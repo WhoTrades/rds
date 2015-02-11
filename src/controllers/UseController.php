@@ -41,7 +41,10 @@ class UseController extends Controller
         }
 
         if ($releaseRequest->canByUsedImmediately()) {
-            $slaveList = ReleaseRequest::model()->findAllByAttributes(['rr_leading_id' => $releaseRequest->obj_id]);
+            $slaveList = ReleaseRequest::model()->findAllByAttributes([
+                'rr_leading_id' => $releaseRequest->obj_id,
+                'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
+            ]);
             $releaseRequest->sendUseTasks();
             foreach ($slaveList as $slave) {
                 /** @var $slave ReleaseRequest */
@@ -147,7 +150,10 @@ class UseController extends Controller
             if ($releaseRequest->rr_project_owner_code_entered) {
                 $releaseRequest->sendUseTasks();
 
-                $slaveList = ReleaseRequest::model()->findAllByAttributes(['rr_leader_id' => $releaseRequest->obj_id]);
+                $slaveList = ReleaseRequest::model()->findAllByAttributes([
+                    'rr_leading_id' => $releaseRequest->obj_id,
+                    'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
+                ]);
                 foreach ($slaveList as $slave) {
                     /** @var $slave ReleaseRequest */
                     $slave->sendUseTasks();

@@ -29,6 +29,7 @@
  * @property string $rr_post_migration_status
  * @property string $rr_built_time
  * @property string $rr_cron_config
+ * @property string $rr_build_started
  *
  * @property Build[] $builds
  * @property Project $project
@@ -365,9 +366,10 @@ class ReleaseRequest extends CActiveRecord
                     $this->project->project_name,
                     $this->obj_id,
                     $this->rr_build_version,
-                    $this->rr_build_version > $this->project->project_current_version
-                        ? \ReleaseRequest::STATUS_USED_ATTEMPT
-                        : \ReleaseRequest::STATUS_USED
+                    \ReleaseRequest::STATUS_USED
+//                    $this->rr_build_version > $this->project->project_current_version
+//                        ? \ReleaseRequest::STATUS_USED_ATTEMPT
+//                        : \ReleaseRequest::STATUS_USED
                 )
             );
         }
