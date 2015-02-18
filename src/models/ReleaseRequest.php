@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This is the model class for table "rds.release_request".
  *
@@ -11,6 +10,7 @@
  * @property string $rr_user
  * @property string $rr_comment
  * @property string $rr_project_obj_id
+ * @property integer $rr_leading_id
  * @property string $rr_status
  * @property string $rr_old_version
  * @property string $rr_build_version
@@ -18,9 +18,6 @@
  * @property string $rr_release_engineer_code
  * @property string $rr_project_owner_code_entered
  * @property string $rr_release_engineer_code_entered
- * @property Build[] $builds
- * @property Project $project
- * @property HardMigration[] $hardMigrations
  * @property string $rr_last_time_on_prod
  * @property string $rr_revert_after_time
  * @property string $rr_release_version
@@ -32,9 +29,16 @@
  * @property string $rr_post_migration_status
  * @property string $rr_built_time
  * @property string $rr_cron_config
+ * @property string $rr_build_started
+ *
+ * @property Build[] $builds
+ * @property Project $project
+ * @property HardMigration[] $hardMigrations
+ * @property ReleaseRequest $leader
  */
 class ReleaseRequest extends CActiveRecord
 {
+    const USE_ATTEMPT_TIME = 40;
     const IMMEDIATELY_TIME = 900;
 
     const STATUS_NEW                 = 'new';
@@ -158,6 +162,7 @@ class ReleaseRequest extends CActiveRecord
             'project' => array(self::BELONGS_TO, 'Project', 'rr_project_obj_id'),
             'builds' => array(self::HAS_MANY, 'Build', 'build_release_request_obj_id'),
             'hardMigrations' => array(self::HAS_MANY, 'HardMigration', 'migration_release_request_obj_id'),
+            'leader' => array(self::BELONGS_TO, 'ReleaseRequest', 'rr_leading_id'),
 		);
 	}
 
@@ -301,5 +306,75 @@ class ReleaseRequest extends CActiveRecord
     public function getBuildTag()
     {
         return $this->project->project_name."-".$this->rr_build_version;
+    }
+
+    public function createAndSendBuildTasks()
+    {
+        $this->project->incrementBuildVersion($this->rr_release_version);
+        $list = Project2worker::model()->findAllByAttributes(array(
+            'project_obj_id' => $this->rr_project_obj_id,
+        ));
+
+        $tasks = [];
+        foreach ($list as $val) {
+            /** @var $val Project2worker */
+            $task = new Build();
+            $task->build_release_request_obj_id = $this->obj_id;
+            $task->build_worker_obj_id = $val->worker_obj_id;
+            $task->build_project_obj_id = $val->project_obj_id;
+            $task->save();
+
+            $tasks[] = $task;
+        }
+
+        Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRequestNotification'}($this->rr_user, $this->project->project_name, $this->rr_comment);
+        $text = "{$this->rr_user} requested {$this->project->project_name}. {$this->rr_comment}";
+        foreach (explode(",", \Yii::app()->params['notify']['releaseRequest']['phones']) as $phone) {
+            if (!$phone) continue;
+            Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+        }
+
+        Log::createLogMessage("Создан {$this->getTitle()}");
+
+        foreach ($tasks as $task) {
+            $c = new CDbCriteria();
+            $c->compare('rr_build_version', '<'.$task->releaseRequest->rr_build_version);
+            $c->compare('rr_status', ReleaseRequest::getInstalledStatuses());
+            $c->compare('rr_project_obj_id', $task->releaseRequest->rr_project_obj_id);
+            $c->order = 'rr_build_version desc';
+            $lastSuccess = ReleaseRequest::model()->find($c);
+
+            //an: Отправляем задачу в Rabbit на сборку
+            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($task->worker->worker_name, new \RdsSystem\Message\BuildTask(
+                $task->obj_id, $task->project->project_name, $task->releaseRequest->rr_build_version, $task->releaseRequest->rr_release_version,
+                $lastSuccess ? $lastSuccess->project->project_name.'-'.$lastSuccess->rr_build_version : null,
+                RdsDbConfig::get()->preprod_online
+            ));
+        }
+    }
+
+    public function sendUseTasks()
+    {
+        $this->rr_status = \ReleaseRequest::STATUS_USING;
+        $this->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
+        Log::createLogMessage("USE {$this->getTitle()}");
+
+        foreach (Worker::model()->findAll() as $worker) {
+            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
+                $worker->worker_name,
+                new \RdsSystem\Message\UseTask(
+                    $this->project->project_name,
+                    $this->obj_id,
+                    $this->rr_build_version,
+                    \ReleaseRequest::STATUS_USED
+//                    $this->rr_build_version > $this->project->project_current_version
+//                        ? \ReleaseRequest::STATUS_USED_ATTEMPT
+//                        : \ReleaseRequest::STATUS_USED
+                )
+            );
+        }
+
+        $this->save();
+        Yii::app()->realplexor->send('updateAllReleaseRequests', []);
     }
 }
