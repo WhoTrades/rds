@@ -111,9 +111,14 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 }
             }
 
-            //an: И в любом случае отправляем задачу обратно разработчику (если не смержилась - пусто мержит, если смержилась - пусть дальше работает:) )
-            if ($lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo)) {
-                $jira->assign($feature->jf_ticket, $lastDeveloper);
+            //an: И если исполнитель все ещё RDS (могли руками переназначить) -  отправляем задачу обратно разработчику
+            // (если не смержилась - пусто мержит, если смержилась - пусть дальше работает :) )
+            if ($lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo) && $ticketInfo['fields']['assignee']['name'] == $jira->getUserName()) {
+                try {
+                    $jira->assign($feature->jf_ticket, $lastDeveloper);
+                } catch (\Exception $e) {
+                    $this->debugLogger->error("Can't assign $lastDeveloper to $feature->jf_ticket");
+                }
             }
         } else {
             $this->debugLogger->error("Unknown target branch, skip jira integration");

@@ -159,6 +159,12 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
                 break;
+            case Build::STATUS_BUILDING:
+                if (!empty($build->releaseRequest) && empty($build->releaseRequest->rr_build_started)) {
+                    $build->releaseRequest->rr_build_started = date("Y-m-d H:i:s");
+                    $build->releaseRequest->save();
+                }
+                break;
             case Build::STATUS_CANCELLED:
                 $title = "Failed to install $project->project_name";
                 $text = "Проект $project->project_name не удалось собрать. <a href='".Yii::app()->createAbsoluteUrl('build/view', array('id' => $build->obj_id))."'>Подробнее</a>";
