@@ -96,6 +96,12 @@ class SiteController extends Controller
                         $dictionary->createAndSendBuildTasks();
                     }
                     $transaction->commit();
+
+                    $model->sendBuildTasks();
+                    if (!empty($dictionary)) {
+                        $dictionary->sendBuildTasks();
+                    }
+                    
                     Yii::app()->realplexor->send('updateAllReleaseRequests', []);
 
                     $this->redirect(array('index'));

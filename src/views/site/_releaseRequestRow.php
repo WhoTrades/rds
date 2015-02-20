@@ -34,6 +34,7 @@
 
             $result = array();
             foreach ($releaseRequest->builds as $val) {
+                /** @var $val Build */
                 $map = array(
                     Build::STATUS_FAILED => array(TbHtml::ICON_EXCLAMATION_SIGN, 'Не собралось', 'red'),
                     Build::STATUS_BUILDING => array(TbHtml::ICON_REFRESH, 'Собирается', 'orange'),
@@ -61,6 +62,10 @@
                             </div>
                             </div>';
                     }
+                }
+
+                if ($text = $val->determineHumanReadableError()) {
+                    $result[] = TbHtml::alert(TbHTML::ALERT_COLOR_WARNING, $text, ['closeText' => false]);
                 }
             }
 

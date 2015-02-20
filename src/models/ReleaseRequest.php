@@ -335,18 +335,21 @@ class ReleaseRequest extends CActiveRecord
         }
 
         Log::createLogMessage("Создан {$this->getTitle()}");
+    }
 
-        foreach ($tasks as $task) {
+    public function sendBuildTasks()
+    {
+        foreach ($this->builds as $build) {
             $c = new CDbCriteria();
-            $c->compare('rr_build_version', '<'.$task->releaseRequest->rr_build_version);
+            $c->compare('rr_build_version', '<'.$build->releaseRequest->rr_build_version);
             $c->compare('rr_status', ReleaseRequest::getInstalledStatuses());
-            $c->compare('rr_project_obj_id', $task->releaseRequest->rr_project_obj_id);
+            $c->compare('rr_project_obj_id', $build->releaseRequest->rr_project_obj_id);
             $c->order = 'rr_build_version desc';
             $lastSuccess = ReleaseRequest::model()->find($c);
 
             //an: Отправляем задачу в Rabbit на сборку
-            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($task->worker->worker_name, new \RdsSystem\Message\BuildTask(
-                $task->obj_id, $task->project->project_name, $task->releaseRequest->rr_build_version, $task->releaseRequest->rr_release_version,
+            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($build->worker->worker_name, new \RdsSystem\Message\BuildTask(
+                $build->obj_id, $build->project->project_name, $build->releaseRequest->rr_build_version, $build->releaseRequest->rr_release_version,
                 $lastSuccess ? $lastSuccess->project->project_name.'-'.$lastSuccess->rr_build_version : null,
                 RdsDbConfig::get()->preprod_online
             ));
