@@ -173,4 +173,27 @@ class Build extends CActiveRecord
     {
         return [self::STATUS_BUILDING, self::STATUS_BUILT, self::STATUS_PREPROD_USING, self::STATUS_PREPROD_MIGRATIONS];
     }
+
+    public function determineHumanReadableError()
+    {
+        $regexes = [
+            '~Execution of target "merge-(?:(?:js)|(?:css))" failed for the following reason: Task exited with code 10~' => "Ошибка в MergeJS/CSS, обращайтесь к фронтдендщикам",
+            '~HTTP request sent, awaiting response... (5\d{2} [\w -]*)~' => "DEV не отдает словарь: $1. Попробуйте пересобрать",
+            '~ssh: connect to host ([\w-]+.whotrades.net) port 22: No route to host~' => "$0. Обратитесь к администратору",
+            '~E: Unable to lock the administration directory \(/var/lib/dpkg/\), is another process using it\?~' => "На сервере администратор что-то устанавливает. Пересоберите позже",
+            '~ssh: connect to host ([\w-]+.whotrades.net) port 22: Connection timed out~' => "Сервер $1 не отвечает. Обратитесь к администратору<br />$0",
+            '~([\w-]+.whotrades.net):.*No space left on device~' => "Закончилось место на <b>$1</b>. Обратитесь к администратору",
+        ];
+
+        foreach ($regexes as $regex => $text) {
+            if (preg_match($regex, $this->build_attach, $ans)) {
+                $i = 0;
+                return str_replace(array_map(function() use (&$i){
+                    return '$'.($i++);
+                }, $ans), $ans, $text);
+            }
+        }
+
+        return null;
+    }
 }
