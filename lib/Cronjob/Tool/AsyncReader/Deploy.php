@@ -218,7 +218,14 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         $lines = explode("\n", str_replace("\r", "", $message->output));
 
+        $repository = null;
         foreach ($lines as $line) {
+            $this->debugLogger->debug("Processing $line");
+            if (preg_match('~>>> origin\s*ssh://(?:\w+@)?git2?.whotrades.net/srv/git/([\w-]+)\s~', $line, $ans)) {
+                $repository = $ans[1];
+                $this->debugLogger->message("Repo: $repository");
+                continue;
+            }
             if (preg_match('~^\s*(?<hash>\w+)\|(?<comment>.*)\|/(?<author>.*?)/$~', $line, $matches)) {
                 $commit = new JiraCommit();
                 if (preg_match_all('~#(WT\w+-\d+)~', $matches['comment'], $ans)) {
@@ -230,6 +237,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                             'jira_commit_comment' => $matches['comment'],
                             'jira_commit_ticket' => $val2,
                             'jira_commit_project' => explode('-', $val2)[0],
+                            'jira_commit_repository' => $repository,
                         ];
 
                         $commit->save();

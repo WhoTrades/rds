@@ -14,6 +14,15 @@
     'header' => 'USE',
     'content' => '',
 )); ?>
+<?php $this->widget('yiistrap.widgets.TbModal', array(
+    'id' => 'modal-popup',
+    'header' => '',
+    'content' => '',
+    'footer' => [
+        TbHtml::button('Close', array('data-dismiss' => 'modal')),
+    ],
+)); ?>
+
 
 <h1>Запреты релиза</h1>
 <a href="<?=$this->createUrl('createReleaseReject')?>">Создать</a>
@@ -130,6 +139,23 @@
             $('#release-request-use-form-modal .modal-body').html($("#use-form", $(html)).html());
             $('body').append($(html).filter('script:last'))
             $("#release-request-use-form-modal").modal("show");
+        });
+    }
+
+    function popup(title, url, data)
+    {
+        data = data || {};
+        data.ajax = 1;
+        $("#modal-popup").modal("show");
+        $("#modal-popup .modal-header h4").html(title);
+        $("#modal-popup .modal-body").html("<center><span style='font-size: 3em'>" + <?=json_encode(TbHtml::icon(TbHtml::ICON_REFRESH))?> + "<span></center>");
+        $.ajax({
+            url: url,
+            data: data
+        }).done(function(html){
+            $("#modal-popup .modal-body").html(html);
+        }).fail(function(a, b, c, d){
+            $("#modal-popup .modal-body").html("<h1>"+ a.status + " " + c + "</h1>");
         });
     }
 </script>
