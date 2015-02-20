@@ -19,9 +19,13 @@
             <?}?>
             <tr class="<?=$key%2 ? 'odd' : 'even'?>">
                 <td>
-                    <a href="http://sources:8060/changelog/<?=$commit->jira_commit_repository?>?cs=<?=$commit->jira_commit_hash?>">
+                    <?if ($commit->jira_commit_repository) {?>
+                        <a href="http://sources:8060/changelog/<?=$commit->jira_commit_repository?>?cs=<?=$commit->jira_commit_hash?>">
+                            <?=substr($commit->jira_commit_hash, 0, 8)?>
+                        </a>
+                    <?} else {?>
                         <?=substr($commit->jira_commit_hash, 0, 8)?>
-                    </a>
+                    <?}?>
                 </td>
                 <td><?=$commit->jira_commit_author?></td>
                 <td><?=$commit->jira_commit_comment?></td>
