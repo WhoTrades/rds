@@ -15,6 +15,7 @@
  * @property string $jira_commit_comment
  * @property string $jira_commit_ticket
  * @property string $jira_commit_project
+ * @property string $jira_commit_repository
  */
 class JiraCommit extends CActiveRecord
 {
@@ -49,9 +50,10 @@ class JiraCommit extends CActiveRecord
                 array('jira_commit_comment', 'length', 'max'=>256),
                 array('jira_commit_ticket', 'length', 'max'=>16),
                 array('jira_commit_project', 'length', 'max'=>8),
+                array('jira_commit_repository', 'length', 'max'=>50),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-                array('obj_id, obj_created, obj_modified, obj_status_did, jira_commit_build_tag, jira_commit_hash, jira_commit_author, jira_commit_comment, jira_commit_ticket, jira_commit_project', 'safe', 'on'=>'search'),
+                array('obj_id, obj_created, obj_modified, obj_status_did, jira_commit_build_tag, jira_commit_hash, jira_commit_author, jira_commit_comment, jira_commit_ticket, jira_commit_project,jira_commit_repository', 'safe', 'on'=>'search'),
         );
     }
 
@@ -82,6 +84,7 @@ class JiraCommit extends CActiveRecord
                 'jira_commit_comment' => 'Jira Commit Comment',
                 'jira_commit_ticket' => 'Jira Commit Ticket',
                 'jira_commit_project' => 'Jira Commit Project',
+                'jira_commit_repository' => 'Jira Commit Repository',
         );
     }
 
@@ -113,6 +116,7 @@ class JiraCommit extends CActiveRecord
         $criteria->compare('jira_commit_comment',$this->jira_commit_comment,true);
         $criteria->compare('jira_commit_ticket',$this->jira_commit_ticket,true);
         $criteria->compare('jira_commit_project',$this->jira_commit_project,true);
+        $criteria->compare('jira_commit_repository',$this->jira_commit_repository,true);
 
         return new CActiveDataProvider($this, array(
                 'criteria'=>$criteria,

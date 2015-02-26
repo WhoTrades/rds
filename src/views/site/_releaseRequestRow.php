@@ -10,6 +10,7 @@
             if ($releaseRequest->isInstalledStatus()) {
                 echo "<a href='".Yii::app()->createUrl('/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты</a><br />";
             }
+            echo "<a href='/site/commits/$releaseRequest->obj_id' onclick=\"popup('test', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>";
         }
 
     ],
@@ -141,7 +142,7 @@
                     $widget->init();
                     $widget->run();
 
-                    echo '<a href="" style="info" data-toggle="modal" data-target="#release-request-migration-error-419" onclick="return false;">view error</a> | ';
+                    echo '<a href="" style="info" data-toggle="modal" data-target="#release-request-migration-error-'.$releaseRequest->obj_id.'" onclick="return false;">view error</a> | ';
                     echo "<a href='".Yii::app()->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre'))."' class='ajax-url'>Retry</a><br />";
                     return;
                 } else {

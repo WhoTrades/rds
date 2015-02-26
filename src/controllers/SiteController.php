@@ -232,6 +232,26 @@ class SiteController extends Controller
 		$this->redirect(Yii::app()->homeUrl);
 	}
 
+    public function actionCommits($id, $ajax = false)
+    {
+        /** @var $releaseRequest ReleaseRequest */
+        if (!$releaseRequest = ReleaseRequest::model()->findByPk($id)) {
+            throw new CHttpException(404, "Сборка #$id не найдена");
+        }
+
+        $c = new CDbCriteria();
+        $c->order = 'jira_commit_repository';
+        $c->compare('jira_commit_build_tag', $releaseRequest->getBuildTag());
+
+        $commits = JiraCommit::model()->findAll($c);
+
+        if ($ajax) {
+            $this->renderPartial('commits', ['commits' => $commits]);
+        } else {
+            $this->render('commits', ['commits' => $commits]);
+        }
+    }
+
     protected function performAjaxValidation($model)
     {
         if(isset($_POST['ajax']) && $_POST['ajax']==='release-request-form')
