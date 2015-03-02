@@ -72,5 +72,22 @@ class JsonController extends Controller
 
         echo time() - strtotime($mtr->obj_created);
     }
+
+    public function actionAddWtFlowStat()
+    {
+        ob_get_clean();
+        $developer = Developer::model()->findByAttributes(['whotrades_email' => $_POST['developer']]);
+        
+        if (!$developer) {
+            echo "Unknown developer ".$_POST['developer'];
+            return;
+        }
+
+        $wtflow = new WtFlowStat();
+        $wtflow->attributes = $_POST;
+        $wtflow->developer_id = $developer->obj_id;
+        $wtflow->log = implode("\n", $_POST['log']);
+        $wtflow->save();
+    }
 }
 
