@@ -38,10 +38,16 @@ class Cronjob_Tool_JiraFixVersionsRelease extends Cronjob\Tool\ToolBase
                 return (false !== strpos($version['description'], '[auto]')) && $version['released'] == false;
             });
 
-            //an: последнюю версию никогда не удаляем и не архивируем, потому что по ней ещё просто могла не отработать очередь создания тикетов
-            array_pop($versions);
-
             foreach ($versions as $version) {
+
+                if ($count = JiraCommit::model()->countByAttributes([
+                    'jira_commit_build_tag' => $version['name'],
+                    'jira_commit_tag_created' => false,
+                ])) {
+                    $this->debugLogger->message("Can't release version {$version['name']} cause there are $count non-processed commits");
+                    continue;
+                }
+
                 $this->debugLogger->message("Checking version {$version['name']}, id: {$version['id']}");
                 $tickets = $jiraApi->getTicketsByVersion($version['id']);
 

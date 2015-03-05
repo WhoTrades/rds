@@ -133,4 +133,18 @@ class Developer extends CActiveRecord
     {
         return "Разработчик $this->whotrades_email, корпоративная почта - $this->finam_email";
     }
+
+    public function forList(){
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
+        $list = array('' => " - Разработчик - ");
+        $c=new CDbCriteria;
+        $c->order = 'finam_email';
+        foreach ($this->findAll($c) as $val)
+            $list[$val->obj_id] = $val->finam_email;
+
+        return $cache = $list;
+    }
 }

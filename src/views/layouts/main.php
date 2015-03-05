@@ -28,7 +28,8 @@
     array('label'=>'Интеграция', 'url'=>array('/jira/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => in_array($this->getId(), ['jira', 'developer', 'git']), 'items' => [
         ['label'=>'JIRA', 'url'=>array('/jira/index'), 'active' => $this->getId() == 'jira'],
         ['label'=>'Разработчики', 'url'=>array('/developer/index'), 'active' => $this->getId() == 'developer'],
-        ['label'=>'Git', 'url'=>array('/git/index'), 'active' => $this->getId() == 'git'],
+        ['label'=>'Git', 'url'=>array('/git/index'), 'active' => $this->getId() == 'git' && $this->action->id == 'index'],
+        ['label'=>'wtflow', 'url'=>array('/git/wtflowStat'), 'active' => $this->getId() == 'git' && $this->action->id == 'wtflowStat'],
     ],),
     array('label'=>'Обслуживание', 'url'=>array('/maintenanceTool/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'maintenanceTool', 'items' => [
         ['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => $this->getId() == 'maintenanceTool'],

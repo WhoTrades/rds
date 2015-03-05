@@ -19,7 +19,7 @@
  * The followings are the available model relations:
  * @property Developer $developer
  */
-class WtflowStat extends CActiveRecord
+class WtFlowStat extends CActiveRecord
 {
     /**
      * @return string the associated database table name
@@ -84,7 +84,7 @@ class WtflowStat extends CActiveRecord
             'action' => 'Action',
             'ticket' => 'Ticket',
             'command' => 'Command',
-            'time' => 'Time',
+            'time' => 'Time, sec',
             'log' => 'Log',
         );
     }
@@ -107,11 +107,11 @@ class WtflowStat extends CActiveRecord
 
         $criteria=new CDbCriteria;
 
-        $criteria->compare('obj_id',$this->obj_id,true);
-        $criteria->compare('obj_created',$this->obj_created,true);
-        $criteria->compare('obj_modified',$this->obj_modified,true);
+        $criteria->compare('obj_id',$this->obj_id);
+        $criteria->compare('obj_created',$this->obj_created);
+        $criteria->compare('obj_modified',$this->obj_modified);
         $criteria->compare('obj_status_did',$this->obj_status_did);
-        $criteria->compare('developer_id',$this->developer_id,true);
+        $criteria->compare('developer_id',$this->developer_id);
         $criteria->compare('exit_code',$this->exit_code);
         $criteria->compare('action',$this->action,true);
         $criteria->compare('ticket',$this->ticket,true);

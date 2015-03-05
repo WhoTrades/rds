@@ -23,6 +23,12 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
 
         $jiraApi = new JiraApi($this->debugLogger);
 
+        $jiraCommit = JiraCommit::model()->findByPk($event->getData()['obj_id']);
+        if (!$jiraCommit) {
+            $this->debugLogger->error("Can't find row at db with id=".$event->getData()['obj_id']);
+            return;
+        }
+
         $ticket = $event->getData()['jira_commit_ticket'];
         $fixVersion = $event->getData()['jira_commit_build_tag'];
 
@@ -45,6 +51,11 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
 
         if (!$releaseRequest) {
             $this->debugLogger->message("Skip creating tag of version $fixVersion because release request was deleted");
+
+            $this->debugLogger->error("jira commit #".$event->getData()['obj_id']." market as processed");
+            $jiraCommit->jira_commit_tag_created = true;
+            $jiraCommit->save(false);
+
             return;
         }
 
@@ -62,6 +73,10 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
         } catch (ServiceBase\HttpRequest\Exception\ResponseCode $e) {
 
         }
+
+        $this->debugLogger->error("jira commit #".$event->getData()['obj_id']." market as processed");
+        $jiraCommit->jira_commit_tag_created = true;
+        $jiraCommit->save(false);
 
         $this->debugLogger->message("Adding fixVersion $fixVersion to ticket $ticket");
         $jiraApi->addTicketFixVersion($ticket, $fixVersion);

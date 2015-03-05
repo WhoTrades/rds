@@ -19,4 +19,16 @@ class GitController extends Controller
             'list' => $list,
         ]);
     }
+
+    public function actionWtFlowStat()
+    {
+        $model=new WtFlowStat('search');
+        $model->unsetAttributes();  // clear any default values
+        if(isset($_GET['WtFlowStat']))
+            $model->attributes=$_GET['WtFlowStat'];
+
+        $this->render('wtFlowStat',array(
+            'model'=>$model,
+        ));
+    }
 }

@@ -16,6 +16,7 @@
  * @property string $jira_commit_ticket
  * @property string $jira_commit_project
  * @property string $jira_commit_repository
+ * @property string $jira_commit_tag_created
  */
 class JiraCommit extends CActiveRecord
 {
