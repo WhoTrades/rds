@@ -19,28 +19,32 @@ class PgQ_EventProcessor_RdsJiraUse extends PgQ\EventProcessor\EventProcessorBas
         $tagFrom = $event->getData()['jira_use_from_build_tag'];
         $tagTo = $event->getData()['jira_use_to_build_tag'];
 
-        $jira = new JiraApi($this->debugLogger);
+        $sql = "SELECT DISTINCT jira_commit_ticket FROM rds.jira_commit WHERE jira_commit_build_tag > :tagFrom AND jira_commit_build_tag <= :tagTo";
+        $ticketKeys = Yii::app()->db->createCommand($sql)->queryColumn([
+            ':tagFrom' => $tagFrom,
+            ':tagTo' => $tagTo,
+        ]);
 
-        $projects = Yii::app()->params['jiraProjects'];
-        $allVersions = [];
-        foreach ($projects as $project) {
-            $allVersions = array_merge($allVersions, $jira->getAllVersions($project));
-        }
+        $this->debugLogger->message("Found tickets between $tagFrom and $tagTo: ".implode(", $ticketKeys"));
 
-        $versions = array_filter($allVersions, function($version) use ($tagFrom, $tagTo){
-            return $version['name'] > min($tagFrom, $tagTo) && $version['name'] <= max($tagFrom, $tagTo);
-        });
-
-        $names = array_map(function($version){ return $version['name'];}, $versions);
-        $this->debugLogger->message("Found between $tagFrom and $tagTo: ".implode(", $names"));
-
-        if (empty($versions)) {
+        if (empty($ticketKeys)) {
             return;
         }
 
-        $tickets = $jira->getTicketsByVersions($names);
+        $jira = new JiraApi($this->debugLogger);
 
-        foreach ($tickets['issues'] as $ticket) {
+        foreach ($ticketKeys as $key) {
+            try {
+                $ticket = $jira->getTicketInfo($key);
+            } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+                if ($e->getHttpCode() == 404 && $e->getResponse() == '{"errorMessages":["ЗАПРОС НЕ СУЩЕСТВУЕТ"],"errors":{}}') {
+                    $this->debugLogger->message("Can't move ticket $key, as ticket was deleted");
+                    continue;
+                } else {
+                    throw $e;
+                }
+            }
+
             $this->debugLogger->message("Processing ticket {$ticket['key']}, status={$ticket['fields']['status']['name']}");
             $transitionId = null;
 
