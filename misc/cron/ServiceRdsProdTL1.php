@@ -53,7 +53,7 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_MaintenanceToolRun::getToolCommand(['--tool-name=systemTest --env=main'], $verbosity=1), '*/10 * * * *'),     //an: для проверки работоспособности системы запуска тулов
 
             new CronCommand(Cronjob_Tool_HardMigrationStarter::getToolCommand([], $verbosity=1)),
-            new CronCommand(new PeriodicCommand(Cronjob_Tool_CiBuildStatus::getToolCommand([], $verbosity=1), $delay = 5)),
+            new CronCommand(new PeriodicCommand(Cronjob_Tool_RdsAlertStatus::getToolCommand([], $verbosity=1), $delay = 5)),
             new CronCommand(Cronjob_Tool_JiraMergeTasks::getToolCommand(['--max-duration=60'], $verbosity=1)),
             new CronCommand(Cronjob_Tool_JiraCloseFeatures::getToolCommand([], $verbosity=1), '10 * * * *'),
             new CronCommand(Cronjob_Tool_TeamCityCheckQueuedTasks::getToolCommand([], $verbosity=1), '* * * * *'),
