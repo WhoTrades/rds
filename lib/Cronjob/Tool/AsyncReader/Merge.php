@@ -111,6 +111,11 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 }
             }
 
+            $feature->jf_last_merge_request_to_develop_time = null;
+            $feature->jf_last_merge_request_to_staging_time = null;
+            $feature->jf_last_merge_request_to_master_time = null;
+            $feature->save();
+
             //an: И если исполнитель все ещё RDS (могли руками переназначить) -  отправляем задачу обратно разработчику
             // (если не смержилась - пусто мержит, если смержилась - пусть дальше работает :) )
             if (($lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo)) && ($ticketInfo['fields']['assignee']['name'] == $jira->getUserName())) {
