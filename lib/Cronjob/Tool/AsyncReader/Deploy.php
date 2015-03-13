@@ -108,7 +108,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         $build->build_status = $status;
         if ($attach) {
-            $build->build_attach = $attach;
+            $build->build_attach .= $attach;
         }
         if ($version) {
             $build->build_version = $version;
