@@ -30,11 +30,15 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
         $errors = [];
         foreach ($data['result']['data'] as $name => $val) {
-            if ($val['data'] === null) {
+            if ($name == 'ES: AccountPortfolio') {
                 continue;
             }
 
-            $errors[] = "Error with $name, url: {$val['url']}";
+            if (empty($val['data']) || (isset($val['data']['result']['data']) && empty($val['data']['result']['data']))) {
+                continue;
+            }
+
+            $errors[] = "Error with $name, url: {$val['url']}, ".json_encode($val['data']);
         }
 
         foreach ($errors as $error) {
