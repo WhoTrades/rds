@@ -55,7 +55,6 @@ class JiraController extends Controller
 
     public function actionTicketHide($project)
     {
-        ob_get_clean();
         $jiraApi = new JiraApi(Yii::app()->debugLogger);
 
         $jql = "project=$project and fixVersion is not empty and status != Closed";
@@ -114,7 +113,6 @@ class JiraController extends Controller
 
     public function actionVersions($project, $released = null)
     {
-        ob_get_clean();
         $jiraApi = new JiraApi(Yii::app()->debugLogger);
         $versions = $jiraApi->getAllVersions($project);
 
