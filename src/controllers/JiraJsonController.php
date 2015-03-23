@@ -221,14 +221,14 @@ class JiraJsonController extends Controller
                 $assignee = isset($data['fields']['assignee']) ? $data['fields']['assignee'] : array();
 
                 if (!$assignee) {
-                    throw new TicketException("No assignee defined in issue '.$ticket.' please, set assignee", 102);
+                    throw new TicketException("No assignee defined in issue {$ticket} please, set assignee", 102);
                 }
 
                 /** @var $developer Developer */
                 $developer = Developer::getByFinamEmail($assignee['emailAddress']);
                 if (!$developer) {
                     throw new TicketException(
-                        "Unknown user " . $assignee['emailAddress'] . ", please register yourself at  RDS http://rds.whotrades.com/developer/create",
+                        "Unknown user {$assignee['emailAddress']}, please register yourself at  RDS http://rds.whotrades.com/developer/create",
                         103
                     );
                 }
@@ -267,13 +267,26 @@ class JiraJsonController extends Controller
         } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
             $result['errors'][] = 'Ticket not found, '.$e->getResponse();
         } catch (TicketException $e) {
-            // vs @todo: revert ticket back i "In Progress" status, add comment into ticket and send email about error to assignee
             $result['errors'][] = $e->getMessage();
             $this->jiraApi->transitionTicket(
                 $data,
-                \Jira\Transition::START_PROGRESS,
-                "Попытка завершить задачу вручную заверщилась ошибкой: ".$e->getMessage()
+                \Jira\Transition::FAILED_INTEGRATION_TESTING
             );
+
+            $this->jiraApi->addComment($ticket, "Попытка завершить задачу вручную заверщилась ошибкой: ".$e->getMessage());
+
+            if (isset($developer) && $developer) {
+                /** @var $existingFeature JiraFeature */
+                $existingFeature = JiraFeature::model()->findByAttributes([
+                    'jf_developer_id' => $developer->obj_id,
+                    'jf_ticket' => $ticket
+                ]);
+
+                // vs : save into RDS database
+                $existingFeature->jf_status = JiraFeature::STATUS_IN_PROGRESS;
+                $existingFeature->resetMergeConditions();
+                $existingFeature->save();
+            }
         }
 
         $this->printJson($result);
