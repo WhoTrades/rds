@@ -206,7 +206,7 @@ class JiraJsonController extends Controller
             $data = $this->jiraApi->getTicketInfo($ticket);
 
             // vs: check is wtflow do ticket transition? if yes - do notihing
-            if ($this->jiraApi->isStatusChangedByRds($data)) {
+            if ($this->jiraApi->isStatusChangedByRds($data, 'In Progress')) {
                 $result['messages'][] = 'Ticket ' . $ticket . ' already handled by wtflow';
             } else {
                 // vs : $ticket MUST be in status 'Countinous integration' after native Jira transition
@@ -273,7 +273,7 @@ class JiraJsonController extends Controller
                 \Jira\Transition::FAILED_INTEGRATION_TESTING
             );
 
-            $comment = "Попытка завершить задачу {$ticket} вручную заверщилась ошибкой: ".$e->getMessage();
+            $comment = "Попытка завершить задачу {$ticket} вручную завершилась ошибкой: ".$e->getMessage();
 
             $this->jiraApi->addComment($ticket, $comment);
             mail($data['fields']['assignee']['emailAddress'], "{$ticket} : не удалось закрыть вручную", $comment);
