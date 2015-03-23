@@ -273,7 +273,10 @@ class JiraJsonController extends Controller
                 \Jira\Transition::FAILED_INTEGRATION_TESTING
             );
 
-            $this->jiraApi->addComment($ticket, "Попытка завершить задачу вручную заверщилась ошибкой: ".$e->getMessage());
+            $comment = "Попытка завершить задачу {$ticket} вручную заверщилась ошибкой: ".$e->getMessage();
+
+            $this->jiraApi->addComment($ticket, $comment);
+            mail($data['fields']['assignee']['emailAddress'], "{$ticket} : не удалось закрыть вручную", $comment);
 
             if (isset($developer) && $developer) {
                 /** @var $existingFeature JiraFeature */
