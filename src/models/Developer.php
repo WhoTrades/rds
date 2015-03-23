@@ -129,6 +129,11 @@ class Developer extends CActiveRecord
         return static::model()->findByAttributes(['whotrades_email' => $whoTradesEmail]);
     }
 
+    public static function getByFinamEmail($email)
+    {
+        return static::model()->findByAttributes(['finam_email' => $email]);
+    }
+
     public function getTitle()
     {
         return "Разработчик $this->whotrades_email, корпоративная почта - $this->finam_email";

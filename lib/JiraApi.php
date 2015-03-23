@@ -3,6 +3,7 @@ class JiraApi
 {
     const DEFAULT_JIRA_URL = 'http://msk-bls1.office.finam.ru:9380';
     const DEFAULT_JIRA_USER_PASSWORD = 'RDS:yz7119agyh';
+    const DEFAULT_JIRA_USERNAME = 'RDS';
 
     const TIMEOUT = 90;
 
@@ -272,6 +273,9 @@ class JiraApi
      *
      * @param array $ticketInfo - информация о тикете, возвращаемая методом getTicketInfo()
      * @param string $transition - элемент из констант класса Jira\Transition, например Jira\Transition::START_PROGRESS
+     * @param null $comment
+     * @param bool $ignoreIncorrectStatus
+     * @throws ApplicationException
      */
     public function transitionTicket($ticketInfo, $transition, $comment = null, $ignoreIncorrectStatus = false)
     {
@@ -320,6 +324,21 @@ class JiraApi
         }
 
         return null;
+    }
+
+    public function isStatusChangedByRds($ticketInfo)
+    {
+        foreach (array_reverse($ticketInfo['changelog']['histories']) as $val) {
+            foreach ($val['items'] as $item) {
+                if ($item['field'] != 'status') {
+                    continue;
+                }
+
+                return (strtolower($val['author']['name']) == strtolower(static::DEFAULT_JIRA_USERNAME));
+            }
+        }
+
+        return false;
     }
 
     public static function getUserNameByEmail($email)
