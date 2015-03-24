@@ -115,8 +115,8 @@
 
             $currentUsed = $provider->getCurrentUsedReleaseRequest($releaseRequest->rr_project_obj_id);
 
-            if ($currentUsed && $currentUsed->rr_cron_config != $releaseRequest->rr_cron_config) {
-                $diffStat = Yii::app()->diffStat->getDiffStat($currentUsed->rr_cron_config, $releaseRequest->rr_cron_config);
+            if ($currentUsed && $currentUsed->getCronConfigCleaned() != $releaseRequest->getCronConfigCleaned()) {
+                $diffStat = Yii::app()->diffStat->getDiffStat($currentUsed->getCronConfigCleaned(), $releaseRequest->getCronConfigCleaned());
                 $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
                 $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
                 echo "<a href='".Yii::app()->createUrl('/diff/index/', ['id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id])."'>CRON changed<br />$diffStat</a><br />";

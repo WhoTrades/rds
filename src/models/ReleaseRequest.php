@@ -380,4 +380,14 @@ class ReleaseRequest extends CActiveRecord
         $this->save();
         Yii::app()->realplexor->send('updateAllReleaseRequests', []);
     }
+
+
+    public function getCronConfigCleaned()
+    {
+        $text = $this->rr_cron_config;
+        $text = preg_replace('~ --sys__key=\w+~', '', $text);
+        $text = preg_replace('~ --sys__package=[\w-]+-[\d.]+~', '', $text);
+
+        return $text;
+    }
 }

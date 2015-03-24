@@ -17,8 +17,14 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $model = $this->getMessagingModel($cronJob);
-        $model->sendDropBranches(new Message\Merge\DropBranches('test'));
+        $fp = stream_socket_client("udp://localhost:51411", $errno, $errstr);
+
+        if ($fp)
+        {
+            fwrite($fp, "TEST 1 TEST 2 TEST 3");
+            $buf = fgets($fp);
+            var_dump($buf);
+            fclose($fp);
+        }
     }
 }
-

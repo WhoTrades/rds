@@ -15,6 +15,8 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
+        $this->debugLogger->error("Tool disabled");
+        return;
         $versions = ReleaseVersion::model()->findAll();
 
         $host = parse_url(\Config::getInstance()->phpLogsSystem['service']['location'], PHP_URL_HOST);
@@ -38,7 +40,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
                 continue;
             }
 
-            $errors[] = "Error with $name, url: {$val['url']}, ".json_encode($val['data']);
+            $errors[] = "Error with $name, url: {$val['url']}";
         }
 
         foreach ($errors as $error) {

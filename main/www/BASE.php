@@ -1,5 +1,44 @@
 <?php
 define('SCRIPT_START_TIME', microtime(true)); // save script start time
+//an: Этот код будет отрабатывать только на dev/tst контурах, так как на проде не стоит xhprof
+if (isset($_REQUEST['profile_xhprof']) && function_exists('xhprof_enable')){
+    xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+
+    function on_shutdown_debug(){
+        $xhprof_data = xhprof_disable();
+
+        $XHPROF_ROOT = "/var/www/xhprof/";
+        include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_lib.php";
+        include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_runs.php";
+
+        $xhprof_runs = new XHProfRuns_Default();
+        $run_id = $xhprof_runs->save_run($xhprof_data, "xhprof_testing");
+
+        if (isset($_SERVER['HTTP_HOST']) && false !== strpos($_SERVER['HTTP_HOST'], 'tst.whotrades.net')) {
+            $host = "xhprof.tst.whotrades.net";
+        } else {
+            $host = "xhprof.dev.whotrades.net";
+        }
+
+        echo "<script>
+                      var div = document.createElement('div');
+                      div.style.position = 'fixed';
+                      div.style.top = '50px';
+                      div.style.left = '10px';
+                      div.style.width = '100px';
+                      div.style.backgroundColor = '#eee';
+                      div.style.border = '2px solid #aaa';
+                      div.style.padding = '10px';
+                      div.style.overflow = 'hidden';
+                      div.innerHTML = '<a target=\"_blank\" href=\"http://$host/xhprof_html/index.php?run={$run_id}&source=xhprof_testing\">Profiler</a><br />';
+                      div.innerHTML += '<a target=\"_blank\" href=\"http://$host/xhprof_html/callgraph.php?run={$run_id}&source=xhprof_testing\">Call graph</a>';
+                      document.body.appendChild(div);
+                  </script>";
+    }
+
+    register_shutdown_function('on_shutdown_debug');
+}
+
 
 /**
  * @property string DSN_DB4

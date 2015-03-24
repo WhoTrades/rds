@@ -22,7 +22,7 @@ Yii::app()->jsdifflib->register();
     </div>
     <div class="item">
         <?
-        $diffStat = Yii::app()->diffStat->getDiffStat($current->rr_cron_config, $new->rr_cron_config);
+        $diffStat = Yii::app()->diffStat->getDiffStat($current->getCronConfigCleaned(), $new->getCronConfigCleaned());
         $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
         $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
         ?>
@@ -32,8 +32,8 @@ Yii::app()->jsdifflib->register();
 </div>
 
 <br />
-<div id="baseText" style="display: none"><?=htmlspecialchars($current->rr_cron_config)?></div>
-<div id="newText" style="display: none"><?=htmlspecialchars($new->rr_cron_config)?></div>
+<div id="baseText" style="display: none"><?=htmlspecialchars($current->getCronConfigCleaned())?></div>
+<div id="newText" style="display: none"><?=htmlspecialchars($new->getCronConfigCleaned())?></div>
 <div id="diffoutput"></div>
 
 <script>

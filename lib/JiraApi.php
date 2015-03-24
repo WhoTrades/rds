@@ -238,9 +238,9 @@ class JiraApi
         return $this->getTicketsByJql($jql);
     }
 
-    public function getTicketsByStatus($status)
+    public function getTicketsByStatus($status, $projects = [])
     {
-        return $this->getTicketsByJql("status=\"$status\"");
+        return $this->getTicketsByJql("status='$status' AND project IN (".implode(", ", $projects).")");
     }
 
     public function getTicketsByJql($jql)

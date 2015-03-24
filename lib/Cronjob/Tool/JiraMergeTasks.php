@@ -45,7 +45,7 @@ class Cronjob_Tool_JiraMergeTasks extends RdsSystem\Cron\RabbitDaemon
 
         foreach ($map as $status => $branch) {
             $this->debugLogger->message("Processing branch $branch");
-            $list = $jira->getTicketsByStatus($status);
+            $list = $jira->getTicketsByStatus($status, Yii::app()->params['jiraProjects']);
 
             foreach ($list['issues'] as $ticketInfo) {
                 $ticket = $ticketInfo['key'];

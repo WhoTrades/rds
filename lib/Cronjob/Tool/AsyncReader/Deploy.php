@@ -332,6 +332,51 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         $releaseRequest->save(false);
 
+        $group = null;
+
+        foreach (array_filter(explode("\n", str_replace("\r", "", $releaseRequest->rr_cron_config))) as $line) {
+            if (preg_match('~^#\s*(\S.*)$~', $line, $ans)) {
+                $group = $ans[1];
+                continue;
+            }
+            if (preg_match('~^\w+\=.*~', $line)) {
+                continue;
+            }
+
+            if (preg_match('~--sys__key=(\w+)~', $line, $ans)) {
+                $key = $ans[1];
+            } else {
+                $this->debugLogger->error("Can't parse line $line");
+                continue;
+            }
+
+            if (preg_match('~--sys__package=([\w.-]+)~', $line, $ans)) {
+                $package = $ans[1];
+            } else {
+                $this->debugLogger->error("Can't parse line $line");
+                continue;
+            }
+
+            if (!$job = ToolJob::model()->findByAttributes([
+                'key' => $key,
+                'project_obj_id' => $releaseRequest->rr_project_obj_id,
+            ])) {
+                $job = new ToolJob();
+                $job->key = $key;
+                $job->project_obj_id = $releaseRequest->rr_project_obj_id;
+            }
+
+            $job->package = $package;
+            $job->version = $releaseRequest->rr_build_version;
+            $job->group = $group;
+            $job->command = $line;
+
+            if (!$job->save()) {
+                $this->debugLogger->error("Can't save ToolJob: ".json_encode($job->errors, JSON_UNESCAPED_UNICODE));
+            }
+        }
+
+
         self::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();

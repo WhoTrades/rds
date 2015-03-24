@@ -57,7 +57,7 @@
             <?php echo TbHtml::button('Собрать '.$project->project_name, array(
                 'data-toggle' => 'modal',
                 'data-target' => '#release-request-form-modal',
-                'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id})",
+                'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id}); setTimeout(function(){ $('#release-request-form-modal .modal-body input:first').focus();}, 500);",
             )); ?>
         <?}?>
     </div>
@@ -114,10 +114,6 @@
     realplexor.execute();
 </script>
 <script>
-    $('body').on('click', '.ajax-url', function(e){
-        $.ajax({url: this.href});
-        e.preventDefault();
-    });
     $('body').on('click', '.use-button', function(e){
         var obj = this;
         $.ajax({url: this.href, data: {"ajax": 1}}).done(function(html, b, c, d){
@@ -139,6 +135,9 @@
             $('#release-request-use-form-modal .modal-body').html($("#use-form", $(html)).html());
             $('body').append($(html).filter('script:last'))
             $("#release-request-use-form-modal").modal("show");
+            setTimeout(function(){
+                $('#release-request-use-form-modal .modal-body input:first').focus();
+            }, 500);
         });
     }
 
