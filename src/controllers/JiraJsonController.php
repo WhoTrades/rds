@@ -193,7 +193,6 @@ class JiraJsonController extends Controller
      */
     public function actionManualFinishTicketWork($ticket)
     {
-        file_put_contents('/tmp/wttest40', var_export($_REQUEST, 1));
         $result = [
             'errors' => [],
             'warnings' => [],
