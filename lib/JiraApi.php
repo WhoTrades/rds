@@ -326,7 +326,13 @@ class JiraApi
         return null;
     }
 
-    public function isStatusChangedByRds($ticketInfo)
+    /**
+     * @param $ticketInfo
+     * @param null $fromStatus
+     * @param null $toStatus
+     * @return bool
+     */
+    public function isStatusChangedByRds($ticketInfo, $fromStatus = null, $toStatus = null)
     {
         foreach (array_reverse($ticketInfo['changelog']['histories']) as $val) {
             foreach ($val['items'] as $item) {
@@ -334,7 +340,16 @@ class JiraApi
                     continue;
                 }
 
-                return (strtolower($val['author']['name']) == strtolower(static::DEFAULT_JIRA_USERNAME));
+                $return =  (strtolower($val['author']['name']) == strtolower(static::DEFAULT_JIRA_USERNAME));
+                if ($fromStatus) {
+                    $return = $return && ($item['fromString'] == $fromStatus);
+                }
+
+                if ($toStatus) {
+                    $return = $return && ($item['toString'] == $toStatus);
+                }
+
+                return $return;
             }
         }
 

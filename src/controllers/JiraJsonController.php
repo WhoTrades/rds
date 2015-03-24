@@ -206,32 +206,14 @@ class JiraJsonController extends Controller
             $data = $this->jiraApi->getTicketInfo($ticket);
 
             // vs: check is wtflow do ticket transition? if yes - do notihing
-            if ($this->jiraApi->isStatusChangedByRds($data, 'In Progress')) {
+            if ($this->jiraApi->isStatusChangedByRds($data, \Jira\Status::STATUS_IN_PROGRESS)) {
                 $result['messages'][] = 'Ticket ' . $ticket . ' already handled by wtflow';
             } else {
                 // vs : $ticket MUST be in status 'Countinous integration' after native Jira transition
-                if ($data['fields']['status']['name'] != \Jira\Status::STATUS_IN_CONTINUOUS_INTEGRATION) {
-                    throw new TicketException(
-                        "Ticket status is \"{$data['fields']['status']['name']}\", but only 'Continous integration' needed for manual finish!",
-                        101
-                    );
-                }
-
-                // vs: get assignee data from ticket
-                $assignee = isset($data['fields']['assignee']) ? $data['fields']['assignee'] : array();
-
-                if (!$assignee) {
-                    throw new TicketException("No assignee defined in issue {$ticket} please, set assignee", 102);
-                }
+                $this->assertStatus($data, \Jira\Status::STATUS_IN_CONTINUOUS_INTEGRATION);
 
                 /** @var $developer Developer */
-                $developer = Developer::getByFinamEmail($assignee['emailAddress']);
-                if (!$developer) {
-                    throw new TicketException(
-                        "Unknown user {$assignee['emailAddress']}, please register yourself at  RDS http://rds.whotrades.com/developer/create",
-                        103
-                    );
-                }
+                $developer = $this->getDeveloperByFinamEmail($this->getAssigneeEmail($data));
 
                 /** @var $existingFeature JiraFeature */
                 $existingFeature = JiraFeature::model()->findByAttributes([
@@ -293,6 +275,43 @@ class JiraJsonController extends Controller
         }
 
         $this->printJson($result);
+    }
+
+    protected function getDeveloperByFinamEmail($email)
+    {
+        /** @var $developer Developer */
+        $developer = Developer::getByFinamEmail($email);
+        if (!$developer) {
+            throw new TicketException(
+                "Unknown user {$email}, please register yourself at  RDS http://rds.whotrades.com/developer/create",
+                103
+            );
+        }
+
+        return $developer;
+    }
+
+    protected function getAssigneeEmail($ticketInfo)
+    {
+        $assignee = isset($ticketInfo['fields']['assignee']) ? $ticketInfo['fields']['assignee'] : array();
+
+        if (!$assignee || !isset($assignee['emailAddress'])) {
+            throw new TicketException("No assignee defined in issue {$ticketInfo['key']} please, set assignee", 102);
+        }
+
+        return $assignee['emailAddress'];
+    }
+
+    protected function assertStatus($ticketInfo, $requiredStatus)
+    {
+        if ($ticketInfo['fields']['status']['name'] != $requiredStatus) {
+            throw new TicketException(
+                "Ticket status is \"{$ticketInfo['fields']['status']['name']}\", but only 'Continous integration' needed for manual finish!",
+                101
+            );
+        }
+
+        return true;
     }
 
     public function printJson($data)
