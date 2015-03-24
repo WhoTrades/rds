@@ -3,7 +3,6 @@ class JiraApi
 {
     const DEFAULT_JIRA_URL = 'http://msk-bls1.office.finam.ru:9380';
     const DEFAULT_JIRA_USER_PASSWORD = 'RDS:yz7119agyh';
-    const DEFAULT_JIRA_USERNAME = 'RDS';
 
     const TIMEOUT = 90;
 
@@ -340,7 +339,7 @@ class JiraApi
                     continue;
                 }
 
-                $return =  (strtolower($val['author']['name']) == strtolower(static::DEFAULT_JIRA_USERNAME));
+                $return =  (strtolower($val['author']['name']) == strtolower($this->getUserName()));
                 if ($fromStatus) {
                     $return = $return && ($item['fromString'] == $fromStatus);
                 }
