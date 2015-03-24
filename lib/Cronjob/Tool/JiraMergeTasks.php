@@ -9,7 +9,7 @@ class Cronjob_Tool_JiraMergeTasks extends RdsSystem\Cron\RabbitDaemon
     //an: Интервал, с которым мы пытается заново смержить задачу. Например, если разработчик разрулит конфликты - мы сами
     //это заметим и передвинем задачу в следующий статус
 
-    const MERGE_INTERVAL = 600;
+    const MERGE_INTERVAL = 3600;
     const LABEL_MERGING = "merging";
 
     public static function getCommandLineSpec()

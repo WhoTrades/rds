@@ -88,7 +88,7 @@ class ReleaseRequest extends CActiveRecord
 			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_status', 'safe', 'on'=>'search'),
 			array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on'=>'use'),
             array('rr_release_version', 'checkForReleaseReject'),
-            array('rr_release_version', 'checkForTeamCityHasNoErrors'),
+            //array('rr_release_version', 'checkForTeamCityHasNoErrors'),
             array('rr_release_version', 'checkNotExistsHardMigrationOfPreviousRelease'),
 		);
 	}
