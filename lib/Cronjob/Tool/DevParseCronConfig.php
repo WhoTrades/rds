@@ -43,7 +43,7 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
         }
 
         /** @var $rr ReleaseRequest */
-        $rr = ReleaseRequest::model()->findByAttributes([
+        $rr = ReleaseRequest::model()->deleteAllByAttributes([
             'rr_project_obj_id' => $Project->obj_id,
             'rr_build_version' => $Project->project_current_version,
         ]);
