@@ -32,8 +32,14 @@ class PgQ_EventProcessor_RdsJiraTicketStatus extends PgQ\EventProcessor\EventPro
                 throw $e;
             }
         }
+
+        $allowedStatuses = [
+            \Jira\Status::STATUS_READY_FOR_DEPLOYMENT,
+            \Jira\Status::STATUS_READY_FOR_ACCEPTANCE,
+            \Jira\Status::STATUS_CLOSED
+        ];
         
-        if (!in_array($info['fields']['status']['name'], ['Готово к выкладке', 'Закрыт', 'Готово к приемке'])) {
+        if (!in_array($info['fields']['status']['name'], $allowedStatuses)) {
             $this->debugLogger->message("Marking ticket $ticket as invalid status");
             $jiraApi->addTicketLabel($ticket, 'deployed-at-invalid-status');
         }
