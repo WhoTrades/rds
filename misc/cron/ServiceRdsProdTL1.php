@@ -65,7 +65,6 @@ class ServiceRdsProdTL1
             new CronCommand(new PeriodicCommand(Cronjob_Tool_RdsAlertStatus::getToolCommand([], $verbosity=1), $delay = 5)),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity=1), $delay = 30)),
             new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity=3), '10 0 * * *'),
-            new CronCommand(new PeriodicCommand(Cronjob_Tool_Maintenance_MasterTool::getToolCommand([], $verbosity=1), $delay = 5)),
         ];
     }
 
