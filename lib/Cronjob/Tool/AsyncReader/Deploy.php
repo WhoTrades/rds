@@ -312,31 +312,48 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
     public function actionSetCronConfig(Message\ReleaseRequestCronConfig $message, MessagingRdsMs $model)
     {
-        /** @var $build Build */
-        $build = Build::model()->findByPk($message->taskId);
+        $transaction = Build::model()->dbConnection->beginTransaction();
+        try {
+            /** @var $build Build */
+            $build = Build::model()->findByPk($message->taskId);
 
-        if (!$build) {
-            $this->debugLogger->error("Build #$message->taskId not found");
+            if (!$build) {
+                $this->debugLogger->error("Build #$message->taskId not found");
+                $message->accepted();
+                return;
+            }
+            $releaseRequest = $build->releaseRequest;
+
+            if (!$releaseRequest) {
+                $this->debugLogger->error("Build #$message->taskId has no release request");
+                $message->accepted();
+                return;
+            }
+
+            $releaseRequest->rr_cron_config = $message->text;
+
+            $releaseRequest->save(false);
+
+            $releaseRequest->parseCronConfig();
+
+            ToolJob::model()->updateAll([
+                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED
+            ], 'project_obj_id=:id AND "version"=:version', [
+                ':id' => $releaseRequest->rr_project_obj_id,
+                ':version' => $releaseRequest->rr_build_version,
+            ]);
+
+            self::sendReleaseRequestUpdated($releaseRequest->obj_id);
+
+            $transaction->commit();
+
             $message->accepted();
-            return;
-        }
-        $releaseRequest = $build->releaseRequest;
 
-        if (!$releaseRequest) {
-            $this->debugLogger->error("Build #$message->taskId has no release request");
-            $message->accepted();
-            return;
+        } catch (\Exception $e) {
+            $transaction->rollback();
+            throw $e;
         }
 
-        $releaseRequest->rr_cron_config = $message->text;
-
-        $releaseRequest->save(false);
-
-        $releaseRequest->parseCronConfig();
-
-        self::sendReleaseRequestUpdated($releaseRequest->obj_id);
-
-        $message->accepted();
     }
 
     public function actionSetUseError(Message\ReleaseRequestUseError $message, MessagingRdsMs $model)
@@ -483,6 +500,19 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     $jiraUse->save();
                 }
             }
+
+            ToolJob::model()->updateAll([
+                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED
+            ], "project_obj_id=:id", [
+                ':id' => $releaseRequest->rr_project_obj_id,
+            ]);
+
+            ToolJob::model()->updateAll([
+                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE
+            ], 'project_obj_id=:id AND "version"=:version', [
+                ':id' => $releaseRequest->rr_project_obj_id,
+                ':version' => $releaseRequest->rr_build_version,
+            ]);
 
             if ($oldVersion < $message->version) {
                 $title = "Deployed $project->project_name v.$message->version";
