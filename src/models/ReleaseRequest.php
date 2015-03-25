@@ -390,4 +390,53 @@ class ReleaseRequest extends CActiveRecord
 
         return $text;
     }
+
+    public function parseCronConfig($forcePackage = null)
+    {
+        $group = null;
+        /** @var $debugLogger \ServiceBase_IDebugLogger */
+        $debugLogger = Yii::app()->debugLogger;
+
+        foreach (array_filter(explode("\n", str_replace("\r", "", $this->rr_cron_config))) as $line) {
+            if (preg_match('~^#\s*(\S.*)$~', $line, $ans)) {
+                $group = $ans[1];
+                continue;
+            }
+            if (preg_match('~^\w+\=.*~', $line)) {
+                continue;
+            }
+
+            if (preg_match('~--sys__key=(\w+)~', $line, $ans)) {
+                $key = $ans[1];
+            } else {
+                $debugLogger->message("Can't parse line $line");
+                continue;
+            }
+
+            if (preg_match('~--sys__package=([\w.-]+)~', $line, $ans)) {
+                $package = $forcePackage ?: $ans[1];
+            } else {
+                $debugLogger->message("Can't parse line $line");
+                continue;
+            }
+
+            if (!$job = ToolJob::model()->findByAttributes([
+                'key' => $key,
+                'project_obj_id' => $this->rr_project_obj_id,
+            ])) {
+                $job = new ToolJob();
+                $job->key = $key;
+                $job->project_obj_id = $this->rr_project_obj_id;
+            }
+
+            $job->package = $package;
+            $job->version = $this->rr_build_version;
+            $job->group = $group;
+            $job->command = $line;
+
+            if (!$job->save()) {
+                $debugLogger->message("Can't save ToolJob: ".json_encode($job->errors, JSON_UNESCAPED_UNICODE));
+            }
+        }
+    }
 }
