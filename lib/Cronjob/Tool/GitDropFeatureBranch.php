@@ -43,7 +43,7 @@ class Cronjob_Tool_GitDropFeatureBranch extends RdsSystem\Cron\RabbitDaemon
             try {
                 $info = $jira->getTicketInfo($feature->jf_ticket);
             } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
-                if ($e->getHttpCode() == 404 && $e->getResponse() == '{"errorMessages":["ЗАПРОС НЕ СУЩЕСТВУЕТ"],"errors":{}}') {
+                if ($e->getHttpCode() == 404 && $e->getResponse() == '{"errorMessages":["Issue Does Not Exist"],"errors":{}}') {
                     $this->debugLogger->message("Ticket was removed, removing branches");
                     $delete = true;
                 } else {

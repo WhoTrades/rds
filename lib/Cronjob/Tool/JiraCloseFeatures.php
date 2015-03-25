@@ -45,7 +45,7 @@ class Cronjob_Tool_JiraCloseFeatures extends RdsSystem\Cron\RabbitDaemon
                     JiraFeature::model()->updateAll(['jf_status' => JiraFeature::STATUS_CLOSED], 'jf_ticket=:ticket', [':ticket' => $ticket]);
                 }
             } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
-                if ($e->getHttpCode() == 404 && $e->getResponse() == '{"errorMessages":["ЗАПРОС НЕ СУЩЕСТВУЕТ"],"errors":{}}') {
+                if ($e->getHttpCode() == 404 && $e->getResponse() == '{"errorMessages":["Issue Does Not Exist"],"errors":{}}') {
                     $this->debugLogger->message("Closing features with ticket=$ticket, as ticket was deleted");
                     JiraFeature::model()->updateAll(['jf_status' => JiraFeature::STATUS_CLOSED], 'jf_ticket=:ticket', [':ticket' => $ticket]);
                 } else {
