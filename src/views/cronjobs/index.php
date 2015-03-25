@@ -28,7 +28,7 @@ $this->pageTitle = "Фоновые процессы";
                     <?if ($toolJob->group !== $group) {?>
                         <tr>
                             <td colspan="10">
-                                <b><a href="#<?=$id = preg_replace('~\W+~', '-', $group)?>" id="<?=$id ?>"><?=$group?></a></b>
+                                <b><a href="#<?=$id = preg_replace('~\W+~', '-', $group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
                             </td>
                         </tr>
                         <?$group = $toolJob->group;?>
