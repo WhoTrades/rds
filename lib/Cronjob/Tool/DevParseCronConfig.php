@@ -58,7 +58,6 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
         $transaction = ToolJob::model()->getDbConnection()->beginTransaction();
         try {
             ToolJob::model()->deleteAllByAttributes([
-                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED,
                 'project_obj_id' => $Project->obj_id,
             ]);
 
