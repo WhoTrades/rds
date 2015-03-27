@@ -10,6 +10,7 @@
  * @property integer $obj_status_did
  * @property string $branch
  * @property string $status
+ * @property string $additional_data
  *
  * The followings are the available model relations:
  * @property GitBuildBranch[] $gitBuildBranches
@@ -45,7 +46,7 @@ class GitBuild extends CActiveRecord
         return array(
             array('obj_created, obj_modified, branch', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('branch, status', 'length', 'max'=>50),
+            array('branch, status, additional_data', 'length', 'max'=>50),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array('obj_id, obj_created, obj_modified, obj_status_did, branch, status', 'safe', 'on'=>'search'),
@@ -103,6 +104,7 @@ class GitBuild extends CActiveRecord
         $criteria->compare('obj_status_did',$this->obj_status_did);
         $criteria->compare('branch',$this->branch,true);
         $criteria->compare('status',$this->status,true);
+        $criteria->compare('additional_data',$this->additional_data,true);
 
         return new CActiveDataProvider($this, array(
             'criteria'=>$criteria,

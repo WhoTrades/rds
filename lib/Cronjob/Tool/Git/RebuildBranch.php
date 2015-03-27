@@ -67,11 +67,12 @@ class Cronjob_Tool_Git_RebuildBranch extends RdsSystem\Cron\RabbitDaemon
         $build = new GitBuild();
         $build->branch = "tmp/build_".uniqid();
         $build->status = GitBuild::STATUS_NEW;
+        $build->additional_data = $branch;
         $build->save();
 
         $this->debugLogger->message("Target branch: $build->branch, sending create branch task");
 
-        $model->sendMergeCreateBranch(new Message\Merge\CreateBranch($build->branch, "master"));
+        $model->sendMergeCreateBranch(new Message\Merge\CreateBranch($build->branch, "master", false));
 
         foreach ($branches as $val) {
 
