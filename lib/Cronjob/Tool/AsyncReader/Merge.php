@@ -133,6 +133,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
     public function actionProcessMergeBuildResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
     {
+        /** @var $gitBuild GitBuild */
         $gitBuild = GitBuild::model()->findByPk($message->featureId);
         if (!$gitBuild) {
             $this->debugLogger->message("Can't find build $message->featureId, skip message");
@@ -153,10 +154,23 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
         if (0 == GitBuildBranch::model()->countByAttributes([
             'git_build_id' => $gitBuild->obj_id,
-            'status' => GitBuild::STATUS_NEW,
+            'status' => GitBuildBranch::STATUS_NEW,
         ])) {
             $this->debugLogger->message("Build #$gitBuild->obj_id finished");
             //an: Если смержили (с ошибками или успешно) все ветки, но билд считаем завершенным
+
+            $errorsCount = GitBuildBranch::model()->countByAttributes([
+                'git_build_id' => $gitBuild->obj_id,
+                'status' => GitBuildBranch::STATUS_ERROR,
+            ]);
+
+            //an: Если собирали ради пересборки develop/staging и все успешно смержилось - тогда пушим пересоздаем ветки
+            if (in_array($gitBuild->additional_data, ["develop", "staging"]) && $errorsCount == 0) {
+                $model->sendMergeCreateBranch(new Message\Merge\CreateBranch($gitBuild->additional_data, $gitBuild->branch, true));
+                mail("dev-test-rebuilt-success@whotrades.org", "[RDS] $gitBuild->additional_data успешно пересобрана", "Все вмержилось, новый код можно смотреть на тестовом контуре");
+            } else {
+                mail("dev-test-rebuilt-failed@whotrades.org", "[RDS] Собрка ветки $gitBuild->additional_data завершилась неудачей", "Часть задач не вмержились");
+            }
 
             $gitBuild->status = GitBuild::STATUS_FINISHED;
             $gitBuild->save();
