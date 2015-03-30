@@ -406,14 +406,14 @@ class ReleaseRequest extends CActiveRecord
                 continue;
             }
 
-            if (preg_match('~--sys__key=(\w+)~', $line, $ans)) {
+            if (preg_match('~\s*--sys__key=(\w+)~', $line, $ans)) {
                 $key = $ans[1];
             } else {
                 $debugLogger->message("Can't parse line $line");
                 continue;
             }
 
-            if (preg_match('~--sys__package=([\w.-]+)~', $line, $ans)) {
+            if (preg_match('~\s*--sys__package=([\w.-]+)~', $line, $ans)) {
                 $package = $forcePackage ?: $ans[1];
             } else {
                 $debugLogger->message("Can't parse line $line");
