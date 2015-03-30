@@ -23,6 +23,7 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
 
         $jiraApi = new JiraApi($this->debugLogger);
 
+        /** @var $jiraCommit JiraCommit */
         $jiraCommit = JiraCommit::model()->findByPk($event->getData()['obj_id']);
         if (!$jiraCommit) {
             $this->debugLogger->error("Can't find row at db with id=".$event->getData()['obj_id']);
@@ -52,13 +53,48 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
         if (!$releaseRequest) {
             $this->debugLogger->message("Skip creating tag of version $fixVersion because release request was deleted");
 
-            $this->debugLogger->error("jira commit #".$event->getData()['obj_id']." market as processed");
+            $this->debugLogger->message("jira commit #".$event->getData()['obj_id']." market as processed");
             $jiraCommit->jira_commit_tag_created = true;
             $jiraCommit->save(false);
 
             return;
         }
 
+        /** @var $jiraFeature JiraFeature */
+        if ($jiraFeature = JiraFeature::model()->findByAttributes(['jf_ticket' => $ticket])) {
+            if (in_array($jiraFeature->jf_status, [JiraFeature::STATUS_CLOSED, JiraFeature::STATUS_REMOVED, JiraFeature::STATUS_REMOVING])) {
+                $this->debugLogger->message("Skip creating tag of version $fixVersion because feature of ticket was closed");
+                $this->debugLogger->message("jira commit #".$event->getData()['obj_id']." market as processed");
+                $jiraCommit->jira_commit_tag_created = true;
+                $jiraCommit->save(false);
+
+                return;
+            }
+        }
+
+        try {
+            $info = $jiraApi->getTicketInfo($ticket);
+        } catch (ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+            if ($e->getHttpCode() != 404) {
+                throw $e;
+            } else {
+                $this->debugLogger->message("Skip creating tag of version $fixVersion because ticket was deleted");
+                $this->debugLogger->message("jira commit #".$event->getData()['obj_id']." market as processed");
+                $jiraCommit->jira_commit_tag_created = true;
+                $jiraCommit->save(false);
+
+                return;
+            }
+        }
+
+        if ($info['fields']['status']['name'] == \Jira\Status::STATUS_CLOSED) {
+            $this->debugLogger->message("Skip creating tag of version $fixVersion because ticket was closed");
+            $this->debugLogger->message("jira commit #".$event->getData()['obj_id']." market as processed");
+            $jiraCommit->jira_commit_tag_created = true;
+            $jiraCommit->save(false);
+
+            return;
+        }
 
         $build = $releaseRequest->builds[0];
         $this->debugLogger->message("Creating version $fixVersion at project $jiraProject");
@@ -74,20 +110,12 @@ class PgQ_EventProcessor_RdsJiraCommit extends PgQ\EventProcessor\EventProcessor
 
         }
 
-        $this->debugLogger->error("jira commit #".$event->getData()['obj_id']." market as processed");
+        $this->debugLogger->message("jira commit #".$event->getData()['obj_id']." market as processed");
         $jiraCommit->jira_commit_tag_created = true;
         $jiraCommit->save(false);
 
         $this->debugLogger->message("Adding fixVersion $fixVersion to ticket $ticket");
         $jiraApi->addTicketFixVersion($ticket, $fixVersion);
-
-        try {
-            $info = $jiraApi->getTicketInfo($ticket);
-        } catch (ServiceBase\HttpRequest\Exception\ResponseCode $e) {
-            if ($e->getHttpCode() != 404) {
-                throw $e;
-            }
-        }
 
         if (!empty($info['fields']['parent']['key'])) {
             $parent = $info['fields']['parent']['key'];

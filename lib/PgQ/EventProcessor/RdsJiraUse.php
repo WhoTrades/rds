@@ -37,7 +37,7 @@ class PgQ_EventProcessor_RdsJiraUse extends PgQ\EventProcessor\EventProcessorBas
             try {
                 $ticket = $jira->getTicketInfo($key);
             } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
-                if ($e->getHttpCode() == 404 && $e->getResponse() == '{"errorMessages":["ЗАПРОС НЕ СУЩЕСТВУЕТ"],"errors":{}}') {
+                if ($e->getHttpCode() == 404 && $e->getResponse() == '{"errorMessages":["Issue Does Not Exist"],"errors":{}}') {
                     $this->debugLogger->message("Can't move ticket $key, as ticket was deleted");
                     continue;
                 } else {

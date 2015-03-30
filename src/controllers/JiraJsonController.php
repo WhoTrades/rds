@@ -1,4 +1,5 @@
 <?php
+
 class JiraJsonController extends Controller
 {
     const MAX_FEATURES_PER_DEVELOPER = 15;
@@ -182,6 +183,133 @@ class JiraJsonController extends Controller
         }
 
         $this->printJson($result);
+    }
+
+    /**
+     * Webhook used AFTER (not before!) ticket transition from 'In Progress' in 'Continous Integration'
+     *
+     * @param $ticket
+     * @throws ApplicationException
+     */
+    public function actionManualFinishTicketWork($ticket)
+    {
+        $result = [
+            'errors' => [],
+            'warnings' => [],
+            'messages' => [],
+        ];
+
+        try {
+            // vs : DON'T throw TicketException before $data was defined
+            $data = $this->jiraApi->getTicketInfo($ticket);
+
+            // vs: check is wtflow do ticket transition? if yes - do notihing
+            if ($this->jiraApi->isStatusChangedByRds($data, \Jira\Status::STATUS_IN_PROGRESS)) {
+                $result['messages'][] = 'Ticket ' . $ticket . ' already handled by wtflow';
+            } else {
+                // vs : $ticket MUST be in status 'Countinous integration' after native Jira transition
+                $this->assertStatus($data, \Jira\Status::STATUS_IN_CONTINUOUS_INTEGRATION);
+
+                /** @var $developer Developer */
+                $developer = $this->getDeveloperByFinamEmail($this->getAssigneeEmail($data));
+
+                /** @var $existingFeature JiraFeature */
+                $existingFeature = JiraFeature::model()->findByAttributes([
+                    'jf_developer_id' => $developer->obj_id,
+                    'jf_ticket' => $ticket
+                ]);
+
+                //an: Проверяем что фича существует и в правильном статусе
+                if (!$existingFeature) {
+                    // vs: lets start it in rds
+                    $existingFeature = new JiraFeature();
+                    $existingFeature->attributes = [
+                        'jf_status' => JiraFeature::STATUS_IN_PROGRESS,
+                        'jf_developer_id' => $developer->obj_id,
+                        'jf_ticket' => $ticket,
+                        'jf_branch' => "feature/$ticket",
+                    ];
+                    $existingFeature->save();
+                }
+
+                // vs : save into RDS database
+                $existingFeature->jf_status = JiraFeature::STATUS_CHECKING;
+                $existingFeature->resetMergeConditions();
+                $existingFeature->save();
+
+                $task = new TeamcityRunTest();
+                $task->attributes = [
+                    'trt_jira_feature_obj_id' => $existingFeature->obj_id,
+                    'trt_branch' => $existingFeature->jf_branch,
+                ];
+                $task->save();
+            }
+        } catch (\ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+            $result['errors'][] = 'Ticket not found, '.$e->getResponse();
+        } catch (TicketException $e) {
+            $result['errors'][] = $e->getMessage();
+            $this->jiraApi->transitionTicket(
+                $data,
+                \Jira\Transition::FAILED_INTEGRATION_TESTING
+            );
+
+            $comment = "Попытка завершить задачу {$ticket} вручную завершилась ошибкой: ".$e->getMessage();
+
+            $this->jiraApi->addComment($ticket, $comment);
+            mail($data['fields']['assignee']['emailAddress'], "{$ticket} : не удалось закрыть вручную", $comment);
+
+            if (isset($developer) && $developer) {
+                /** @var $existingFeature JiraFeature */
+                $existingFeature = JiraFeature::model()->findByAttributes([
+                    'jf_developer_id' => $developer->obj_id,
+                    'jf_ticket' => $ticket
+                ]);
+
+                // vs : save into RDS database
+                $existingFeature->jf_status = JiraFeature::STATUS_IN_PROGRESS;
+                $existingFeature->resetMergeConditions();
+                $existingFeature->save();
+            }
+        }
+
+        $this->printJson($result);
+    }
+
+    protected function getDeveloperByFinamEmail($email)
+    {
+        /** @var $developer Developer */
+        $developer = Developer::getByFinamEmail($email);
+        if (!$developer) {
+            throw new TicketException(
+                "Unknown user {$email}, please register yourself at  RDS http://rds.whotrades.com/developer/create",
+                103
+            );
+        }
+
+        return $developer;
+    }
+
+    protected function getAssigneeEmail($ticketInfo)
+    {
+        $assignee = isset($ticketInfo['fields']['assignee']) ? $ticketInfo['fields']['assignee'] : array();
+
+        if (!$assignee || !isset($assignee['emailAddress'])) {
+            throw new TicketException("No assignee defined in issue {$ticketInfo['key']} please, set assignee", 102);
+        }
+
+        return $assignee['emailAddress'];
+    }
+
+    protected function assertStatus($ticketInfo, $requiredStatus)
+    {
+        if ($ticketInfo['fields']['status']['name'] != $requiredStatus) {
+            throw new TicketException(
+                "Ticket status is \"{$ticketInfo['fields']['status']['name']}\", but only 'Continous integration' needed for manual finish!",
+                101
+            );
+        }
+
+        return true;
     }
 
     public function printJson($data)

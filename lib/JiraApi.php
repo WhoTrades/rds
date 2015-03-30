@@ -272,6 +272,9 @@ class JiraApi
      *
      * @param array $ticketInfo - информация о тикете, возвращаемая методом getTicketInfo()
      * @param string $transition - элемент из констант класса Jira\Transition, например Jira\Transition::START_PROGRESS
+     * @param null $comment
+     * @param bool $ignoreIncorrectStatus
+     * @throws ApplicationException
      */
     public function transitionTicket($ticketInfo, $transition, $comment = null, $ignoreIncorrectStatus = false)
     {
@@ -320,6 +323,36 @@ class JiraApi
         }
 
         return null;
+    }
+
+    /**
+     * @param $ticketInfo
+     * @param null $fromStatus
+     * @param null $toStatus
+     * @return bool
+     */
+    public function isStatusChangedByRds($ticketInfo, $fromStatus = null, $toStatus = null)
+    {
+        foreach (array_reverse($ticketInfo['changelog']['histories']) as $val) {
+            foreach ($val['items'] as $item) {
+                if ($item['field'] != 'status') {
+                    continue;
+                }
+
+                $return =  (strtolower($val['author']['name']) == strtolower($this->getUserName()));
+                if ($fromStatus) {
+                    $return = $return && ($item['fromString'] == $fromStatus);
+                }
+
+                if ($toStatus) {
+                    $return = $return && ($item['toString'] == $toStatus);
+                }
+
+                return $return;
+            }
+        }
+
+        return false;
     }
 
     public static function getUserNameByEmail($email)
