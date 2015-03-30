@@ -28,6 +28,7 @@ class ServiceRdsProdTL2
     {
         return [
             new Comment("Misc"),
+            new CronCommand(new PeriodicCommand(Cronjob_Tool_Maintenance_MasterTool::getToolCommand(['--max-duration=60'], $verbosity=1), $delay = 0)),
         ];
     }
 

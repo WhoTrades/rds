@@ -60,6 +60,7 @@ class ServiceRdsProdTL1
 
             new CronCommand(Cronjob_Tool_MaintenanceToolRun::getToolCommand(['--tool-name=ImportDataFromProdToPreprod --env=preprod'], $verbosity=1), '1 1 * * 6'),     //an: каждую субботу утром
             new CronCommand(Cronjob_Tool_MaintenanceToolRun::getToolCommand(['--tool-name=systemTest --env=main'], $verbosity=1), '*/10 * * * *'),     //an: для проверки работоспособности системы запуска тулов
+            new CronCommand(new PeriodicCommand(Cronjob_Tool_Maintenance_MasterTool::getToolCommand(['--max-duration=60'], $verbosity=1), $delay = 0)),
 
             new Comment("Misc"),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_RdsAlertStatus::getToolCommand([], $verbosity=1), $delay = 5)),
