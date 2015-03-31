@@ -59,7 +59,7 @@ class Cronjob_Tool_JiraFixVersionsRelease extends Cronjob\Tool\ToolBase
                     foreach ($tickets['issues'] as $ticket) {
                         $status = $ticket['fields']['status']['name'];
                         $this->debugLogger->message("Found {$ticket['key']} at status \"$status\"");
-                        if ($status != 'Закрыт') {
+                        if ($status != \Jira\Status::STATUS_CLOSED) {
                             $existsNotClosed = true;
                         }
                     }
