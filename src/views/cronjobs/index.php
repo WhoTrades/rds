@@ -28,7 +28,7 @@ $this->pageTitle = "Фоновые процессы";
                     <?if ($toolJob->group !== $group) {?>
                         <tr>
                             <td colspan="10">
-                                <b><a href="#<?=$id = preg_replace('~\W+~', '-', $group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
+                                <b><a href="#<?=$id = preg_replace('~\W+~', '-', $toolJob->group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
                             </td>
                         </tr>
                         <?$group = $toolJob->group;?>
@@ -71,7 +71,7 @@ $this->pageTitle = "Фоновые процессы";
                                     <?foreach (['0.7em' => '5 minutes', '1em' => '15 minutes', '1.3em' => '1 hour'] as $size => $interval) {?>
                                         <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_STOP), $this->createUrl("/cronjobs/stop", [
                                             'key' => $toolJob->key,
-                                            'interval' => '5 minutes',
+                                            'interval' => $interval,
                                             'projectId' => $val['project']->obj_id,
                                             'url' => $_SERVER['REQUEST_URI'],
                                         ]), "Не запускать ".$interval, ['style' => 'font-size: '.$size])?>
