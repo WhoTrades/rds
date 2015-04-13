@@ -16,6 +16,8 @@
 	<?php echo $form->errorSummary($model); ?>
 
     <?php echo $form->textFieldControlGroup($model,'project_name'); ?>
+    <?php echo $form->textFieldControlGroup($model,'project_notification_email'); ?>
+    <?php echo $form->textFieldControlGroup($model,'project_notification_subject'); ?>
 
 
     <br />

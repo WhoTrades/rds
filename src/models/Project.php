@@ -14,6 +14,8 @@
  * @property string $project_current_version
  * @property string $project_pre_migration_version
  * @property string $project_post_migration_version
+ * @property string $project_notification_email
+ * @property string $project_notification_subject
  * @property ReleaseRequest[] $releaseRequests
  */
 class Project extends CActiveRecord
@@ -48,6 +50,8 @@ class Project extends CActiveRecord
 		return array(
 			array('obj_created, obj_modified, project_name', 'required'),
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
+			array('project_notification_email', 'email'),
+			array('project_notification_email, project_notification_subject', 'length', 'max'=>64),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version, project_current_version', 'safe', 'on'=>'search'),
@@ -112,6 +116,8 @@ class Project extends CActiveRecord
 			'obj_modified' => 'Modified',
 			'obj_status_did' => 'Status Did',
 			'project_name' => 'Project Name',
+			'project_notification_email' => 'Email оповещеиня о выкладке',
+			'project_notification_subject' => 'Тема оповещения о выкладке',
 		);
 	}
 
