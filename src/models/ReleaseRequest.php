@@ -422,14 +422,15 @@ class ReleaseRequest extends CActiveRecord
 
             if (!$job = ToolJob::model()->findByAttributes([
                 'key' => $key,
+                'package' => $package,
                 'project_obj_id' => $this->rr_project_obj_id,
             ])) {
                 $job = new ToolJob();
                 $job->key = $key;
+                $job->package = $package;
                 $job->project_obj_id = $this->rr_project_obj_id;
             }
 
-            $job->package = $package;
             $job->version = $this->rr_build_version;
             $job->group = $group;
             $job->command = $line;
