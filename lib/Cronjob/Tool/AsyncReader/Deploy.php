@@ -408,6 +408,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
+        /** @var $project Project */
         $project = \Project::model()->findByAttributes(array('project_name' => $message->project));
         if (!$project) {
             $this->debugLogger->error("Project $message->project not found");
@@ -514,15 +515,13 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 ':version' => $releaseRequest->rr_build_version,
             ]);
 
-            if ($oldVersion < $message->version) {
-                $title = "Deployed $project->project_name v.$message->version";
-            } else {
-                $title = "Reverted $project->project_name v.$message->version";
-            }
-            Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseReleased'}($project->project_name, $message->version);
-            foreach (explode(",", \Yii::app()->params['notify']['use']['phones']) as $phone) {
-                if (!$phone) continue;
-                Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
+            //an: Асинхронная задача на email/sms/... оповещение
+            $notificationItem = new JiraNotificationQueue();
+            $notificationItem->jnq_project_obj_id = $project->obj_id;
+            $notificationItem->jnq_old_version = $oldVersion;
+            $notificationItem->jnq_new_version = $message->version;
+            if (!$notificationItem->save()) {
+                $this->debugLogger->error("Can't send notification task: ".json_encode($notificationItem->errors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
             }
         }
 

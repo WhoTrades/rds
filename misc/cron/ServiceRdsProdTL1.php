@@ -68,6 +68,9 @@ class ServiceRdsProdTL1
             new CronCommand(new PeriodicCommand(Cronjob_Tool_RdsAlertStatus::getToolCommand([], $verbosity=1), $delay = 5), '* * * * *', 'rds_alert_status'),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity=1), $delay = 30), '* * * * *', 'rds_hard_migration_log_rotator'),
             new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity=3), '10 0 * * *', 'rds_git_drop_feature_branch'),
+
+            new Comment("Notification"),
+            new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsJiraNotificationQueue::getPgqConsumer('rds_jira_notification_queue', 'rds_jira_notification_queue_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *', 'rds_jira_notification_queue'),
         ];
     }
 

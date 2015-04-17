@@ -10,6 +10,12 @@ class PgQ_EventProcessor_JiraMoveTicket extends PgQ\EventProcessor\EventProcesso
 {
     public function processEvent(PgQ_Event $event)
     {
+        //an: скипаем работу с жирой на всех контурах, кроме прода
+        if (!\Config::getInstance()->serviceRds['jira']['transitionTickets']) {
+            $this->debugLogger->message("Skip processing event as disabled in config");
+            return;
+        }
+
         $ticket = $event->getData()['jira_ticket'];
         $direction = $event->getData()['jira_direction'];
 

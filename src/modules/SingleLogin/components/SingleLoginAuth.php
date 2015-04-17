@@ -8,6 +8,18 @@ final class SingleLoginAuth extends \CComponent
     public $secretKey;
     public $crmUrl = 'http://crm.whotrades.com/';
     public $returnRoute = '/SingleLogin/auth/login';
+
+    /**
+     * CRM Rpc Client Auth credentials
+     * @author Anton Zhukov
+     * @var array
+     */
+    public $crmRpcConfig = [
+        'url' => 'http://crm.whotrades.com/json-rpc.php',
+        'token' => 'service-rds',
+        'secret' => 'w72q742oa3O11s1v0OqxdziJKV48CDr0',
+    ];
+
     public $clientId = null;
     public $timeout = 10;
 
@@ -31,9 +43,15 @@ final class SingleLoginAuth extends \CComponent
 
     public function authorize($code)
     {
-        $url = $this->crmUrl.'/json-rpc.php';
         $token = sha1($code . '+' . $this->secretKey);
-        $client = new JsonRpcClient($url, Yii::app()->debugLogger, null, $this->timeout);
+
+        $client = \CrmSystem\Factory::createRpcClient(
+            $this->crmRpcConfig,
+            Yii::app()->debugLogger,
+            null,
+            $this->timeout
+        );
+
         $result = $client->singleLoginConfirm($this->clientId, $code, $token);
 
         if ($result['status'] == 'ERROR') {

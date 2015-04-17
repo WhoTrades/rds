@@ -28,7 +28,7 @@ $this->pageTitle = "Фоновые процессы";
                     <?if ($toolJob->group !== $group) {?>
                         <tr>
                             <td colspan="10">
-                                <b><a href="#<?=$id = preg_replace('~\W+~', '-', $group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
+                                <b><a href="#<?=$id = preg_replace('~\W+~sui', '-', $toolJob->group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
                             </td>
                         </tr>
                         <?$group = $toolJob->group;?>
@@ -71,7 +71,7 @@ $this->pageTitle = "Фоновые процессы";
                                     <?foreach (['0.7em' => '5 minutes', '1em' => '15 minutes', '1.3em' => '1 hour'] as $size => $interval) {?>
                                         <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_STOP), $this->createUrl("/cronjobs/stop", [
                                             'key' => $toolJob->key,
-                                            'interval' => '5 minutes',
+                                            'interval' => $interval,
                                             'projectId' => $val['project']->obj_id,
                                             'url' => $_SERVER['REQUEST_URI'],
                                         ]), "Не запускать ".$interval, ['style' => 'font-size: '.$size])?>
@@ -81,7 +81,6 @@ $this->pageTitle = "Фоновые процессы";
                                     'key' => $toolJob->key,
                                     'project' => $val['project']->project_name
                                 ]), "Мягко завершить работающие процессы (SIGTERM)", [
-                                    'onclick' => 'js:if (!confirm("Вы уверены что хотите завершить процессы?")) {event.stopPropagation(); return false; }',
                                     'style' => 'font-size: '.$size,
                                     'class' => '__kill-process',
                                 ])?>
@@ -91,8 +90,7 @@ $this->pageTitle = "Фоновые процессы";
                                     'signal' => 9,
                                     'project' => $val['project']->project_name
                                 ]), "Жестко убить работающие процессы (sudo kill -9)", [
-                                    'class' => '__kill-process',
-                                    'onclick' => 'js:if (!confirm("Вы уверены что хотите жестко завершить процессы?") || prompt("Введите строку \"подтверждаю\"") != "подтверждаю") { event.stopPropagation(); return false; }',
+                                    'class' => '__kill-process __hard-kill',
                                     'style' => 'font-size: '.$size."; color: red",
                                 ])?>
                             <?}?>
@@ -107,15 +105,28 @@ $this->pageTitle = "Фоновые процессы";
 <script type="text/javascript">
     $().ready(function(){
         $('.__get-process-info, .__kill-process').on('click', function(e){
+
+            if ($(this).hasClass('__kill-process') && !confirm("Вы уверены что хотите завершить процессы?")) {
+                return false;
+            }
+
+            if ($(this).hasClass('__hard-kill') && prompt("Введите строку \"подтверждаю\"") != "подтверждаю"){
+                return false;
+            }
+
             var td = $('td:first', $(this).parents('tr:first'));
             var that = this;
             var html = this.innerHTML;
             that.innerHTML = <?=json_encode(TbHtml::icon(TbHtml::ICON_REFRESH))?>;
+
             $.ajax({
                 url: this.href
             }).done(function(text){
                 $('.alert', td).remove();
                 td.append(text);
+                that.innerHTML = html;
+            }).error(function(state, type, error){
+                alert(error);
                 that.innerHTML = html;
             });
 
