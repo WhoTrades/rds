@@ -14,11 +14,8 @@ final class SingleLoginAuth extends \CComponent
      * @author Anton Zhukov
      * @var array
      */
-    public $crmRpcConfig = [
-        'url' => 'http://crm.whotrades.com/json-rpc.php',
-        'token' => 'service-rds',
-        'secret' => 'w72q742oa3O11s1v0OqxdziJKV48CDr0',
-    ];
+    public $token = 'service-rds';
+    public $secret = 'w72q742oa3O11s1v0OqxdziJKV48CDr0';
 
     public $clientId = null;
     public $timeout = 10;
@@ -45,8 +42,14 @@ final class SingleLoginAuth extends \CComponent
     {
         $token = sha1($code . '+' . $this->secretKey);
 
+        $crmRpcConfig = [
+            'url' => $this->crmUrl . 'json-rpc.php',
+            'token' => $this->token,
+            'secret' => $this->secret,
+        ];
+
         $client = \CrmSystem\Factory::createRpcClient(
-            $this->crmRpcConfig,
+            $crmRpcConfig,
             Yii::app()->debugLogger,
             null,
             $this->timeout
