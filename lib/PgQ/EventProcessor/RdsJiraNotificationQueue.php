@@ -44,8 +44,8 @@ class PgQ_EventProcessor_RdsJiraNotificationQueue extends PgQ\EventProcessor\Eve
             }
 
             $c = new CDbCriteria();
-            $c->compare("jira_commit_build_tag", ">$project->project_name-".$item->jnq_old_version);
-            $c->compare("jira_commit_build_tag", "<=$project->project_name-".$item->jnq_new_version);
+            $c->compare("jira_commit_build_tag", ">".min($project->project_name."-".$item->jnq_old_version, $project->project_name."-".$item->jnq_new_version));
+            $c->compare("jira_commit_build_tag", "<=".max($project->project_name."-".$item->jnq_old_version, $project->project_name."-".$item->jnq_new_version));
             $jiraCommits = JiraCommit::model()->findAll($c);
             $tickets = [];
             /** @var $jiraCommit JiraCommit */
