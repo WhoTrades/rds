@@ -6,18 +6,19 @@ if (empty($result)) {
 $ok = false;
 $text = "<h4>Информация о процессах</h4>";
 foreach ($result as $val) {
-    $text .= "<strong>{$val['server']}</strong><br />\n";
+    $text .= "<strong>{$val['server']}</strong>\n";
     if ($val['processes']) {
         foreach ($val['processes'] as $pid => $command) {
-            $text .= "$pid: $command<br />\n";
+            $text .= "<br />$pid: $command\n";
             $ok = true;
         }
     } else {
-        $text .= "<i>Процессы не найдены</i><br />";
-        $text .= "<small style='padding: 5px; border: solid 1px; margin: 3px 0; display: block'>
-            <span style='color: green'>".TbHtml::icon(TbHtml::ICON_INFO_SIGN)."</span>
-            То что процессов нет при работающем кроне - это нормально. Это случается, например, если тул запускается раз в минуту и отрабатывает за 5 секунд
-        </small><br />";
+        $text .= "<i>Процессы не найдены</i> ".
+            TbHtml::tooltip(
+                TbHtml::icon(TbHtml::ICON_INFO_SIGN),
+                '#',
+                'То что процессов нет при работающем кроне - это нормально. Это случается, например, если тул запускается раз в минуту и отрабатывает за 5 секунд'
+            )."<br />";
     }
 }
 echo TbHtml::alert(TbHtml::ALERT_COLOR_INFO, $text);
