@@ -151,7 +151,7 @@
                         "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show pre migrations</a>
                         <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                     foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                        $text .= "<a href='http://sources:8060/browse/migration-{$releaseRequest->project->project_name}/pre/$migration.php?hb=true'>$migration</a><br />";
+                        $text .= "<a href='http://stash/projects/WT/repos/sparta/browse/migration/{$releaseRequest->project->project_name}/$migration.php'>$migration</a><br />";
                     }
                     $text .= "</div>";
 
