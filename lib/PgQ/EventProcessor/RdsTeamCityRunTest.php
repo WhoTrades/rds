@@ -15,6 +15,11 @@ class PgQ_EventProcessor_RdsTeamCityRunTest extends PgQ\EventProcessor\EventProc
         $teamCityRunTest = TeamcityRunTest::model()->findByPk($event->getData()['obj_id']);
 
         $jiraFeature = $teamCityRunTest->jiraFeature;
+        $jiraApi = new JiraApi($this->debugLogger);
+        $ticketInfo = $jiraApi->getTicketInfo($jiraFeature->jf_ticket);
+        $jiraApi->transitionTicket($ticketInfo, \Jira\Transition::FINISH_INTEGRATION_TESTING, null, true);
+        return;
+
         $affectedRepositories = json_decode($jiraFeature->jf_affected_repositories);
         //an: всегда проверяем comon, lib-crm-system, trade-system
         $affectedRepositories[] = "comon";
