@@ -15,6 +15,11 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
+        if (!Yii::app()->params['alertLampEnabled']) {
+            $this->debugLogger->message("Lamp disabled");
+            return 0;
+        }
+
         $versions = ReleaseVersion::model()->findAll();
 
         $host = parse_url(\Config::getInstance()->phpLogsSystem['service']['location'], PHP_URL_HOST);
