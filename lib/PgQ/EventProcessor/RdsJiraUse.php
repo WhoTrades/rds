@@ -21,8 +21,8 @@ class PgQ_EventProcessor_RdsJiraUse extends PgQ\EventProcessor\EventProcessorBas
 
         $sql = "SELECT DISTINCT jira_commit_ticket FROM rds.jira_commit WHERE jira_commit_build_tag > :tagFrom AND jira_commit_build_tag <= :tagTo";
         $ticketKeys = Yii::app()->db->createCommand($sql)->queryColumn([
-            ':tagFrom' => $tagFrom,
-            ':tagTo' => $tagTo,
+            ':tagFrom' => min($tagFrom, $tagTo),
+            ':tagTo' => max($tagFrom, $tagTo),
         ]);
 
         $this->debugLogger->message("Found tickets between $tagFrom and $tagTo: ".implode(", $ticketKeys"));
