@@ -19,84 +19,88 @@ $this->pageTitle = "Фоновые процессы";
                     <tr>
                         <th>Команда</th>
                         <th>Статус</th>
+                        <th>CPU usage</th>
                         <th>Log filename</th>
                         <th>Действия</th>
                     </tr>
                 </thead>
-                <?foreach($val['cronJobs'] as $toolJob){?>
-                    <?/** @var $toolJob ToolJob*/?>
-                    <?if ($toolJob->group !== $group) {?>
+                <tbody>
+                    <?foreach($val['cronJobs'] as $toolJob){?>
+                        <?/** @var $toolJob ToolJob*/?>
+                        <?if ($toolJob->group !== $group) {?>
+                            <tr>
+                                <td colspan="10">
+                                    <b><a href="#<?=$id = preg_replace('~\W+~sui', '-', $toolJob->group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
+                                </td>
+                            </tr>
+                            <?$group = $toolJob->group;?>
+                        <?}?>
                         <tr>
-                            <td colspan="10">
-                                <b><a href="#<?=$id = preg_replace('~\W+~sui', '-', $toolJob->group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
+                            <td style="font-family: Menlo, Monaco, Consolas, monospace">
+                                <?=preg_replace('~(--(?:tool|queue-name|event-processor)=)(\S*)~', '$1<span style="color: blue">$2</span>', preg_replace('~2>&1.*~', '', $toolJob->command))?>
+                            </td>
+                            <td>
+                                <?if ($stopper = $toolJob->getToolJobStopped()) {?>
+                                    Остановлено до <?=date('H:i', strtotime($stopper->stopped_till))?>
+                                <?} else {?>
+                                    Работает
+                                <?}?>
+                                <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_INFO_SIGN), $this->createUrl("/cronjobs/getInfo", [
+                                    'key' => $toolJob->key,
+                                    'project' => $val['project']->project_name
+                                ]), "Запросить информацию о работающих процессах", [
+                                    'class' => '__get-process-info',
+                                    'style' => 'color: orange',
+                                ])?>
+                            </td>
+                            <td><?=isset($cpuUsages[$toolJob->key][$toolJob->project->project_name]) ? sprintf('%.1f', $cpuUsages[$toolJob->key][$toolJob->project->project_name]->cpu_time / 1000) : 0?>&nbsp;sec</td>
+                            <td>
+                                <?$tag=str_replace('=', '\=', preg_replace('~.*logger -p \S+ -t (\S+).*~', '$1', $toolJob->command))?>
+                                <input type="text"
+                                   value="/var/log/storelog/cronjobs/<?=$tag?>.log"
+                                   onclick="this.select()"
+                                   size="8" />
+                                <a href="" style="display: none" onclick="alert('Функция ожидает websockets, так как на comet будут потери пакетов'); return false;">logs online</a>
+                            </td>
+                            <td>
+                                <?if ($stopper) {?>
+                                    <a href="<?=$this->createUrl("/cronjobs/start", [
+                                        'key' => $toolJob->key,
+                                        'projectId' => $val['project']->obj_id,
+                                        'url' => $_SERVER['REQUEST_URI'],
+                                    ])?>"><?=TbHtml::icon(TbHtml::ICON_PLAY)?></a>
+                                <?} else {?>
+                                    <div style="white-space: nowrap">
+                                        <?foreach (['0.7em' => '5 minutes', '1em' => '15 minutes', '1.3em' => '1 hour'] as $size => $interval) {?>
+                                            <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_STOP), $this->createUrl("/cronjobs/stop", [
+                                                'key' => $toolJob->key,
+                                                'interval' => $interval,
+                                                'projectId' => $val['project']->obj_id,
+                                                'url' => $_SERVER['REQUEST_URI'],
+                                            ]), "Не запускать ".$interval, ['style' => 'font-size: '.$size])?>
+                                        <?}?>
+                                    </div>
+                                    <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE_CIRCLE), $this->createUrl("/cronjobs/kill", [
+                                        'key' => $toolJob->key,
+                                        'project' => $val['project']->project_name
+                                    ]), "Мягко завершить работающие процессы (SIGTERM)", [
+                                        'style' => 'font-size: '.$size,
+                                        'class' => '__kill-process',
+                                    ])?>
+                                    &nbsp;
+                                    <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE), $this->createUrl("/cronjobs/kill", [
+                                        'key' => $toolJob->key,
+                                        'signal' => 9,
+                                        'project' => $val['project']->project_name
+                                    ]), "Жестко убить работающие процессы (sudo kill -9)", [
+                                        'class' => '__kill-process __hard-kill',
+                                        'style' => 'font-size: '.$size."; color: red",
+                                    ])?>
+                                <?}?>
                             </td>
                         </tr>
-                        <?$group = $toolJob->group;?>
                     <?}?>
-                    <tr>
-                        <td style="font-family: Menlo, Monaco, Consolas, monospace">
-                            <?=preg_replace('~(--(?:tool|queue-name|event-processor)=)(\S*)~', '$1<span style="color: blue">$2</span>', preg_replace('~2>&1.*~', '', $toolJob->command))?>
-                        </td>
-                        <td>
-                            <?if ($stopper = $toolJob->getToolJobStopped()) {?>
-                                Остановлено до <?=date('H:i', strtotime($stopper->stopped_till))?>
-                            <?} else {?>
-                                Работает
-                            <?}?>
-                            <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_INFO_SIGN), $this->createUrl("/cronjobs/getInfo", [
-                                'key' => $toolJob->key,
-                                'project' => $val['project']->project_name
-                            ]), "Запросить информацию о работающих процессах", [
-                                'class' => '__get-process-info',
-                                'style' => 'color: orange',
-                            ])?>
-                        </td>
-                        <td>
-                            <?$tag=str_replace('=', '\=', preg_replace('~.*logger -p \S+ -t (\S+).*~', '$1', $toolJob->command))?>
-                            <input type="text"
-                               value="/var/log/storelog/cronjobs/<?=$tag?>.log"
-                               onclick="this.select()"
-                               size="8" />
-                            <a href="" style="display: none" onclick="alert('Функция ожидает websockets, так как на comet будут потери пакетов'); return false;">logs online</a>
-                        </td>
-                        <td>
-                            <?if ($stopper) {?>
-                                <a href="<?=$this->createUrl("/cronjobs/start", [
-                                    'key' => $toolJob->key,
-                                    'projectId' => $val['project']->obj_id,
-                                    'url' => $_SERVER['REQUEST_URI'],
-                                ])?>"><?=TbHtml::icon(TbHtml::ICON_PLAY)?></a>
-                            <?} else {?>
-                                <div style="white-space: nowrap">
-                                    <?foreach (['0.7em' => '5 minutes', '1em' => '15 minutes', '1.3em' => '1 hour'] as $size => $interval) {?>
-                                        <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_STOP), $this->createUrl("/cronjobs/stop", [
-                                            'key' => $toolJob->key,
-                                            'interval' => $interval,
-                                            'projectId' => $val['project']->obj_id,
-                                            'url' => $_SERVER['REQUEST_URI'],
-                                        ]), "Не запускать ".$interval, ['style' => 'font-size: '.$size])?>
-                                    <?}?>
-                                </div>
-                                <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE_CIRCLE), $this->createUrl("/cronjobs/kill", [
-                                    'key' => $toolJob->key,
-                                    'project' => $val['project']->project_name
-                                ]), "Мягко завершить работающие процессы (SIGTERM)", [
-                                    'style' => 'font-size: '.$size,
-                                    'class' => '__kill-process',
-                                ])?>
-                                &nbsp;
-                                <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE), $this->createUrl("/cronjobs/kill", [
-                                    'key' => $toolJob->key,
-                                    'signal' => 9,
-                                    'project' => $val['project']->project_name
-                                ]), "Жестко убить работающие процессы (sudo kill -9)", [
-                                    'class' => '__kill-process __hard-kill',
-                                    'style' => 'font-size: '.$size."; color: red",
-                                ])?>
-                            <?}?>
-                        </td>
-                    </tr>
-                <?}?>
+                </tbody>
             </table>
         </div>
     <?}?>

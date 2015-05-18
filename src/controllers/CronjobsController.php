@@ -41,6 +41,7 @@ class CronJobsController extends Controller
         $list = ToolJob::model()->findAll($c);
 
         $cronJobs = [];
+        $keys = [];
 
         foreach ($list as $val) {
             /** @var $val ToolJob */
@@ -51,12 +52,22 @@ class CronJobsController extends Controller
                 ];
             }
             $cronJobs[$val->project_obj_id]['cronJobs'][] = $val;
+            $keys[] = $val->key;
         }
+
+        $cpuUsagesOrdered = [];
+        $cpuUsages = CpuUsage::model()->findAllByAttributes(['key' => array_unique($keys)]);
+        foreach ($cpuUsages as $cpuUsage) {
+            /** @var $cpuUsage CpuUsage*/
+            $cpuUsagesOrdered[$cpuUsage->key][$cpuUsage->project_name] = $cpuUsage;
+        }
+
 
 
         $this->render('index', [
             'cronJobs' => $cronJobs,
             'project' => $project,
+            'cpuUsages' => $cpuUsagesOrdered,
         ]);
     }
 
