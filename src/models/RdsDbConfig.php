@@ -10,6 +10,7 @@
  * @property integer $obj_status_did
  * @property string $red_lamp_wts_timeout
  * @property string $preprod_online
+ * @property string $cpu_usage_last_truncate
  */
 class RdsDbConfig extends CActiveRecord
 {
@@ -48,7 +49,7 @@ class RdsDbConfig extends CActiveRecord
             array('red_lamp_wts_timeout, preprod_online', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, red_lamp_wts_timeout', 'safe', 'on'=>'search'),
+            array('obj_id, obj_created, obj_modified, obj_status_did, red_lamp_wts_timeout, cpu_usage_last_truncate', 'safe', 'on'=>'search'),
         );
     }
 
@@ -74,6 +75,7 @@ class RdsDbConfig extends CActiveRecord
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
             'red_lamp_wts_timeout' => 'Red Lamp Wts Timeout',
+            'cpu_usage_last_truncate' => 'Cpu Usage last truncate',
         );
     }
 
@@ -100,6 +102,7 @@ class RdsDbConfig extends CActiveRecord
         $criteria->compare('obj_modified',$this->obj_modified,true);
         $criteria->compare('obj_status_did',$this->obj_status_did);
         $criteria->compare('red_lamp_wts_timeout',$this->red_lamp_wts_timeout,true);
+        $criteria->compare('cpu_usage_last_truncate',$this->cpu_usage_last_truncate,true);
 
         return new CActiveDataProvider($this, array(
             'criteria'=>$criteria,

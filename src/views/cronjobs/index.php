@@ -1,13 +1,36 @@
 <?
 $this->pageTitle = "Фоновые процессы";
 ?>
-<h1><?=$this->pageTitle?></h1>
+<h1>
+    <?=$this->pageTitle?>
+    <small><a href="<?=$this->createUrl("cpuUsageReport")?>">CPU usage report</a></small>
+</h1>
+<div style="clear: both"></div>
+
 <ul class="nav nav-tabs" role="menu">
     <?foreach ($cronJobs as $val) {?>
         <li class="<?=$val['project']->project_name == $project ? 'active' : ''?>">
             <a tabindex="-1" href="?project=<?=$val['project']->project_name?>" aria-expanded="true"><?=$val['project']->project_name?></a>
         </li>
     <?}?>
+
+    <li style="float: right">
+        <?=TbHtml::button("Обнулить показатели CPU<br /><small>Последнее обнуление: <span>".($cpuUsageLastTruncate ? date('d.m.Y H:i', strtotime($cpuUsageLastTruncate)) : "никогда")."</span></small>", [
+            'color' => TbHtml::BUTTON_COLOR_DANGER,
+            'onclick' => 'js:if (confirm("Вы уверены что хотите обнулить все показатели по использованию CPU")) {
+                var html = this.innerHTML;
+                this.innerHTML = '.json_encode(TbHtml::icon(TbHtml::ICON_REFRESH)).';
+                this.disabled = true;
+                var obj = this;
+                $.ajax({url: "'.$this->createUrl('truncateCpuUsage').'"}).done(function(){
+                    obj.innerHTML = html;
+                    obj.disabled = false;
+                    $(".cpu-usage").html("0 sec");
+                    $("span", $(obj)).html("только что");
+                });
+            }',
+        ])?>
+    </li>
 </ul>
 
 <div class="tab-content">
@@ -53,7 +76,7 @@ $this->pageTitle = "Фоновые процессы";
                                     'style' => 'color: orange',
                                 ])?>
                             </td>
-                            <td><?=isset($cpuUsages[$toolJob->key][$toolJob->project->project_name]) ? sprintf('%.1f', $cpuUsages[$toolJob->key][$toolJob->project->project_name]->cpu_time / 1000) : 0?>&nbsp;sec</td>
+                            <td class="cpu-usage"><?=isset($cpuUsages[$toolJob->key][$toolJob->project->project_name]) ? sprintf('%.1f', $cpuUsages[$toolJob->key][$toolJob->project->project_name]->cpu_time / 1000) : 0?>&nbsp;sec</td>
                             <td>
                                 <?$tag=str_replace('=', '\=', preg_replace('~.*logger -p \S+ -t (\S+).*~', '$1', $toolJob->command))?>
                                 <input type="text"
