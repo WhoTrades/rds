@@ -14,6 +14,8 @@ class ProgressController extends Controller
         $data = json_decode($build->build_time_log, true);
 
         $lastTime = end($data) ?: 0;
+        $lastAction = key($data) ?: "init";
+
         $timeDiff = abs((float)$time - $lastTime);
         $data[$action] = (float)$time;
 
@@ -25,7 +27,7 @@ class ProgressController extends Controller
         $this->sendGraphiteActionData(
             $build->releaseRequest->project->project_name,
             $build->releaseRequest->rr_build_version,
-            $action,
+            $lastAction,
             $timeDiff
         );
 
