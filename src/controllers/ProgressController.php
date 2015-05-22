@@ -1,4 +1,6 @@
 <?php
+use \GraphiteSystem\Graphite;
+
 class ProgressController extends Controller
 {
     public function actionSetTime($action, $time, $taskId)
@@ -10,6 +12,9 @@ class ProgressController extends Controller
         }
 
         $data = json_decode($build->build_time_log, true);
+
+        $lastTime = end($data) ?: 0;
+        $timeDiff = abs((float)$time - $lastTime);
         $data[$action] = (float)$time;
 
         asort($data);
@@ -17,8 +22,35 @@ class ProgressController extends Controller
         $build->save();
 
         $this->sendProgressbarChanged($build);
+        $this->sendGraphiteActionData(
+            $build->releaseRequest->project->project_name,
+            $build->releaseRequest->rr_build_version,
+            $action,
+            $timeDiff
+        );
 
         echo json_encode(['ok' => true]);
+    }
+
+    /**
+     * @param $project
+     * @param $build
+     * @param $action
+     * @param $value
+     */
+    private function sendGraphiteActionData($project, $build, $action, $value)
+    {
+        $graphite = new Graphite(Yii::app()->params['graphite']);
+        $graphite->gauge(
+            \GraphiteSystem\Metrics::dynamicName(
+                \GraphiteSystem\Metrics::RDS_ACTION_BUILD_TIME,
+                [
+                    $project, $build, $action
+                ]
+            ),
+
+            $value
+        );
     }
 
     private function sendProgressbarChanged(Build $build)
