@@ -47,7 +47,7 @@ class ProgressController extends Controller
             \GraphiteSystem\Metrics::dynamicName(
                 \GraphiteSystem\Metrics::RDS_ACTION_BUILD_TIME,
                 [
-                    $project, $build, $action
+                    $project, $action
                 ]
             ),
 
