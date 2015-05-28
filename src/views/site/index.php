@@ -30,6 +30,7 @@
     'id'=>'release-reject-grid',
     'dataProvider'=>$releaseRejectSearchModel->search(),
     'filter'=>$releaseRejectSearchModel,
+    'ajaxUpdateError'=>'function(xhr,ts,et,err){ console.log(err); }',
     'columns'=>array(
         'obj_id',
         'obj_created',
@@ -68,6 +69,7 @@
     'id'=>'release-request-grid',
     'dataProvider'=>$releaseRequestSearchModel->search(),
     'filter'=>$releaseRequestSearchModel,
+    'ajaxUpdateError'=>'function(xhr,ts,et,err){ console.log(err); }',
     'rowCssClassExpression' => function($index, $rr){
         return 'release-request-'.$rr->obj_id." release-request-".$rr->rr_status;
     },
