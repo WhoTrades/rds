@@ -56,7 +56,7 @@ class PxRealplexor extends CApplicationComponent {
             Yii::app()->clientScript->registerScriptFile($baseUrl.'/realplexor.js',CClientScript::POS_HEAD);
             Yii::app()->clientScript->registerScript('rplServer', '
             realplexor = new initRealplexors(
-                "http://"+document.location.host+'.CJavaScript::encode($this->server).'
+                document.location.protocol+"//"+document.location.host+'.CJavaScript::encode($this->server).'
             );
             ', CClientScript::POS_BEGIN);
         } else {
