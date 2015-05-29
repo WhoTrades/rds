@@ -8,6 +8,16 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 {
     const TIMEOUT = 60;
 
+    /**
+     * Какие очереди надо игнорировать
+     *
+     * @var array
+     */
+    protected $queueIgnore = array(
+        'PGQ TaskOneTime queue (Crm Slow)',
+        'ES: AccountPortfolio',
+    );
+
     public static function getCommandLineSpec()
     {
         return [];
@@ -35,7 +45,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
         $errors = [];
         foreach ($data['result']['data'] as $name => $val) {
-            if ($name == 'ES: AccountPortfolio') {
+            if (in_array($name, $this->queueIgnore)) {
                 continue;
             }
 
