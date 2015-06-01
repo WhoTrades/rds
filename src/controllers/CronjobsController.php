@@ -41,6 +41,7 @@ class CronJobsController extends Controller
         $list = ToolJob::model()->findAll($c);
 
         $cronJobs = [];
+        $keys = [];
 
         foreach ($list as $val) {
             /** @var $val ToolJob */
@@ -51,12 +52,23 @@ class CronJobsController extends Controller
                 ];
             }
             $cronJobs[$val->project_obj_id]['cronJobs'][] = $val;
+            $keys[] = $val->key;
         }
+
+        $cpuUsagesOrdered = [];
+        $cpuUsages = CpuUsage::model()->findAllByAttributes(['key' => array_unique($keys)]);
+        foreach ($cpuUsages as $cpuUsage) {
+            /** @var $cpuUsage CpuUsage*/
+            $cpuUsagesOrdered[$cpuUsage->key][$cpuUsage->project_name] = $cpuUsage;
+        }
+
 
 
         $this->render('index', [
             'cronJobs' => $cronJobs,
             'project' => $project,
+            'cpuUsages' => $cpuUsagesOrdered,
+            'cpuUsageLastTruncate' => RdsDbConfig::get()->cpu_usage_last_truncate,
         ]);
     }
 
@@ -153,5 +165,28 @@ class CronJobsController extends Controller
         });
 
         $this->renderPartial('getInfo', ['result' => $data]);
+    }
+
+    public function actionTruncateCpuUsage()
+    {
+        $config = RdsDbConfig::get();
+        CpuUsage::model()->deleteAll();
+        $config->cpu_usage_last_truncate = date('Y-m-d H:i:s');
+        $config->save();
+
+        Log::model()->createLogMessage("Cronjobs cpu usage обнулены");
+    }
+
+    public function actionCpuUsageReport()
+    {
+        $sql = "select project_name, \"group\", command, substring(command from 'local2.info -t (.*)'), ROUND(cpu_time / 1000) from cronjobs.cpu_usage
+                join rds.project USING(project_name)
+                JOIN cronjobs.tool_job ON cronjobs.cpu_usage.key=cronjobs.tool_job.key and project.obj_id=project_obj_id
+                order by cpu_time desc";
+        $data = Yii::app()->db->createCommand($sql)->queryAll();
+
+        $this->render('cpuUsageReport', [
+            'data' => $data,
+        ]);
     }
 }
