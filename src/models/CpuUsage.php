@@ -1,34 +1,28 @@
 <?php
 
 /**
- * This is the model class for table "rds.rds_db_config".
+ * This is the model class for table "cronjobs.cpu_usage".
  *
- * The followings are the available columns in table 'rds.rds_db_config':
+ * The followings are the available columns in table 'cronjobs.cpu_usage':
  * @property string $obj_id
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
- * @property string $red_lamp_wts_timeout
- * @property string $preprod_online
- * @property string $cpu_usage_last_truncate
+ * @property string $project_name
+ * @property string $key
+ * @property double $cpu_time
  */
-class RdsDbConfig extends CActiveRecord
+class CpuUsage extends CActiveRecord
 {
     /**
      * @return string the associated database table name
      */
     public function tableName()
     {
-        return 'rds.rds_db_config';
+        return 'cronjobs.cpu_usage';
     }
 
-    /** @return RdsDbConfig */
-    public static function get()
-    {
-        return self::model()->find();
-    }
-	
-	public function afterConstruct() {
+    public function afterConstruct() {
         if ($this->isNewRecord) {
             $this->obj_created = date("r");
             $this->obj_modified = date("r");
@@ -44,12 +38,14 @@ class RdsDbConfig extends CActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified', 'required'),
+            array('obj_created, obj_modified, project_name, key', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('red_lamp_wts_timeout, preprod_online', 'safe'),
+            array('cpu_time', 'numerical'),
+            array('project_name', 'length', 'max'=>24),
+            array('key', 'length', 'max'=>12),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, red_lamp_wts_timeout, cpu_usage_last_truncate', 'safe', 'on'=>'search'),
+            array('obj_id, obj_created, obj_modified, obj_status_did, project_name, key, cpu_time', 'safe', 'on'=>'search'),
         );
     }
 
@@ -74,8 +70,9 @@ class RdsDbConfig extends CActiveRecord
             'obj_created' => 'Obj Created',
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
-            'red_lamp_wts_timeout' => 'Red Lamp Wts Timeout',
-            'cpu_usage_last_truncate' => 'Cpu Usage last truncate',
+            'project_name' => 'Project Name',
+            'key' => 'Key',
+            'cpu_time' => 'Cpu Time',
         );
     }
 
@@ -101,8 +98,9 @@ class RdsDbConfig extends CActiveRecord
         $criteria->compare('obj_created',$this->obj_created,true);
         $criteria->compare('obj_modified',$this->obj_modified,true);
         $criteria->compare('obj_status_did',$this->obj_status_did);
-        $criteria->compare('red_lamp_wts_timeout',$this->red_lamp_wts_timeout,true);
-        $criteria->compare('cpu_usage_last_truncate',$this->cpu_usage_last_truncate,true);
+        $criteria->compare('project_name',$this->project_name,true);
+        $criteria->compare('key',$this->key,true);
+        $criteria->compare('cpu_time',$this->cpu_time);
 
         return new CActiveDataProvider($this, array(
             'criteria'=>$criteria,
@@ -113,7 +111,7 @@ class RdsDbConfig extends CActiveRecord
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!
      * @param string $className active record class name.
-     * @return RdsDbConfig the static model class
+     * @return CpuUsage the static model class
      */
     public static function model($className=__CLASS__)
     {
