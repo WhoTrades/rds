@@ -45,7 +45,7 @@ class ProgressController extends Controller
         $graphite = new Graphite(Yii::app()->params['graphite']);
         $graphite->gauge(
             \GraphiteSystem\Metrics::dynamicName(
-                \GraphiteSystem\Metrics::RDS_ACTION_BUILD_TIME,
+                \GraphiteSystem\Metrics::PROJECT__ACTION__TIME,
                 [
                     $project, $action
                 ]
