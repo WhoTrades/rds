@@ -12,7 +12,7 @@
             <?if ($repo != $commit->jira_commit_repository) {?>
                 <tr class="odd">
                     <td colspan="3">
-                        <h3><a href="http://stash/projects/WT/repos/<?=$commit->jira_commit_repository?>/commits"><?=$commit->jira_commit_repository?></a></h3>
+                        <h3><?=$commit->jira_commit_repository?></h3>
                     </td>
                 </tr>
                 <?$repo = $commit->jira_commit_repository?>
@@ -20,7 +20,7 @@
             <tr class="<?=$key%2 ? 'odd' : 'even'?>">
                 <td>
                     <?if ($commit->jira_commit_repository) {?>
-                        <a href="http://stash/projects/WT/repos/<?=$commit->jira_commit_repository?>/commits/<?=$commit->jira_commit_hash?>">
+                        <a href="http://fisheye:8080/whotrades/revision/<?=$commit->jira_commit_hash?>">
                             <?=substr($commit->jira_commit_hash, 0, 8)?>
                         </a>
                     <?} else {?>
