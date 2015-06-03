@@ -7,7 +7,7 @@ require_once 'HTTP/Request2.php';
 
 class WtTeamCityClient extends TeamCityClient
 {
-    const DEFAULT_URL = 'http://rest:rest123@ci.whotrades.net:8111';
+    const DEFAULT_URL = 'http://rds:yz7119agyh@msa-build1.office.finam.ru/';
 
     public function __construct($serverUrl = self::DEFAULT_URL, $user = null, $password = null)
     {
