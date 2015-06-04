@@ -21,7 +21,7 @@ return array(
     [
         'name' => 'migration_name',
         'value' => function(HardMigration $migration){
-            return  "<a href='http://stash/projects/WT/repos/sparta/browse/migration/{$migration->project->project_name}/hard/$migration->migration_name.php' target='_blank' title='Посмотреть исходный код миграции'>$migration->migration_name</a><br />";
+            return  "<a href='http://fisheye:8080/whotrades/file/".urlencode("/migration/{$migration->project->project_name}/hard/$migration->migration_name.php")."' target='_blank' title='Посмотреть исходный код миграции'>$migration->migration_name</a><br />";
         },
         'type' => 'html',
     ],
