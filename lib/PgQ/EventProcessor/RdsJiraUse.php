@@ -51,6 +51,7 @@ class PgQ_EventProcessor_RdsJiraUse extends PgQ\EventProcessor\EventProcessorBas
             if ($tagFrom < $tagTo && $count = HardMigration::model()->getNotDoneMigrationCountForTicket($ticket['key'])) {
                 $jira->addTicketLabel($ticket['key'], "ticket-with-migration");
                 $this->debugLogger->message("Found $count not finished hard migration for ticket #{$ticket['key']}, skip this ticket");
+                continue;
             }
 
             $direction = $tagFrom < $tagTo ? JiraMoveTicket::DIRECTION_UP : JiraMoveTicket::DIRECTION_DOWN;

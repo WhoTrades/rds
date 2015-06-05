@@ -2,9 +2,9 @@
 use RdsSystem\Message;
 
 /**
- * @example dev/services/rds/misc/tools/runner.php --tool=JiraCloseFeatures -vv
+ * @example dev/services/rds/misc/tools/runner.php --tool=Jira_CloseFeatures -vv
  */
-class Cronjob_Tool_JiraCloseFeatures extends RdsSystem\Cron\RabbitDaemon
+class Cronjob_Tool_Jira_CloseFeatures extends RdsSystem\Cron\RabbitDaemon
 {
     //an: Интервал, с которым мы пытается заново смержить задачу. Например, если разработчик разрулит конфликты - мы сами
     //это заметим и передвинем задачу в следующий статус

@@ -3,9 +3,9 @@ use \Cronjob\ConfigGenerator;
 
 /**
  * @example
- * sphp dev/services/rds/misc/tools/runner.php --tool=JiraFixVersionsRelease -vv
+ * sphp dev/services/rds/misc/tools/runner.php --tool=Jira_FixVersionsRelease -vv
  */
-class Cronjob_Tool_JiraFixVersionsRelease extends Cronjob\Tool\ToolBase
+class Cronjob_Tool_Jira_FixVersionsRelease extends Cronjob\Tool\ToolBase
 {
     /**
      * Use this function to get command line spec for cronjob

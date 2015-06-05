@@ -2,9 +2,9 @@
 use RdsSystem\Message;
 
 /**
- * @example dev/services/rds/misc/tools/runner.php --tool=JiraMergeTasks -vv
+ * @example dev/services/rds/misc/tools/runner.php --tool=Jira_MergeTasks -vv
  */
-class Cronjob_Tool_JiraMergeTasks extends RdsSystem\Cron\RabbitDaemon
+class Cronjob_Tool_Jira_MergeTasks extends RdsSystem\Cron\RabbitDaemon
 {
     //an: Интервал, с которым мы пытается заново смержить задачу. Например, если разработчик разрулит конфликты - мы сами
     //это заметим и передвинем задачу в следующий статус
