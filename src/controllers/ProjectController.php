@@ -109,7 +109,10 @@ class ProjectController extends Controller
                 }
 
                 if ($model->project_config != $existingProject->project_config) {
-                    $diffStat = Yii::app()->diffStat->getDiffStat($existingProject->project_config, $model->project_config);
+                    $diffStat = Yii::app()->diffStat->getDiffStat(
+                        str_replace("\r", "", $existingProject->project_config),
+                        str_replace("\r", "", $model->project_config)
+                    );
                     $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
                     $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
 

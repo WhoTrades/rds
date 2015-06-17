@@ -23,14 +23,21 @@ class DiffController extends Controller
     {
         /** @var $rr1 ProjectConfigHistory */
         $rr1 = ProjectConfigHistory::model()->findByPk($id);
+
+        $c = new CDbCriteria();
+        $c->compare('pch_project_obj_id', $rr1->pch_project_obj_id);
+        $c->compare('obj_id', "<$id");
+        $c->order = 'obj_id desc';
+        $c->limit = 1;
+
         /** @var $rr2 ProjectConfigHistory */
-        $rr2 = ProjectConfigHistory::model()->findByPk($id-1);
+        $rr2 = ProjectConfigHistory::model()->find($c);
 
         $this->render('index', array(
             'newText' => $rr1->pch_config,
-            'newTitle' => "NEW VERSION",
+            'newTitle' => "Новая версия: ".date('d.m.Y H:i:s', strtotime($rr1->obj_created))." ".$rr1->pch_user,
             'currentText' => $rr2 ? $rr2->pch_config : "",
-            'currentTitle' => "OLD VERSION",
+            'currentTitle' => "Старая версия: ".date('d.m.Y H:i:s', strtotime($rr2->obj_created))." ".$rr1->pch_user,
         ));
     }
 }
