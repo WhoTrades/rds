@@ -43,7 +43,10 @@ $('.search-form form').submit(function(){
     'columns'=>array(
         'obj_created',
         'log_user',
-        'log_text',
+        [
+            'name' => 'log_text',
+            'type' => 'html',
+        ],
         'obj_id',
     ),
 )); ?>

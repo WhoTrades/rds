@@ -1,6 +1,9 @@
 <?php
-/** @var $new ReleaseRequest */
-/** @var $current ReleaseRequest */
+/** @var $newText string */
+/** @var $newTitle string */
+
+/** @var $currentText string */
+/** @var $currentTtitle string */
 
 Yii::app()->jsdifflib->register();
 
@@ -22,7 +25,7 @@ Yii::app()->jsdifflib->register();
     </div>
     <div class="item">
         <?
-        $diffStat = Yii::app()->diffStat->getDiffStat($current->getCronConfigCleaned(), $new->getCronConfigCleaned());
+        $diffStat = Yii::app()->diffStat->getDiffStat($currentText, $newText);
         $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
         $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
         ?>
@@ -32,8 +35,8 @@ Yii::app()->jsdifflib->register();
 </div>
 
 <br />
-<div id="baseText" style="display: none"><?=htmlspecialchars($current->getCronConfigCleaned())?></div>
-<div id="newText" style="display: none"><?=htmlspecialchars($new->getCronConfigCleaned())?></div>
+<div id="baseText" style="display: none"><?=htmlspecialchars($currentText)?></div>
+<div id="newText" style="display: none"><?=htmlspecialchars($newText)?></div>
 <div id="diffoutput"></div>
 
 <script>
@@ -92,8 +95,8 @@ Yii::app()->jsdifflib->register();
             newTextLines: newtxt,
             opcodes: opcodes,
             // set the display titles for each resource
-            baseTextName: "<?=$current->rr_build_version?> - CURRENT VERSION",
-            newTextName: "<?=$new->rr_build_version?> - NEW VERSION",
+            baseTextName: <?=json_encode($currentTitle)?>,
+            newTextName: <?=json_encode($newTitle)?>,
             contextSize: null,
             viewType: $("#inline")[0].checked ? 1 : 0
         }));

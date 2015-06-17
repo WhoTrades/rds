@@ -9,6 +9,7 @@
  * @property string $obj_modified
  * @property integer $obj_status_did
  * @property string $project_name
+ * @property string $project_config
  * @property string $project_build_version
  * @property array $project_build_subversion
  * @property string $project_current_version
@@ -31,7 +32,6 @@ class Project extends CActiveRecord
 		return 'rds.project';
 	}
 
-
     public function afterConstruct() {
         if ($this->isNewRecord) {
             $this->obj_created = date("r");
@@ -51,6 +51,8 @@ class Project extends CActiveRecord
 			array('obj_created, obj_modified, project_name', 'required'),
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			array('project_notification_email', 'email'),
+			array('project_config', 'length', 'max' => 10240),
+			array('project_config', 'safe'),
 			array('project_notification_email, project_notification_subject', 'length', 'max'=>64),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.

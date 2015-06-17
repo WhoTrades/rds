@@ -2,7 +2,6 @@
 
 class DeveloperController extends Controller
 {
-    public $layout = '/layouts/column2';
     public $pageTitle = 'Разработчики';
     /**
      * @return array action filters

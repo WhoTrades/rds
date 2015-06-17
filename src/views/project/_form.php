@@ -4,7 +4,13 @@
 /* @var $form TbActiveForm */
 ?>
 
-<div class="form" style="width: 400px; margin: auto">
+<script src="/css/codemirror.js"></script>
+<script src="/css/php/clike.js"></script>
+<script src="/css/php/php.js"></script>
+
+<link rel="stylesheet" href="/css/codemirror.css">
+
+<div class="form" style="width: 1200px; margin: auto">
 
 <?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
 	'id'=>'project-form',
@@ -18,6 +24,10 @@
     <?php echo $form->textFieldControlGroup($model,'project_name'); ?>
     <?php echo $form->textFieldControlGroup($model,'project_notification_email'); ?>
     <?php echo $form->textFieldControlGroup($model,'project_notification_subject'); ?>
+    <?php echo $form->textAreaControlGroup($model,'project_config', [
+        'style' => 'min-height: 1000px',
+        'id' => 'php-config-code',
+    ]); ?>
 
 
     <br />
@@ -36,3 +46,14 @@
 <?php $this->endWidget(); ?>
 
 </div><!-- form -->
+
+<script>
+    var editor = CodeMirror.fromTextArea(document.getElementById("php-config-code"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        mode: "application/x-httpd-php",
+        indentUnit: 4,
+        viewportMargin: Infinity,
+        indentWithTabs: true
+    });
+</script>

@@ -3,11 +3,6 @@
 class ProjectController extends Controller
 {
     public $pageTitle = 'Проекты';
-	/**
-	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
-	 * using two-column layout. See 'protected/views/layouts/column2.php'.
-	 */
-	public $layout='//layouts/column2';
 
 	/**
 	 * @return array action filters
@@ -42,8 +37,11 @@ class ProjectController extends Controller
 	 */
 	public function actionView($id)
 	{
+        $configHistoryModel = ProjectConfigHistory::model();
+        $configHistoryModel->pch_project_obj_id = $id;
 		$this->render('view',array(
-			'model'=>$this->loadModel($id),
+			'model'             =>$this->loadModel($id),
+			'configHistoryModel'=> $configHistoryModel,
 		));
 	}
 
@@ -92,24 +90,50 @@ class ProjectController extends Controller
 	{
 		$model=$this->loadModel($id);
 
+        ob_get_clean();
 		if(isset($_POST['Project']))
 		{
 			$model->attributes=$_POST['Project'];
             $transaction = $model->getDbConnection()->beginTransaction();
+            $existingProject = Project::model()->findByPk($model->obj_id);
+
 			if($model->save()) {
                 Log::createLogMessage("Удалены все связки {$model->project_name}");
                 Project2worker::model()->deleteAllByAttributes(array('project_obj_id' => $model->obj_id));
                 foreach ($_POST['workers'] as $workerId) {
-
                     $p2w = new Project2worker();
                     $p2w->worker_obj_id = $workerId;
                     $p2w->project_obj_id = $model->obj_id;
                     $p2w->save();
                     Log::createLogMessage("Создана {$p2w->getTitle()}");
-
-                    $transaction->commit();
                 }
-				$this->redirect(array('view','id'=>$model->obj_id));
+
+                if ($model->project_config != $existingProject->project_config) {
+                    $diffStat = Yii::app()->diffStat->getDiffStat($existingProject->project_config, $model->project_config);
+                    $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
+                    $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
+
+                    $projectHistoryItem = new ProjectConfigHistory();
+                    $projectHistoryItem->pch_project_obj_id = $model->obj_id;
+                    $projectHistoryItem->pch_config = $model->project_config;
+                    $projectHistoryItem->pch_user = \Yii::app()->user->name;
+                    $projectHistoryItem->save();
+
+                    (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(new \RdsSystem\Message\ProjectConfig(
+                        $projectHistoryItem->project->project_name, $model->project_config
+                    ));
+
+                    Log::createLogMessage("Изменение в конфигурации $existingProject->project_name:<br />
+$diffStat<br />
+<a href='".$this->createUrl("/diff/project_config", ['id' => $projectHistoryItem->obj_id])."'>Посмотреть подробнее</a>
+");
+                }
+                if (!$model->hasErrors()) {
+                    $transaction->commit();
+				    $this->redirect(array('view','id'=>$model->obj_id));
+                } else {
+                    $transaction->rollback();
+                }
             } else {
                 $transaction->rollback();
             }

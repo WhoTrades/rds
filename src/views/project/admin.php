@@ -1,6 +1,7 @@
 <?php
 /* @var $this ProjectController */
 /* @var $model Project */
+/* @var $workers Worker[] */
 
 $this->breadcrumbs=array(
 	'Projects'=>array('index'),
@@ -47,6 +48,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 	'columns'=>array(
 		'project_name',
 		'project_current_version',
+		'project_notification_email',
 		array(
             'value' => function($list) use ($workers) {
                 $result = array();

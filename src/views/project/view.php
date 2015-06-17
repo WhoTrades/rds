@@ -28,3 +28,19 @@ $this->menu=array(
 		'project_name',
 	),
 )); ?>
+
+
+<?php $this->widget('yiistrap.widgets.TbGridView', array(
+    'id'=>'log-grid',
+    'dataProvider'=>$configHistoryModel->search(),
+    'filter'=>$configHistoryModel,
+    'columns'=>array(
+        'obj_created',
+        'pch_user',
+        array(
+            'class'=>'yiistrap.widgets.TbButtonColumn',
+            'template' => '{view}',
+            'viewButtonUrl' => 'Yii::app()->controller->createUrl("/diff/project_config",array("id"=>$data->primaryKey))',
+        ),
+    ),
+)); ?>
