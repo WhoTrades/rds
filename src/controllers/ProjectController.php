@@ -94,6 +94,7 @@ class ProjectController extends Controller
 		if(isset($_POST['Project']))
 		{
 			$model->attributes=$_POST['Project'];
+            $model->project_config = str_replace("\r", "", $model->project_config);
             $transaction = $model->getDbConnection()->beginTransaction();
             $existingProject = Project::model()->findByPk($model->obj_id);
 

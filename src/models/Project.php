@@ -51,7 +51,6 @@ class Project extends CActiveRecord
 			array('obj_created, obj_modified, project_name', 'required'),
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			array('project_notification_email', 'email'),
-			array('project_config', 'length', 'max' => 10240),
 			array('project_config', 'safe'),
 			array('project_notification_email, project_notification_subject', 'length', 'max'=>64),
 			// The following rule is used by search().

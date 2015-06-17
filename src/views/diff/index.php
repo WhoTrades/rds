@@ -25,7 +25,7 @@ Yii::app()->jsdifflib->register();
     </div>
     <div class="item">
         <?
-        $diffStat = Yii::app()->diffStat->getDiffStat($currentText, $newText);
+        $diffStat = Yii::app()->diffStat->getDiffStat(str_replace("\r", "", $currentText), str_replace("\r", "", $newText));
         $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
         $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
         ?>
