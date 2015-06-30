@@ -4,7 +4,7 @@
         <h2>Ветка "<?=$val['jf_branch']?>"</h2>
         <?foreach($val['jf_blocker_commits'] as $repo => $commits) {?>
             <h3>Репозиторий "<?=$repo?>"</h3>
-            <pre><?=preg_replace('~[a-f0-9]{40}~', '<a href="http://fisheye:8080/whotrades/revision/$0">$0</a>', $commits)?></pre>
+            <pre><?=preg_replace('~[a-f0-9]{40}~', '<a href="http://stash/projects/WT/repos/'.$repo.'/commits/$0">$0</a>', $commits)?></pre>
         <?}?>
     </div>
 <?}?>

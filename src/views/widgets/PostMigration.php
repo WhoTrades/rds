@@ -14,7 +14,7 @@
                 <a href="/use/migrate/?id=<?=$rr->obj_id?>&type=post">Накатить</a>
                 <div style="clear: both"></div>
                 <?foreach (json_decode($rr->rr_new_post_migrations) as $migration) {?>
-                    <a href='http://fisheye:8080/whotrades/file/HEAD/<?=urlencode("/migration/<?=$rr->project->project_name?>/post/<?=$migration?>.php")?>'><?=$migration?></a><br />
+                    <a href='http://stash/projects/WT/repos/sparta/browse/migration/<?=$rr->project->project_name?>/post/<?=$migration?>.php'><?=$migration?></a><br />
                 <?}?>
             <?}?>
         <?}?>
