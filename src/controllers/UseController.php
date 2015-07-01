@@ -71,6 +71,16 @@ class UseController extends Controller
 
         if ($releaseRequest->save()) {
             Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
+
+            if ($currentUsed = ReleaseRequest::model()->findByAttributes([
+                'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
+                'rr_status' => ReleaseRequest::STATUS_USED,
+            ])) {
+                //an: хак, потому что нельзя в комет слать "быстро" 2 сообщения. Как перейдем на вебсокеты - удалить. @websockets
+                sleep(1);
+                Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($currentUsed->obj_id);
+            }
+
             Log::createLogMessage("CODES {$releaseRequest->getTitle()}");
         }
 

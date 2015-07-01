@@ -165,9 +165,12 @@
             } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {
                 return "<a href='".Yii::app()->createUrl('/use/fixAttempt', array('id' => $releaseRequest->obj_id))."' class='ajax-url'>Make stable</a>";
             } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
-                $oldReleaseRequest = $releaseRequest->getOldReleaseRequest($releaseRequest->rr_project_obj_id, $releaseRequest->rr_old_version);
-                if ($oldReleaseRequest && $oldReleaseRequest->canBeUsed()) {
-                    return "<a href='".Yii::app()->createUrl('/use/create', array('id' => $oldReleaseRequest->obj_id))."' class='use-button'>Revert to $releaseRequest->rr_old_version</a>";
+                if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest($releaseRequest->rr_project_obj_id, $releaseRequest->rr_old_version)) {
+                    if ($oldReleaseRequest->canBeUsed()) {
+                        return "<a href='".Yii::app()->createUrl('/use/create', array('id' => $oldReleaseRequest->obj_id))."' --data-id='$oldReleaseRequest->obj_id' class='use-button'>Revert to $releaseRequest->rr_old_version</a>";
+                    } elseif ($oldReleaseRequest->rr_status == ReleaseRequest::STATUS_CODES) {
+                        return "<a href='".Yii::app()->createUrl('/use/index', array('id' => $oldReleaseRequest->obj_id))."' onclick='showForm($oldReleaseRequest->obj_id); return false;'>Codes for revert to $releaseRequest->rr_old_version</a>";
+                    }
                 }
             }
 
