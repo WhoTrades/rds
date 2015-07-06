@@ -37,6 +37,7 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_Jira_MergeTasks::getToolCommand(['--max-duration=60'], $verbosity=1), '* * * * *', 'rds_jira_merge_tasks'),
             new CronCommand(Cronjob_Tool_Jira_CloseFeatures::getToolCommand([], $verbosity=1), '10 * * * *', 'rds_jira_close_features'),
             new CronCommand(Cronjob_Tool_Jira_HardMigrationNotifier::getToolCommand([], $verbosity=1), '10 4 * * *', 'rds_jira_hard_migration_notifier'),
+            new CronCommand(Cronjob_Tool_Jira_CreateProjectComponents::getToolCommand(['--jira-projects=WTA,WTI'], $verbosity=3), '15 4 * * *', 'rds_jira_create_project_components'),
 
             new Comment("TeamCity integration"),
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsTeamCityRunTest::getPgqConsumer('rds_teamcity_run_test', 'rds_teamcity_run_test_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *', 'rds_teamcity_run_test'),

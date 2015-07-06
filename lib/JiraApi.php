@@ -309,6 +309,22 @@ class JiraApi
         $this->updateTicketTransition($ticketInfo['key'], $transitionId, $comment);
     }
 
+    public function createComponent($name, $description, $project)
+    {
+        $request = [
+            'name' => $name,
+            'description' => $description,
+            'project' => $project,
+            'leadUserName' => $this->getUserName(),
+        ];
+        $this->sendRequest("$this->jiraUrl/rest/api/2/component", 'POST', $request);
+    }
+
+    public function getProjectInfo($project)
+    {
+        return $this->sendRequest("$this->jiraUrl/rest/api/2/project/$project/", 'GET', []);
+    }
+
     public function getLastDeveloperNotRds($ticketInfo)
     {
         foreach (array_reverse($ticketInfo['changelog']['histories']) as $val) {
