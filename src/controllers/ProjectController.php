@@ -90,7 +90,6 @@ class ProjectController extends Controller
 	{
 		$model=$this->loadModel($id);
 
-        ob_get_clean();
 		if(isset($_POST['Project']))
 		{
 			$model->attributes=$_POST['Project'];
