@@ -11,7 +11,15 @@
 	<title>RDS: <?php echo CHtml::encode($this->pageTitle); ?></title>
 
 	<?php Yii::app()->bootstrap->register(); ?>
-    <?php Yii::app()->realplexor->registerScripts()?>
+    <?php Yii::app()->webSockets->registerScripts()?>
+    <script>
+        function webSocketSubscribe(channel, callback)
+        {
+            webSocketSession.subscribe(channel, function (topic, event) {
+                callback(event.data);
+            });
+        }
+    </script>
 </head>
 
 <body>

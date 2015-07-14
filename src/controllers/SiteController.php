@@ -29,7 +29,6 @@ class SiteController extends Controller
 
 	public function actionIndex()
 	{
-        Yii::app()->realplexor->init();
         $releaseRequestSearchModel=new ReleaseRequest('search');
         $releaseRequestSearchModel->unsetAttributes();  // clear any default values
         if(isset($_GET['ReleaseRequest']))
@@ -101,8 +100,8 @@ class SiteController extends Controller
                     if (!empty($dictionary)) {
                         $dictionary->sendBuildTasks();
                     }
-                    
-                    Yii::app()->realplexor->send('updateAllReleaseRequests', []);
+
+                    Yii::app()->webSockets->send('updateAllReleaseRequests', []);
 
                     $this->redirect(array('index'));
                 }

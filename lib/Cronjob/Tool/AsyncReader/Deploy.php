@@ -529,7 +529,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         //self::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
-        Yii::app()->realplexor->send('updateAllReleaseRequests', []);
+        Yii::app()->webSockets->send('updateAllReleaseRequests', []);
 
         $message->accepted();
     }
@@ -739,8 +739,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $widget->run();
         $html = ob_get_clean();
 
-        $comet = Yii::app()->realplexor;
-        $comet->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
+        Yii::app()->webSockets->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
         $debugLogger->message("Sended");
     }
 

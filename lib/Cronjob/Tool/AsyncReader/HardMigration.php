@@ -122,8 +122,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
 
         /** @var $migration HardMigration */
         $migration = HardMigration::model()->findByPk($id);
-        $comet = Yii::app()->realplexor;
-        $comet->send('hardMigrationChanged', ['rr_id' => str_replace("/", "", "{$migration->migration_name}_$migration->migration_environment"), 'html' => $html]);
+        Yii::app()->webSockets->send('hardMigrationChanged', ['rr_id' => str_replace("/", "", "{$migration->migration_name}_$migration->migration_environment"), 'html' => $html]);
         $debugLogger->message("Sended");
     }
 

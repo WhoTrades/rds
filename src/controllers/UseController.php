@@ -76,8 +76,6 @@ class UseController extends Controller
                 'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
                 'rr_status' => ReleaseRequest::STATUS_USED,
             ])) {
-                //an: хак, потому что нельзя в комет слать "быстро" 2 сообщения. Как перейдем на вебсокеты - удалить. @websockets
-                sleep(1);
                 Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($currentUsed->obj_id);
             }
 
@@ -188,7 +186,7 @@ class UseController extends Controller
         $releaseRequest->rr_status = \ReleaseRequest::STATUS_USED;
 
         if ($releaseRequest->save()) {
-            Yii::app()->realplexor->send('updateAllReleaseRequests', []);
+            Yii::app()->webSockets->send('updateAllReleaseRequests', []);
             Log::createLogMessage("Помечен стабильным {$releaseRequest->getTitle()}");
 
             $jiraUse = new JiraUse();

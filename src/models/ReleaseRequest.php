@@ -378,7 +378,7 @@ class ReleaseRequest extends CActiveRecord
         }
 
         $this->save();
-        Yii::app()->realplexor->send('updateAllReleaseRequests', []);
+        Yii::app()->webSockets->send('updateAllReleaseRequests', []);
     }
 
 

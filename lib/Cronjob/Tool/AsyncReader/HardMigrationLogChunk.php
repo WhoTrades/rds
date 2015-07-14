@@ -56,7 +56,7 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
 
         //an: Максимальный размер пакета, который умещается в comet - 8KB. Потому и нам нужно разбивать
         foreach (str_split($message->text, self::MAX_TEXT_SIZE) as $chunk) {
-            Yii::app()->realplexor->send("migrationLogChunk_$id", ['text' => $chunk]);
+            Yii::app()->webSockets->send("migrationLogChunk_$id", ['text' => $chunk]);
         }
 
         $message->accepted();

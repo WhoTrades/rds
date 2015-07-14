@@ -77,7 +77,7 @@
 )); ?>
 
 <script type="text/javascript">
-    //an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на realplexor.
+    //an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
     // А такое случается часто, когда мы заказываем сборку
     $(document).ready(function(){
         setTimeout(function(){
@@ -88,7 +88,8 @@
 </script>
 
 <script>
-    realplexor.subscribe('releaseRequestChanged', function(event){
+    webSocketSubscribe('releaseRequestChanged', function(event){
+        console.log("websocket event received", event);
         var html = event.html;
         console.log($(html).find('tr.rowItem').first().attr('class'));
         var trHtmlCode = $(html).find('tr.rowItem').first().html()
@@ -96,24 +97,24 @@
         $('.release-request-'+event.rr_id).attr('class', $(html).find('tr.rowItem').first().attr('class'));
         console.log('Release request '+event.rr_id+' updated');
     });
-    realplexor.subscribe('progressbarChanged', function(event){
+    webSocketSubscribe('progressbarChanged', function(event){
         $('.progress-'+event.build_id+' .progress-bar').css({width: event.percent+'%'});
         $('.progress-'+event.build_id+' .progress-bar').html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
         console.log(event);
     });
-    realplexor.subscribe('refresh', function(event){
+    webSocketSubscribe('refresh', function(event){
         document.location += '';
         console.log('got refresh event');
     });
-    realplexor.subscribe('updateAllReleaseRequests', function(event){
+    webSocketSubscribe('updateAllReleaseRequests', function(event){
+        console.log("websocket event received", event);
         $.fn.yiiGridView.update("release-request-grid");
         console.log('got update all release requests event');
     });
-    realplexor.subscribe('updateAllReleaseRejects', function(event){
+    webSocketSubscribe('updateAllReleaseRejects', function(event){
         $.fn.yiiGridView.update("release-reject-grid");
         console.log('got update all release rejects event');
     });
-    realplexor.execute();
 </script>
 <script>
     $('body').on('click', '.use-button', function(e){

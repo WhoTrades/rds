@@ -1,12 +1,16 @@
 {
-	"name": "whotrades.com/service-rds",
-	"type": "library",
-	"description": "WhoTrades release deployment service",
+    "name": "whotrades.com/service-rds",
+    "type": "library",
+    "description": "WhoTrades release deployment service",
 
-	"repositories": [ { "type": "composer", "url": "http://git.whotrades.net/packages.json" } ],
-	"minimum-stability": "dev",
+    "repositories": [
+        { "type": "composer", "url": "http://git.whotrades.net/external/packages.json" },
+        { "packagist": false }
+    ],
+    "minimum-stability": "dev",
 
-	"require": {
-		"php": ">=5.3.3"
-	}
+    "require": {
+        "php": ">=5.4.0",
+        "react/zmq": "0.2.*|0.3.*"
+    }
 }

@@ -60,8 +60,7 @@ class ProgressController extends Controller
         $info = $build->getProgressbarInfo();
         if ($info) {
             list($percent, $key) = $info;
-            $comet = Yii::app()->realplexor;
-            $comet->send('progressbarChanged', ['build_id' => $build->obj_id, 'percent' => $percent, 'key' => $key]);
+            Yii::app()->webSockets->send('progressbarChanged', ['build_id' => $build->obj_id, 'percent' => $percent, 'key' => $key]);
         }
     }
 }
