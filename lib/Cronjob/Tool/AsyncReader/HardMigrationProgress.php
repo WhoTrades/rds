@@ -60,6 +60,6 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
     private function sendMigrationProgressbarChanged($id, $percent, $key)
     {
         $this->debugLogger->message("Sending migraion progressbar to comet");
-        Yii::app()->realplexor->send('migrationProgressbarChanged', ['migration' => $id, 'percent' => (float)$percent, 'key' => $key]);
+        Yii::app()->webSockets->send('migrationProgressbarChanged', ['migration' => $id, 'percent' => (float)$percent, 'key' => $key]);
     }
 }

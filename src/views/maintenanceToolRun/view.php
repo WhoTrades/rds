@@ -58,7 +58,7 @@ $this->menu=array(
 )); ?>
 
 <script type="text/javascript">
-    realplexor.subscribe('maintenanceToolProgressbarChanged', function(event){
+    webSocketSubscribe('maintenanceToolProgressbarChanged', function(event){
         console.log(event);
         $('.progress-'+event.id+' .bar').css({width: event.percent+'%'});
         var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
@@ -66,7 +66,7 @@ $this->menu=array(
         $('.progress-action-'+event.id).html(event.key);
     });
 
-    realplexor.subscribe('maintenance_tool_log_<?=$model->obj_id?>', function(event){
+    webSocketSubscribe('maintenance_tool_log_<?=$model->obj_id?>', function(event){
         $('.pre').append('<span>' + event.text + '</span>');
         var span = $('.pre span:last');
         span.css({fontWeight: 'bold'});
@@ -75,6 +75,5 @@ $this->menu=array(
         }, 250);
         $('body').scrollTop($('body').height())
     });
-    realplexor.execute();
     $('body').scrollTop($('body').height());
 </script>

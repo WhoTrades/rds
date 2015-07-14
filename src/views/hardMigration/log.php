@@ -13,7 +13,7 @@
 </div>
 
 <script type="text/javascript">
-    realplexor.subscribe('migrationLogChunk_<?=str_replace("/", "", $migration->migration_name)?>_<?=$migration->migration_environment?>', function(event){
+    webSocketSubscribe('migrationLogChunk_<?=str_replace("/", "", $migration->migration_name)?>_<?=$migration->migration_environment?>', function(event){
         $('#pre').append('<span>' + event.text + '</span>');
         var span = $('#pre span:last');
         span.css({fontWeight: 'bold'});
@@ -22,6 +22,5 @@
         }, 250);
         $('body').scrollTop($('body').height())
     });
-    realplexor.execute();
     $('body').scrollTop($('body').height());
 </script>

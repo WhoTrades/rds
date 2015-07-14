@@ -89,15 +89,13 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
 
         $this->debugLogger->message("commet id=maintenance_tool_log_$message->id");
 
-        Yii::app()->realplexor->send("maintenance_tool_log_$message->id", ['text' => $message->text]);
+        Yii::app()->webSockets->send("maintenance_tool_log_$message->id", ['text' => $message->text]);
 
         /** @var $mtr MaintenanceToolRun */
         $mtr = MaintenanceToolRun::model()->findByPk($message->id);
         if ($pair = $mtr->getProgressPercentAndKey()) {
             list($percent, $key) = $pair;
-            //an: Комет не умеет принимать сообщения очень быстро, потому тут ставим sleep. Когда перейдем на нормальный транспорт - это нужно убрать
-            usleep(0.1*pow(10, 6));
-            Yii::app()->realplexor->send("maintenanceToolProgressbarChanged", ['id' => $message->id, 'percent' => $percent, 'key' => $key]);
+            Yii::app()->webSockets->send("maintenanceToolProgressbarChanged", ['id' => $message->id, 'percent' => $percent, 'key' => $key]);
             $this->debugLogger->message("Percentage of tool updated to percent=$percent");
         }
 
@@ -146,8 +144,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $debugLogger->message("html code generated, html=".$html);
 
         /** @var $migration HardMigration */
-        $comet = Yii::app()->realplexor;
-        $comet->send('maintenanceToolChanged', ['id' => $mtr->mtr_maintenance_tool_obj_id, 'html' => $html]);
+        Yii::app()->webSockets->send('maintenanceToolChanged', ['id' => $mtr->mtr_maintenance_tool_obj_id, 'html' => $html]);
         $debugLogger->message("Sended");
     }
 
