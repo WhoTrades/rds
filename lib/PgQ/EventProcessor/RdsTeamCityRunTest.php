@@ -10,7 +10,7 @@ class PgQ_EventProcessor_RdsTeamCityRunTest extends PgQ\EventProcessor\EventProc
 {
     public function processEvent(PgQ_Event $event)
     {
-        $teamCity = new TeamcityClient\WtTeamCityClient();
+        $teamCity = new CompanyInfrastructure\WtTeamCityClient();
 
         $teamCityRunTest = TeamcityRunTest::model()->findByPk($event->getData()['obj_id']);
 

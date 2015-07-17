@@ -157,26 +157,4 @@ class ReleaseVersionController extends Controller
 			Yii::app()->end();
 		}
 	}
-
-    private function updateVersionsAtTeamCity()
-    {
-        if (!Yii::app()->params['syncVersionsWithCi']) {
-            return;
-        }
-
-        $versions = [
-            "+:refs/heads/(master)",
-            "+:refs/heads/(feature/*)",
-        ];
-        foreach (ReleaseVersion::model()->findAll() as $version) {
-            /** @var $version ReleaseVersion */
-            $versions[] = "+:refs/heads/(release-$version->rv_version)";
-        }
-
-        $client = new \TeamcityClient\WtTeamCityClient();
-
-        foreach ($client->getVcsRootsList() as $vcsRoot) {
-            $client->updateVcsRootProperty($vcsRoot['id'], 'teamcity:branchSpec', implode("\n", $versions));
-        }
-    }
 }

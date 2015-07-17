@@ -23,7 +23,7 @@ class PgQ_EventProcessor_RdsTeamCityBuildComplete extends PgQ\EventProcessor\Eve
         $c->compare('tb_build_type_id', $buildTypeId);
         $c->compare('tb_branch', $branch);
 
-        $teamcity = new \TeamcityClient\WtTeamCityClient();
+        $teamcity = new CompanyInfrastructure\WtTeamCityClient();
 
         /** @var $teamCityBuilds TeamCityBuild[] */
         $teamCityBuilds = TeamcityBuild::model()->findAll($c);

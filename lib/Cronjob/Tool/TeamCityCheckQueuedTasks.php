@@ -17,7 +17,7 @@ class Cronjob_Tool_TeamCityCheckQueuedTasks extends RdsSystem\Cron\RabbitDaemon
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $this->debugLogger->message("Starting");
-        $teamcity = new \TeamcityClient\WtTeamCityClient();
+        $teamcity = new CompanyInfrastructure\WtTeamCityClient();
         $builds = TeamcityBuild::model()->findAllByAttributes([
             'tb_status' => TeamCityBuild::STATUS_QUEUED,
             'tb_notified' => false,
