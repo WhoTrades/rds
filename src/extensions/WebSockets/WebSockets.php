@@ -38,7 +38,7 @@ webSocketSession = {
 };
 
 ab.connect(
-   'ws://'+document.location.host+'$this->server',
+   'wss://'+document.location.host+'$this->server',
    function (session) {
         webSocketSession.session = session;
         webSocketSession.resubscribe();
@@ -51,9 +51,6 @@ ab.connect(
        'retryDelay': $this->retryDelay
    }
 );
-webSocketSession.subscribe("123", function (topic, event) {
-    console.log("Event 1 received!" + topic + '" : ', event);
-});
 here
                 , CClientScript::POS_BEGIN);
         } else {
