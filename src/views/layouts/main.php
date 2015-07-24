@@ -33,11 +33,11 @@
         array('label'=>'Сборщики', 'url'=>array('/worker/admin'), 'active' => $this->getId() == 'worker'),
         array('label'=>'Версии', 'url'=>array('/releaseVersion/admin'), 'active' => $this->getId() == 'releaseVersion'),
     ]),
-    array('label'=>'Интеграция', 'url'=>array('/jira/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => in_array($this->getId(), ['jira', 'developer', 'git']), 'items' => [
-        ['label'=>'JIRA', 'url'=>array('/jira/index'), 'active' => $this->getId() == 'jira'],
-        ['label'=>'Разработчики', 'url'=>array('/developer/index'), 'active' => $this->getId() == 'developer'],
-        ['label'=>'Git', 'url'=>array('/git/index'), 'active' => $this->getId() == 'git' && $this->action->id == 'index'],
-        ['label'=>'wtflow', 'url'=>array('/git/wtflowStat'), 'active' => $this->getId() == 'git' && $this->action->id == 'wtflowStat'],
+    array('label'=>'Интеграция', 'url'=>array('/Wtflow/jira/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => in_array($this->getId(), ['jira', 'developer', 'git']), 'items' => [
+        ['label'=>'JIRA', 'url'=>array('/Wtflow/jira/index'), 'active' => $this->getId() == 'jira'],
+        ['label'=>'Разработчики', 'url'=>array('/Wtflow/developer/index'), 'active' => $this->getId() == 'developer'],
+        ['label'=>'Git', 'url'=>array('/Wtflow/git/index'), 'active' => $this->getId() == 'git' && $this->action->id == 'index'],
+        ['label'=>'wtflow', 'url'=>array('/Wtflow/git/wtflowStat'), 'active' => $this->getId() == 'git' && $this->action->id == 'wtflowStat'],
     ],),
     array('label'=>'Обслуживание', 'url'=>array('/maintenanceTool/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => in_array($this->getId(), ['maintenanceTool', 'alert', 'cronjobs']), 'items' => [
         //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => $this->getId() == 'maintenanceTool'],
