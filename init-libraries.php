@@ -6,16 +6,17 @@ if (($idx = array_search('/usr/share/pear', $includePaths)) !== false) {
 }
 set_include_path(join(PATH_SEPARATOR, array_merge($includePaths, array(
 	// local
-	dirname(__FILE__) . '/',
-	dirname(__FILE__) . '/misc/cron/',
+	__DIR__ . '/',
+	__DIR__ . '/misc/cron/',
 	//an: prod
-	dirname(__FILE__) . '/lib',
-	dirname(__FILE__) . '/lib/creole',
+	__DIR__ . '/lib',
+	__DIR__ . '/lib/creole',
 	// developer's
-	dirname(__FILE__) . '/../../lib/',
-	dirname(__FILE__) . '/../../lib/libcore/',
-	dirname(__FILE__) . '/../../lib/pear/',
-	dirname(__FILE__) . '/../../lib/creole',
+	__DIR__ . '/../../lib/',
+	__DIR__ . '/../../lib/libcore/',
+	__DIR__ . '/../../lib/pear/',
+	__DIR__ . '/../../lib/creole',
+	__DIR__ . '/protected/modules/Wtflow',
 ))));
 require_once(__DIR__."/vendor/autoload.php");
 require_once 'Autoload.php';

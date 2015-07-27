@@ -3,7 +3,6 @@ class WebApplication extends CWebApplication
 {
     /** @var \ServiceBase_IDebugLogger */
     public $debugLogger;
-    public $preloadedModules = [];
 
     public function end($status=0,$exit=true)
     {
@@ -34,16 +33,5 @@ class WebApplication extends CWebApplication
         }
 
         return parent::setRuntimePath($path);
-    }
-
-    protected function init()
-    {
-        //ob_get_clean();
-        error_reporting(E_ALL);
-        foreach ($this->preloadedModules as $module) {
-            var_dump($this->getModule($module));
-        }
-
-        parent::init();
     }
 }
