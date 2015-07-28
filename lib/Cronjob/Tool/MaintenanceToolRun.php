@@ -2,7 +2,7 @@
 use RdsSystem\Message;
 
 /**
- * @example dev/services/rds/misc/tools/runner.php --tool=MaintenanceToolRun -vv --tool_name=InstrumentsUpdateTickers
+ * @example dev/services/rds/misc/tools/runner.php --tool=MaintenanceToolRun -vv --tool-name=InstrumentsUpdateTickers
  */
 class Cronjob_Tool_MaintenanceToolRun extends RdsSystem\Cron\RabbitDaemon
 {

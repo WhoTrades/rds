@@ -75,7 +75,6 @@ class JsonController extends Controller
 
     public function actionAddWtFlowStat()
     {
-        ob_get_clean();
         $developer = Developer::model()->findByAttributes(['whotrades_email' => $_POST['developer']]);
         
         if (!$developer) {
