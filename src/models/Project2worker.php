@@ -15,7 +15,7 @@
  * @property Worker $worker
  * @property Project $project
  */
-class Project2worker extends CActiveRecord
+class Project2worker extends ActiveRecord
 {
 	/**
 	 * @return string the associated database table name
@@ -24,14 +24,6 @@ class Project2worker extends CActiveRecord
 	{
 		return 'rds.project2worker';
 	}
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
-    }
 
 	/**
 	 * @return array validation rules for model attributes.

@@ -13,7 +13,7 @@
  * @property string $rr_project_obj_id
  * @property string $rr_release_version
  */
-class ReleaseReject extends CActiveRecord
+class ReleaseReject extends ActiveRecord
 {
 	/**
 	 * @return string the associated database table name
@@ -22,14 +22,6 @@ class ReleaseReject extends CActiveRecord
 	{
 		return 'rds.release_reject';
 	}
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
-    }
 
 	/**
 	 * @return array validation rules for model attributes.

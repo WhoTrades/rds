@@ -11,7 +11,7 @@
  * @property string $log_user
  * @property string $log_text
  */
-class Log extends CActiveRecord
+class Log extends ActiveRecord
 {
     /**
      * @return string the associated database table name
@@ -19,15 +19,6 @@ class Log extends CActiveRecord
     public function tableName()
     {
         return 'rds.log';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-            $this->obj_status_did = 1;
-        }
-        return parent::afterConstruct();
     }
 
     /**

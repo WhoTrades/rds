@@ -15,7 +15,7 @@
  * The followings are the available model relations:
  * @property Project $projectObj
  */
-class ToolJobStopped extends CActiveRecord
+class ToolJobStopped extends ActiveRecord
 {
     /**
      * @return string the associated database table name
@@ -23,14 +23,6 @@ class ToolJobStopped extends CActiveRecord
     public function tableName()
     {
         return 'cronjobs.tool_job_stopped';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
     }
 
     /**

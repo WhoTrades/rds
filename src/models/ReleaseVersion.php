@@ -11,7 +11,7 @@
  * @property string $rv_version
  * @property string $rv_name
  */
-class ReleaseVersion extends CActiveRecord
+class ReleaseVersion extends ActiveRecord
 {
     /**
      * @return string the associated database table name
@@ -19,14 +19,6 @@ class ReleaseVersion extends CActiveRecord
     public function tableName()
     {
         return 'rds.release_version';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
     }
 
     /**

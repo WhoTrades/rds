@@ -19,7 +19,7 @@
  * @property string $project_notification_subject
  * @property ReleaseRequest[] $releaseRequests
  */
-class Project extends CActiveRecord
+class Project extends ActiveRecord
 {
     const STATUS_NEW = 'new';
     public $project_build_subversion_array;
@@ -31,14 +31,6 @@ class Project extends CActiveRecord
 	{
 		return 'rds.project';
 	}
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
-    }
 
 	/**
 	 * @return array validation rules for model attributes.

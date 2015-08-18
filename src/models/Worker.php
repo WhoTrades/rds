@@ -13,7 +13,7 @@
  * The followings are the available model relations:
  * @property Project2worker[] $project2workers
  */
-class Worker extends CActiveRecord
+class Worker extends ActiveRecord
 {
 	/**
 	 * @return string the associated database table name
@@ -22,14 +22,6 @@ class Worker extends CActiveRecord
 	{
 		return 'rds.worker';
 	}
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
-    }
 
 	/**
 	 * @return array validation rules for model attributes.

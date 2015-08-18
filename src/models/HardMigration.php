@@ -25,7 +25,7 @@
  * The followings are the available model relations:
  * @property ReleaseRequest $releaseRequest
  */
-class HardMigration extends CActiveRecord
+class HardMigration extends ActiveRecord
 {
     const MIGRATION_STATUS_NEW          = 'new';
     const MIGRATION_STATUS_IN_PROGRESS  = 'process';
@@ -45,14 +45,6 @@ class HardMigration extends CActiveRecord
     public function tableName()
     {
         return 'rds.hard_migration';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
     }
 
     /**
