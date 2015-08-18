@@ -8,7 +8,7 @@
             echo strip_tags($releaseRequest->rr_comment)."<br />";
 
             if ($releaseRequest->isInstalledStatus()) {
-                echo "<a href='".Yii::app()->createUrl('/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты</a><br />";
+                echo "<a href='".Yii::app()->createUrl('/Wtflow/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id])."' target='_blank'>Тикеты</a><br />";
             }
             echo "<a href='/site/commits/$releaseRequest->obj_id' onclick=\"popup('test', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>";
         }
