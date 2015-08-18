@@ -20,7 +20,7 @@
  * @property Project $project
  * @property ReleaseRequest $releaseRequest
  */
-class Build extends CActiveRecord
+class Build extends ActiveRecord
 {
     const STATUS_NEW = 'new';
     const STATUS_BUILDING = 'building';
@@ -39,14 +39,6 @@ class Build extends CActiveRecord
 	{
 		return 'rds.build';
 	}
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
-    }
 
 	/**
 	 * @return array validation rules for model attributes.

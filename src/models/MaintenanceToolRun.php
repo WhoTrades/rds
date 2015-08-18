@@ -17,7 +17,7 @@
  * The followings are the available model relations:
  * @property MaintenanceTool $mtrMaintenanceTool
  */
-class MaintenanceToolRun extends CActiveRecord
+class MaintenanceToolRun extends ActiveRecord
 {
     const STATUS_NEW = 'new';
     const STATUS_IN_PROGRESS = 'in-progress';
@@ -32,14 +32,6 @@ class MaintenanceToolRun extends CActiveRecord
     public function tableName()
     {
         return 'rds.maintenance_tool_run';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
     }
 
     /**

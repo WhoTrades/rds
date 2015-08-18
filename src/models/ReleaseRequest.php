@@ -36,7 +36,7 @@
  * @property HardMigration[] $hardMigrations
  * @property ReleaseRequest $leader
  */
-class ReleaseRequest extends CActiveRecord
+class ReleaseRequest extends ActiveRecord
 {
     const USE_ATTEMPT_TIME = 40;
     const IMMEDIATELY_TIME = 900;
@@ -64,14 +64,6 @@ class ReleaseRequest extends CActiveRecord
 	{
 		return 'rds.release_request';
 	}
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
-    }
 
 	/**
 	 * @return array validation rules for model attributes.

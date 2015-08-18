@@ -16,7 +16,7 @@
  * The followings are the available model relations:
  * @property MaintenanceToolRun[] $maintenanceToolRuns
  */
-class MaintenanceTool extends CActiveRecord
+class MaintenanceTool extends ActiveRecord
 {
     /** @var MaintenanceToolRun */
     protected $lastRunLocal = false;
@@ -27,14 +27,6 @@ class MaintenanceTool extends CActiveRecord
     public function tableName()
     {
         return 'rds.maintenance_tool';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
     }
 
     /**
@@ -158,30 +150,23 @@ class MaintenanceTool extends CActiveRecord
      */
     public function start($user)
     {
-        $transaction = $this->getDbConnection()->beginTransaction();
-        try {
-            Log::createLogMessage("Запущен тул {$this->getTitle()}", $user);
+        Log::createLogMessage("Запущен тул {$this->getTitle()}", $user);
 
-            if (!$this->canBeStarted()) {
-                throw new Exception("Invalid tool status");
-            }
+        if (!$this->canBeStarted()) {
+            throw new Exception("Invalid tool status");
+        }
 
-            $mtr = new MaintenanceToolRun();
+        $mtr = new MaintenanceToolRun();
 
-            $mtr->attributes = [
-                'mtr_maintenance_tool_obj_id' => $this->obj_id,
-                'mtr_runner_user' => $user,
-                'mtr_status' => MaintenanceToolRun::STATUS_NEW,
-            ];
+        $mtr->attributes = [
+            'mtr_maintenance_tool_obj_id' => $this->obj_id,
+            'mtr_runner_user' => $user,
+            'mtr_status' => MaintenanceToolRun::STATUS_NEW,
+        ];
 
-            if ($mtr->save()) {
-                $messageModel = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
-                $messageModel->sendMaintenanceToolStart(new \RdsSystem\Message\MaintenanceTool\Start($mtr->obj_id, $this->mt_command));
-                $transaction->commit();
-            }
-        } catch (Exception $e) {
-            $transaction->rollback();
-            throw $e;
+        if ($mtr->save()) {
+            $messageModel = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
+            $messageModel->sendMaintenanceToolStart(new \RdsSystem\Message\MaintenanceTool\Start($mtr->obj_id, $this->mt_command));
         }
 
         return $mtr;

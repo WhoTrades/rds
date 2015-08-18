@@ -12,7 +12,7 @@
  * @property string $preprod_online
  * @property string $cpu_usage_last_truncate
  */
-class RdsDbConfig extends CActiveRecord
+class RdsDbConfig extends ActiveRecord
 {
     /**
      * @return string the associated database table name
@@ -28,14 +28,6 @@ class RdsDbConfig extends CActiveRecord
         return self::model()->find();
     }
 	
-	public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
-    }
-
     /**
      * @return array validation rules for model attributes.
      */

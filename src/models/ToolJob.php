@@ -18,7 +18,7 @@
  * The followings are the available model relations:
  * @property Project $project
  */
-class ToolJob extends CActiveRecord
+class ToolJob extends ActiveRecord
 {
     /**
      * @return string the associated database table name
@@ -26,14 +26,6 @@ class ToolJob extends CActiveRecord
     public function tableName()
     {
         return 'cronjobs.tool_job';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
     }
 
     /**

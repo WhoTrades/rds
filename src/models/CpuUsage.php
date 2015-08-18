@@ -12,7 +12,7 @@
  * @property string $key
  * @property double $cpu_time
  */
-class CpuUsage extends CActiveRecord
+class CpuUsage extends ActiveRecord
 {
     /**
      * @return string the associated database table name
@@ -20,14 +20,6 @@ class CpuUsage extends CActiveRecord
     public function tableName()
     {
         return 'cronjobs.cpu_usage';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
     }
 
     /**

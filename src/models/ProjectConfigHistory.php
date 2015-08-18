@@ -15,7 +15,7 @@
  * The followings are the available model relations:
  * @property Project $project
  */
-class ProjectConfigHistory extends CActiveRecord
+class ProjectConfigHistory extends ActiveRecord
 {
     /**
      * @return string the associated database table name
@@ -23,14 +23,6 @@ class ProjectConfigHistory extends CActiveRecord
     public function tableName()
     {
         return 'rds.project_config_history';
-    }
-
-    public function afterConstruct() {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        return parent::afterConstruct();
     }
 
     /**
