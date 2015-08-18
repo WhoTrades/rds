@@ -43,6 +43,9 @@ class ServiceRdsProdTL1
             new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_RdsTeamCityBuildComplete::getPgqConsumer('rds_teamcity_build_complete', 'rds_teamcity_build_complete_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *', 'rds_teamcity_build_complete'),
             new CronCommand(Cronjob_Tool_TeamCityCheckQueuedTasks::getToolCommand([], $verbosity=1), '* * * * *', 'rds_team_city_check_queued_tasks'),
 
+            new Comment("Stash integration"),
+            new MultiCommandToCron(new MultiPeriodicCommand(\PgQ_EventProcessor_ProcessCreatePullRequest::getPgqConsumer('rds_create_pull_request', 'rds_create_pull_request_consumer', 'simple', 'DSN_DB4', 1, [], 3), 5), '* * * * *', 'rds_create_pull_request'),
+
             new Comment("Deployment"),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_Deploy::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1), '* * * * *', 'rds_async_reader_deploy'),
             new CronCommand(new PeriodicCommand(Cronjob_Tool_AsyncReader_Merge::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=1), '* * * * *', 'rds_async_reader_merge'),
