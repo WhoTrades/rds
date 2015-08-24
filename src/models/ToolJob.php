@@ -136,6 +136,26 @@ class ToolJob extends ActiveRecord
         return null;
     }
 
+    public function getLoggerTag()
+    {
+        if (!preg_match('~local2.info -t (\S*)~', $this->command, $ans)) {
+            throw new \Exception("Can't find logger tag at command $this->command");
+        }
+
+        return $ans[1];
+    }
+
+    public function getSmallCpuUsageGraphSrc()
+    {
+        //https://stm-graphite.whotrades.com/render/?width=100&height=60&from=-24minutes&target=summarize(sumSeries(stats.gauges.rds.main.system.COMON.tool.ACTIVITY_STREAM_QUEUE-78A9AB09C70D.timeCpu)%2C%221min%22)&graphOnly=true
+        return "https://stm-graphite.whotrades.com/render/?width=100&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.main.system.COMON.tool.".strtoupper($this->getLoggerTag())."-".strtoupper($this->key).".timeCpu)%2C%2215min%22)&graphOnly=true&yMin=0";
+    }
+
+    public function getSmallTimeRealGraphSrc()
+    {
+        return "https://stm-graphite.whotrades.com/render/?width=180&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.main.system.COMON.tool.".strtoupper($this->getLoggerTag())."-".strtoupper($this->key).".timeReal)%2C%2215min%22)&graphOnly=true&yMin=0";
+    }
+
     /**
      * Returns the static model of the specified AR class.
      * Please note that you should have this exact method in all your CActiveRecord descendants!

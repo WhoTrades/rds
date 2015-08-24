@@ -11,6 +11,9 @@
  * @property string $project_name
  * @property string $key
  * @property double $cpu_time
+ * @property string $last_run_time
+ * @property int $last_exit_code
+ * @property int $last_duration
  */
 class CpuUsage extends ActiveRecord
 {

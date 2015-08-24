@@ -179,7 +179,8 @@ class CronJobsController extends Controller
 
     public function actionCpuUsageReport()
     {
-        $sql = "select project_name, \"group\", command, substring(command from 'local2.info -t (.*)'), ROUND(cpu_time / 1000) from cronjobs.cpu_usage
+        $sql = "select project_name, \"group\", command, substring(command from 'local2.info -t (.*)'), cpu_time / 1000 as round, cpu_usage.key, project_name
+                from cronjobs.cpu_usage
                 join rds.project USING(project_name)
                 JOIN cronjobs.tool_job ON cronjobs.cpu_usage.key=cronjobs.tool_job.key and project.obj_id=project_obj_id
                 order by cpu_time desc";

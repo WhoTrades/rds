@@ -4,6 +4,7 @@ $this->pageTitle = "Фоновые процессы";
 <h1>
     <?=$this->pageTitle?>
     <small><a href="<?=$this->createUrl("cpuUsageReport")?>">CPU usage report</a></small>
+    <img src="https://stm-graphite.whotrades.com/render/?width=300&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.main.system.COMON.tool.*.timeCpu)%2C%2215min%22)&graphOnly=true&yMin=0" style="border: solid 1px #eee" />
 </h1>
 <div style="clear: both"></div>
 
@@ -25,8 +26,7 @@ $this->pageTitle = "Фоновые процессы";
                 $.ajax({url: "'.$this->createUrl('truncateCpuUsage').'"}).done(function(){
                     obj.innerHTML = html;
                     obj.disabled = false;
-                    $(".cpu-usage").html("0 sec");
-                    $("span", $(obj)).html("только что");
+                    location += "";
                 });
             }',
         ])?>
@@ -41,6 +41,7 @@ $this->pageTitle = "Фоновые процессы";
                 <thead>
                     <tr>
                         <th>Команда</th>
+                        <th style=" width: 120px;">Последний запуск</th>
                         <th>Статус</th>
                         <th>CPU usage</th>
                         <th>Log filename</th>
@@ -62,11 +63,29 @@ $this->pageTitle = "Фоновые процессы";
                             <td style="font-family: Menlo, Monaco, Consolas, monospace">
                                 <?=preg_replace('~(--(?:tool|queue-name|event-processor)=)(\S*)~', '$1<span style="color: blue">$2</span>', preg_replace('~2>&1.*~', '', $toolJob->command))?>
                             </td>
-                            <td>
+                            <td style="white-space: nowrap;" class="cpu-usage __project-<?=$toolJob->project->project_name?> __key-<?=$toolJob->key?>">
+                                <?if (isset($cpuUsages[$toolJob->key][$toolJob->project->project_name])) {?>
+                                    <?/* @var $cpuUsage CpuUsage */?>
+                                    <?$cpuUsage = $cpuUsages[$toolJob->key][$toolJob->project->project_name];?>
+                                    Время: <time><?=date('Y-m-d H:i:s', strtotime($cpuUsage->last_run_time))?></time><br />
+                                    Продолжительность: <span class="duration"><?=$cpuUsage->last_run_duration?> сек.</span><br />
+                                    <img src="<?=$toolJob->getSmallTimeRealGraphSrc()?>" style="border: solid 1px #eee" /><br />
+                                    Ошибка: <span class="error-mark"><?=$cpuUsage->last_exit_code
+                                        ? TbHtml::labelTb('Да', ['color' => TbHtml::ALERT_COLOR_DANGER])
+                                        : "Нет"
+                                    ?></span><br />
+                                <?} else {?>
+                                    Время: <time>&ndash;</time><br />
+                                    Продолжительность: <span class="duration">&ndash;</span><br />
+                                    <img src="<?=$toolJob->getSmallTimeRealGraphSrc()?>" style="border: solid 1px #eee" /><br />
+                                    Ошибка: <span class="error-mark">&ndash;</span><br />
+                                <?}?>
+                            </td>
+                            <td style="white-space: nowrap">
                                 <?if ($stopper = $toolJob->getToolJobStopped()) {?>
                                     Остановлено до <?=date('H:i', strtotime($stopper->stopped_till))?>
                                 <?} else {?>
-                                    Работает
+                                    Активен
                                 <?}?>
                                 <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_INFO_SIGN), $this->createUrl("/cronjobs/getInfo", [
                                     'key' => $toolJob->key,
@@ -76,7 +95,15 @@ $this->pageTitle = "Фоновые процессы";
                                     'style' => 'color: orange',
                                 ])?>
                             </td>
-                            <td class="cpu-usage"><?=isset($cpuUsages[$toolJob->key][$toolJob->project->project_name]) ? sprintf('%.1f', $cpuUsages[$toolJob->key][$toolJob->project->project_name]->cpu_time / 1000) : 0?>&nbsp;sec</td>
+                            <td class="cpu-usage __project-<?=$toolJob->project->project_name?> __key-<?=$toolJob->key?>">
+                                <div class="cpu-usage-time">
+                                    <?=isset($cpuUsages[$toolJob->key][$toolJob->project->project_name])
+                                        ? sprintf('%.2f', $cpuUsages[$toolJob->key][$toolJob->project->project_name]->cpu_time / 1000)
+                                        : 0
+                                    ?>&nbsp;сек
+                                </div>
+                                <img src="<?=$toolJob->getSmallCpuUsageGraphSrc()?>" style="border: solid 1px #eee" />
+                            </td>
                             <td>
                                 <?$tag=str_replace('=', '\=', preg_replace('~.*logger -p \S+ -t (\S+).*~', '$1', $toolJob->command))?>
                                 <input type="text"
@@ -158,6 +185,22 @@ $this->pageTitle = "Фоновые процессы";
             });
 
             e.preventDefault();
+        });
+
+
+        webSocketSubscribe('updateToolJonPerformanceStats', function(event){
+            var objs = $('.cpu-usage.__key-' + event.key + '.__project-' + event.project);
+            $('.cpu-usage-time', objs).html(event.cpuTime.toFixed(2) + ' сек');
+            objs.css({'color': 'red'});
+            $('time', objs).html(event.last_run_time);
+            $('span.duration', objs).html(event.last_run_duration + ' сек.');
+            $('span.error-mark', objs).html(event.last_exit_code
+                ? '<?=TbHtml::labelTb('Да', ['color' => TbHtml::ALERT_COLOR_DANGER])?>'
+                : 'Нет'
+            );
+            setTimeout(function(){
+                objs.css({'color': 'inherit'});
+            }, 500);
         });
     });
 </script>

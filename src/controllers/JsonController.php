@@ -88,5 +88,87 @@ class JsonController extends Controller
         $wtflow->log = implode("\n", $_POST['log']);
         $wtflow->save();
     }
+
+    public function actionTest()
+    {
+        var_dump(Yii::app()->params['graphite']);
+    }
+
+    public function actionSetCronJobsStats()
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        if (!$data) {
+            echo json_encode(["OK" => true]);
+            return;
+        }
+
+//        file_put_contents("/tmp/file.txt", '');
+
+        foreach ($data as $line => $val) {
+            if (!preg_match('~--sys__package=([\w-]+)-([\d.]+) --sys__key=(\w+)~', $line, $ans)) {
+                file_put_contents("/tmp/file.txt", "ERROR PARSING $line\n\n", FILE_APPEND);
+                continue;
+            }
+
+//            file_put_contents("/tmp/file.txt", $line."\n", FILE_APPEND);
+//            file_put_contents("/tmp/file.txt", var_export($val, 1), FILE_APPEND);
+
+            list(,$project, $version, $key) = $ans;
+            $bind = [
+                ':project' => $project,
+                ':key' => $key,
+                ':cpu' => 1000 * ($val['CPUUser'] + $val['CPUSystem']),
+                ':last_run' => date("r", round($val['lastRunTimestamp'])),
+                ':exit_code' => $val['errors'],
+                ':duration' => (int)$val['time'] / $val['count'],
+            ];
+
+
+//            file_put_contents("/tmp/file.txt", var_export($bind, 1), FILE_APPEND);
+            $row = Yii::app()->db->createCommand("SELECT * FROM cronjobs.add_cronjobs_cpu_usage(:project, :key, :cpu, :last_run, :exit_code, :duration)")->queryRow(true, $bind);
+
+            $toolJob = ToolJob::model()->findByAttributes([
+                'key' => $key,
+                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
+            ]);
+            if ($toolJob) {
+                $graphite = new \GraphiteSystem\Graphite(Yii::app()->params['graphite']);
+                $graphite->gauge(
+                    \GraphiteSystem\Metrics::dynamicName(
+                        \GraphiteSystem\Metrics::SYSTEM_PROJECT_TOOL_TIME_REAL,
+                        [
+                            $project, $toolJob->getLoggerTag() . "-" . $key
+                        ]
+                    ),
+                    $val['time'] / $val['count']
+                );
+                $graphite->gauge(
+                    \GraphiteSystem\Metrics::dynamicName(
+                        \GraphiteSystem\Metrics::SYSTEM_PROJECT_TOOL_TIME_CPU,
+                        [
+                            $project, $toolJob->getLoggerTag() . "-" . $key
+                        ]
+                    ),
+                    ($val['CPUUser'] + $val['CPUSystem']) / $val['count']
+                );
+            }
+
+            Yii::app()->webSockets->send('updateToolJonPerformanceStats', [
+                'key' => $key,
+                'version' => $version,
+                'project' => $project,
+                'package' => "$project-$version",
+                'cpuTime' => $row['cpu_time'] / 1000,
+                'last_exit_code' => $row['last_exit_code'],
+                'last_run_time' => date("Y-m-d H:i:s", strtotime($row['last_run_time'])),
+                'last_run_duration' => $row['last_run_duration'],
+            ]);
+
+            file_put_contents("/tmp/file.txt", $line."\n\n", FILE_APPEND);
+        }
+
+        echo json_encode(["OK" => true]);
+    }
 }
 
