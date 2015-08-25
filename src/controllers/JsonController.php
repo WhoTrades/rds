@@ -136,7 +136,7 @@ class JsonController extends Controller
                 $graphite = new \GraphiteSystem\Graphite(Yii::app()->params['graphite']);
                 $graphite->gauge(
                     \GraphiteSystem\Metrics::dynamicName(
-                        \GraphiteSystem\Metrics::SYSTEM_PROJECT_TOOL_TIME_REAL,
+                        \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMEREAL,
                         [
                             $project, $toolJob->getLoggerTag() . "-" . $key
                         ]
@@ -145,7 +145,7 @@ class JsonController extends Controller
                 );
                 $graphite->gauge(
                     \GraphiteSystem\Metrics::dynamicName(
-                        \GraphiteSystem\Metrics::SYSTEM_PROJECT_TOOL_TIME_CPU,
+                        \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMECPU,
                         [
                             $project, $toolJob->getLoggerTag() . "-" . $key
                         ]
