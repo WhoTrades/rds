@@ -89,11 +89,6 @@ class JsonController extends Controller
         $wtflow->save();
     }
 
-    public function actionTest()
-    {
-        var_dump(Yii::app()->params['graphite']);
-    }
-
     public function actionSetCronJobsStats()
     {
         $data = json_decode(file_get_contents("php://input"), true);
