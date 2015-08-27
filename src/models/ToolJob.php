@@ -148,12 +148,17 @@ class ToolJob extends ActiveRecord
     public function getSmallCpuUsageGraphSrc()
     {
         //https://stm-graphite.whotrades.com/render/?width=100&height=60&from=-24minutes&target=summarize(sumSeries(stats.gauges.rds.main.system.COMON.tool.ACTIVITY_STREAM_QUEUE-78A9AB09C70D.timeCpu)%2C%221min%22)&graphOnly=true
-        return "https://stm-graphite.whotrades.com/render/?width=100&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.".\Config::getInstance()->environment.".system.COMON.tool.".strtoupper($this->getLoggerTag())."-".strtoupper($this->key).".timeCpu)%2C%2215min%22)&graphOnly=true&yMin=0";
+        return "https://stm-graphite.whotrades.com/render/?width=100&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.".\Config::getInstance()->environment.".system.".strtoupper($this->getProjectName()).".tool.".strtoupper($this->getLoggerTag())."-".strtoupper($this->key).".timeCpu)%2C%2215min%22)&graphOnly=true&yMin=0";
     }
 
     public function getSmallTimeRealGraphSrc()
     {
-        return "https://stm-graphite.whotrades.com/render/?width=180&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.".\Config::getInstance()->environment.".system.COMON.tool.".strtoupper($this->getLoggerTag())."-".strtoupper($this->key).".timeReal)%2C%2215min%22)&graphOnly=true&yMin=0";
+        return "https://stm-graphite.whotrades.com/render/?width=180&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.".\Config::getInstance()->environment.".system.".strtoupper($this->getProjectName()).".tool.".strtoupper($this->getLoggerTag())."-".strtoupper($this->key).".timeReal)%2C%2215min%22)&graphOnly=true&yMin=0";
+    }
+
+    public function getProjectName()
+    {
+        return preg_replace('~-[\d.]+$~', '', $this->package);
     }
 
     /**

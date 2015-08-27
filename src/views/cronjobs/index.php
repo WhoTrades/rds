@@ -4,7 +4,7 @@ $this->pageTitle = "Фоновые процессы";
 <h1>
     <?=$this->pageTitle?>
     <small><a href="<?=$this->createUrl("cpuUsageReport")?>">CPU usage report</a></small>
-    <img src="https://stm-graphite.whotrades.com/render/?width=300&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.<?=\Config::getInstance()->environment?>.system.COMON.tool.*.timeCpu)%2C%2215min%22)&graphOnly=true&yMin=0" style="border: solid 1px #eee" />
+    <img src="https://stm-graphite.whotrades.com/render/?width=300&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.<?=\Config::getInstance()->environment?>.system.*.tool.*.timeCpu)%2C%2215min%22)&graphOnly=true&yMin=0" style="border: solid 1px #eee" />
 </h1>
 <div style="clear: both"></div>
 
