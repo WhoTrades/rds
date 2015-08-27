@@ -10,13 +10,6 @@ use \Cronjob\ConfigGenerator\MultiPeriodicCommand;
 
 class ServiceRdsTestTL1 extends ServiceRdsProdTL1
 {
-    protected function getAllCommands()
-    {
-        return array_merge(parent::getAllCommands(), [
-            new CronCommand(new PeriodicCommand(Cronjob_Tool_HardMigrationStarter::getToolCommand(['--max-duration=60'], $verbosity=1), $delay=60)),
-        ]);
-    }
-
     protected function getEnv()
     {
         return [
