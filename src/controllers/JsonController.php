@@ -98,16 +98,10 @@ class JsonController extends Controller
             return;
         }
 
-//        file_put_contents("/tmp/file.txt", '');
-
         foreach ($data as $line => $val) {
             if (!preg_match('~--sys__package=([\w-]+)-([\d.]+) --sys__key=(\w+)~', $line, $ans)) {
-                file_put_contents("/tmp/file.txt", "ERROR PARSING $line\n\n", FILE_APPEND);
                 continue;
             }
-
-//            file_put_contents("/tmp/file.txt", $line."\n", FILE_APPEND);
-//            file_put_contents("/tmp/file.txt", var_export($val, 1), FILE_APPEND);
 
             list(,$project, $version, $key) = $ans;
             $bind = [
@@ -119,8 +113,6 @@ class JsonController extends Controller
                 ':duration' => (int)$val['time'] / $val['count'],
             ];
 
-
-//            file_put_contents("/tmp/file.txt", var_export($bind, 1), FILE_APPEND);
             $row = Yii::app()->db->createCommand("SELECT * FROM cronjobs.add_cronjobs_cpu_usage(:project, :key, :cpu, :last_run, :exit_code, :duration)")->queryRow(true, $bind);
 
             $toolJob = ToolJob::model()->findByAttributes([
@@ -159,8 +151,6 @@ class JsonController extends Controller
                 'last_run_time' => date("Y-m-d H:i:s", strtotime($row['last_run_time'])),
                 'last_run_duration' => $row['last_run_duration'],
             ]);
-
-            file_put_contents("/tmp/file.txt", $line."\n\n", FILE_APPEND);
         }
 
         echo json_encode(["OK" => true]);
