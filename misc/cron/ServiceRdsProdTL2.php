@@ -4,9 +4,7 @@ use \Cronjob\ConfigGenerator\Comment;
 use \Cronjob\ConfigGenerator\MultiCronCommand;
 use \Cronjob\ConfigGenerator\CronCommand;
 use \Cronjob\ConfigGenerator\SimpleCommand;
-use \Cronjob\ConfigGenerator\PeriodicCommand;
 use \Cronjob\ConfigGenerator\MultiCommandToCron;
-use \Cronjob\ConfigGenerator\MultiPeriodicCommand;
 
 /** @example sphp dev/services/rds/misc/tools/runner.php --tool=CodeGenerate_CronjobGenerator -vv --project=service-rds --env=prod --server=1 */
 
