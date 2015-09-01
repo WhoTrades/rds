@@ -82,7 +82,13 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         }
 
         $jira = new JiraApi($this->debugLogger);
-        $ticketInfo = $jira->getTicketInfo($feature->jf_ticket);
+        try {
+            $ticketInfo = $jira->getTicketInfo($feature->jf_ticket);
+        } catch (\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
+            $this->debugLogger->error("Skip accepting ticket $feature->jf_ticket, as it was deleted");
+            $message->accepted();
+            return;
+        }
 
         if (isset($transitionMap[$message->targetBranch])) {
             if ($message->status) {
