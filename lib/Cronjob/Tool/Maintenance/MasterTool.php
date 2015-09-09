@@ -1,6 +1,6 @@
 <?php
 /**
- * @example dev/services/deploy/misc/tools/runner.php --tool=Maintenance_MasterTool -vv
+ * @example dev/services/rds/misc/tools/runner.php --tool=Maintenance_MasterTool -vv
  */
 
 use RdsSystem\Message;
@@ -74,8 +74,6 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
                 $processList[(int)$ans['pid']] = ['command' => $ans['command'], 'killed' => false];
             }
 
-            var_export($processList);
-
             foreach ($processList as $pid => $data) {
                 $this->debugLogger->message("Killing process $pid");
                 $processList[$pid]['killed'] = posix_kill($pid, $task->signal);
@@ -83,6 +81,46 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
 
             $model->sendToolKillResult(
                 new RdsSystem\Message\Tool\KillResult($task->getUniqueTag(), $server, $processList)
+            );
+
+            $this->debugLogger->message("Message accepted");
+            $task->accepted();
+        });
+
+        $model->readToolGetToolLogTail(false, function(RdsSystem\Message\Tool\ToolLogTail $task) use ($server, $model, $commandExecutor) {
+            $this->debugLogger->message("Received message of tail ");
+
+            $filename = "/var/log/storelog/cronjobs/".$task->tag.".log";
+
+            if (!file_exists($filename)) {
+                $this->debugLogger->message("File $filename not found");
+                $model->sendToolGetToolLogTailResult(
+                    new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), false, $server, "No logs")
+                );
+
+                $this->debugLogger->message("Message accepted");
+                $task->accepted();
+                return;
+            }
+
+
+            $command = "tail -n ".(int)$task->linesCount." ".escapeshellarg($filename);
+            try {
+                $text = $commandExecutor->executeCommand($command);
+            } catch (\RdsSystem\lib\CommandExecutorException $e) {
+
+                $this->debugLogger->error("Error occured during command execution: ".$e->getMessage());
+                $model->sendToolGetToolLogTailResult(
+                    new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), false, $server, $e->getMessage())
+                );
+
+                $this->debugLogger->message("Message accepted");
+                $task->accepted();
+                return;
+            }
+
+            $model->sendToolGetToolLogTailResult(
+                new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), true, $server, $text)
             );
 
             $this->debugLogger->message("Message accepted");

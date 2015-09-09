@@ -20,6 +20,10 @@
                     $.post($("#release-request-use-form").attr("action"), $("#release-request-use-form").serialize()).done(function(){
                         $("#release-request-use-form-modal").modal("hide");
                         $("button", $(form)).attr("disabled", false);
+                    }).error(function(e){
+                        console.log(e);
+                        $("#release-request-use-form-modal").modal("hide");
+                        $("button", $(form)).attr("disabled", false);
                     });
                 } else {
                     $("button", $(form)).attr("disabled", false);

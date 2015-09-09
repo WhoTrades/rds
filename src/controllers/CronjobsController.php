@@ -2,6 +2,7 @@
 
 class CronJobsController extends Controller
 {
+    const TAIL_LINES_COUNT = 100;
     const KILL_SIGNAL = 15; //SIGTERM
 
     public function filters()
@@ -165,6 +166,36 @@ class CronJobsController extends Controller
         });
 
         $this->renderPartial('getInfo', ['result' => $data]);
+    }
+
+    public function actionLog($tag)
+    {
+        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+
+        $servers = [];
+        $result = [];
+        $res = null;
+
+        do {
+            if (!empty($res)) {
+                $servers[] = $res->server;
+                $result[] = $res;
+            }
+
+            $res = $model->sendToolGetToolLogTail(
+                new RdsSystem\Message\Tool\ToolLogTail($tag, self::TAIL_LINES_COUNT), RdsSystem\Message\Tool\ToolLogTailResult::type(), 1
+            );
+        } while (!in_array($res->server, $servers));
+
+        $data = array_map(function(RdsSystem\Message\Tool\ToolLogTailResult $val){
+            return ['server' => $val->server, 'log' => $val->result];
+        }, $result);
+
+        usort($data, function($a, $b){
+            return $a['server'] > $b['server'];
+        });
+
+        $this->renderPartial('log', ['result' => $data]);
     }
 
     public function actionTruncateCpuUsage()

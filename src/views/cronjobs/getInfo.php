@@ -6,10 +6,10 @@ if (empty($result)) {
 $ok = false;
 $text = "<h4>Информация о процессах</h4>";
 foreach ($result as $val) {
-    $text .= "<strong>{$val['server']}</strong>\n";
+    $text .= "<strong>{$val['server']}</strong><br />\n";
     if ($val['processes']) {
         foreach ($val['processes'] as $pid => $command) {
-            $text .= "<br />$pid: $command\n";
+            $text .= "$pid: $command<br />\n";
             $ok = true;
         }
     } else {

@@ -17,23 +17,11 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $pullRequestTitle = 'test';
-        $pullRequestDescription = 'test';
-        $pullRequestProject = 'WT';
-        $pullRequestRepo = 'sparta';
-        $fromBranch = 'staging';
-        $toBranch = 'master';
-        $assignee = ['anaumenko'];
-        $stash = new \CompanyInfrastructure\StashApi($this->debugLogger);
-        $data = $stash->createPullRequest($pullRequestTitle, $pullRequestDescription, $pullRequestProject, $pullRequestRepo, $fromBranch, $toBranch, $assignee);
-        $url = "http://stash".$data['link']['url'];
+        $tag = 'activity_stream_queue';
+        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
 
-        $this->debugLogger->message($url);
-
-        return;
-
-
-        $jira = new \JiraApi($this->debugLogger);
-        $jira->setCustomField('WTTES-47', 'customfield_15000', 'http://lenta.ru/');
+        $res = $model->sendToolGetToolLogTail(
+            new RdsSystem\Message\Tool\ToolLogTail($tag, 10), RdsSystem\Message\Tool\ToolLogTailResult::type(), 1
+        );
     }
 }
