@@ -2,7 +2,6 @@
 
 class CronJobsController extends Controller
 {
-    const TAIL_LINES_COUNT = 100;
     const KILL_SIGNAL = 15; //SIGTERM
 
     public function filters()
@@ -62,8 +61,6 @@ class CronJobsController extends Controller
             /** @var $cpuUsage CpuUsage*/
             $cpuUsagesOrdered[$cpuUsage->key][$cpuUsage->project_name] = $cpuUsage;
         }
-
-
 
         $this->render('index', [
             'cronJobs' => $cronJobs,
@@ -168,8 +165,9 @@ class CronJobsController extends Controller
         $this->renderPartial('getInfo', ['result' => $data]);
     }
 
-    public function actionLog($tag)
+    public function actionLog($tag, $lines, $plainText = false)
     {
+        $lines = min((int)$lines, 100);
         $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
 
         $servers = [];
@@ -183,7 +181,7 @@ class CronJobsController extends Controller
             }
 
             $res = $model->sendToolGetToolLogTail(
-                new RdsSystem\Message\Tool\ToolLogTail($tag, self::TAIL_LINES_COUNT), RdsSystem\Message\Tool\ToolLogTailResult::type(), 1
+                new RdsSystem\Message\Tool\ToolLogTail($tag, $lines), RdsSystem\Message\Tool\ToolLogTailResult::type(), 1
             );
         } while (!in_array($res->server, $servers));
 
@@ -195,7 +193,10 @@ class CronJobsController extends Controller
             return $a['server'] > $b['server'];
         });
 
-        $this->renderPartial('log', ['result' => $data]);
+        $this->renderPartial('log', [
+            'result' => $data,
+            'plainText' => $plainText,
+        ]);
     }
 
     public function actionTruncateCpuUsage()

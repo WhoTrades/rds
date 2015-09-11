@@ -54,15 +54,28 @@ $this->pageTitle = "Фоновые процессы";
                     <?foreach($val['cronJobs'] as $toolJob){?>
                         <?/** @var $toolJob ToolJob*/?>
                         <?if ($toolJob->group !== $group) {?>
-                            <tr class="group-splitter">
+                            <tr class="group-splitter active-tr" id="group-<?=$groupNormalized = preg_replace('~\W+~', '-', $toolJob->group)?>">
                                 <td colspan="10">
+                                    <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_LINK, [
+                                        'class' => 'active-link',
+                                        'style' => 'cursor: pointer',
+                                        'border' => 'solid 1px #eee',
+                                        'padding' => '3px',
+                                    ]), "#group-$groupNormalized", 'Постоянная ссылка на процесс')?>
+
                                     <b><a href="#<?=$id = preg_replace('~\W+~sui', '-', $toolJob->group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
                                 </td>
                             </tr>
                             <?$group = $toolJob->group;?>
                         <?}?>
-                        <tr>
+                        <tr id="<?=$toolJob->getLoggerTag()?>" class="active-tr">
                             <td style="font-family: Menlo, Monaco, Consolas, monospace">
+                                <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_LINK, [
+                                    'class' => 'active-link',
+                                    'style' => 'cursor: pointer',
+                                    'border' => 'solid 1px #eee',
+                                    'padding' => '3px',
+                                ]), "#".$toolJob->getLoggerTag(), 'Постоянная ссылка на процесс')?>
                                 <span class="command">
                                     <?=preg_replace('~(--(?:tool|queue-name|event-processor)=)(\S*)~', '$1<span class="highlight" style="color: blue">$2</span>', preg_replace('~2>&1.*~', '', $toolJob->command))?>
                                 </span>
@@ -71,8 +84,10 @@ $this->pageTitle = "Фоновые процессы";
                                 Log: <input type="text"
                                        value="/var/log/storelog/cronjobs/<?=$tag?>.log"
                                        onclick="this.select()"
-                                       style="width: 85%" />
-                                <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>">tail&nbsp;-<?=CronJobsController::TAIL_LINES_COUNT?></button><br /><br />
+                                       style="width: 60%" />
+                                <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>" rel="30">tail&nbsp;-30</button>
+                                <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>" rel="100">tail&nbsp;-100</button>
+                                <button style="width: 10%" onclick="window.open('/cronjobs/log/?tag=<?=$tag?>&lines=1000&plainText=1')">tail&nbsp;-1000</button><br /><br />
                             </td>
                             <td>
                                 <div style="white-space: nowrap">
@@ -205,7 +220,11 @@ $this->pageTitle = "Фоновые процессы";
             $('.alert', td).remove();
 
             $.ajax({
-                url: '<?=$this->createUrl('log')?>?tag='+$(this).attr('tag')
+                url: '<?=$this->createUrl('log')?>',
+                data: {
+                    tag: $(this).attr('tag'),
+                    lines: $(this).attr('rel')
+                }
             }).done(function(text){
                 that.disabled = false;
                 $('.alert', td).remove();
@@ -251,4 +270,27 @@ $this->pageTitle = "Фоновые процессы";
             }, 500);
         });
     });
+
+
+    if (document.location.toString().indexOf('#') != -1) {
+        var id = a = document.location.toString().replace(/.*#(.*)/, '$1');
+        $('#' + id).addClass('selected');
+    }
+
+    $('.active-link').click(function(){
+        console.log(this);
+        if ($(this).parents('tr:first').hasClass('selected')) {
+            $(this).parents('tr:first').removeClass('selected');
+        } else {
+            $('.active-tr').removeClass('selected');
+            $(this).parents('tr:first').addClass('selected');
+        }
+        document.location = document.location.toString().replace(/.*#(.*)/, '') + '#' + $(this).parents('tr:first').attr('id');
+    });
 </script>
+
+<style>
+    tr.selected {
+        background-color: #ecf8be !important;
+    }
+</style>
