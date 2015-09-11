@@ -167,7 +167,7 @@ class CronJobsController extends Controller
 
     public function actionLog($tag, $lines, $plainText = false)
     {
-        $lines = min((int)$lines, 100);
+        $lines = min((int)$lines, 1000);
         $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
 
         $servers = [];
