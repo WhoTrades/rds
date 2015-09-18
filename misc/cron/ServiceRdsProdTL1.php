@@ -55,17 +55,26 @@ class ServiceRdsProdTL1
 
             new Comment("Maintenance tools"),
             new CronCommand(Cronjob_Tool_AsyncReader_MaintenanceTool::getToolCommand(['--max-duration=60'], $verbosity=1), '* * * * * *', 'rds_maintenance_tool'),
-
             new CronCommand(Cronjob_Tool_MaintenanceToolRun::getToolCommand(['--tool-name=systemTest --env=main'], $verbosity=1), '8 */10 * * * *', 'rds_maintenance_tool_run-system'),     //an: для проверки работоспособности системы запуска тулов
+
+            new Comment("Управляющий тул (убивает другие тулы)"),
             new CronCommand(Cronjob_Tool_Maintenance_MasterTool::getToolCommand(['--max-duration=60'], $verbosity=1), '* * * * * *', 'rds_master_tool'),
 
-            new Comment("Misc"),
+            new Comment("Лампа"),
             new CronCommand(Cronjob_Tool_RdsAlertStatus::getToolCommand([], $verbosity=1), '*/10 * * * * *', 'rds_alert_status'),
+
+            new Comment("Ротация логом тяжелых миграций"),
             new CronCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity=1), '*/28 * * * * *', 'rds_hard_migration_log_rotator'),
+
+            new Comment("Удаление старых веток из git"),
             new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity=3), '37 10 0 * * *', 'rds_git_drop_feature_branch'),
 
-            new Comment("Notification"),
+            new Comment("Уведомления о релизах"),
             new MultiCommandToCron(\PgQ_EventProcessor_RdsJiraNotificationQueue::getPgqConsumer('rds_jira_notification_queue', 'rds_jira_notification_queue_consumer', 'simple', 'DSN_DB4', 1, [], 3), '* * * * * *', 'rds_jira_notification_queue'),
+
+            new Comment("Пересборка веток"),
+            new CronCommand(Cronjob_Tool_Git_RebuildBranch::getToolCommand(['--branch=develop'], $verbosity=3), '39 10 20 * * *', 'rds_rebuild_develop'),
+            new CronCommand(Cronjob_Tool_Git_RebuildBranch::getToolCommand(['--branch=staging'], $verbosity=3), '39 30 20 * * *', 'rds_rebuild_staging'),
         ];
     }
 

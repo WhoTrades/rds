@@ -1,4 +1,7 @@
 <?php
+//an: Так как тестового гита, жиры, тимсити и т.д. у нас нет - то все интеграционные штуки по умолчанию отключаем.
+// Включаем только на время отладки в config.local во время отладки и в config.local на прод контуре
+
 $this->serviceRds['jira']['createTags'] = false;
 $this->serviceRds['jira']['tagTickets'] = false;
 $this->serviceRds['jira']['transitionTickets'] = false;
