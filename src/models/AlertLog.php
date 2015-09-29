@@ -8,11 +8,18 @@
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
+ * @property string $alert_detect_at
+ * @property string $alert_lamp
+ * @property string $alert_provider
  * @property string $alert_name
  * @property string $alert_status
  * @property string $alert_text
+ * @property bool $alert_ignore
+ *
+ * @method AlertLog[] findAll($condition = '', $params = array())
+ * @method AlertLog findByPk($pk,$condition='',$params=array())
  */
-class AlertLog extends CActiveRecord
+class AlertLog extends ActiveRecord
 {
     const WTS_LAMP_NAME = 'red_lamp_wts';
 
@@ -28,8 +35,7 @@ class AlertLog extends CActiveRecord
 
     public function afterConstruct() {
         if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
+            $this->alert_detect_at = date("r");
         }
         return parent::afterConstruct();
     }
@@ -42,13 +48,15 @@ class AlertLog extends CActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, alert_name, alert_status, alert_version', 'required'),
+            array('obj_created, obj_modified, alert_detect_at, alert_lamp, alert_provider, alert_name, alert_status', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('alert_name, alert_status', 'length', 'max'=>16),
+            array('alert_lamp', 'length', 'max'=>32),
+            array('alert_provider', 'length', 'max'=>64),
+            array('alert_name', 'length', 'max'=>256),
             array('alert_text', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, alert_name, alert_status, alert_text, alert_version', 'safe', 'on'=>'search'),
+            array('obj_id, obj_created, obj_modified, obj_status_did, alert_lamp, alert_provider, alert_name, alert_status, alert_text', 'safe', 'on'=>'search'),
         );
     }
 
@@ -73,6 +81,9 @@ class AlertLog extends CActiveRecord
             'obj_created' => 'Obj Created',
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
+            'alert_detect_at' => 'Detect at',
+            'alert_lamp' => 'Lamp Name',
+            'alert_provider' => 'Provider Name',
             'alert_name' => 'Alert Name',
             'alert_status' => 'Alert Status',
             'alert_text' => 'Text',
@@ -101,14 +112,27 @@ class AlertLog extends CActiveRecord
         $criteria->compare('obj_created',$this->obj_created,true);
         $criteria->compare('obj_modified',$this->obj_modified,true);
         $criteria->compare('obj_status_did',$this->obj_status_did);
+        $criteria->compare('alert_lamp',$this->alert_name,true);
+        $criteria->compare('alert_provider',$this->alert_name,true);
         $criteria->compare('alert_name',$this->alert_name,true);
         $criteria->compare('alert_status',$this->alert_status,true);
         $criteria->compare('alert_text',$this->alert_text,true);
-        $criteria->compare('alert_version',$this->alert_version);
 
         return new CActiveDataProvider($this, array(
             'criteria'=>$criteria,
         ));
+    }
+
+    /**
+     * @param string $status
+     */
+    public function setStatus($status)
+    {
+        $this->alert_status = $status;
+        if($status === self::STATUS_ERROR) {
+            $this->alert_detect_at = date('r');
+        }
+        $this->save();
     }
 
     /**

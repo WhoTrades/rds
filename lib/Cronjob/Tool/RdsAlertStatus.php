@@ -2,21 +2,10 @@
 use RdsSystem\Message;
 
 /**
- * @example dev/services/rds/misc/tools/runner.php --tool=RdsAlertStatus -vv
+ * @example dev/services/rds/misc/tools/runner.php --tool=RdsAlertStatus2 -vv
  */
 class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 {
-    const TIMEOUT = 60;
-
-    /**
-     * Какие очереди надо игнорировать
-     *
-     * @var array
-     */
-    protected $queueIgnore = array(
-        'PGQ TaskOneTime queue (Crm Slow)',
-        'ES: AccountPortfolio',
-    );
 
     public static function getCommandLineSpec()
     {
@@ -27,106 +16,118 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
     {
         if (!Yii::app()->params['alertLampEnabled']) {
             $this->debugLogger->message("Lamp disabled");
-            return 0;
+            return;
         }
 
-        $versions = ReleaseVersion::model()->findAll();
+        foreach ($this->getDataProviderList() as $lampName => $dataProvider) {
+            /** @var \AlertLog\AlertData[] $errors */
+            $errors = [];
+            foreach ($dataProvider->getData() as $alertData) {
+                if($alertData->isError()) {
+                    $errors[$alertData->getName()] = $alertData;
 
-        $host = parse_url(\Config::getInstance()->phpLogsSystem['service']['location'], PHP_URL_HOST);
-        $httpSender = new \ServiceBase\HttpRequest\RequestSender($this->debugLogger);
-        $url = "http://$host/status/list";
-        $json = $httpSender->getRequest($url, ['format' => 'json'], self::TIMEOUT);
-        $data = json_decode($json, true);
-
-        if (!$data) {
-            $this->debugLogger->error("Invalid json received from $url");
-            return 1;
-        }
-
-        $errors = [];
-        foreach ($data['result']['data'] as $name => $val) {
-            if (in_array($name, $this->queueIgnore)) {
-                continue;
+                    $this->debugLogger->error("Error with {$alertData->getName()}, {$alertData->getText()}");
+                }
             }
 
-            if (empty($val['data']) || (isset($val['data']['result']['data']) && empty($val['data']['result']['data']))) {
-                continue;
-            }
-
-            $errors[] = "Error with $name, url: {$val['url']}";
-        }
-
-        foreach ($errors as $error) {
-            $this->debugLogger->message($error);
-        }
-
-
-        foreach ($versions as $version) {
-            $this->debugLogger->message("Processing release-$version->rv_version");
-            /** @var $version ReleaseVersion */
-
-            $text = implode("<br />", $errors);
-            $status = $text ? AlertLog::STATUS_ERROR : AlertLog::STATUS_OK;
             $c = new CDbCriteria();
-            $c->compare('alert_name', AlertLog::WTS_LAMP_NAME);
-            $c->compare('alert_version', $version->rv_version);
-            $c->order = 'obj_id desc';
-            /** @var $alertLog AlertLog */
-            $alertLog = AlertLog::model()->find($c);
+            $c->compare('alert_lamp', $lampName);
+            $c->compare('alert_provider', $dataProvider->getName());
+            $alertLog = AlertLog::model()->findAll($c);
 
-            //an: Вырезаем номер билда, так как он будет постоянно меняться
-            if (empty($alertLog) || preg_replace('~\?buildId=\d+~', '', $alertLog->alert_text) != preg_replace('~\?buildId=\d+~', '', $text) || $alertLog->alert_status != $status) {
-                $this->debugLogger->message("Adding new record, status=$status, text=$text");
+            foreach($alertLog as $alert) {
+                if(isset($errors[$alert->alert_name])) {
+                    if($alert->alert_status !== AlertLog::STATUS_ERROR) {
+                        $alert->setStatus(AlertLog::STATUS_ERROR);
+                        $this->sendEmailError($alert);
+                    }
+                    unset($errors[$alert->alert_name]);
+                } else {
+                    if($alert->alert_status !== AlertLog::STATUS_OK) {
+                        $alert->setStatus(AlertLog::STATUS_OK);
+                        $this->sendEmailOK($alert);
+                    }
+                }
+            }
+
+            foreach ($errors as $error) {
                 $new = new AlertLog();
                 $new->attributes = [
-                    'alert_name' => AlertLog::WTS_LAMP_NAME,
-                    'alert_text' => $text,
-                    'alert_status' => $status,
-                    'alert_version' => $version->rv_version,
+                    'alert_lamp' => $lampName,
+                    'alert_provider' => $dataProvider->getName(),
+                    'alert_name' => $error->getName(),
+                    'alert_text' => $error->getText(),
+                    'alert_status' => $error->isError() ? AlertLog::STATUS_ERROR : AlertLog::STATUS_OK,
                 ];
-                if (!$new->save()) {
-                    $this->debugLogger->error("Can't save alertLog: " . json_encode($new->errors));
-                }
 
-                $receiver = $status == AlertLog::STATUS_OK
-                    ? \Config::getInstance()->serviceRds['alerts']['lampOffEmail']
-                    : \Config::getInstance()->serviceRds['alerts']['lampOnEmail'];
+                $new->save();
 
-                $mailHeaders = "From: $receiver\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=utf-8";
-
-                if ($status != AlertLog::STATUS_OK) {
-                    $subject = "Лаг в очередях № $new->obj_id, лампочка $new->alert_name";
-                    $prev = date_default_timezone_get();
-                    date_default_timezone_set(AlertController::TIMEZONE);
-                    $text = "Ошибки: $text<br />\n";
-                    if (AlertController::canBeLampLightedByTimeRanges()) {
-                        $text .= "Лампа загорится через 5 минут в " . date("Y.m.d H:i:s", strtotime(AlertController::ALERT_TIMEOUT)) . " МСК<br />
-                        Взять ошибку в работу - http://rds.whotrades.net/alert/ (лампа погаснет на 10 минут)
-                        \n";
-                    } else {
-                        $text .= "Лампа загорится в " . AlertController::ALERT_START_HOUR . ":00 МСК<br />\n";
-                    }
-                    date_default_timezone_set($prev);
-                    if (preg_replace('~\?buildId=\d+~', '', $text) != preg_replace('~\?buildId=\d+~', '', $alertLog->alert_text)) {
-                        $this->debugLogger->message("Sending alert email");
-                        mail($receiver, $subject, $text, $mailHeaders);
-                    }
-                } else {
-                    $subject = "Лаг в очередях № $alertLog->obj_id, лампочка $alertLog->alert_name";
-                    $this->debugLogger->message("Sending ok email");
-                    $secondsTotal = time() - strtotime($alertLog->obj_created . " " . AlertController::ALERT_TIMEOUT);
-                    echo $secondsTotal . "\n";
-                    $text = "Лампа выключена, ошибок больше нет<br />\n";
-                    if ($secondsTotal > 0) {
-                        date_default_timezone_set("GMT");
-                        $text .= "Лампа горела на протяжении " . date("H:i:s", $secondsTotal) . " часов <br />\n";
-                        date_default_timezone_set($prev);
-                    } else {
-                        $text .= "Лампа была потушена ещё до зажигания!<br />\n";
-                    }
-                    mail($receiver, $subject, $text, $mailHeaders);
-                }
+                $this->sendEmailError($new);
             }
         }
+    }
+
+    /**
+     * Отправка письма о появлении ошибки
+     *
+     * @param AlertLog $alertLog
+     */
+    private function sendEmailError(AlertLog $alertLog)
+    {
+        $subject = "Лаг в очередях \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
+        $text = "$alertLog->alert_text<br />\n";
+
+        if (AlertController::canBeLampLightedByTimeRanges()) {
+            $prev = date_default_timezone_get();
+            date_default_timezone_set(AlertController::TIMEZONE);
+            $text .= "Лампа загорится через 5 минут в " . date("Y.m.d H:i:s", strtotime(AlertController::ALERT_TIMEOUT)) . " МСК<br />
+                        Взять ошибку в работу - http://rds.whotrades.net/alert/ (лампа погаснет на 10 минут)
+                        \n";
+            date_default_timezone_set($prev);
+        } else {
+            $text .= "Лампа загорится в " . AlertController::ALERT_START_HOUR . ":00 МСК<br />\n";
+        }
+
+        $receiver = \Config::getInstance()->serviceRds['alerts']['lampOnEmail'];
+        $this->sendEmail($subject, $text, $receiver);
+    }
+
+    /**
+     * Отпарвка письма о пропадании ошибки
+     *
+     * @param AlertLog $alertLog
+     */
+    private function sendEmailOK(AlertLog $alertLog)
+    {
+        $subject = "Лаг в очередях \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
+        $text = "Лаг пропал, ошибок больше нет<br />\n";
+        $receiver = \Config::getInstance()->serviceRds['alerts']['lampOffEmail'];
+        $this->sendEmail($subject, $text, $receiver);
+    }
+
+    /**
+     * Отправка письма
+     *
+     * @param string $subject тема письма
+     * @param string $text текст письма
+     * @param string $receiver адрес получателя
+     */
+    private function sendEmail($subject, $text, $receiver)
+    {
+        $mailHeaders = "From: $receiver\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=utf-8";
+
+        $this->debugLogger->message("Sending alert email");
+        mail($receiver, $subject, $text, $mailHeaders);
+    }
+
+
+    /**
+     * @return \AlertLog\IAlertDataProvider[]
+     */
+    private function getDataProviderList()
+    {
+        return [
+            AlertLog::WTS_LAMP_NAME => new \AlertLog\PhpLogsDataProvider($this->debugLogger),
+        ];
     }
 }

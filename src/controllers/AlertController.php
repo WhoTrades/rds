@@ -22,12 +22,30 @@ class AlertController extends Controller
             $this->redirect("/alert/");
         }
 
+        if (!empty($_POST['ignore'])) {
+            foreach($_POST['ignore'] as $id => $action) {
+                $alertLog = AlertLog::model()->findByPk($id);
+
+                if($alertLog) {
+                    $alertLog->alert_ignore = ($action === 'add');
+                    $alertLog->save();
+                }
+            }
+            $this->redirect("/alert/");
+        }
+
+        $lamps = [];
+
+        foreach ([AlertLog::WTS_LAMP_NAME] as $lampName) {
+            $lamps[$lampName] = [
+                'status' => $this->getLampStatus($lampName),
+                'errors' => $this->getLampErrors($lampName),
+                'ignores' => $this->getLampIgnores($lampName),
+            ];
+        }
+
         $this->render('index', [
-            'lamps' => [
-                AlertLog::WTS_LAMP_NAME => [
-                    'status' => $this->getLampStatus(AlertLog::WTS_LAMP_NAME),
-                ],
-            ],
+            'lamps' => $lamps,
         ]);
     }
 
@@ -56,21 +74,56 @@ class AlertController extends Controller
             return false;
         }
         $result = false;
-        $versions = ReleaseVersion::model()->findAll();
-        foreach ($versions as $version) {
-            /** @var $version ReleaseVersion */
-            $c = new CDbCriteria();
-            $c->compare('alert_name', $lampName);
-            $c->compare('alert_version', $version->rv_version);
-            $c->order = 'obj_id desc';
-            $last = AlertLog::model()->find($c);
-            $var = "{$lampName}_timeout";
 
-            if ($last && \RdsDbConfig::get()->$var < date('Y-m-d H:i:s')) {
-                $result = $result || (strtotime($last->obj_created) < strtotime('now -'.self::ALERT_TIMEOUT) && $last->alert_status == AlertLog::STATUS_ERROR);
-            }
+        $timeout = \RdsDbConfig::get()->{$lampName."_timeout"};
+
+        if ($timeout > date('Y-m-d H:i:s')) {
+            return $result;
+        }
+
+        $errors = $this->getLampErrors($lampName);
+
+        foreach ($errors as $error) {
+            $result = $result || (strtotime($error->alert_detect_at) < strtotime('now -'.self::ALERT_TIMEOUT));
         }
 
         return $result;
+    }
+
+    /**
+     * Список ошибок для данной лампой
+     *
+     * @param string $lampName название лампы
+     *
+     * @return AlertLog[]
+     */
+    private function getLampErrors($lampName)
+    {
+        $c = new CDbCriteria();
+        $c->compare('alert_lamp', $lampName);
+        $c->compare('alert_status', AlertLog::STATUS_ERROR);
+        $c->addCondition('NOT alert_ignore');
+
+        $alertLog = AlertLog::model()->findAll($c);
+
+        return $alertLog;
+    }
+
+    /**
+     * Список событий, которые игнорируются данной лампой
+     *
+     * @param string $lampName название лампы
+     *
+     * @return AlertLog[]
+     */
+    private function getLampIgnores($lampName)
+    {
+        $c = new CDbCriteria();
+        $c->compare('alert_lamp', $lampName);
+        $c->addCondition('alert_ignore');
+
+        $alertLog = AlertLog::model()->findAll($c);
+
+        return $alertLog;
     }
 }
