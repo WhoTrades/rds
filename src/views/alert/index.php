@@ -26,7 +26,7 @@
                             <form method="post">
                             <? foreach($lamp['errors'] as $error) {?>
                                 <p class="text-danger">
-                                    <button type="submit" name="ignore[<?= $error->obj_id ?>]" value="add" class="btn btn-xs glyphicon glyphicon-pause"></button>
+                                    <button type="submit" name="ignore[<?= $error->obj_id ?>]" value="+10 years" class="btn btn-xs glyphicon glyphicon-pause"></button>
                                     <?= $error->alert_name?>
                                 </p>
                             <? } ?>
@@ -39,8 +39,9 @@
                             <form method="post">
                             <? foreach($lamp['ignores'] as $ignore) {?>
                                 <p class="text-<?= $ignore->alert_status === AlertLog::STATUS_ERROR ? 'danger' : 'success'?>">
-                                    <button type="submit" name="ignore[<?= $ignore->obj_id ?>]" value="remove" class="btn btn-xs glyphicon glyphicon-play"></button>
+                                    <button type="submit" name="ignore[<?= $ignore->obj_id ?>]" value="-1 minutes" class="btn btn-xs glyphicon glyphicon-play"></button>
                                     <?= $ignore->alert_name?>
+                                    <? /* (до <span class="label label-info"><?= $ignore->alert_ignore_timeout ?></span>) */ ?>
                                 </p>
                             <? } ?>
                             </form>

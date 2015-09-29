@@ -14,7 +14,7 @@
  * @property string $alert_name
  * @property string $alert_status
  * @property string $alert_text
- * @property bool $alert_ignore
+ * @property string $alert_ignore_timeout
  *
  * @method AlertLog[] findAll($condition = '', $params = array())
  * @method AlertLog findByPk($pk,$condition='',$params=array())
@@ -36,6 +36,7 @@ class AlertLog extends ActiveRecord
     public function afterConstruct() {
         if ($this->isNewRecord) {
             $this->alert_detect_at = date("r");
+            $this->alert_ignore_timeout = date("r");
         }
         return parent::afterConstruct();
     }

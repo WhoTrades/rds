@@ -23,11 +23,11 @@ class AlertController extends Controller
         }
 
         if (!empty($_POST['ignore'])) {
-            foreach($_POST['ignore'] as $id => $action) {
+            foreach($_POST['ignore'] as $id => $time) {
                 $alertLog = AlertLog::model()->findByPk($id);
 
                 if($alertLog) {
-                    $alertLog->alert_ignore = ($action === 'add');
+                    $alertLog->alert_ignore_timeout = date(DATE_ISO8601, strtotime($time));
                     $alertLog->save();
                 }
             }
@@ -39,6 +39,7 @@ class AlertController extends Controller
         foreach ([AlertLog::WTS_LAMP_NAME] as $lampName) {
             $lamps[$lampName] = [
                 'status' => $this->getLampStatus($lampName),
+                // 'timeout' => $this->getLampTimeout($lampName),
                 'errors' => $this->getLampErrors($lampName),
                 'ignores' => $this->getLampIgnores($lampName),
             ];
@@ -75,9 +76,9 @@ class AlertController extends Controller
         }
         $result = false;
 
-        $timeout = \RdsDbConfig::get()->{$lampName."_timeout"};
+        $lampTimeout = $this->getLampTimeout($lampName);
 
-        if ($timeout > date('Y-m-d H:i:s')) {
+        if ($lampTimeout > date('Y-m-d H:i:s')) {
             return $result;
         }
 
@@ -102,7 +103,9 @@ class AlertController extends Controller
         $c = new CDbCriteria();
         $c->compare('alert_lamp', $lampName);
         $c->compare('alert_status', AlertLog::STATUS_ERROR);
-        $c->addCondition('NOT alert_ignore');
+        $c->compare('alert_ignore_timeout', '<'.date(DATE_ISO8601));
+
+        $c->order = 'alert_detect_at DESC';
 
         $alertLog = AlertLog::model()->findAll($c);
 
@@ -120,10 +123,24 @@ class AlertController extends Controller
     {
         $c = new CDbCriteria();
         $c->compare('alert_lamp', $lampName);
-        $c->addCondition('alert_ignore');
+        $c->compare('alert_ignore_timeout', '>'.date(DATE_ISO8601));
+
+        $c->order = 'alert_ignore_timeout ASC';
 
         $alertLog = AlertLog::model()->findAll($c);
 
         return $alertLog;
+    }
+
+    /**
+     * Время, до которого выключена лампа
+     *
+     * @param string $lampName
+     *
+     * @return string
+     */
+    private function getLampTimeout($lampName)
+    {
+        return \RdsDbConfig::get()->{$lampName . "_timeout"};
     }
 }
