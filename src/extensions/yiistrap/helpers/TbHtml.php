@@ -24,7 +24,8 @@ class TbHtml extends CHtml // required in order to access the protected methods 
     const TEXT_ALIGN_NOWRAP = 'nowrap';
 
     const TEXT_COLOR_DEFAULT = '';
-    const TEXT_COLOR_WARNING = 'warning';
+    // const TEXT_COLOR_WARNING = 'warning'; // dg: no more
+    const TEXT_COLOR_DANGER = 'danger';
     const TEXT_COLOR_ERROR = 'error';
     const TEXT_COLOR_INFO = 'info';
     const TEXT_COLOR_SUCCESS = 'success';

@@ -6,51 +6,62 @@
             <td><img src="/images/alarm.png" class="<?=$lamp['status'] ? 'status-on' : 'status-off'?>" /></td>
             <td>
                 <?if ($lamp['status']) {?>
-                    <form method="post">
-                        <button type="submit" name="disable[<?=$name?>]" value="1" class="btn btn-default">
-                            Остановить на 10 минут
-                        </button>
-                    </form>
+                    <?= TbHtml::form() ?>
+                        <?= TbHtml::submitButton('Остановить на 10 минут', [ 'name' => "disable[$name]", 'value' => 1 ]) ?>
+                    <?= TbHtml::endForm() ?>
                 <?}?>
             </td>
         </tr>
         <tr>
             <td colspan="3">
+                <?= TbHtml::form() ?>
                 <table class="table table-bordered">
                     <tr>
-                        <td>Errors</td>
-                        <td>Ignore</td>
+                        <td>Ошибки</td>
+                        <td>Игнорируемые</td>
                     </tr>
                     <tr>
                         <td>
-                            <form method="post">
                             <? foreach($lamp['errors'] as $error) {?>
-                                <p class="text-danger">
-                                    <button type="submit" name="ignore[<?= $error->obj_id ?>]" value="+10 years" class="btn btn-xs glyphicon glyphicon-pause"></button>
-                                    <?= $error->alert_name?>
-                                </p>
+                                <?= TbHtml::em(
+                                    TbHtml::submitButton(TbHtml::icon(TbHtml::ICON_PAUSE), [
+                                        'name' => "ignore[$error->obj_id]",
+                                        'value' => "+10 years",
+                                        'size' => "xs",
+                                        'color' => TbHtml::BUTTON_COLOR_DANGER,
+                                    ]) . ' ' .$error->alert_name,
+                                    ['color' => TbHtml::TEXT_COLOR_DANGER]
+                                )?>
                             <? } ?>
-                            </form>
                             <? if (empty($lamp['errors'])) { ?>
-                                <p class="label label-warning">None</p>
+                                <?= TbHtml::labelTb('None', ['color' => TbHtml::LABEL_COLOR_WARNING]) ?>
                             <? } ?>
                         </td>
                         <td>
-                            <form method="post">
                             <? foreach($lamp['ignores'] as $ignore) {?>
-                                <p class="text-<?= $ignore->alert_status === AlertLog::STATUS_ERROR ? 'danger' : 'success'?>">
-                                    <button type="submit" name="ignore[<?= $ignore->obj_id ?>]" value="-1 minutes" class="btn btn-xs glyphicon glyphicon-play"></button>
-                                    <?= $ignore->alert_name?>
-                                    <? /* (до <span class="label label-info"><?= $ignore->alert_ignore_timeout ?></span>) */ ?>
-                                </p>
+                                <?= TbHtml::em(
+                                    TbHtml::submitButton(TbHtml::icon(TbHtml::ICON_PLAY), [
+                                        'name' => "ignore[$ignore->obj_id]",
+                                        'value' => "-1 minutes",
+                                        'size' => "xs",
+                                        'color' => $ignore->alert_status === AlertLog::STATUS_ERROR
+                                                    ? TbHtml::BUTTON_COLOR_DANGER
+                                                    : TbHtml::BUTTON_COLOR_SUCCESS,
+                                    ]) . ' ' .$ignore->alert_name,
+                                    [
+                                        'color' => $ignore->alert_status === AlertLog::STATUS_ERROR
+                                                    ? TbHtml::TEXT_COLOR_DANGER
+                                                    : TbHtml::TEXT_COLOR_SUCCESS
+                                    ]
+                                )?>
                             <? } ?>
-                            </form>
                             <? if (empty($lamp['ignores'])) { ?>
-                                <p class="label label-warning">None</p>
+                                <?= TbHtml::labelTb('None', ['color' => TbHtml::LABEL_COLOR_WARNING]) ?>
                             <? } ?>
                         </td>
                     </tr>
                 </table>
+                <?= TbHtml::endForm() ?>
             </td>
         </tr>
     <?}?>

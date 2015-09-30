@@ -24,9 +24,9 @@ class PhpLogsDataProvider implements IAlertDataProvider
     private $debugLogger;
 
     /**
-     * @param $debugLogger
+     * @param \ServiceBase_IDebugLogger $debugLogger
      */
-    public function __construct($debugLogger)
+    public function __construct(\ServiceBase_IDebugLogger $debugLogger)
     {
         $this->debugLogger = $debugLogger;
     }
@@ -67,7 +67,7 @@ class PhpLogsDataProvider implements IAlertDataProvider
 
             if (!$data) {
                 $this->debugLogger->error("Invalid json received from $url");
-                return;
+                throw new BadJsonException();
             }
 
             foreach ($data['result']['data'] as $name => $val) {

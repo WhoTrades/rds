@@ -2,7 +2,7 @@
 use RdsSystem\Message;
 
 /**
- * @example dev/services/rds/misc/tools/runner.php --tool=RdsAlertStatus2 -vv
+ * @example dev/services/rds/misc/tools/runner.php --tool=RdsAlertStatus -vv
  */
 class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 {
@@ -16,7 +16,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
     {
         if (!Yii::app()->params['alertLampEnabled']) {
             $this->debugLogger->message("Lamp disabled");
-            return;
+            return 0;
         }
 
         foreach ($this->getDataProviderList() as $lampName => $dataProvider) {
@@ -74,7 +74,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      */
     private function sendEmailError(AlertLog $alertLog)
     {
-        $subject = "Лаг в очередях \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
+        $subject = "Лаг в очереди \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
         $text = "$alertLog->alert_text<br />\n";
 
         if (AlertController::canBeLampLightedByTimeRanges()) {
@@ -99,7 +99,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      */
     private function sendEmailOK(AlertLog $alertLog)
     {
-        $subject = "Лаг в очередях \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
+        $subject = "Лаг в очереди \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
         $text = "Лаг пропал, ошибок больше нет<br />\n";
         $receiver = \Config::getInstance()->serviceRds['alerts']['lampOffEmail'];
         $this->sendEmail($subject, $text, $receiver);
