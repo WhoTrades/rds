@@ -89,6 +89,19 @@ class JsonController extends Controller
         $wtflow->save();
     }
 
+    public function actionGetDisabledCronjobs()
+    {
+        $c = new CDbCriteria();
+        $c->addCondition("stopped_till > NOW()");
+        $list = ToolJobStopped::model()->findAll($c);
+        $result = [];
+        foreach ($list as $val) {
+            $result[] = [$val->project_name, $val->key];
+        }
+        header("Content-type: application/javascript");
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
     public function actionSetCronJobsStats()
     {
         $data = json_decode(file_get_contents("php://input"), true);
