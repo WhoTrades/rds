@@ -7,6 +7,7 @@ $this->serviceRds['jira']['tagTickets'] = false;
 $this->serviceRds['jira']['transitionTickets'] = false;
 $this->serviceRds['jira']['checkTicketStatus'] = false;
 $this->serviceRds['jira']['mergeTasks'] = false;
+$this->serviceRds['jira']['asyncRpc'] = false;
 $this->serviceRds['stash']['createPullRequest'] = false;
 $this->environment = 'main';
 $this->serviceRds['alerts']['lampOnEmail'] = 'oops+lamp-on@whotrades.org';

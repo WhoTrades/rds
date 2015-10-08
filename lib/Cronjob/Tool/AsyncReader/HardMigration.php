@@ -52,7 +52,9 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         //an: В жиру пишем только факт накатывания миграций на прод
         if ($model->getEnv() == 'main' && $migration->migration_status != $message->status) {
             if (\Config::getInstance()->serviceRds['jira']['repostMigrationStatus']) {
-                $jira = new JiraApi($this->debugLogger);
+                /** @var $jira JiraApi */
+                $jira = new Jira\AsyncRpc($this->debugLogger);
+
                 switch ($message->status) {
                     case HardMigration::MIGRATION_STATUS_NEW:
                         //an: Это означает что миграцию пытались запустить, но миграция оказалась ещё не готова к запуску. Просто ничего не делаем
