@@ -120,22 +120,17 @@ class JsonController extends Controller
                 'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
             ]);
             if ($toolJob) {
-                $graphite = new \GraphiteSystem\Graphite(Yii::app()->params['graphite']);
-                $graphite->gauge(
+                Yii::app()->graphite->getGraphite()->gauge(
                     \GraphiteSystem\Metrics::dynamicName(
                         \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMEREAL,
-                        [
-                            $project, $toolJob->getLoggerTag() . "-" . $key
-                        ]
+                        [$project, $toolJob->getLoggerTag() . "-" . $key]
                     ),
                     $val['time'] / $val['count']
                 );
-                $graphite->gauge(
+                Yii::app()->graphite->getGraphite()->gauge(
                     \GraphiteSystem\Metrics::dynamicName(
                         \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMECPU,
-                        [
-                            $project, $toolJob->getLoggerTag() . "-" . $key
-                        ]
+                        [$project, $toolJob->getLoggerTag() . "-" . $key]
                     ),
                     ($val['CPUUser'] + $val['CPUSystem']) / $val['count']
                 );

@@ -6,7 +6,7 @@ class ActiveRecord extends CActiveRecord
             $this->obj_created = date("r");
             $this->obj_modified = date("r");
         }
-        return parent::afterConstruct();
+        parent::afterConstruct();
     }
 
     public function save($runValidation=true, $attributes=null)

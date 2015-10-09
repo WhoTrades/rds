@@ -4,7 +4,6 @@ $this->pageTitle = "Фоновые процессы";
 <h1>
     <?=$this->pageTitle?>
     <small><a href="<?=$this->createUrl("cpuUsageReport")?>">CPU usage report</a></small>
-    <img style="width: 300px; height: 60px;" src="https://stm-graphite.whotrades.com/render/?width=300&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.<?=\Config::getInstance()->environment?>.system.*.tool.*.timeCpu)%2C%2215min%22)&graphOnly=true&yMin=0" style="border: solid 1px #eee" />
 </h1>
 <div style="clear: both"></div>
 
@@ -147,7 +146,10 @@ $this->pageTitle = "Фоновые процессы";
                                     <?$cpuUsage = $cpuUsages[$toolJob->key][$toolJob->project->project_name];?>
                                     Время: <time><?=date('Y-m-d H:i:s', strtotime($cpuUsage->last_run_time))?></time><br />
                                     Продолжительность: <span class="duration"><?=$cpuUsage->last_run_duration?> сек.</span><br />
-                                    <img src="<?=$toolJob->getSmallTimeRealGraphSrc()?>" style="width: 180px; height: 60px;border: solid 1px #eee" /><br />
+                                    <a href="<?=$toolJob->getSmallTimeRealGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
+                                        <img src="<?=$toolJob->getSmallTimeRealGraphSrc(true, $width=180, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
+                                    </a>
+                                    <br />
                                     Ошибка: <span class="error-mark"><?=$cpuUsage->last_exit_code
                                         ? TbHtml::labelTb('Да', [
                                                 'color' => TbHtml::ALERT_COLOR_DANGER,
@@ -160,7 +162,10 @@ $this->pageTitle = "Фоновые процессы";
                                 <?} else {?>
                                     Время: <time>&ndash;</time><br />
                                     Продолжительность: <span class="duration">&ndash;</span><br />
-                                    <img src="<?=$toolJob->getSmallTimeRealGraphSrc()?>" style="width: 180px; height: 60px;border: solid 1px #eee" /><br />
+                                    <a href="<?=$toolJob->getSmallTimeRealGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
+                                        <img src="<?=$toolJob->getSmallTimeRealGraphSrc(true, $width=180, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
+                                    </a>
+                                    <br />
                                     Ошибка: <span class="error-mark">&ndash;</span><br />
                                 <?}?>
                             </td>
@@ -171,9 +176,11 @@ $this->pageTitle = "Фоновые процессы";
                                         : 0
                                     ?>&nbsp;сек
                                 </div>
-                                <img src="<?=$toolJob->getSmallCpuUsageGraphSrc()?>" style="width: 100px; height: 60px; border: solid 1px #eee" />
+                                <a href="<?=$toolJob->getSmallCpuUsageGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
+                                    <img src="<?=$toolJob->getSmallCpuUsageGraphSrc(true, $width=100, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
+                                </a>
+                                <br />
                             </td>
-
                         </tr>
                     <?}?>
                 </tbody>

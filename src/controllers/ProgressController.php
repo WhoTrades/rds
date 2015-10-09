@@ -42,15 +42,8 @@ class ProgressController extends Controller
      */
     private function sendGraphiteActionData($project, $build, $action, $value)
     {
-        $graphite = new Graphite(Yii::app()->params['graphite']);
-        $graphite->gauge(
-            \GraphiteSystem\Metrics::dynamicName(
-                \GraphiteSystem\Metrics::PROJECT__ACTION__TIME,
-                [
-                    $project, $action
-                ]
-            ),
-
+        Yii::app()->graphite->getGraphite()->gauge(
+            \GraphiteSystem\Metrics::dynamicName(\GraphiteSystem\Metrics::PROJECT__ACTION__TIME, [$project, $action]),
             $value
         );
     }

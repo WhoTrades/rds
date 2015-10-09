@@ -145,15 +145,32 @@ class ToolJob extends ActiveRecord
         return $ans[1];
     }
 
-    public function getSmallCpuUsageGraphSrc()
+    public function getSmallCpuUsageGraphSrc($directImageUrl = true, $width = 100, $height = 60, $graphOnly = true)
     {
-        //https://stm-graphite.whotrades.com/render/?width=100&height=60&from=-24minutes&target=summarize(sumSeries(stats.gauges.rds.main.system.COMON.tool.ACTIVITY_STREAM_QUEUE-78A9AB09C70D.timeCpu)%2C%221min%22)&graphOnly=true
-        return "https://stm-graphite.whotrades.com/render/?width=100&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.".\Config::getInstance()->environment.".system.".strtoupper($this->getProjectName()).".tool.".strtoupper($this->getLoggerTag())."-".strtoupper($this->key).".timeCpu)%2C%2215min%22)&graphOnly=true&yMin=0";
+        return $this->getGraphiteCpuStatsUrl('timeCpu', $directImageUrl, $width, $height, $graphOnly);
     }
 
-    public function getSmallTimeRealGraphSrc()
+    public function getSmallTimeRealGraphSrc($directImageUrl = true, $width = 100, $height = 60, $graphOnly = true)
     {
-        return "https://stm-graphite.whotrades.com/render/?width=180&height=60&from=-24hours&target=summarize(sumSeries(stats.gauges.rds.".\Config::getInstance()->environment.".system.".strtoupper($this->getProjectName()).".tool.".strtoupper($this->getLoggerTag())."-".strtoupper($this->key).".timeReal)%2C%2215min%22)&graphOnly=true&yMin=0";
+        return $this->getGraphiteCpuStatsUrl('timeReal', $directImageUrl, $width, $height, $graphOnly);
+    }
+
+    private function getGraphiteCpuStatsUrl($type, $directImageUrl = true, $width = 100, $height = 60, $graphOnly = true)
+    {
+        $baseUrl = Yii::app()->graphite->GUIUrl;
+        $env = Yii::app()->graphite->env;
+        $direct = $directImageUrl ? "render/" : "";
+        $loggerTag = strtoupper($this->getLoggerTag())."-".strtoupper($this->key);
+        $params = [
+            'width'     => $width,
+            'height'    => $height,
+            'from'      => '-24hours',
+            'target'    => "summarize(sumSeries(stats.gauges.rds.$env.system.".strtoupper($this->getProjectName()).".tool.".$loggerTag.".$type),'15min')",
+            'graphOnly' => json_encode($graphOnly),
+            'yMin'      => 0,
+        ];
+
+        return "{$baseUrl}{$direct}?".http_build_query($params);
     }
 
     public function getProjectName()
