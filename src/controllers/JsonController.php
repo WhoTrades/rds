@@ -111,12 +111,21 @@ class JsonController extends Controller
             return;
         }
 
+        $transaction = Yii::app()->db->beginTransaction();
+
         foreach ($data as $line => $val) {
-            if (!preg_match('~--sys__package=([\w-]+)-([\d.]+) --sys__key=(\w+)~', $line, $ans)) {
+            if (!preg_match('~--sys__package=([\w-]+)-([\d.]+)~', $line, $ans)) {
                 continue;
             }
 
-            list(,$project, $version, $key) = $ans;
+            list(,$project, $version) = $ans;
+
+            if (!preg_match('~--sys__key=(\w+)~', $line, $ans)) {
+                continue;
+            }
+
+            list(, $key) = $ans;
+
             $bind = [
                 ':project' => $project,
                 ':key' => $key,
@@ -160,6 +169,8 @@ class JsonController extends Controller
                 'last_run_duration' => $row['last_run_duration'],
             ]);
         }
+
+        $transaction->commit();
 
         echo json_encode(["OK" => true]);
     }
