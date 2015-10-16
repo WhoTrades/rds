@@ -30,7 +30,7 @@ class ServiceRdsProdTL1
             new MultiCommandToCron(\PgQ_EventProcessor_RdsJiraTicketStatus::getPgqConsumer('rds_jira_commit', 'rds_jira_ticket_status_consumer', 'simple', 'DSN_DB4', 1, [], 3), '* * * * * *', 'rds_jira_commit-ticket_status'),
             new MultiCommandToCron(\PgQ_EventProcessor_RdsJiraUse::getPgqConsumer('rds_jira_use', 'rds_jira_use_consumer', 'simple', 'DSN_DB4', 1, [], 3), '* * * * * *', 'rds_jira_use'),
             new MultiCommandToCron(\PgQ_EventProcessor_JiraMoveTicket::getPgqConsumer('rds_jira_move_ticket', 'rds_jira_move_ticket_consumer', 'simple', 'DSN_DB4', 1, [], 3), '* * * * * *', 'rds_jira_move_ticket'),
-            new MultiCommandToCron(\PgQ_EventProcessor_JiraMoveTicket::getPgqConsumer('rds_jira_async_rpc', 'rds_jira_async_rpc_consumer', 'simple', 'DSN_DB4', 1, [], 3), '* * * * * *', 'rds_jira_async_rpc'),
+            new MultiCommandToCron(\PgQ_EventProcessor_JiraAsyncRpc::getPgqConsumer('rds_jira_async_rpc', 'rds_jira_async_rpc_consumer', 'simple', 'DSN_DB4', 1, [], 3), '* * * * * *', 'rds_jira_async_rpc'),
 
             new CronCommand(Cronjob_Tool_Jira_FixVersionsRelease::getToolCommand([], $verbosity=1), '46 10 * * * *', 'rds_jira_fix_versions_release'),
             new CronCommand(Cronjob_Tool_Jira_MergeTasks::getToolCommand(['--max-duration=60'], $verbosity=1), '15 * * * * *', 'rds_jira_merge_tasks'),
