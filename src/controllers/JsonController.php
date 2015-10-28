@@ -174,5 +174,19 @@ class JsonController extends Controller
 
         echo json_encode(["OK" => true]);
     }
-}
 
+    public function actionStartTeamcityBuild()
+    {
+        $buildId = isset($_GET['build']) && trim($_GET['build']) ? html_entity_decode(strip_tags($_GET['build'])) : '';
+        $branch = isset($_GET['branch']) && trim($_GET['branch']) ? html_entity_decode(strip_tags($_GET['branch'])) : 'master';
+
+        if ($buildId) {
+            $teamCity = new CompanyInfrastructure\WtTeamCityClient();
+            $result = $teamCity->startBuild($buildId, $branch, "Teamcity build run on request");
+
+            echo json_encode(["OK" => true, 'TC_RESPONSE' => json_encode($result)]);
+        }
+
+        echo json_encode(["ERROR" => 'Wrong build name given']);
+    }
+}
