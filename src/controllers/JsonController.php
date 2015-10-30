@@ -175,7 +175,7 @@ class JsonController extends Controller
         echo json_encode(["OK" => true]);
     }
 
-    public function actionStartTeamcityBuild($buildId = '', $branch = 'master')
+    public function actionStartTeamcityBuild($buildId, $branch = 'master')
     {
         $buildId = trim($buildId) ? html_entity_decode(strip_tags($buildId)) : '';
         $branch = trim($branch) ? html_entity_decode(strip_tags($branch)) : 'master';
