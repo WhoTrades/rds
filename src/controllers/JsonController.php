@@ -175,19 +175,45 @@ class JsonController extends Controller
         echo json_encode(["OK" => true]);
     }
 
-    public function actionStartTeamcityBuild($buildId, $branch = 'master')
+    public function actionStartTeamcityBuild($issueKey, $branch = 'master')
     {
-        $buildId = trim($buildId) ? html_entity_decode(strip_tags($buildId)) : '';
         $branch = trim($branch) ? html_entity_decode(strip_tags($branch)) : 'master';
+        $issueKey = trim($issueKey) ? html_entity_decode(strip_tags($issueKey)) : '';
 
-        if ($buildId) {
-            $teamCity = new CompanyInfrastructure\WtTeamCityClient();
-            $result = $teamCity->startBuild($buildId, $branch, "Teamcity build run on request");
+        $errorMsg = 'Wrong issue key given: "'.$issueKey.'"';
 
-            echo json_encode(["OK" => true, 'TC_RESPONSE' => json_encode($result)]);
-            return;
+        if ($issueKey) {
+            $jiraApi = new JiraApi(Yii::app()->debugLogger);
+            $ticket = $jiraApi->getTicketInfo($issueKey);
+
+            if ($ticket) {
+                $component2Build = Yii::app()->params['component2Build'];
+
+                $componentAllowed = '';
+                if (isset($ticket['components'])) {
+                    foreach ($ticket['components'] as $component) {
+                        if (isset($component2Build[$component['name']])) {
+                            $componentAllowed = $component['name'];
+                            break;
+                        }
+                    }
+                }
+
+                if ($componentAllowed) {
+                    $teamCity = new CompanyInfrastructure\WtTeamCityClient();
+                    $result = array();
+                    foreach($component2Build[$componentAllowed] as $buildId) {
+                        $result[] = $teamCity->startBuild($buildId, $branch, "Teamcity build run on request");
+                    }
+
+                    echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
+                    return;
+                } else {
+                    $errorMsg = 'Issue "'.$issueKey.'" have not allowed components';
+                }
+            }
         }
 
-        echo json_encode(["ERROR" => 'Wrong build name given']);
+        echo json_encode(["ERROR" => $errorMsg]);
     }
 }
