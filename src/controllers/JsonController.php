@@ -203,8 +203,12 @@ class JsonController extends Controller
                     $teamCity = new CompanyInfrastructure\WtTeamCityClient();
                     $result = array();
                     foreach($component2Build[$componentAllowed] as $buildId) {
-                        $result[] = $teamCity->startBuild($buildId, $branch, "Teamcity build run on request");
+                        $parameters = $teamCity->getBuildType($buildId);
+
+//                        $result[] = $teamCity->startBuild($buildId, $branch, "Teamcity build run on request");
                     }
+
+$result = array($parameters);
 
                     echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
                     return;
