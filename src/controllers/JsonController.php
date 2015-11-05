@@ -187,28 +187,37 @@ class JsonController extends Controller
             $ticket = $jiraApi->getTicketInfo($issueKey);
 
             if ($ticket) {
-                $component2Build = Yii::app()->params['component2Build'];
+                if (isset($ticket['fields']['components'])) {
+                    $result = array();
+                    $projectsAllowed = Yii::app()->params['teamCityProjectAllowed'];
+                    $parameterName = Yii::app()->params['teamCityBuildComponentParameter'];
+                    $teamCity = new CompanyInfrastructure\WtTeamCityClient();
+                    $components = $ticket['fields']['components'];
 
-                $componentAllowed = '';
-                if (isset($ticket['components'])) {
-                    foreach ($ticket['components'] as $component) {
-                        if (isset($component2Build[$component['name']])) {
-                            $componentAllowed = $component['name'];
-                            break;
+                    foreach ($projectsAllowed as $project) {
+                        foreach ($teamCity->getBuildTypesList($project) as $buildList) {
+                            foreach ($buildList as $build) {
+                                $buildId = (string)$build['id'];
+                                $parameter = '';
+                                try {
+                                    $parameter = $teamCity->getBuildTypeParameterByName($buildId, $parameterName);
+                                } catch (\Exception $e) {
+                                    /** go forward **/
+                                }
+
+                                if (isset($parameter['value'])) {
+                                    $teamcityJiraComponent = (string)$parameter['value'];
+                                    foreach ($components as $component) {
+                                        if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
+                                            $result[] = $teamCity->startBuild(
+                                                $buildId, $branch, "Teamcity build run on request"
+                                            );
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-
-                if ($componentAllowed) {
-                    $teamCity = new CompanyInfrastructure\WtTeamCityClient();
-                    $result = array();
-                    foreach($component2Build[$componentAllowed] as $buildId) {
-                        $parameters = $teamCity->getBuildType($buildId);
-
-//                        $result[] = $teamCity->startBuild($buildId, $branch, "Teamcity build run on request");
-                    }
-
-$result = array($parameters);
 
                     echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
                     return;
