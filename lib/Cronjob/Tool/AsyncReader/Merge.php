@@ -187,5 +187,44 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
         $this->debugLogger->message("Message accepted");
         $message->accepted();
+
+        self::updateGitBuildAtInterface($gitBuild);
+    }
+
+    /**
+     * Функция отправляет по комету изменения GitBuild, что бы интерфейс мог отрисовать то что изменилось
+     * @param GitBuild $gitBuild
+     */
+    private static function updateGitBuildAtInterface(\GitBuild $gitBuild)
+    {
+        \Yii::app()->assetManager->setBasePath(\Yii::getPathOfAlias('application')."/../main/www/assets/");
+        \Yii::app()->assetManager->setBaseUrl("/assets/");
+        \Yii::app()->urlManager->setBaseUrl('');
+        /** @var $controller \CController */
+        list($controller, $action) = \Yii::app()->createController('/');
+        $controller->setAction($controller->createAction($action));
+        \Yii::app()->setController($controller);
+
+        $filename = \Yii::getPathOfAlias('application.modules.Wtflow.views.gitBuild._gitBuildRow').'.php';
+        $rowTemplate = include($filename);
+        $model = \GitBuild::model();
+        $model->obj_id = $gitBuild->obj_id;
+        /** @var $widget \CWidget*/
+        $widget = \Yii::app()->getWidgetFactory()->createWidget(\Yii::app(),'yiistrap.widgets.TbGridView', [
+            'dataProvider'=>$model->search(),
+            'columns'=>$rowTemplate,
+            'rowCssClassExpression' => function() use ($gitBuild){
+                return 'rowItem git-build-'.$gitBuild->obj_id." git-build-".$gitBuild->status;
+            },
+        ]);
+        $widget->init();
+        ob_start();
+        $widget->run();
+        $html = ob_get_clean();
+
+        \Yii::app()->webSockets->send('gitBuildChanged', [
+            'html' => $html,
+            'git_build_id' => $gitBuild->obj_id,
+        ]);
     }
 }

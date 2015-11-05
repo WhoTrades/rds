@@ -39,11 +39,18 @@
         ['label'=>'Git', 'url'=>array('/Wtflow/git/index'), 'active' => $this->getId() == 'git' && $this->action->id == 'index'],
         ['label'=>'wtflow', 'url'=>array('/Wtflow/git/wtflowStat'), 'active' => $this->getId() == 'git' && $this->action->id == 'wtflowStat'],
     ],),
-    array('label'=>'Обслуживание', 'url'=>array('/maintenanceTool/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => in_array($this->getId(), ['maintenanceTool', 'alert', 'cronjobs']), 'items' => [
-        //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => $this->getId() == 'maintenanceTool'],
-        ['label'=>'Сигнализация', 'url'=>array('/alert/index'), 'active' => $this->getId() == 'alert'],
-        ['label'=>'Фоновые задачи', 'url'=>array('/cronjobs/index'), 'active' => $this->getId() == 'cronjobs'],
-    ]),
+    array(
+        'label'=>'Обслуживание',
+        'url'=>array('/maintenanceTool/index'),
+        'visible'=>!Yii::app()->user->isGuest,
+        'active' => in_array($this->getId(), ['maintenanceTool', 'alert', 'cronjobs', 'gitBuild']),
+        'items' => [
+            //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => $this->getId() == 'maintenanceTool'],
+            ['label'=>'Сигнализация', 'url'=>array('/alert/index'), 'active' => $this->getId() == 'alert'],
+            ['label'=>'Фоновые задачи', 'url'=>array('/cronjobs/index'), 'active' => $this->getId() == 'cronjobs'],
+            ['label'=>'Пересборка веток', 'url'=>array('/Wtflow/gitBuild'), 'active' => $this->getId() == 'gitBuild'],
+        ]
+    ),
     array('label'=>'Журнал', 'url'=>array('/log/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'log'),
     array('label'=>'Выйти ('.Yii::app()->user->name.')', 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
 )); ?>
