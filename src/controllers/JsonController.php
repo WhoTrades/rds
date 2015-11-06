@@ -180,53 +180,49 @@ class JsonController extends Controller
         $branch = trim($branch) ? html_entity_decode(strip_tags($branch)) : 'master';
         $issueKey = trim($issueKey) ? html_entity_decode(strip_tags($issueKey)) : '';
 
-        $errorMsg = 'Wrong issue key given: "'.$issueKey.'"';
-
-        if ($issueKey) {
-            $jiraApi = new JiraApi(Yii::app()->debugLogger);
+        $jiraApi = new JiraApi(Yii::app()->debugLogger);
+        try {
             $ticket = $jiraApi->getTicketInfo($issueKey);
+        } catch(\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
+            echo json_encode(["ERROR" => 'Wrong issue key given: "'.$issueKey.'"']);
+            return;
+        }
 
-            if ($ticket) {
-                if (isset($ticket['fields']['components'])) {
-                    $result = array();
-                    $projectsAllowed = Yii::app()->params['teamCityProjectAllowed'];
-                    $parameterName = Yii::app()->params['teamCityBuildComponentParameter'];
-                    $teamCity = new CompanyInfrastructure\WtTeamCityClient();
-                    $components = $ticket['fields']['components'];
+        if (!isset($ticket['fields']['components'])) {
+            echo json_encode(["ERROR" => 'Issue "'.$issueKey.'" have not allowed components']);
+            return;
+        }
 
-                    foreach ($projectsAllowed as $project) {
-                        foreach ($teamCity->getBuildTypesList($project) as $buildList) {
-                            foreach ($buildList as $build) {
-                                $buildId = (string)$build['id'];
-                                $parameter = '';
-                                try {
-                                    $parameter = $teamCity->getBuildTypeParameterByName($buildId, $parameterName);
-                                } catch (\Exception $e) {
-                                    /** go forward **/
-                                }
+        $result = array();
+        $projectsAllowed = Yii::app()->params['teamCityProjectAllowed'];
+        $parameterName = Yii::app()->params['teamCityBuildComponentParameter'];
+        $teamCity = new CompanyInfrastructure\WtTeamCityClient();
+        $components = $ticket['fields']['components'];
 
-                                if (isset($parameter['value'])) {
-                                    $teamcityJiraComponent = (string)$parameter['value'];
-                                    foreach ($components as $component) {
-                                        if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
-                                            $result[] = $teamCity->startBuild(
-                                                $buildId, $branch, "Teamcity build run on request"
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                        }
+        foreach ($projectsAllowed as $project) {
+            foreach ($teamCity->getBuildTypesList($project) as $buildList) {
+                foreach ($buildList as $build) {
+                    $buildId = (string)$build['id'];
+                    try {
+                        $parameter = $teamCity->getBuildTypeParameterByName($buildId, $parameterName);
+                    } catch (\Exception $e) {
+                        /** go forward **/
+                        continue;
                     }
 
-                    echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
-                    return;
-                } else {
-                    $errorMsg = 'Issue "'.$issueKey.'" have not allowed components';
+                    $teamcityJiraComponent = (string)$parameter['value'];
+                    foreach ($components as $component) {
+                        if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
+                            $result[] = $teamCity->startBuild(
+                                $buildId, $branch, "Teamcity build run on request"
+                            );
+                        }
+                    }
                 }
             }
         }
 
-        echo json_encode(["ERROR" => $errorMsg]);
+        echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
+        return;
     }
 }
