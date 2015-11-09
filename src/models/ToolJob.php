@@ -165,7 +165,7 @@ class ToolJob extends ActiveRecord
             'width'     => $width,
             'height'    => $height,
             'from'      => '-24hours',
-            'target'    => "summarize(sumSeries(stats.gauges.rds.$env.system.".strtoupper($this->getProjectName()).".tool.".$loggerTag.".$type),'15min')",
+            'target'    => "sumSeries(stats.gauges.rds.$env.system.".strtoupper($this->getProjectName()).".tool.".$loggerTag.".$type)",
             'graphOnly' => json_encode($graphOnly),
             'yMin'      => 0,
         ];

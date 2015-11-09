@@ -42,17 +42,18 @@ class CronJobsController extends Controller
 
         $cronJobs = [];
         $keys = [];
+        $projects = [];
 
         foreach ($list as $val) {
             /** @var $val ToolJob */
-            if (!isset($cronJobs[$val->project_obj_id])) {
-                $cronJobs[$val->project_obj_id] = [
-                    'project' => $val->project,
-                    'cronJobs' => [],
-                ];
+            if (!isset($projects[$val->project_obj_id])) {
+                $projects[$val->project_obj_id] = $val->project;
             }
-            $cronJobs[$val->project_obj_id]['cronJobs'][] = $val;
-            $keys[] = $val->key;
+
+            if ($val->project->project_name == $project) {
+                $cronJobs[] = $val;
+                $keys[] = $val->key;
+            }
         }
 
         $cpuUsagesOrdered = [];
@@ -65,6 +66,7 @@ class CronJobsController extends Controller
         $this->render('index', [
             'cronJobs' => $cronJobs,
             'project' => $project,
+            'projects' => $projects,
             'cpuUsages' => $cpuUsagesOrdered,
             'cpuUsageLastTruncate' => RdsDbConfig::get()->cpu_usage_last_truncate,
         ]);

@@ -1,4 +1,8 @@
 <?
+/** @var $project string - название текущего проекта */
+/** @var $projects Project[] - Список всех проектов с кронами */
+/** @var $cronJobs ToolJob[] - Список кронов */
+/** @var $cpuUsageLastTruncate date - Дата последнего сброса статистики по использованию CPU */
 $this->pageTitle = "Фоновые процессы";
 ?>
 <h1>
@@ -8,9 +12,9 @@ $this->pageTitle = "Фоновые процессы";
 <div style="clear: both"></div>
 
 <ul class="nav nav-tabs" role="menu">
-    <?foreach ($cronJobs as $val) {?>
-        <li class="<?=$val['project']->project_name == $project ? 'active' : ''?>">
-            <a tabindex="-1" href="?project=<?=$val['project']->project_name?>" aria-expanded="true"><?=$val['project']->project_name?></a>
+    <?foreach ($projects as $val) {?>
+        <li class="<?=$val->project_name == $project ? 'active' : ''?>">
+            <a tabindex="-1" href="?project=<?=$val->project_name?>" aria-expanded="true"><?=$val->project_name?></a>
         </li>
     <?}?>
 
@@ -37,156 +41,153 @@ $this->pageTitle = "Фоновые процессы";
 </ul>
 
 <div class="tab-content">
-    <?foreach ($cronJobs as $val) {?>
-        <?$group = false;?>
-        <div id="tab-<?=$val['project']->project_name?>" class="tab-pane fade <?=$val['project']->project_name == $project ? 'active' : ''?> in">
-            <table class="items table table-hover table-bordered">
-                <thead>
-                    <tr>
-                        <th>Команда</th>
-                        <th>Действия</th>
-                        <th style=" width: 120px;">Последний запуск</th>
-                        <th>CPU usage</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?foreach($val['cronJobs'] as $toolJob){?>
-                        <?/** @var $toolJob ToolJob*/?>
-                        <?if ($toolJob->group !== $group) {?>
-                            <tr class="group-splitter active-tr" id="group-<?=$groupNormalized = preg_replace('~\W+~', '-', $toolJob->group)?>">
-                                <td colspan="10">
-                                    <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_LINK, [
-                                        'class' => 'active-link',
-                                        'style' => 'cursor: pointer',
-                                        'border' => 'solid 1px #eee',
-                                        'padding' => '3px',
-                                    ]), "#group-$groupNormalized", 'Постоянная ссылка на процесс')?>
-
-                                    <b><a href="#<?=$id = preg_replace('~\W+~sui', '-', $toolJob->group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
-                                </td>
-                            </tr>
-                            <?$group = $toolJob->group;?>
-                        <?}?>
-                        <tr id="<?=$toolJob->getLoggerTag()?>" class="active-tr">
-                            <td style="font-family: Menlo, Monaco, Consolas, monospace">
+    <div id="tab-<?=$project?>" class="tab-pane fade active in">
+        <table class="items table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>Команда</th>
+                    <th>Действия</th>
+                    <th style=" width: 120px;">Последний запуск</th>
+                    <th>CPU usage</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?$group = false;?>
+                <?foreach($cronJobs as $toolJob){?>
+                    <?/** @var $toolJob ToolJob*/?>
+                    <?if ($toolJob->group !== $group) {?>
+                        <tr class="group-splitter active-tr" id="group-<?=$groupNormalized = preg_replace('~\W+~', '-', $toolJob->group)?>">
+                            <td colspan="10">
                                 <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_LINK, [
                                     'class' => 'active-link',
                                     'style' => 'cursor: pointer',
                                     'border' => 'solid 1px #eee',
                                     'padding' => '3px',
-                                ]), "#".$toolJob->getLoggerTag(), 'Постоянная ссылка на процесс')?>
-                                <span class="command">
-                                    <?=preg_replace('~(--(?:tool|queue-name|event-processor)=)(\S*)~', '$1<span class="highlight" style="color: blue">$2</span>', preg_replace('~2>&1.*~', '', $toolJob->command))?>
-                                </span>
-                                <hr style="margin: 5px 0px" />
-                                <?$tag=str_replace('=', '\=', preg_replace('~.*logger -p \S+ -t (\S+).*~', '$1', $toolJob->command))?><br />
-                                Log: <input type="text"
-                                       value="/var/log/storelog/cronjobs/<?=$tag?>.log"
-                                       onclick="this.select()"
-                                       style="width: 60%" />
-                                <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>" rel="30">tail&nbsp;-30</button>
-                                <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>" rel="100">tail&nbsp;-100</button>
-                                <button style="width: 10%" onclick="window.open('/cronjobs/log/?tag=<?=$tag?>&lines=1000&plainText=1')">tail&nbsp;-1000</button><br /><br />
-                            </td>
-                            <td>
-                                <div style="white-space: nowrap">
-                                    <?if ($stopper = $toolJob->getToolJobStopped()) {?>
-                                        Остановлено до <?=date('H:i', strtotime($stopper->stopped_till))?>
-                                    <?} else {?>
-                                        Активен
-                                    <?}?>
-                                    <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_INFO_SIGN), $this->createUrl("/cronjobs/getInfo", [
-                                        'key' => $toolJob->key,
-                                        'project' => $val['project']->project_name
-                                    ]), "Запросить информацию о работающих процессах", [
-                                        'class' => '__get-process-info',
-                                        'style' => 'color: orange',
-                                    ])?>
-                                </div>
-                                <?if ($stopper) {?>
-                                    <a href="<?=$this->createUrl("/cronjobs/start", [
-                                        'key' => $toolJob->key,
-                                        'projectId' => $val['project']->obj_id,
-                                        'url' => $_SERVER['REQUEST_URI'],
-                                    ])?>"><?=TbHtml::icon(TbHtml::ICON_PLAY, [
-                                        'style' => 'font-size: 2em; color: green'
-                                    ])?></a><br />
-                                <?} else {?>
-                                    <div style="white-space: nowrap">
-                                        <?foreach (['0.7em' => '5 minutes', '1em' => '15 minutes', '1.3em' => '1 hour', '1.7em' => '3 hours', '2.0em' => '1 day'] as $size => $interval) {?>
-                                            <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_STOP), $this->createUrl("/cronjobs/stop", [
-                                                'key' => $toolJob->key,
-                                                'interval' => $interval,
-                                                'projectId' => $val['project']->obj_id,
-                                                'url' => $_SERVER['REQUEST_URI'],
-                                            ]), "Не запускать ".$interval, ['style' => 'font-size: '.$size])?>
-                                        <?}?>
-                                    </div>
-                                <?}?>
-                                <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE_CIRCLE), $this->createUrl("/cronjobs/kill", [
-                                    'key' => $toolJob->key,
-                                    'project' => $val['project']->project_name
-                                ]), "Мягко завершить работающие процессы (SIGTERM)", [
-                                    'style' => 'font-size: 2em',
-                                    'class' => '__kill-process',
-                                ])?>
-                                &nbsp;
-                                <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE), $this->createUrl("/cronjobs/kill", [
-                                    'key' => $toolJob->key,
-                                    'signal' => 9,
-                                    'project' => $val['project']->project_name
-                                ]), "Жестко убить работающие процессы (sudo kill -9)", [
-                                    'class' => '__kill-process __hard-kill',
-                                    'style' => 'font-size: 2em; color: red',
-                                ])?>
-                            </td>
-                            <td style="white-space: nowrap;" class="cpu-usage __project-<?=$toolJob->project->project_name?> __key-<?=$toolJob->key?>">
-                                <?if (isset($cpuUsages[$toolJob->key][$toolJob->project->project_name])) {?>
-                                    <?/* @var $cpuUsage CpuUsage */?>
-                                    <?$cpuUsage = $cpuUsages[$toolJob->key][$toolJob->project->project_name];?>
-                                    Время: <time><?=date('Y-m-d H:i:s', strtotime($cpuUsage->last_run_time))?></time><br />
-                                    Продолжительность: <span class="duration"><?=$cpuUsage->last_run_duration?> сек.</span><br />
-                                    <a href="<?=$toolJob->getSmallTimeRealGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
-                                        <img src="<?=$toolJob->getSmallTimeRealGraphSrc(true, $width=180, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
-                                    </a>
-                                    <br />
-                                    Ошибка: <span class="error-mark"><?=$cpuUsage->last_exit_code
-                                        ? TbHtml::labelTb('Да', [
-                                                'color' => TbHtml::ALERT_COLOR_DANGER,
-                                                'class' => "__get-log-tail",
-                                                'tag' => $tag,
-                                                'style' => 'cursor: pointer',
-                                            ])
-                                        : "Нет"
-                                    ?></span><br />
-                                <?} else {?>
-                                    Время: <time>&ndash;</time><br />
-                                    Продолжительность: <span class="duration">&ndash;</span><br />
-                                    <a href="<?=$toolJob->getSmallTimeRealGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
-                                        <img src="<?=$toolJob->getSmallTimeRealGraphSrc(true, $width=180, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
-                                    </a>
-                                    <br />
-                                    Ошибка: <span class="error-mark">&ndash;</span><br />
-                                <?}?>
-                            </td>
-                            <td class="cpu-usage __project-<?=$toolJob->project->project_name?> __key-<?=$toolJob->key?>">
-                                <div class="cpu-usage-time">
-                                    <?=isset($cpuUsages[$toolJob->key][$toolJob->project->project_name])
-                                        ? sprintf('%.2f', $cpuUsages[$toolJob->key][$toolJob->project->project_name]->cpu_time / 1000)
-                                        : 0
-                                    ?>&nbsp;сек
-                                </div>
-                                <a href="<?=$toolJob->getSmallCpuUsageGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
-                                    <img src="<?=$toolJob->getSmallCpuUsageGraphSrc(true, $width=100, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
-                                </a>
-                                <br />
+                                ]), "#group-$groupNormalized", 'Постоянная ссылка на процесс')?>
+
+                                <b><a href="#<?=$id = preg_replace('~\W+~sui', '-', $toolJob->group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
                             </td>
                         </tr>
+                        <?$group = $toolJob->group;?>
                     <?}?>
-                </tbody>
-            </table>
-        </div>
-    <?}?>
+                    <tr id="<?=$toolJob->getLoggerTag()?>" class="active-tr">
+                        <td style="font-family: Menlo, Monaco, Consolas, monospace">
+                            <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_LINK, [
+                                'class' => 'active-link',
+                                'style' => 'cursor: pointer',
+                                'border' => 'solid 1px #eee',
+                                'padding' => '3px',
+                            ]), "#".$toolJob->getLoggerTag(), 'Постоянная ссылка на процесс')?>
+                            <span class="command">
+                                <?=preg_replace('~(--(?:tool|queue-name|event-processor)=)(\S*)~', '$1<span class="highlight" style="color: blue">$2</span>', preg_replace('~2>&1.*~', '', $toolJob->command))?>
+                            </span>
+                            <hr style="margin: 5px 0px" />
+                            <?$tag=str_replace('=', '\=', preg_replace('~.*logger -p \S+ -t (\S+).*~', '$1', $toolJob->command))?><br />
+                            Log: <input type="text"
+                                   value="/var/log/storelog/cronjobs/<?=$tag?>.log"
+                                   onclick="this.select()"
+                                   style="width: 60%" />
+                            <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>" rel="30">tail&nbsp;-30</button>
+                            <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>" rel="100">tail&nbsp;-100</button>
+                            <button style="width: 10%" onclick="window.open('/cronjobs/log/?tag=<?=$tag?>&lines=1000&plainText=1')">tail&nbsp;-1000</button><br /><br />
+                        </td>
+                        <td>
+                            <div style="white-space: nowrap">
+                                <?if ($stopper = $toolJob->getToolJobStopped()) {?>
+                                    Остановлено до <?=date('H:i', strtotime($stopper->stopped_till))?>
+                                <?} else {?>
+                                    Активен
+                                <?}?>
+                                <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_INFO_SIGN), $this->createUrl("/cronjobs/getInfo", [
+                                    'key' => $toolJob->key,
+                                    'project' => $val->project_name
+                                ]), "Запросить информацию о работающих процессах", [
+                                    'class' => '__get-process-info',
+                                    'style' => 'color: orange',
+                                ])?>
+                            </div>
+                            <?if ($stopper) {?>
+                                <a href="<?=$this->createUrl("/cronjobs/start", [
+                                    'key' => $toolJob->key,
+                                    'projectId' => $val->obj_id,
+                                    'url' => $_SERVER['REQUEST_URI'],
+                                ])?>"><?=TbHtml::icon(TbHtml::ICON_PLAY, [
+                                    'style' => 'font-size: 2em; color: green'
+                                ])?></a><br />
+                            <?} else {?>
+                                <div style="white-space: nowrap">
+                                    <?foreach (['0.7em' => '5 minutes', '1em' => '15 minutes', '1.3em' => '1 hour', '1.7em' => '3 hours', '2.0em' => '1 day'] as $size => $interval) {?>
+                                        <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_STOP), $this->createUrl("/cronjobs/stop", [
+                                            'key' => $toolJob->key,
+                                            'interval' => $interval,
+                                            'projectId' => $val->obj_id,
+                                            'url' => $_SERVER['REQUEST_URI'],
+                                        ]), "Не запускать ".$interval, ['style' => 'font-size: '.$size])?>
+                                    <?}?>
+                                </div>
+                            <?}?>
+                            <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE_CIRCLE), $this->createUrl("/cronjobs/kill", [
+                                'key' => $toolJob->key,
+                                'project' => $val->project_name
+                            ]), "Мягко завершить работающие процессы (SIGTERM)", [
+                                'style' => 'font-size: 2em',
+                                'class' => '__kill-process',
+                            ])?>
+                            &nbsp;
+                            <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE), $this->createUrl("/cronjobs/kill", [
+                                'key' => $toolJob->key,
+                                'signal' => 9,
+                                'project' => $val->project_name
+                            ]), "Жестко убить работающие процессы (sudo kill -9)", [
+                                'class' => '__kill-process __hard-kill',
+                                'style' => 'font-size: 2em; color: red',
+                            ])?>
+                        </td>
+                        <td style="white-space: nowrap;" class="cpu-usage __project-<?=$toolJob->project->project_name?> __key-<?=$toolJob->key?>">
+                            <?if (isset($cpuUsages[$toolJob->key][$toolJob->project->project_name])) {?>
+                                <?/* @var $cpuUsage CpuUsage */?>
+                                <?$cpuUsage = $cpuUsages[$toolJob->key][$toolJob->project->project_name];?>
+                                Время: <time><?=date('Y-m-d H:i:s', strtotime($cpuUsage->last_run_time))?></time><br />
+                                Продолжительность: <span class="duration"><?=$cpuUsage->last_run_duration?> сек.</span><br />
+                                <a href="<?=$toolJob->getSmallTimeRealGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
+                                    <img src="<?=$toolJob->getSmallTimeRealGraphSrc(true, $width=180, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
+                                </a>
+                                <br />
+                                Ошибка: <span class="error-mark"><?=$cpuUsage->last_exit_code
+                                    ? TbHtml::labelTb('Да', [
+                                            'color' => TbHtml::ALERT_COLOR_DANGER,
+                                            'class' => "__get-log-tail",
+                                            'tag' => $tag,
+                                            'style' => 'cursor: pointer',
+                                        ])
+                                    : "Нет"
+                                ?></span><br />
+                            <?} else {?>
+                                Время: <time>&ndash;</time><br />
+                                Продолжительность: <span class="duration">&ndash;</span><br />
+                                <a href="<?=$toolJob->getSmallTimeRealGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
+                                    <img src="<?=$toolJob->getSmallTimeRealGraphSrc(true, $width=180, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
+                                </a>
+                                <br />
+                                Ошибка: <span class="error-mark">&ndash;</span><br />
+                            <?}?>
+                        </td>
+                        <td class="cpu-usage __project-<?=$toolJob->project->project_name?> __key-<?=$toolJob->key?>">
+                            <div class="cpu-usage-time">
+                                <?=isset($cpuUsages[$toolJob->key][$toolJob->project->project_name])
+                                    ? sprintf('%.2f', $cpuUsages[$toolJob->key][$toolJob->project->project_name]->cpu_time / 1000)
+                                    : 0
+                                ?>&nbsp;сек
+                            </div>
+                            <a href="<?=$toolJob->getSmallCpuUsageGraphSrc(false, 800, 600, false)?>" target="_blank" rel="tooltip" data-original-title="Открыть график в большем масштабе">
+                                <img src="<?=$toolJob->getSmallCpuUsageGraphSrc(true, $width=100, $height=60, true)?>" style="width: <?=$width?>px; height: <?=$height?>px;border: solid 1px #eee" />
+                            </a>
+                            <br />
+                        </td>
+                    </tr>
+                <?}?>
+            </tbody>
+        </table>
 </div>
 
 <script type="text/javascript">
