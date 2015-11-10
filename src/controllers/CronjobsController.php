@@ -27,6 +27,11 @@ class CronJobsController extends Controller
 
     public function actionIndex($project = 'comon')
     {
+        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        if (!$Project) {
+            throw new CHttpException(404, "Проект $project не найден");
+        }
+
         $projects = Project::model()->findAll();
 
         $packages = array_map(function(Project $project){
@@ -65,7 +70,7 @@ class CronJobsController extends Controller
 
         $this->render('index', [
             'cronJobs' => $cronJobs,
-            'project' => $project,
+            'Project' => $Project,
             'projects' => $projects,
             'cpuUsages' => $cpuUsagesOrdered,
             'cpuUsageLastTruncate' => RdsDbConfig::get()->cpu_usage_last_truncate,

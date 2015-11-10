@@ -1,5 +1,5 @@
 <?
-/** @var $project string - название текущего проекта */
+/** @var $Project Project - название текущего проекта */
 /** @var $projects Project[] - Список всех проектов с кронами */
 /** @var $cronJobs ToolJob[] - Список кронов */
 /** @var $cpuUsageLastTruncate date - Дата последнего сброса статистики по использованию CPU */
@@ -13,7 +13,7 @@ $this->pageTitle = "Фоновые процессы";
 
 <ul class="nav nav-tabs" role="menu">
     <?foreach ($projects as $val) {?>
-        <li class="<?=$val->project_name == $project ? 'active' : ''?>">
+        <li class="<?=$val->obj_id == $Project->obj_id ? 'active' : ''?>">
             <a tabindex="-1" href="?project=<?=$val->project_name?>" aria-expanded="true"><?=$val->project_name?></a>
         </li>
     <?}?>
@@ -41,7 +41,7 @@ $this->pageTitle = "Фоновые процессы";
 </ul>
 
 <div class="tab-content">
-    <div id="tab-<?=$project?>" class="tab-pane fade active in">
+    <div id="tab-<?=$Project->project_name?>" class="tab-pane fade active in">
         <table class="items table table-hover table-bordered">
             <thead>
                 <tr>
@@ -100,7 +100,7 @@ $this->pageTitle = "Фоновые процессы";
                                 <?}?>
                                 <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_INFO_SIGN), $this->createUrl("/cronjobs/getInfo", [
                                     'key' => $toolJob->key,
-                                    'project' => $val->project_name
+                                    'project' => $Project->project_name
                                 ]), "Запросить информацию о работающих процессах", [
                                     'class' => '__get-process-info',
                                     'style' => 'color: orange',
@@ -109,7 +109,7 @@ $this->pageTitle = "Фоновые процессы";
                             <?if ($stopper) {?>
                                 <a href="<?=$this->createUrl("/cronjobs/start", [
                                     'key' => $toolJob->key,
-                                    'projectId' => $val->obj_id,
+                                    'projectId' => $Project->obj_id,
                                     'url' => $_SERVER['REQUEST_URI'],
                                 ])?>"><?=TbHtml::icon(TbHtml::ICON_PLAY, [
                                     'style' => 'font-size: 2em; color: green'
@@ -120,7 +120,7 @@ $this->pageTitle = "Фоновые процессы";
                                         <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_STOP), $this->createUrl("/cronjobs/stop", [
                                             'key' => $toolJob->key,
                                             'interval' => $interval,
-                                            'projectId' => $val->obj_id,
+                                            'projectId' => $Project->obj_id,
                                             'url' => $_SERVER['REQUEST_URI'],
                                         ]), "Не запускать ".$interval, ['style' => 'font-size: '.$size])?>
                                     <?}?>
@@ -128,7 +128,7 @@ $this->pageTitle = "Фоновые процессы";
                             <?}?>
                             <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE_CIRCLE), $this->createUrl("/cronjobs/kill", [
                                 'key' => $toolJob->key,
-                                'project' => $val->project_name
+                                'project' => $Project->project_name
                             ]), "Мягко завершить работающие процессы (SIGTERM)", [
                                 'style' => 'font-size: 2em',
                                 'class' => '__kill-process',
@@ -137,7 +137,7 @@ $this->pageTitle = "Фоновые процессы";
                             <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_REMOVE), $this->createUrl("/cronjobs/kill", [
                                 'key' => $toolJob->key,
                                 'signal' => 9,
-                                'project' => $val->project_name
+                                'project' => $Project->project_name
                             ]), "Жестко убить работающие процессы (sudo kill -9)", [
                                 'class' => '__kill-process __hard-kill',
                                 'style' => 'font-size: 2em; color: red',
