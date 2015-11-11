@@ -82,7 +82,6 @@ class RebuildBranch
 
         \Yii::app()->debugLogger->message("Target branch: $build->branch, sending create branch task");
 
-        $model->sendMergeCreateBranch(new Message\Merge\CreateBranch($build->branch, "master", false));
         $model->sendMergeTask(new Message\Merge\Task(-1, "master", $build->branch, Message\Merge\Task::MERGE_TYPE_FEATURE));
 
         foreach ($branches as $val) {
