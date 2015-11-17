@@ -26,3 +26,26 @@
 	width: 20%;
 }
 
+
+@media (max-width: 1000px) {
+	.navbar .nav > li > a {
+		padding-left: 9px;
+		padding-right: 9px;
+		font-size: 0.9em;
+	}
+}
+@media (max-width: 1200px) and (min-width: 768px) {
+	.navbar .container {
+		width: 100%;
+		padding: 0;
+	}
+	.navbar {
+	}
+	.navbar-brand {
+		display: none;
+	}
+}
+
+.table-responsive .table td {
+	vertical-align: middle;
+}

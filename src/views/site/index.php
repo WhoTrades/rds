@@ -31,6 +31,7 @@
     'dataProvider'=>$releaseRejectSearchModel->search(),
     'filter'=>$releaseRejectSearchModel,
     'ajaxUpdateError'=>'function(xhr,ts,et,err){ console.log(err); }',
+    'htmlOptions' => ['class' => 'table-responsive'],
     'columns'=>array(
         'obj_id',
         'obj_created',
@@ -45,28 +46,43 @@
         ),
 ))); ?>
 <hr />
+<div class="row">
+    <div class="col-md-4">
+        <h2 style="padding: 0; margin:0; float: left; margin-right: 20px;">Запрос релиза</h2>
+        <?php echo TbHtml::button('Собрать проект', array(
+            'data-toggle' => 'modal',
+            'data-target' => '#release-request-form-modal',
+        )); ?>
+    </div>
+    <div class="col-md-8" style="float: right">
+        <div class="row">
+            <?foreach ($mainProjects as $project) {?>
+                <div style="float: right">
+                    <?/** @var $project Project */?>
+                    <?php echo TbHtml::button('Собрать '.$project->project_name, array(
+                        'data-toggle' => 'modal',
+                        'data-target' => '#release-request-form-modal',
+                        'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id}); setTimeout(function(){ $('#release-request-form-modal .modal-body input:first').focus();}, 500);",
+                    )); ?>
+                </div>
+            <?}?>
+        </div>
+    </div>
+
+</div>
 <h2>
-    Запрос релиза
-    <?php echo TbHtml::button('Собрать проект', array(
-        'data-toggle' => 'modal',
-        'data-target' => '#release-request-form-modal',
-    )); ?>
+
+
 
     <div style="float: right">
-        <?foreach ($mainProjects as $project) {?>
-            <?/** @var $project Project */?>
-            <?php echo TbHtml::button('Собрать '.$project->project_name, array(
-                'data-toggle' => 'modal',
-                'data-target' => '#release-request-form-modal',
-                'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id}); setTimeout(function(){ $('#release-request-form-modal .modal-body input:first').focus();}, 500);",
-            )); ?>
-        <?}?>
+
     </div>
 </h2>
 
 <div style="clear: both"></div>
 <?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'release-request-grid',
+    'htmlOptions' => ['class' => 'table-responsive'],
     'dataProvider'=>$releaseRequestSearchModel->search(),
     'filter'=>$releaseRequestSearchModel,
     'ajaxUpdateError'=>'function(xhr,ts,et,err){ console.log(err); }',
