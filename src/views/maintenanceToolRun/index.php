@@ -21,6 +21,7 @@ $this->menu=array(
 <?php $this->widget('yiistrap.widgets.TbGridView',array(
     'id'=>'maintenance-tool-run-grid',
     'dataProvider'=>$model->search(),
+    'htmlOptions' => ['class' => 'table-responsive'],
     'filter'=>$model,
     'columns'=>array(
         'obj_id',

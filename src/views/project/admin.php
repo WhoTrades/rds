@@ -43,6 +43,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 <?php $this->widget('yiistrap.widgets.TbGridView', array(
 	'id'=>'project-grid',
 	'dataProvider'=>$model->search(),
+	'htmlOptions' => ['class' => 'table-responsive'],
 	'filter'=>$model,
 	'columns'=>array(
 		'project_name',

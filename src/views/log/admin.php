@@ -39,6 +39,7 @@ $('.search-form form').submit(function(){
 <?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'log-grid',
     'dataProvider'=>$model->search(),
+    'htmlOptions' => ['class' => 'table-responsive'],
     'filter'=>$model,
     'columns'=>array(
         'obj_created',

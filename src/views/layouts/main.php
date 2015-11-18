@@ -49,12 +49,11 @@
                     'label'=>'Обслуживание',
                     'url'=>array('/maintenanceTool/index'),
                     'visible'=>!Yii::app()->user->isGuest,
-                    'active' => in_array($this->getId(), ['maintenanceTool', 'alert', 'cronjobs', 'gitBuild', 'pgQ']),
+                    'active' => in_array($this->getId(), ['maintenanceTool', 'alert', 'cronjobs', 'gitBuild']),
                     'items' => [
                         //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => $this->getId() == 'maintenanceTool'],
                         ['label'=>'Сигнализация', 'url'=>array('/alert/index'), 'active' => $this->getId() == 'alert'],
                         ['label'=>'Фоновые задачи', 'url'=>array('/cronjobs/index'), 'active' => $this->getId() == 'cronjobs'],
-                        ['label'=>'PgQ сбойные события', 'url'=>array('/Db/PgQ/'), 'active' => $this->getId() == 'pgQ'],
                         ['label'=>'Пересборка веток', 'url'=>array('/Wtflow/gitBuild'), 'active' => $this->getId() == 'gitBuild'],
                     ]
                 ),

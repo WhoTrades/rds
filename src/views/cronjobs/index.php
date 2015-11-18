@@ -41,7 +41,7 @@ $this->pageTitle = "Фоновые процессы";
 </ul>
 
 <div class="tab-content">
-    <div id="tab-<?=$Project->project_name?>" class="tab-pane fade active in">
+    <div id="tab-<?=$Project->project_name?>" class="tab-pane fade active in table-responsive">
         <table class="items table table-hover table-bordered">
             <thead>
                 <tr>

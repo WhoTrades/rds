@@ -8,6 +8,7 @@ $this->breadcrumbs=array(
 $this->pageTitle = "Обслуживание";
 $this->widget('yiistrap.widgets.TbGridView', array(
     'dataProvider'=>$model->search(),
+    'htmlOptions' => ['class' => 'table-responsive'],
     'rowCssClassExpression' => function($index, MaintenanceTool $tool){
         return 'maintenance-tool-'.$tool->obj_id;
     },

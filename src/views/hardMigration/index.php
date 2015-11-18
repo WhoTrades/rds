@@ -9,6 +9,7 @@ $this->breadcrumbs=['Hard Migrations'];
 <?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'hard-migration-grid',
     'dataProvider'=>$model->search(),
+    'htmlOptions' => ['class' => 'table-responsive'],
     'filter'=>$model,
     'rowCssClassExpression' => function($index, $rr){
         return 'hard-migration-'.str_replace("/", "", $rr->migration_name).'_'.$rr->migration_environment;

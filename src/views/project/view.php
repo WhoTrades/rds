@@ -32,6 +32,7 @@ $this->menu=array(
 <?php $this->widget('yiistrap.widgets.TbGridView', array(
     'id'=>'log-grid',
     'dataProvider'=>$configHistoryModel->search(),
+	'htmlOptions' => ['class' => 'table-responsive'],
     'filter'=>$configHistoryModel,
     'columns'=>array(
         'obj_created',
