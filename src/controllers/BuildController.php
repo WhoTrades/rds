@@ -151,14 +151,15 @@ class BuildController extends Controller
         $foregroundColors['green'] = '0;32';
         $foregroundColors['green  '] = '32';
         $foregroundColors['lightgreen'] = '1;32';
-        $foregroundColors['cyan'] = '0;36';
-        $foregroundColors['lightcyan'] = '1;36';
+        $foregroundColors['#FF5555'] = '00;36';
+        $foregroundColors['lightcyan'] = '01;36';
         $foregroundColors['red'] = '0;31';
-        $foregroundColors['lightred'] = '1;31';
+        $foregroundColors['#FF5555'] = '01;31';
         $foregroundColors['red    '] = '31;1';
         $foregroundColors['purple'] = '0;35';
         $foregroundColors['lightpurple'] = '1;35';
         $foregroundColors['brown'] = '0;33';
+        $foregroundColors['#00BBA1'] = '00;36';
         $foregroundColors['yellow'] = '1;33';
         $foregroundColors['lightgray'] = '0;37';
         $foregroundColors['white'] = '1;37';
@@ -169,7 +170,6 @@ class BuildController extends Controller
         $backgroundColors['yellow'] = '43';
         $backgroundColors['blue'] = '44';
         $backgroundColors['magenta'] = '45';
-        $backgroundColors['cyan'] = '46';
         $backgroundColors['lightgray'] = '47';
         $temp = $foregroundColors;
         foreach ($temp as $key => $val) {

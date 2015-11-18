@@ -39,7 +39,7 @@ class SiteController extends Controller
         if(isset($_GET['ReleaseRequest']))
             $releaseRejectSearchModel->attributes=$_GET['ReleaseRequest'];
 
-        $mainProjects = Project::model()->findAllByAttributes(['project_name' => ['comon', 'service-crm', 'dictionary']]);
+        $mainProjects = Project::model()->findAllByAttributes(['project_name' => ['comon', 'service-crm', 'whotrades']]);
 
 		$this->render('index', array(
             'releaseRequestSearchModel' => $releaseRequestSearchModel,
