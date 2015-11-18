@@ -1,7 +1,7 @@
 <?/* @var $this PostMigration*/?>
 <?/* @var $releaseRequests ReleaseRequest[]*/?>
 <?if ($releaseRequests) {?>
-    <div style="float: right; margin: 20px;">
+    <div style="float: right; ">
         <h4>POST миграции</h4>
         <?foreach($releaseRequests as $rr) {?>
             <?if (!$rr->rr_new_post_migrations || !json_encode($rr->rr_new_post_migrations)) { continue;} ?>

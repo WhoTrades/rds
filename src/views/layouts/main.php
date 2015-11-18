@@ -25,7 +25,7 @@
 <body>
 
 <?$this->widget('yiistrap.widgets.TbNavbar', array(
-        'display' => TbHtml::NAVBAR_DISPLAY_FIXEDTOP,
+        'display' => TbHtml::NAVBAR_DISPLAY_STATICTOP,
         'brandLabel' => '',
         'collapse' => true,
         'items' => [[
