@@ -64,6 +64,7 @@
     )
 ); ?>
 
+<?$this->widget('GlobalWarnings', [])?>
 <?$this->widget('PostMigration', [])?>
 
 

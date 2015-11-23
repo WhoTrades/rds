@@ -25,7 +25,7 @@ class Cronjob_Tool_MaintenanceToolRun extends RdsSystem\Cron\RabbitDaemon
             return 1;
         }
 
-        $mtr = $tool->start("cron runner");
+        $mtr = $tool->start("cron runner", false);
 
         if ($mtr->errors) {
             $this->debugLogger->error("Can't start tool: ".json_encode($mtr->errors));

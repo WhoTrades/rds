@@ -148,9 +148,11 @@ class MaintenanceTool extends ActiveRecord
      * @return MaintenanceToolRun
      * @throws Exception
      */
-    public function start($user)
+    public function start($user, $writeLogMessage = true)
     {
-        Log::createLogMessage("Запущен тул {$this->getTitle()}", $user);
+        if ($writeLogMessage) {
+            Log::createLogMessage("Запущен тул {$this->getTitle()}", $user);
+        }
 
         if (!$this->canBeStarted()) {
             throw new Exception("Invalid tool status");

@@ -8,6 +8,7 @@
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
+ * @property string $is_tst_updating_enabled
  * @property string $red_lamp_wts_timeout
  * @property string $preprod_online
  * @property string $cpu_usage_last_truncate
@@ -38,10 +39,10 @@ class RdsDbConfig extends ActiveRecord
         return array(
             array('obj_created, obj_modified', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('red_lamp_wts_timeout, preprod_online', 'safe'),
+            array('red_lamp_wts_timeout, preprod_online, is_tst_updating_enabled', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, red_lamp_wts_timeout, cpu_usage_last_truncate', 'safe', 'on'=>'search'),
+            array('obj_id, obj_created, obj_modified, obj_status_did, is_tst_updating_enabled, red_lamp_wts_timeout, cpu_usage_last_truncate', 'safe', 'on'=>'search'),
         );
     }
 
@@ -66,6 +67,7 @@ class RdsDbConfig extends ActiveRecord
             'obj_created' => 'Obj Created',
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
+            'is_tst_updating_enabled' => 'Включено ли обновление tst контура',
             'red_lamp_wts_timeout' => 'Red Lamp Wts Timeout',
             'cpu_usage_last_truncate' => 'Cpu Usage last truncate',
         );
@@ -93,6 +95,7 @@ class RdsDbConfig extends ActiveRecord
         $criteria->compare('obj_created',$this->obj_created,true);
         $criteria->compare('obj_modified',$this->obj_modified,true);
         $criteria->compare('obj_status_did',$this->obj_status_did);
+        $criteria->compare('is_tst_updating_enabled',$this->is_tst_updating_enabled);
         $criteria->compare('red_lamp_wts_timeout',$this->red_lamp_wts_timeout,true);
         $criteria->compare('cpu_usage_last_truncate',$this->cpu_usage_last_truncate,true);
 

@@ -175,6 +175,18 @@ class JsonController extends Controller
         echo json_encode(["OK" => true]);
     }
 
+    /**
+     * Этот метод дергается скриптом updater.php на tst контуре, что бы понять нужно ли обновлять контур
+     * Сделано в связи с регламентом http://wiki/pages/viewpage.action?pageId=72813392
+     */
+    public function actionGetTstUpdatingEnabled()
+    {
+        echo json_encode([
+            'ok' => true,
+            'enabled' => \RdsDbConfig::get()->is_tst_updating_enabled
+        ]);
+    }
+
     public function actionStartTeamcityBuild($issueKey, $branch = 'master')
     {
         $branch = trim($branch) ? html_entity_decode(strip_tags($branch)) : 'master';
