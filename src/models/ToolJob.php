@@ -40,7 +40,7 @@ class ToolJob extends ActiveRecord
             array('obj_status_did', 'numerical', 'integerOnly'=>true),
             array('key', 'length', 'max'=>12),
             array('group', 'length', 'max'=>250),
-            array('package', 'length', 'max'=>32),
+            array('package', 'length', 'max'=>64),
             array('command', 'length', 'max'=>1000),
             array('version', 'length', 'max'=>16),
             // The following rule is used by search().
