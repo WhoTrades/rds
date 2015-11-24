@@ -28,7 +28,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
             $this->debugLogger->message("Received get process info message");
 
             try {
-                $text = $commandExecutor->executeCommand("ps -Ao pid,command|grep 'sys__key=$task->key'|grep 'sys__package=$task->project-'|grep -v periodic|grep -P '^\\s*\\d+ php'");
+                $text = $commandExecutor->executeCommand("ps -Ao pid,command|grep 'sys__key=$task->key'|grep 'sys__package=$task->project-' | grep -v 'set -o pipefail'");
             } catch (\RdsSystem\lib\CommandExecutorException $e) {
                 if ($e->getCode() == 1) {
                     //an: grep возвращает exit-code=1, если вернулось 0 строк
@@ -57,7 +57,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
             $this->debugLogger->message("Received message");
 
             try {
-                $text = $commandExecutor->executeCommand("ps -Ao pid,command|grep 'sys__key=$task->key'|grep 'sys__package=$task->project-'|grep -v periodic|grep -P '^\\s*\\d+ php'");
+                $text = $commandExecutor->executeCommand("ps -Ao pid,command|grep 'sys__key=$task->key'|grep 'sys__package=$task->project-' | grep -v 'set -o pipefail'");
             } catch (\RdsSystem\lib\CommandExecutorException $e) {
                 if ($e->getCode() == 1) {
                     //an: grep возвращает exit-code=1, если вернулось 0 строк
