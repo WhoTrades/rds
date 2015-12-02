@@ -128,6 +128,28 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
     {
         return [
             AlertLog::WTS_LAMP_NAME => new \AlertLog\PhpLogsDataProvider($this->debugLogger),
+            AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(['WhoTrades_AcceptanceTests'], 'TeamCity: Acceptance Tests'),
         ];
+    }
+
+    /**
+     * Создает объединенный провайдер данных, который включает в себе провайдеры данных для каждого проекта
+     *
+     * @param array $projects Идентификаторы проектов
+     * @param string $name Название провайдера данных
+     *
+     * @return \AlertLog\CompoundDataProvider
+     */
+    private function getTeamCityDataProvider(array $projects, $name = 'TeamCity')
+    {
+        $teamCityClient = new \CompanyInfrastructure\WtTeamCityClient();
+
+        $dataProviders = [];
+
+        foreach ($projects as $project) {
+            $dataProviders[] = new \AlertLog\TeamCityDataProvider($this->debugLogger, $teamCityClient, $project);
+        }
+
+        return new \AlertLog\CompoundDataProvider($this->debugLogger, $name, $dataProviders);
     }
 }

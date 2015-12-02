@@ -10,6 +10,8 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 {
     const PACKAGES_TIMEOUT = 30;
 
+    private $teamCityClient;
+
     public static function getCommandLineSpec()
     {
         return [] + parent::getCommandLineSpec();
@@ -17,11 +19,13 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $tag = 'activity_stream_queue';
-        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+        $this->teamCityClient = new \CompanyInfrastructure\WtTeamCityClient();
 
-        $res = $model->sendToolGetToolLogTail(
-            new RdsSystem\Message\Tool\ToolLogTail($tag, 10), RdsSystem\Message\Tool\ToolLogTailResult::type(), 1
-        );
+
+        $dataProvider = new \AlertLog\TeamCityDataProvider($this->debugLogger, $this->teamCityClient, 'WhoTrades_AcceptanceTests');
+
+        var_dump(array_filter($dataProvider->getData(), function(\AlertLog\AlertData $alertData) {
+            return strpos($alertData->getName(), 'JUnit4_comon_Login_popap_blogs') > 0;
+        }));
     }
 }

@@ -36,7 +36,7 @@ class AlertController extends Controller
 
         $lamps = [];
 
-        foreach ([AlertLog::WTS_LAMP_NAME] as $lampName) {
+        foreach ([AlertLog::WTS_LAMP_NAME, AlertLog::TEAM_CITY_LAMP_NAME] as $lampName) {
             $lamps[$lampName] = [
                 'status' => $this->getLampStatus($lampName),
                 // 'timeout' => $this->getLampTimeout($lampName),
