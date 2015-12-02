@@ -38,7 +38,7 @@ class TeamCityDataProvider implements IAlertDataProvider
     /**
      * @param \ServiceBase_IDebugLogger $debugLogger
      * @param TeamCityClient $teamCityClient
-     * @param string $projectId
+     * @param string $projectId Идентификатор проекта в TeamCity
      */
     public function __construct(\ServiceBase_IDebugLogger $debugLogger, TeamCityClient $teamCityClient, $projectId = 'Whotrades')
     {
@@ -68,7 +68,7 @@ class TeamCityDataProvider implements IAlertDataProvider
     }
 
     /**
-     * Загружает данные из PhpLogs
+     * Загружает данные из TeamCity
      */
     private function loadDataIfNeeded()
     {
