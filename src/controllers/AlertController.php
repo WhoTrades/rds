@@ -36,7 +36,7 @@ class AlertController extends Controller
 
         $lamps = [];
 
-        foreach ([AlertLog::WTS_LAMP_NAME, AlertLog::TEAM_CITY_LAMP_NAME] as $lampName) {
+        foreach ($this->getLamps() as $lampName) {
             $lamps[$lampName] = [
                 'status' => $this->getLampStatus($lampName),
                 // 'timeout' => $this->getLampTimeout($lampName),
@@ -48,6 +48,19 @@ class AlertController extends Controller
         $this->render('index', [
             'lamps' => $lamps,
         ]);
+    }
+
+    public function actionGetAllLampStatusJson()
+    {
+        $result = [];
+
+        foreach ($this->getLamps() as $lamp) {
+            $result[$lamp] = [
+                'alert' => $this->getLampStatus($lamp),
+            ];
+        }
+
+        echo json_encode($result, JSON_PRETTY_PRINT);
     }
 
 
@@ -142,5 +155,13 @@ class AlertController extends Controller
     private function getLampTimeout($lampName)
     {
         return \RdsDbConfig::get()->{$lampName . "_timeout"};
+    }
+
+    /**
+     * @return array
+     */
+    protected function getLamps()
+    {
+        return [AlertLog::WTS_LAMP_NAME, AlertLog::TEAM_CITY_LAMP_NAME];
     }
 }

@@ -78,7 +78,10 @@ class TeamCityDataProvider implements IAlertDataProvider
             $project = $this->teamCityClient->getProject($this->projectId);
 
             foreach ($project->buildTypes->children() as $buildType) {
-                $this->data[] = $this->getAlertData($buildType);
+                $alertData = $this->getAlertData($buildType);
+                if ($alertData) {
+                    $this->data[] = $alertData;
+                }
             }
         }
     }
@@ -97,6 +100,11 @@ class TeamCityDataProvider implements IAlertDataProvider
         $alertName  = (string) $build->buildType->attributes()['projectName'] . ' :: ' . (string) $build->buildType->attributes()['name'];
         $url = (string) $build->attributes()['webUrl'];
         $status = (string) $build->attributes()['status'];
+
+        if ($status === 'UNKNOWN') {
+            $this->debugLogger->warning('process=getTeamCityBuildData, status=skip, reason=unknown_status');
+            return null;
+        }
 
         return new AlertData(
             $alertName,
