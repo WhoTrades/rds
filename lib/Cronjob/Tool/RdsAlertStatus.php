@@ -74,7 +74,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      */
     private function sendEmailError(AlertLog $alertLog)
     {
-        $subject = "Лаг в очереди \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
+        $subject = "Ошибка \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
         $text = "$alertLog->alert_text<br />\n";
 
         if (AlertController::canBeLampLightedByTimeRanges()) {
@@ -99,8 +99,8 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      */
     private function sendEmailOK(AlertLog $alertLog)
     {
-        $subject = "Лаг в очереди \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
-        $text = "Лаг пропал, ошибок больше нет<br />\n";
+        $subject = "Ошибка \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
+        $text = "Ошибка пропала<br />\n";
         $receiver = \Config::getInstance()->serviceRds['alerts']['lampOffEmail'];
         $this->sendEmail($subject, $text, $receiver);
     }
