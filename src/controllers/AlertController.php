@@ -11,12 +11,14 @@ class AlertController extends Controller
     const ALERT_START_HOUR = 10;
     const ALERT_END_HOUR = 20;
 
+    const ALERT_LIST_TYPE_ERRORS = 'errors';
+    const ALERT_LIST_TYPE_IGNORES = 'ignores';
+
     public function actionIndex()
     {
         if (!empty($_POST['disable'])) {
             $conf = \RdsDbConfig::get();
-            foreach ($_POST['disable'] as $key => $tmp) {
-                $timeout = $tmp === '1' ? self::ALERT_WAIT_TIMEOUT : $tmp;
+            foreach ($_POST['disable'] as $key => $timeout) {
                 $conf->{$key."_timeout"} = date("Y-m-d H:i:s", strtotime($timeout));
             }
             $conf->save();
@@ -41,8 +43,8 @@ class AlertController extends Controller
             $lamps[$lampName] = [
                 'status' => $this->getLampStatus($lampName),
                 'timeout' => $this->getLampTimeout($lampName),
-                'errors' => $this->getLampErrors($lampName),
-                'ignores' => $this->getLampIgnores($lampName),
+                self::ALERT_LIST_TYPE_ERRORS => $this->getLampErrors($lampName),
+                self::ALERT_LIST_TYPE_IGNORES => $this->getLampIgnores($lampName),
             ];
         }
 

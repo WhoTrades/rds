@@ -147,4 +147,24 @@ class AlertLog extends ActiveRecord
     {
         return parent::model($className);
     }
+
+    /**
+     * Имеется ли ссылка на страницу ошибки
+     *
+     * @return bool
+     */
+    public function hasLink()
+    {
+        return strpos($this->alert_text, 'url: ') !== false;
+    }
+
+    /**
+     * Возвращает ссылку на страницу ошибки
+     *
+     * @return string
+     */
+    public function getLink()
+    {
+        return trim(str_replace('url: ', '', $this->alert_text));
+    }
 }

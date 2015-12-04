@@ -7,7 +7,7 @@
             <td>
                 <?if ($lamp['status']) {?>
                     <?= TbHtml::form() ?>
-                        <?= TbHtml::submitButton('Остановить на 10 минут', [ 'name' => "disable[$name]", 'value' => 1 ]) ?>
+                        <?= TbHtml::submitButton('Остановить на 10 минут', [ 'name' => "disable[$name]", 'value' => AlertController::ALERT_WAIT_TIMEOUT ]) ?>
                     <?= TbHtml::endForm() ?>
                 <?} else { ?>
                     <?= TbHtml::form() ?>
@@ -28,24 +28,24 @@
                     <tr>
                         <?
                             $iconMap = [
-                                'errors'  => TbHtml::ICON_PAUSE,
-                                'ignores' => TbHtml::ICON_PLAY,
+                                AlertController::ALERT_LIST_TYPE_ERRORS  => TbHtml::ICON_PAUSE,
+                                AlertController::ALERT_LIST_TYPE_IGNORES => TbHtml::ICON_PLAY,
                             ];
 
                             $ignoreTimeMap = [
-                                'errors'  => '+10 years',
-                                'ignores' => '-1 minutes',
+                                AlertController::ALERT_LIST_TYPE_ERRORS  => '+10 years',
+                                AlertController::ALERT_LIST_TYPE_IGNORES => '-1 minutes',
                             ];
                         ?>
 
-                        <? foreach(['errors', 'ignores'] as $type) { ?>
+                        <? foreach([AlertController::ALERT_LIST_TYPE_ERRORS, AlertController::ALERT_LIST_TYPE_IGNORES] as $type) { ?>
                         <td>
                             <? foreach($lamp[$type] as $alert) {?>
                                 <? /** @var AlertLog $alert */?>
-                                <? if (strpos($alert->alert_text, 'url:') !== false) {
-                                    $alertName = TbHtml::link($alert->alert_name, trim(str_replace('url: ', '', $alert->alert_text)), ['target' => '_blank']);
-                                } else {
-                                    $alertName = $alert->alert_name;
+                                <? $alertName = $alert->alert_name; ?>
+
+                                <? if ($alert->hasLink()) {
+                                    $alertName = TbHtml::link($alertName, $alert->getLink(), ['target' => '_blank']);
                                 } ?>
 
                                 <?= TbHtml::em(
