@@ -9,7 +9,12 @@
                     <?= TbHtml::form() ?>
                         <?= TbHtml::submitButton('Остановить на 10 минут', [ 'name' => "disable[$name]", 'value' => 1 ]) ?>
                     <?= TbHtml::endForm() ?>
-                <?}?>
+                <?} else { ?>
+                    <?= TbHtml::form() ?>
+                        Остановлена до <?= date('H:i:s', strtotime($lamp['timeout'])) ?>
+                        <?= TbHtml::submitButton('Включить', [ 'name' => "disable[$name]", 'value' => '-1 minutes' ]) ?>
+                    <?= TbHtml::endForm() ?>
+                <? } ?>
             </td>
         </tr>
         <tr>
@@ -21,44 +26,49 @@
                         <td>Игнорируемые</td>
                     </tr>
                     <tr>
+                        <?
+                            $iconMap = [
+                                'errors'  => TbHtml::ICON_PAUSE,
+                                'ignores' => TbHtml::ICON_PLAY,
+                            ];
+
+                            $ignoreTimeMap = [
+                                'errors'  => '+10 years',
+                                'ignores' => '-1 minutes',
+                            ];
+                        ?>
+
+                        <? foreach(['errors', 'ignores'] as $type) { ?>
                         <td>
-                            <? foreach($lamp['errors'] as $error) {?>
+                            <? foreach($lamp[$type] as $alert) {?>
+                                <? /** @var AlertLog $alert */?>
+                                <? if (strpos($alert->alert_text, 'url:') !== false) {
+                                    $alertName = TbHtml::link($alert->alert_name, trim(str_replace('url: ', '', $alert->alert_text)), ['target' => '_blank']);
+                                } else {
+                                    $alertName = $alert->alert_name;
+                                } ?>
+
                                 <?= TbHtml::em(
-                                    TbHtml::submitButton(TbHtml::icon(TbHtml::ICON_PAUSE), [
-                                        'name' => "ignore[$error->obj_id]",
-                                        'value' => "+10 years",
+                                    TbHtml::submitButton(TbHtml::icon($iconMap[$type]), [
+                                        'name' => "ignore[$alert->obj_id]",
+                                        'value' => $ignoreTimeMap[$type],
                                         'size' => "xs",
-                                        'color' => TbHtml::BUTTON_COLOR_DANGER,
-                                    ]) . ' ' .$error->alert_name,
-                                    ['color' => TbHtml::TEXT_COLOR_DANGER]
-                                )?>
-                            <? } ?>
-                            <? if (empty($lamp['errors'])) { ?>
-                                <?= TbHtml::labelTb('None', ['color' => TbHtml::LABEL_COLOR_WARNING]) ?>
-                            <? } ?>
-                        </td>
-                        <td>
-                            <? foreach($lamp['ignores'] as $ignore) {?>
-                                <?= TbHtml::em(
-                                    TbHtml::submitButton(TbHtml::icon(TbHtml::ICON_PLAY), [
-                                        'name' => "ignore[$ignore->obj_id]",
-                                        'value' => "-1 minutes",
-                                        'size' => "xs",
-                                        'color' => $ignore->alert_status === AlertLog::STATUS_ERROR
-                                                    ? TbHtml::BUTTON_COLOR_DANGER
-                                                    : TbHtml::BUTTON_COLOR_SUCCESS,
-                                    ]) . ' ' .$ignore->alert_name,
+                                        'color' => $alert->alert_status === AlertLog::STATUS_ERROR
+                                            ? TbHtml::BUTTON_COLOR_DANGER
+                                            : TbHtml::BUTTON_COLOR_SUCCESS,
+                                    ]) . ' ' . $alertName,
                                     [
-                                        'color' => $ignore->alert_status === AlertLog::STATUS_ERROR
-                                                    ? TbHtml::TEXT_COLOR_DANGER
-                                                    : TbHtml::TEXT_COLOR_SUCCESS
+                                        'color' => $alert->alert_status === AlertLog::STATUS_ERROR
+                                            ? TbHtml::TEXT_COLOR_DANGER
+                                            : TbHtml::TEXT_COLOR_SUCCESS
                                     ]
                                 )?>
                             <? } ?>
-                            <? if (empty($lamp['ignores'])) { ?>
+                            <? if (empty($lamp[$type])) { ?>
                                 <?= TbHtml::labelTb('None', ['color' => TbHtml::LABEL_COLOR_WARNING]) ?>
                             <? } ?>
                         </td>
+                        <? } ?>
                     </tr>
                 </table>
                 <?= TbHtml::endForm() ?>

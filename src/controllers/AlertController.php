@@ -16,7 +16,8 @@ class AlertController extends Controller
         if (!empty($_POST['disable'])) {
             $conf = \RdsDbConfig::get();
             foreach ($_POST['disable'] as $key => $tmp) {
-                $conf->{$key."_timeout"} = date("Y-m-d H:i:s", strtotime(self::ALERT_WAIT_TIMEOUT));
+                $timeout = $tmp === '1' ? self::ALERT_WAIT_TIMEOUT : $tmp;
+                $conf->{$key."_timeout"} = date("Y-m-d H:i:s", strtotime($timeout));
             }
             $conf->save();
             $this->redirect("/alert/");
@@ -39,7 +40,7 @@ class AlertController extends Controller
         foreach ($this->getLamps() as $lampName) {
             $lamps[$lampName] = [
                 'status' => $this->getLampStatus($lampName),
-                // 'timeout' => $this->getLampTimeout($lampName),
+                'timeout' => $this->getLampTimeout($lampName),
                 'errors' => $this->getLampErrors($lampName),
                 'ignores' => $this->getLampIgnores($lampName),
             ];
