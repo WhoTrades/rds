@@ -1,8 +1,15 @@
 <?/** @var $lamps array*/?>
+<?
+    $lampNameMap = [
+        AlertLog::WTS_LAMP_NAME => '[PROD] Phplogs',
+        AlertLog::TEAM_CITY_LAMP_NAME => 'TeamCity',
+        AlertLog::PHPLOGS_DEV_LAMP_NAME => '[DEV] Phplogs',
+    ];
+?>
 <table>
     <?foreach ($lamps as $name => $lamp) {?>
         <tr>
-            <td><?=$name?></td>
+            <td><?=$lampNameMap[$name]?> (<?=$name?>)</td>
             <td><img src="/images/alarm.png" class="<?=$lamp['status'] ? 'status-on' : 'status-off'?>" /></td>
             <td>
                 <?if ($lamp['status']) {?>
