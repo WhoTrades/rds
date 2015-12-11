@@ -16,7 +16,7 @@
                     <?= TbHtml::form() ?>
                         <?= TbHtml::submitButton('Остановить на 10 минут', [ 'name' => "disable[$name]", 'value' => AlertController::ALERT_WAIT_TIMEOUT ]) ?>
                     <?= TbHtml::endForm() ?>
-                <?} else { ?>
+                <?} else if (strtotime($lamp['timeout']) > time()) { ?>
                     <?= TbHtml::form() ?>
                         Остановлена до <?= date('H:i:s', strtotime($lamp['timeout'])) ?>
                         <?= TbHtml::submitButton('Включить', [ 'name' => "disable[$name]", 'value' => '-1 minutes' ]) ?>
