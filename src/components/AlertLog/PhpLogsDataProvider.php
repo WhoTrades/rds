@@ -14,6 +14,16 @@ class PhpLogsDataProvider implements IAlertDataProvider
     const TIMEOUT = 60;
 
     /**
+     * @var string Название провайдера
+     */
+    protected $name;
+
+    /**
+     * @var string url источника данных
+     */
+    protected $dataProviderUrl;
+
+    /**
      * @var AlertData[]
      */
     private $data;
@@ -25,9 +35,13 @@ class PhpLogsDataProvider implements IAlertDataProvider
 
     /**
      * @param \ServiceBase_IDebugLogger $debugLogger
+     * @param string $name название провайдера
+     * @param string $dataProviderUrl url источника данных
      */
-    public function __construct(\ServiceBase_IDebugLogger $debugLogger)
+    public function __construct(\ServiceBase_IDebugLogger $debugLogger, $name, $dataProviderUrl)
     {
+        $this->name = $name;
+        $this->dataProviderUrl = $dataProviderUrl;
         $this->debugLogger = $debugLogger;
     }
 
@@ -38,7 +52,7 @@ class PhpLogsDataProvider implements IAlertDataProvider
      */
     public function getName()
     {
-        return 'PhpLogs';
+        return $this->name;
     }
 
     /**
@@ -59,9 +73,8 @@ class PhpLogsDataProvider implements IAlertDataProvider
         if($this->data === null) {
             $this->data = [];
 
-            $host = parse_url(\Config::getInstance()->phpLogsSystem['service']['location'], PHP_URL_HOST);
             $httpSender = new \ServiceBase\HttpRequest\RequestSender($this->debugLogger);
-            $url = "http://$host/status/list";
+            $url = $this->getDataProviderUrl();
             $json = $httpSender->getRequest($url, ['format' => 'json'], self::TIMEOUT);
             $data = json_decode($json, true);
 
@@ -83,5 +96,15 @@ class PhpLogsDataProvider implements IAlertDataProvider
                 $this->data[] = $alertData;
             }
         }
+    }
+
+    /**
+     * Возвращает url источника данных
+     *
+     * @return string
+     */
+    private function getDataProviderUrl()
+    {
+        return $this->dataProviderUrl;
     }
 }

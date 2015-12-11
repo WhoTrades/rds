@@ -23,6 +23,7 @@ class AlertLog extends ActiveRecord
 {
     const WTS_LAMP_NAME = 'red_lamp_wts';
     const TEAM_CITY_LAMP_NAME = 'red_lamp_team_city';
+    const PHPLOGS_DEV_LAMP_NAME = 'red_lamp_phplogs_dev';
 
     const STATUS_OK = 'ok';
     const STATUS_ERROR = 'error';
