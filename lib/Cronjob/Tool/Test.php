@@ -4,7 +4,6 @@
  */
 
 use RdsSystem\Message;
-use RdsSystem\lib\CommandExecutor;
 
 class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 {
@@ -17,11 +16,25 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $tag = 'activity_stream_queue';
-        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+        $teamcity = new \CompanyInfrastructure\WtTeamCityClient();
+        $project = $teamcity->getProject('WhoTrades_AcceptanceTests');
+        foreach ($project->buildTypes->children() as $buildType) {
+            /** @var $buildType SimpleXmlElement */
+            $buildTypeId = $buildType->attributes()['id'];
+            $build = $teamcity->getLastBuildByBuildType($buildTypeId);
+            $status = (string) $build->attributes()['status'];
+            $url = (string) $build->attributes()['webUrl'];
 
-        $res = $model->sendToolGetToolLogTail(
-            new RdsSystem\Message\Tool\ToolLogTail($tag, 10), RdsSystem\Message\Tool\ToolLogTailResult::type(), 1
-        );
+            if ($status === 'SUCCESS') {
+                $this->debugLogger->message($url);
+
+                $result = $teamcity->startBuild($buildTypeId, 'master', null, [
+                    'env.ENV' => 'dev',
+                    'env.DLD' => 'pdev',
+                ]);
+
+                $this->debugLogger->message("Started build " . $result->attributes()['webUrl']);
+            }
+        }
     }
 }
