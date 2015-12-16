@@ -13,6 +13,13 @@ class WebApplication extends CWebApplication
         return parent::end();
     }
 
+    public function handleException(Exception $exception)
+    {
+        $this->debugLogger->dump()->exception('an', $exception)->save();
+
+        parent::handleException($exception);
+    }
+
     /**
      * Метод используется в частности при авторизации для формирования имени сессии
      * Так как по дефолту для определения идентификатора приложения используется абсолютный путь - то при каждом релизе происходило вылогинивание

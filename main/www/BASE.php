@@ -84,4 +84,4 @@ require_once __DIR__ . '/../../RequestHandler/Dispatcher.php';
 $Core = \CoreLight::getInstance(__DIR__ . "/../../")->init();
 
 $Core->getServiceBaseDebugLogger()->tagPersistently(array('source' => 'www'))->tagPersistently(array('service' => 'yii-whotrades'));
-$Core->processRequest('yiiWhotrades\\RequestHandler\\Dispatcher');
+$Core->processRequest('YiiWhotrades\\RequestHandler\\Dispatcher');

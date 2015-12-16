@@ -4,8 +4,6 @@
  */
 namespace YiiWhotrades\RequestHandler;
 
-use GoogleAnalytics\Exception;
-
 class Dispatcher implements \ServiceBase\IRequestHandler
 {
     protected $config;
