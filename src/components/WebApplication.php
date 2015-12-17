@@ -15,7 +15,11 @@ class WebApplication extends CWebApplication
 
     public function handleException(Exception $exception)
     {
-        $this->debugLogger->dump()->exception('an', $exception)->save();
+        if (!$exception instanceof CHttpException) {
+            $this->debugLogger->dump()->exception('an', $exception)->critical()->save();
+        } else {
+            $this->debugLogger->dump()->exception('an', $exception)->notice()->save();
+        }
 
         parent::handleException($exception);
     }
