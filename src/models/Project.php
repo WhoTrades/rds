@@ -44,6 +44,7 @@ class Project extends ActiveRecord
 			array('obj_status_did', 'numerical', 'integerOnly'=>true),
 			array('project_notification_email', 'email'),
 			array('project_config', 'safe'),
+			array('project_config', 'ext.validators.PhpSyntaxValidator'),
 			array('project_notification_email, project_notification_subject', 'length', 'max'=>64),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
