@@ -212,7 +212,7 @@ class JsonController extends Controller
         $components = $ticket['fields']['components'];
 
         foreach ($projectsAllowed as $project) {
-            foreach ($teamCity->getBuildTypesList($project) as $buildList) {
+            $buildList = $teamCity->getBuildTypesList($project);
                 foreach ($buildList as $build) {
                     $buildId = (string)$build['id'];
                     try {
@@ -222,7 +222,7 @@ class JsonController extends Controller
                         continue;
                     }
 
-                    $teamcityJiraComponent = (string)$parameter['value'];
+                    $teamcityJiraComponent = (string)$parameter;
                     foreach ($components as $component) {
                         if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
                             $result[] = $teamCity->startBuild(
@@ -231,7 +231,7 @@ class JsonController extends Controller
                         }
                     }
                 }
-            }
+
         }
 
         echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
