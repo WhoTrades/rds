@@ -212,7 +212,7 @@ class JsonController extends Controller
         $components = $ticket['fields']['components'];
 
         foreach ($projectsAllowed as $project) {
-            foreach ($teamCity->getBuildTypesList($project) as $buildList) {
+            $buildList = $teamCity->getBuildTypesList($project);
                 foreach ($buildList as $build) {
                     $buildId = (string)$build['id'];
                     try {
@@ -222,7 +222,7 @@ class JsonController extends Controller
                         continue;
                     }
 
-                    $teamcityJiraComponent = (string)$parameter['value'];
+                    $teamcityJiraComponent = (string)$parameter;
                     foreach ($components as $component) {
                         if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
                             $result[] = $teamCity->startBuild(
@@ -231,10 +231,27 @@ class JsonController extends Controller
                         }
                     }
                 }
-            }
+
         }
 
         echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
         return;
+    }
+
+    public function actionGetCronJobsStatus()
+    {
+        $sql = "select
+          project_name,
+          command,
+          last_run_time,
+          extract(epoch from (NOW() - last_run_time)) as sec_from_last_run
+        from cronjobs.cpu_usage
+        join cronjobs.tool_job ON cpu_usage.key=tool_job.key AND tool_job.obj_status_did=1
+        ";
+
+        $result = Yii::app()->db->createCommand($sql)->queryAll();
+
+        header("Content-type: application/javascript");
+        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 }

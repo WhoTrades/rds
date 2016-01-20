@@ -28,7 +28,7 @@ class PhpSyntaxValidator extends CValidator
         $commandExecutor = new \RdsSystem\lib\CommandExecutor(Yii::app()->debugLogger);
 
         try {
-            $command = PHP_BINDIR.DIRECTORY_SEPARATOR."php -l $tempName 2>&1";
+            $command = PHP_BINDIR.DIRECTORY_SEPARATOR."php -l -ddisplay_errors=On $tempName 2>&1";
             $commandExecutor->executeCommand($command);
         } catch (\RdsSystem\lib\CommandExecutorException $exception) {
             $errorMessage = 'Ошибка синтаксиса валидации PHP-кода:'.PHP_EOL;
