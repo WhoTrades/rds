@@ -4,7 +4,7 @@
  */
 namespace YiiWhotrades\RequestHandler;
 
-class Dispatcher implements \ServiceBase\IRequestHandler
+class Dispatcher extends \ServiceBase\AbstractRequestHandler
 {
     protected $config;
 
