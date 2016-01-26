@@ -42,15 +42,23 @@
                     Build::STATUS_NEW => array(TbHtml::ICON_TIME, 'Ожидает сборки', 'black'),
                     Build::STATUS_BUILT => array(TbHtml::ICON_UPLOAD, 'Раскладывается по серверам', 'orange'),
                     Build::STATUS_INSTALLED => array(TbHtml::ICON_OK, 'Скопировано на сервер', 'black'),
-                    Build::STATUS_USED=> array(TbHtml::ICON_OK, 'Установлено', '#32cd32'),
-                    Build::STATUS_CANCELLED=> array(TbHtml::ICON_BAN_CIRCLE, 'Отменено', 'red'),
-                    Build::STATUS_PREPROD_USING=> array(TbHtml::ICON_REFRESH, 'Устанавливаем на preprod', 'orange'),
-                    Build::STATUS_PREPROD_MIGRATIONS=> array(TbHtml::ICON_REFRESH, 'Устанавливаем на preprod', 'orange'),
+                    Build::STATUS_USED => array(TbHtml::ICON_OK, 'Установлено', '#32cd32'),
+                    Build::STATUS_CANCELLED => array(TbHtml::ICON_BAN_CIRCLE, 'Отменено', 'red'),
+                    Build::STATUS_PREPROD_USING => array(TbHtml::ICON_REFRESH, 'Устанавливаем на preprod', 'orange'),
+                    Build::STATUS_PREPROD_MIGRATIONS => array(
+                        TbHtml::ICON_REFRESH,
+                        'Устанавливаем на preprod',
+                        'orange',
+                    ),
                 );
                 list($icon, $text, $color) = $map[$val->build_status];
-                $result[] =  "<a href='".Yii::app()->createUrl('build/view', array('id' => $val->obj_id))."' title='{$text}' style='color: $color'>".
-                TbHtml::icon($icon)
-                ."{$val->worker->worker_name} - {$val->build_status} {$val->project->project_name} {$val->build_version}</a>";
+
+                $result[] =  implode("", [
+                    "<a href='".Yii::app()->createUrl('build/view', array('id' => $val->obj_id)),
+                    "' title='{$text}' style='color: $color'>",
+                    TbHtml::icon($icon),
+                    " {$val->build_status} {$val->project->project_name} {$val->build_version}</a>",
+                ]);
 
                 if ($val->build_status == Build::STATUS_BUILDING) {
                     $info = $val->getProgressbarInfo();
@@ -151,7 +159,9 @@
                         "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show pre migrations</a>
                         <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                     foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                        $text .= "<a href='http://stash/projects/WT/repos/sparta/browse/migration/{$releaseRequest->project->project_name}/pre/$migration.php'>$migration</a><br />";
+                        $text .= "<a href='http://stash.finam.ru/projects/WT/repos/sparta/browse/migration/{$releaseRequest->project->project_name}/pre/$migration.php'>";
+                        $text .= "$migration";
+                        $text .= "</a><br />";
                     }
                     $text .= "</div>";
 

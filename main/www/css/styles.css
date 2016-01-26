@@ -1,51 +1,72 @@
 .form .row {
-	margin-left: 0px;
+    margin-left: 0;
 }
 
 .diff {
-	width: 100%;
-	background: none;
+    width: 100%;
+    background: none;
 }
 
 .diff.navbar-fixed-top {
-	padding: 10px;
-	background: #fafafa;
-	top: 40px;
-	left: auto;
-	right: 20px;
-	width: 250px;
+    padding: 10px;
+    background: #fafafa;
+    top: 40px;
+    left: auto;
+    right: 20px;
+    width: 250px;
 }
 
 .diff.navbar-fixed-top .item {
-	float: none;
-	width: 100%;
+    float: none;
+    width: 100%;
 }
 
 .diff .item{
-	float: left;
-	width: 20%;
+    float: left;
+    width: 20%;
 }
 
 
 @media (max-width: 1000px) {
-	.navbar .nav > li > a {
-		padding-left: 9px;
-		padding-right: 9px;
-		font-size: 0.9em;
-	}
+    .navbar .nav > li > a {
+        padding-left: 9px;
+        padding-right: 9px;
+        font-size: 0.9em;
+    }
+
 }
+
 @media (max-width: 1200px) and (min-width: 768px) {
-	.navbar .container {
-		width: 100%;
-		padding: 0;
-	}
-	.navbar {
-	}
-	.navbar-brand {
-		display: none;
-	}
+    .navbar .container {
+        width: 100%;
+        padding: 0;
+    }
+
+    .navbar {
+    }
+
+    .navbar-brand {
+        display: none;
+    }
+
 }
 
 .table-responsive .table td {
-	vertical-align: middle;
+    vertical-align: middle;
+}
+
+.glyphicon-refresh {
+    animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+
+    from {
+        transform:rotate(0deg);
+    }
+
+    to {
+        transform:rotate(360deg);
+    }
+
 }
