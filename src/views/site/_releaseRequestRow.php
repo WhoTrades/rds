@@ -159,7 +159,11 @@
                         "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show pre migrations</a>
                         <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                     foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                        $text .= "<a href='http://stash.finam.ru/projects/WT/repos/sparta/browse/migration/{$releaseRequest->project->project_name}/pre/$migration.php'>";
+                        $text .= "<a href='http://stash.finam.ru/projects/".
+                            JiraJsonController::PULL_REQUEST_PROJECT.
+                            "/repos/".
+                            JiraJsonController::PULL_REQUEST_REPOSITORY.
+                            "/browse/migration/{$releaseRequest->project->project_name}/pre/$migration.php'>";
                         $text .= "$migration";
                         $text .= "</a><br />";
                     }

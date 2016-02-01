@@ -14,7 +14,7 @@
                 <a href="/use/migrate/?id=<?=$rr->obj_id?>&type=post">Накатить</a>
                 <div style="clear: both"></div>
                 <?foreach (json_decode($rr->rr_new_post_migrations) as $migration) {?>
-                    <a href='http://stash.finam.ru/projects/WT/repos/sparta/browse/migration/<?=$rr->project->project_name?>/post/<?=$migration?>.php'><?=$migration?></a><br />
+                    <a href='http://stash.finam.ru/projects/<?=JiraJsonController::PULL_REQUEST_PROJECT?>/repos/<?=JiraJsonController::PULL_REQUEST_REPOSITORY?>/browse/migration/<?=$rr->project->project_name?>/post/<?=$migration?>.php'><?=$migration?></a><br />
                 <?}?>
             <?}?>
         <?}?>

@@ -11,9 +11,16 @@
             "packagist": false
         }
     ],
-    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "Whotrades_": "../../code-standard/Standards/"
+        }
+    },
+    "minimum-stability": "stable",
     "require": {
-        "php": ">=5.4.0",
-        "react/zmq": "0.2.*|0.3.*"
+        "react/zmq": "0.2.*|0.3.*",
+        "whotrades/phpcs-stash": "0.0.*",
+        "escapestudios/symfony2-coding-standard": "~2.0",
+        "php": ">=5.4.0"
     }
 }
