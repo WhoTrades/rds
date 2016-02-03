@@ -24,6 +24,48 @@ class JsonController extends Controller
         echo json_encode($result);
     }
 
+    /**
+     * Возвращает список пакетов, установленных на PROD сервера
+     * @param string $project название проекта (Поле в БД project.project_name)
+     * @param int    $limit   максимальное количество результатов. Работает только если $project указан
+     * @param string $format  формат ответа. null (json) или не null (plain text)
+     * @throws CHttpException
+     */
+    public function actionGetInstalledPackages($project = null, $limit = null, $format = null)
+    {
+        $limit = $limit ?: 5;
+
+        $c = new CDbCriteria();
+        $c->compare("rr_status", ReleaseRequest::getInstalledStatuses());
+        $c->order = "obj_id desc";
+
+        if ($project) {
+            $projectObj = Project::model()->findByAttributes([
+                'project_name' => $project,
+            ]);
+
+            if (!$projectObj) {
+                throw new CHttpException(404, "Project $project not found");
+            }
+
+            $c->compare("rr_project_obj_id", $projectObj->obj_id);
+            $c->limit = $limit;
+        }
+
+        $result = [];
+        $releaseRequests = ReleaseRequest::model()->findAll($c);
+        foreach ($releaseRequests as $releaseRequest) {
+            /** @var $releseRequest ReleaseRequest */
+            $result[] = $releaseRequest->getBuildTag();
+        }
+
+        if ($format === null) {
+            echo json_encode($result, JSON_PRETTY_PRINT);
+        } else {
+            echo implode(" ", $result);
+        }
+    }
+
     public function actionGetAllowedReleaseBranches()
     {
         $versions = ReleaseVersion::model()->findAll();
