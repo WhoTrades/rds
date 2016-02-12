@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "363a1d0306825de861a86d24a6ea2134",
-    "content-hash": "5402c249a58cfd5e1a249db4a37f6e96",
+    "hash": "8ffa260c4a370794218f26669ad9dce6",
+    "content-hash": "7151a0a66ca6fdffb3697f230014a5d6",
     "packages": [
         {
             "name": "escapestudios/symfony2-coding-standard",
@@ -602,17 +602,17 @@
         },
         {
             "name": "whotrades/phpcs-stash",
-            "version": "0.0.3",
+            "version": "0.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/phpcs-stash.git",
-                "reference": "007899b0fa5a9dc76e39e83d69bb64787e714dde"
+                "reference": "99efe9d3d77ec13092109620a985505e39766e55"
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/whotrades-phpcs-stash-0.0.3-b8e99f.tar",
-                "reference": "007899b0fa5a9dc76e39e83d69bb64787e714dde",
-                "shasum": "7f5e078897616eab3de9c26bf1c5fe6002f56f13"
+                "url": "http://git.whotrades.net/external/dist/whotrades-phpcs-stash-0.0.4-46ad98.tar",
+                "reference": "99efe9d3d77ec13092109620a985505e39766e55",
+                "shasum": "878d04ae1468e6bb83c4de35dae1f8dae9ff9e29"
             },
             "require": {
                 "escapestudios/symfony2-coding-standard": "~2.0",
@@ -628,7 +628,7 @@
                 }
             },
             "description": "Integration between phpcs and atlassian stash",
-            "time": "2016-02-01 12:55:23"
+            "time": "2016-02-12 11:48:20"
         }
     ],
     "packages-dev": [],
