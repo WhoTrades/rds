@@ -19,7 +19,7 @@
     "minimum-stability": "stable",
     "require": {
         "react/zmq": "0.2.*|0.3.*",
-        "whotrades/phpcs-stash": "0.0.4",
+        "whotrades/phpcs-stash": "0.0.5",
         "escapestudios/symfony2-coding-standard": "~2.0",
         "php": ">=5.4.0"
     }
