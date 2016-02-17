@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "19983dbbc932a820fd97cd930e9cf65c",
-    "content-hash": "843fe0e6fc20e3fed1a335a8bdc950c4",
+    "hash": "163fd547d1faadea1833e9605e0baf2d",
+    "content-hash": "56f1c23a58eebebac85d4ed6201a517d",
     "packages": [
         {
             "name": "escapestudios/symfony2-coding-standard",
