@@ -24,10 +24,29 @@
     <?php echo $form->textFieldControlGroup($model,'project_name'); ?>
     <?php echo $form->textFieldControlGroup($model,'project_notification_email'); ?>
     <?php echo $form->textFieldControlGroup($model,'project_notification_subject'); ?>
-    <?php echo $form->textAreaControlGroup($model,'project_config', [
-        'style' => 'min-height: 1000px',
-        'id' => 'php-config-code',
-    ]); ?>
+    <?foreach ($model->projectConfigs as $projectConfig) { ?>
+        <h3><?=$projectConfig->pc_filename?></h3>
+        <?=TbHtml::error($model, $projectConfig->pc_filename, ['class' => 'alert alert-danger'])?>
+        <?=TbHtml::textAreaControlGroup(
+            'project_config[' . $projectConfig->pc_filename . ']',
+            isset($_POST['project_config'][$projectConfig->pc_filename]) ? $_POST['project_config'][$projectConfig->pc_filename] : $projectConfig->pc_content,
+            ['id' => 'php-config-code-' . $projectConfig->pc_filename]
+        ); ?>
+
+        <script type="text/javascript">
+            var editor = CodeMirror.fromTextArea(
+                document.getElementById("php-config-code-<?=$projectConfig->pc_filename?>"),
+                {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    mode: "application/x-httpd-php",
+                    indentUnit: 4,
+                    viewportMargin: Infinity,
+                    indentWithTabs: true
+                }
+            );
+        </script>
+    <?php } ?>
 
 
     <br />
@@ -47,13 +66,3 @@
 
 </div><!-- form -->
 
-<script>
-    var editor = CodeMirror.fromTextArea(document.getElementById("php-config-code"), {
-        lineNumbers: true,
-        matchBrackets: true,
-        mode: "application/x-httpd-php",
-        indentUnit: 4,
-        viewportMargin: Infinity,
-        indentWithTabs: true
-    });
-</script>

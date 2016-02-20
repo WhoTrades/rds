@@ -11,6 +11,7 @@
  * @property string $pch_project_obj_id
  * @property string $pch_user
  * @property string $pch_config
+ * @property string $pch_filename
  *
  * The followings are the available model relations:
  * @property Project $project

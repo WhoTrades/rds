@@ -1,4 +1,6 @@
 <?php
+/** @var $filename string */
+
 /** @var $newText string */
 /** @var $newTitle string */
 
@@ -7,7 +9,9 @@
 
 Yii::app()->jsdifflib->register();
 
+$this->pageTitle = "$projectName/$filename";
 ?>
+<h1>Изменения <?=$projectName?>/<?=$filename?></h1>
 <div class="diff">
     <?=TbHtml::icon(TbHtml::ICON_MINUS, ['style' => 'float: right ;border: solid 1px #eee; cursor: pointer', 'onclick' => 'togglePanelMode()',], 'div');?>
     <div class="item">

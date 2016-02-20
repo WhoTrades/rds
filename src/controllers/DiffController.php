@@ -26,6 +26,7 @@ class DiffController extends Controller
 
         $c = new CDbCriteria();
         $c->compare('pch_project_obj_id', $rr1->pch_project_obj_id);
+        $c->compare('pch_filename', $rr1->pch_filename);
         $c->compare('obj_id', "<$id");
         $c->order = 'obj_id desc';
         $c->limit = 1;
@@ -34,6 +35,8 @@ class DiffController extends Controller
         $rr2 = ProjectConfigHistory::model()->find($c);
 
         $this->render('index', array(
+            'projectName' => $rr1->project->project_name,
+            'filename' => $rr1->pch_filename,
             'newText' => $rr1->pch_config,
             'newTitle' => "Новая версия: ".date('d.m.Y H:i:s', strtotime($rr1->obj_created))." ".$rr1->pch_user,
             'currentText' => $rr2 ? $rr2->pch_config : "",
