@@ -12,19 +12,19 @@
 
 <div class="form" style="width: 1200px; margin: auto">
 
-<?php $form=$this->beginWidget('yiistrap.widgets.TbActiveForm', array(
-	'id'=>'project-form',
-	'enableAjaxValidation'=>false,
+<?php $form = $this->beginWidget('yiistrap.widgets.TbActiveForm', array(
+    'id' => 'project-form',
+    'enableAjaxValidation' => false,
 )); ?>
 
 	<p class="note">Fields with <span class="required">*</span> are required.</p>
 
 	<?php echo $form->errorSummary($model); ?>
 
-    <?php echo $form->textFieldControlGroup($model,'project_name'); ?>
-    <?php echo $form->textFieldControlGroup($model,'project_notification_email'); ?>
-    <?php echo $form->textFieldControlGroup($model,'project_notification_subject'); ?>
-    <?foreach ($model->projectConfigs as $projectConfig) { ?>
+    <?php echo $form->textFieldControlGroup($model, 'project_name'); ?>
+    <?php echo $form->textFieldControlGroup($model, 'project_notification_email'); ?>
+    <?php echo $form->textFieldControlGroup($model, 'project_notification_subject'); ?>
+    <?php foreach ($model->projectConfigs as $projectConfig) { ?>
         <h3><?=$projectConfig->pc_filename?></h3>
         <?=TbHtml::error($model, $projectConfig->pc_filename, ['class' => 'alert alert-danger'])?>
         <?=TbHtml::textAreaControlGroup(
