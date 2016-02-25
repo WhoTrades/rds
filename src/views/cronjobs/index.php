@@ -250,6 +250,8 @@ $this->pageTitle = "Фоновые процессы";
         $('.__tools-filter').keyup(function(e){
             if (this.value) {
                 $('.group-splitter').hide();
+            } else {
+                $('.group-splitter').show();
             }
 
             var text = this.value.toLowerCase();
