@@ -9,27 +9,35 @@ class RebuildBranch
      * @param string $branch - ветка, которую нужно пересобрать, develop|staging
      * @param string $user - имя пользовеля, инициатора пересборки
      * @param \RdsSystem\Model\Rabbit\MessagingRdsMs $model
+     * @param bool $checkForDuplicateTasks - проверять ли на повторную пересборку той же ветки
      * @throws \ApplicationException
      * @throws \Exception
      */
-    public function run($branch, $user, \RdsSystem\Model\Rabbit\MessagingRdsMs $model)
+    public function run($branch, $user, \RdsSystem\Model\Rabbit\MessagingRdsMs $model, $checkForDuplicateTasks = null)
     {
+        $checkForDuplicateTasks = $checkForDuplicateTasks === null ? true : false;
+
         if (!in_array($branch, ['develop', 'staging'])) {
             throw new \ApplicationException('Branch must be develop or staging only', 404);
         }
 
-        $notReadyBranchesCount = \GitBuild::model()->countByAttributes([
-            'additional_data' => $branch,
-            'status' => \GitBuild::STATUS_NEW,
-        ]);
+        if ($checkForDuplicateTasks) {
+            $notReadyBranchesCount = \GitBuild::model()->countByAttributes([
+                'additional_data' => $branch,
+                'status' => \GitBuild::STATUS_NEW,
+            ]);
 
-        if ($notReadyBranchesCount > 0) {
-            throw new \ApplicationException("Ветка $branch уже пересобирается, дождитесь окончания процесса прежде чем пересобирать заново", 500);
+            if ($notReadyBranchesCount > 0) {
+                throw new \ApplicationException(
+                    "Ветка $branch уже пересобирается, дождитесь окончания процесса прежде чем пересобирать заново",
+                    500
+                );
+            }
         }
 
         $map = [
             'develop' => [
-                \Jira\Status::STATUS_MERGE_TO_DEVELOP,
+//                \Jira\Status::STATUS_MERGE_TO_DEVELOP,
                 \Jira\Status::STATUS_WAITING_FOR_TEST,
                 \Jira\Status::STATUS_TESTING,
 
@@ -38,7 +46,7 @@ class RebuildBranch
                 \Jira\Status::STATUS_CHECKING,
             ],
             'staging' => [
-                \Jira\Status::STATUS_MERGE_TO_STAGING,
+//                \Jira\Status::STATUS_MERGE_TO_STAGING,
                 \Jira\Status::STATUS_READY_FOR_CHECK,
                 \Jira\Status::STATUS_CHECKING,
             ],
@@ -50,8 +58,6 @@ class RebuildBranch
         \Yii::app()->debugLogger->message("Getting tickets by jql=$jql");
 
         $tickets = $jira->getTicketsByJql($jql);
-
-
 
         $branches = [];
         foreach ($tickets['issues'] as $ticket) {
