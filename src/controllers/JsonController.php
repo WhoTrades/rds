@@ -306,7 +306,7 @@ class JsonController extends Controller
      */
     public function actionTicketRemovedFromStaging($ticket)
     {
-        if (false === strpos($ticket, 'WTS') && false === strpos($ticket, 'WTS')) {
+        if (false === strpos($ticket, 'WTS') && false === strpos($ticket, 'WTT')) {
             echo 'Skip ticket';
 
             return;
