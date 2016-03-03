@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d922b9dd10cb2a5225b531d8804755d4",
-    "content-hash": "583a74626441d6e3dfc1d1f0e36bd7fc",
+    "hash": "7b9f5144a6773ea888ee0f7cdf9011d7",
+    "content-hash": "7153b8df9978ffc913a8cd7d19476cea",
     "packages": [
         {
             "name": "escapestudios/symfony2-coding-standard",
@@ -17,7 +17,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/escapestudios-symfony2-coding-standard-2.9.0-f3d4ff.tar",
+                "url": "https://git.whotrades.net/external/dist/escapestudios-symfony2-coding-standard-2.9.0-f3d4ff.tar",
                 "reference": "9560cf42efb6a66dd6c946cc06e2eb6f29626dac",
                 "shasum": "70813c11a9d9362f01940e23cc3533432d7f429a"
             },
@@ -66,7 +66,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/evenement-evenement-v2.0.0-f65b45.tar",
+                "url": "https://git.whotrades.net/external/dist/evenement-evenement-v2.0.0-f65b45.tar",
                 "reference": "f6e843799fd4f4184d54d8fc7b5b3551c9fa803e",
                 "shasum": "a8ff647685beda62b09cdf918a33ec30929e566b"
             },
@@ -110,7 +110,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/guzzlehttp-guzzle-5.3.0-731b7d.tar",
+                "url": "https://git.whotrades.net/external/dist/guzzlehttp-guzzle-5.3.0-731b7d.tar",
                 "reference": "5704fe9adfcbb5df01597a29acadf65daa5be2c1",
                 "shasum": "b063789344e347873b8f398e352b4098121e2f11"
             },
@@ -172,7 +172,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/guzzlehttp-ringphp-1.1.0-6654cd.tar",
+                "url": "https://git.whotrades.net/external/dist/guzzlehttp-ringphp-1.1.0-6654cd.tar",
                 "reference": "dbbb91d7f6c191e5e405e900e3102ac7f261bc0b",
                 "shasum": "93879f841503437006ed493831e8420b4d7550dc"
             },
@@ -227,7 +227,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/guzzlehttp-streams-3.0.0-c67b5d.tar",
+                "url": "https://git.whotrades.net/external/dist/guzzlehttp-streams-3.0.0-c67b5d.tar",
                 "reference": "47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5",
                 "shasum": "3af786891d906228cd7fcbad55388ee5e8a88308"
             },
@@ -276,7 +276,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/monolog-monolog-1.17.2-299fa0.tar",
+                "url": "https://git.whotrades.net/external/dist/monolog-monolog-1.17.2-299fa0.tar",
                 "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
                 "shasum": "c925c7a1bd642addb07907578ef26ac2c6b4179c"
             },
@@ -363,7 +363,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/psr-log-1.0.0-e71523.tar",
+                "url": "https://git.whotrades.net/external/dist/psr-log-1.0.0-e71523.tar",
                 "reference": "fe0936ee26643249e916849d48e3a51d5f5e278b",
                 "shasum": "1e8f522b4f8e9311f09a5ae126ea224c8db04580"
             },
@@ -400,7 +400,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/react-event-loop-v0.4.1-2a3b37.tar",
+                "url": "https://git.whotrades.net/external/dist/react-event-loop-v0.4.1-2a3b37.tar",
                 "reference": "18c5297087ca01de85518e2b55078f444144aa1b",
                 "shasum": "25e162cd5775c6db862012ff7a8a01e548c94df9"
             },
@@ -434,17 +434,17 @@
         },
         {
             "name": "react/promise",
-            "version": "v2.2.1",
+            "version": "v2.2.2",
             "source": {
                 "type": "git",
                 "url": "http://github.com/reactphp/promise.git",
-                "reference": "2ca597732a926038bdcfe949e73f9200f7328b84"
+                "reference": "38f03935b83dd12481a431dcf9d4c12d15d2d4e0"
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/react-promise-v2.2.1-1b642f.tar",
-                "reference": "2ca597732a926038bdcfe949e73f9200f7328b84",
-                "shasum": "e3539d068ff367008d76ca1cb8e334788456bdff"
+                "url": "https://git.whotrades.net/external/dist/react-promise-v2.2.2-35f20e.tar",
+                "reference": "38f03935b83dd12481a431dcf9d4c12d15d2d4e0",
+                "shasum": "a525391697277e6e7ace48ac2ef4d0edf5d7d150"
             },
             "require": {
                 "php": ">=5.4.0"
@@ -473,7 +473,7 @@
                 }
             ],
             "description": "A lightweight implementation of CommonJS Promises/A for PHP",
-            "time": "2015-07-03 13:48:55"
+            "time": "2016-02-26 19:09:02"
         },
         {
             "name": "react/zmq",
@@ -485,7 +485,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/react-zmq-v0.3.0-a7318e.tar",
+                "url": "https://git.whotrades.net/external/dist/react-zmq-v0.3.0-a7318e.tar",
                 "reference": "2865e3b23000751ed443d3f108da2735abf80716",
                 "shasum": "6132adf1c709e8d15c9c1ec47411b3b802d71999"
             },
@@ -529,7 +529,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/squizlabs-php_codesniffer-2.5.1-5ee81c.tar",
+                "url": "https://git.whotrades.net/external/dist/squizlabs-php_codesniffer-2.5.1-5ee81c.tar",
                 "reference": "1b9ef561f9df453b4ae50e3a52028c0ede2206be",
                 "shasum": "460417a0abbd5465b093151e471e6a35d91725e3"
             },
@@ -610,7 +610,7 @@
             },
             "dist": {
                 "type": "tar",
-                "url": "http://git.whotrades.net/external/dist/whotrades-phpcs-stash-0.0.7-7a2069.tar",
+                "url": "https://git.whotrades.net/external/dist/whotrades-phpcs-stash-0.0.7-7a2069.tar",
                 "reference": "30764539c42c86cea520ca443ce7894d06fffbea",
                 "shasum": "c33abd6333b0e184549da8fe7205c5d0e779d8f5"
             },

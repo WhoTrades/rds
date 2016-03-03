@@ -55,7 +55,7 @@ class JsonController extends Controller
         $result = [];
         $releaseRequests = ReleaseRequest::model()->findAll($c);
         foreach ($releaseRequests as $releaseRequest) {
-            /** @var $releseRequest ReleaseRequest */
+            /** @var $releaseRequest ReleaseRequest */
             $result[] = $releaseRequest->getBuildTag();
         }
 
@@ -109,7 +109,7 @@ class JsonController extends Controller
 
         //an: если тул ни разу не запускали - считаем что его запустили в начале времен
         if (!$mtr) {
-            return time();
+            echo time();
         }
 
         echo time() - strtotime($mtr->obj_created);
@@ -295,5 +295,26 @@ class JsonController extends Controller
 
         header("Content-type: application/javascript");
         echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Метод API, который дергает JIRA посредством web хука при переводе задачи из статуса "Ready for staging" назад
+     * @param string $ticket
+     *
+     * @throws ApplicationException
+     * @return void
+     */
+    public function actionTicketRemovedFromStaging($ticket)
+    {
+        if (false === strpos($ticket, 'WTS') && false === strpos($ticket, 'WTS')) {
+            echo 'Skip ticket';
+
+            return;
+        }
+
+        $action = new \Action\Git\RebuildBranch();
+        $action->run('staging', 'JIRA-hook', (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel(), false);
+
+        echo 'OK';
     }
 }
