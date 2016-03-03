@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7b9f5144a6773ea888ee0f7cdf9011d7",
-    "content-hash": "7153b8df9978ffc913a8cd7d19476cea",
+    "hash": "e40f1f46b925f58a785b5707dd9303bc",
+    "content-hash": "e6e9e373770d0b87ab1c8436736f0e7e",
     "packages": [
         {
             "name": "escapestudios/symfony2-coding-standard",
@@ -268,17 +268,17 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.17.2",
+            "version": "1.18.0",
             "source": {
                 "type": "git",
                 "url": "http://github.com/Seldaek/monolog.git",
-                "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24"
+                "reference": "e19b764b5c855580e8ffa7e615f72c10fd2f99cc"
             },
             "dist": {
                 "type": "tar",
-                "url": "https://git.whotrades.net/external/dist/monolog-monolog-1.17.2-299fa0.tar",
-                "reference": "bee7f0dc9c3e0b69a6039697533dca1e845c8c24",
-                "shasum": "c925c7a1bd642addb07907578ef26ac2c6b4179c"
+                "url": "https://git.whotrades.net/external/dist/monolog-monolog-1.18.0-a22ec4.tar",
+                "reference": "e19b764b5c855580e8ffa7e615f72c10fd2f99cc",
+                "shasum": "ed3644327d3e34df84a1781145108d4c402d72b5"
             },
             "require": {
                 "php": ">=5.3.0",
@@ -306,6 +306,7 @@
                 "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
                 "ext-mongo": "Allow sending log messages to a MongoDB server",
                 "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
                 "php-console/php-console": "Allow sending log messages to Google Chrome",
                 "raven/raven": "Allow sending log messages to a Sentry server",
                 "rollbar/rollbar": "Allow sending log messages to Rollbar",
@@ -315,7 +316,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.16.x-dev"
+                    "dev-master": "2.0.x-dev"
                 }
             },
             "autoload": {
@@ -351,7 +352,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2015-10-14 12:51:02"
+            "time": "2016-03-01 18:00:40"
         },
         {
             "name": "psr/log",
@@ -602,17 +603,17 @@
         },
         {
             "name": "whotrades/phpcs-stash",
-            "version": "0.0.7",
+            "version": "0.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/phpcs-stash.git",
-                "reference": "30764539c42c86cea520ca443ce7894d06fffbea"
+                "reference": "5498a7f6121d1db18bbd03a50f82eb56c7f7ce2c"
             },
             "dist": {
                 "type": "tar",
-                "url": "https://git.whotrades.net/external/dist/whotrades-phpcs-stash-0.0.7-7a2069.tar",
-                "reference": "30764539c42c86cea520ca443ce7894d06fffbea",
-                "shasum": "c33abd6333b0e184549da8fe7205c5d0e779d8f5"
+                "url": "https://git.whotrades.net/external/dist/whotrades-phpcs-stash-0.0.8-45e9f8.tar",
+                "reference": "5498a7f6121d1db18bbd03a50f82eb56c7f7ce2c",
+                "shasum": "b29ef6758534a5642ae5d1a9683212afb0b39c7e"
             },
             "require": {
                 "escapestudios/symfony2-coding-standard": "~2.0",
@@ -628,7 +629,7 @@
                 }
             },
             "description": "Integration between phpcs and atlassian stash",
-            "time": "2016-02-18 12:59:43"
+            "time": "2016-03-03 15:30:17"
         }
     ],
     "packages-dev": [],
