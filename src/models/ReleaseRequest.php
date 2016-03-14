@@ -197,15 +197,15 @@ class ReleaseRequest extends ActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('t.obj_id',$this->obj_id);
-		$criteria->compare('t.obj_created',$this->obj_created,true);
-		$criteria->compare('t.obj_modified',$this->obj_modified,true);
-		$criteria->compare('t.obj_status_did',$this->obj_status_did);
-		$criteria->compare('t.rr_user',$this->rr_user,true);
-		$criteria->compare('t.rr_status',$this->rr_status,true);
-		$criteria->compare('t.rr_comment',$this->rr_comment,true);
-		$criteria->compare('t.rr_project_obj_id',$this->rr_project_obj_id);
-		$criteria->compare('t.rr_build_version',$this->rr_build_version, true);
+        $criteria->compare('t.obj_id', $this->obj_id);
+        $criteria->compare('t.obj_created', $this->obj_created);
+        $criteria->compare('t.obj_modified', $this->obj_modified);
+        $criteria->compare('t.obj_status_did', $this->obj_status_did);
+        $criteria->compare('t.rr_user', $this->rr_user, true);
+        $criteria->compare('t.rr_status', $this->rr_status);
+        $criteria->compare('t.rr_comment', $this->rr_comment, true);
+        $criteria->compare('t.rr_project_obj_id', $this->rr_project_obj_id);
+        $criteria->compare('t.rr_build_version', $this->rr_build_version, true);
         $criteria->order = 't.obj_created desc';
         $criteria->with = array('builds', 'builds.worker', 'builds.project', 'hardMigrations');
 
