@@ -45,11 +45,14 @@ class RebuildBranch
                 \Jira\Status::STATUS_READY_FOR_CHECK,
                 \Jira\Status::STATUS_CHECKING,
                 \Jira\Status::STATUS_READY_FOR_STAGING,
+                \Jira\Status::STATUS_PACKED_FOR_RELEASE,
             ],
             'staging' => [
                 \Jira\Status::STATUS_MERGE_TO_STAGING,
                 \Jira\Status::STATUS_READY_FOR_CHECK,
                 \Jira\Status::STATUS_CHECKING,
+
+                \Jira\Status::STATUS_PACKED_FOR_RELEASE,
             ],
         ];
 
