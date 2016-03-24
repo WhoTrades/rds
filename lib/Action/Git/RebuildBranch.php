@@ -37,7 +37,7 @@ class RebuildBranch
 
         $map = [
             'develop' => [
-//                \Jira\Status::STATUS_MERGE_TO_DEVELOP,
+                \Jira\Status::STATUS_MERGE_TO_DEVELOP,
                 \Jira\Status::STATUS_WAITING_FOR_TEST,
                 \Jira\Status::STATUS_TESTING,
 
@@ -47,7 +47,7 @@ class RebuildBranch
                 \Jira\Status::STATUS_READY_FOR_STAGING,
             ],
             'staging' => [
-//                \Jira\Status::STATUS_MERGE_TO_STAGING,
+                \Jira\Status::STATUS_MERGE_TO_STAGING,
                 \Jira\Status::STATUS_READY_FOR_CHECK,
                 \Jira\Status::STATUS_CHECKING,
             ],
