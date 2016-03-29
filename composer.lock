@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "bc795f1c3eeebbfd9f727b12da749949",
-    "content-hash": "d0413275f10a6e5d67ba7078c6bf598f",
+    "hash": "5921d5f393c6d9973e854748ac033727",
+    "content-hash": "65032d1be3117514c8d6c05ddd9a5f62",
     "packages": [
         {
             "name": "escapestudios/symfony2-coding-standard",
@@ -390,6 +390,59 @@
                 "psr-3"
             ],
             "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "raven/raven",
+            "version": "0.13.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/getsentry/raven-php.git",
+                "reference": "1d5be07afc001df98a3528d1f928eeb2241afce6"
+            },
+            "dist": {
+                "type": "tar",
+                "url": "https://git.whotrades.net/external/dist/raven-raven-0.13.0-2d0335.tar",
+                "reference": "1d5be07afc001df98a3528d1f928eeb2241afce6",
+                "shasum": "ea06b24bca016c9ca0b7acb08e6a57a93ef171ff"
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.2.4"
+            },
+            "require-dev": {
+                "fabpot/php-cs-fixer": "^1.8.0",
+                "phpunit/phpunit": "^4.6.6"
+            },
+            "bin": [
+                "bin/raven"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.13.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Raven_": "lib/"
+                }
+            },
+            "license": [
+                "BSD"
+            ],
+            "authors": [
+                {
+                    "name": "David Cramer",
+                    "email": "dcramer@gmail.com"
+                }
+            ],
+            "description": "A PHP client for Sentry (http://getsentry.com)",
+            "homepage": "http://getsentry.com",
+            "keywords": [
+                "log",
+                "logging"
+            ],
+            "time": "2015-09-09 18:12:58"
         },
         {
             "name": "react/event-loop",
