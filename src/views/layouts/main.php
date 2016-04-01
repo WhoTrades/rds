@@ -12,6 +12,7 @@
 
 	<?php Yii::app()->bootstrap->register(); ?>
     <?php Yii::app()->webSockets->registerScripts()?>
+    <?php Yii::app()->assetManager->publish(Yii::getPathOfAlias('application.assets.fonts'));?>
     <script>
         function webSocketSubscribe(channel, callback)
         {
