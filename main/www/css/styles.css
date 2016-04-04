@@ -2,6 +2,10 @@
     margin-left: 0;
 }
 
+.modal-backdrop {
+    z-index: 0 !important;
+}
+
 .diff {
     width: 100%;
     background: none;
