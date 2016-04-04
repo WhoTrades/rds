@@ -17,9 +17,9 @@
     array(
         'value' => function(ReleaseRequest $releaseRequest){
             $map = array(
-                ReleaseRequest::STATUS_NEW => array(TbHtml::ICON_TIME, 'Ожидает сборки', 'gray'),
+                ReleaseRequest::STATUS_NEW => array(TbHtml::ICON_TIME, 'Ожидает сборки', 'black'),
                 ReleaseRequest::STATUS_FAILED => array(TbHtml::ICON_REMOVE, 'Не собралось', 'red'),
-                ReleaseRequest::STATUS_INSTALLED => array(TbHtml::ICON_OK, 'Установлено', 'gray'),
+                ReleaseRequest::STATUS_INSTALLED => array(TbHtml::ICON_OK, 'Установлено', 'black'),
                 ReleaseRequest::STATUS_USING=> array(TbHtml::ICON_REFRESH, 'Активируем', 'orange'),
                 ReleaseRequest::STATUS_CODES=> array(TbHtml::ICON_TIME, 'Ждем ввода кодов', 'orange'),
                 ReleaseRequest::STATUS_USED=> array(TbHtml::ICON_OK, 'Активная версия', '#32cd32'),
@@ -39,9 +39,9 @@
                 $map = array(
                     Build::STATUS_FAILED => array(TbHtml::ICON_EXCLAMATION_SIGN, 'Не собралось', 'red'),
                     Build::STATUS_BUILDING => array(TbHtml::ICON_REFRESH, 'Собирается', 'orange'),
-                    Build::STATUS_NEW => array(TbHtml::ICON_TIME, 'Ожидает сборки', 'gray'),
+                    Build::STATUS_NEW => array(TbHtml::ICON_TIME, 'Ожидает сборки', 'black'),
                     Build::STATUS_BUILT => array(TbHtml::ICON_UPLOAD, 'Раскладывается по серверам', 'orange'),
-                    Build::STATUS_INSTALLED => array(TbHtml::ICON_OK, 'Скопировано на сервер', 'gray'),
+                    Build::STATUS_INSTALLED => array(TbHtml::ICON_OK, 'Скопировано на сервер', 'black'),
                     Build::STATUS_USED => array(TbHtml::ICON_OK, 'Установлено', '#32cd32'),
                     Build::STATUS_CANCELLED => array(TbHtml::ICON_BAN_CIRCLE, 'Отменено', 'red'),
                     Build::STATUS_PREPROD_USING => array(TbHtml::ICON_REFRESH, 'Устанавливаем на preprod', 'orange'),

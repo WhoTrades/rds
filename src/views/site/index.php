@@ -181,6 +181,6 @@
 
 <style>
     .release-request-used {
-        background: #424242;
+        background: #EEFFEE;
     }
 </style>
