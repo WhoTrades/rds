@@ -73,11 +73,13 @@ class SiteController extends Controller
                     //an: Для comon мы выкладываем паралельно и dictionary. В данный момент это реализовано на уровне хардкода тут. В будущем, когда появится больше
                     // взаимосвязанныъ проектов - нужно подумать как это объединить в целостную систему
 
-                    if ($model->project->project_name == 'comon' && $dictionaryProject = Project::model()->findByAttributes(['project_name' => 'dictionary'])) {
+                    if (in_array($model->project->project_name, ['comon', 'whotrades'])
+                        && $dictionaryProject = Project::model()->findByAttributes(['project_name' => 'dictionary'])) {
                         $dictionary = new ReleaseRequest();
                         $dictionary->rr_user = $model->rr_user;
                         $dictionary->rr_project_obj_id = $dictionaryProject->obj_id;
-                        $dictionary->rr_comment = $model->rr_comment." [slave for comon-$model->rr_build_version]";
+                        $dictionary->rr_comment =
+                            $model->rr_comment . " [slave for " . $model->project->project_name . "-$model->rr_build_version]";
                         $dictionary->rr_release_version = $model->rr_release_version;
                         $dictionary->rr_build_version = $dictionary->project->getNextVersion($dictionary->rr_release_version);
                         $dictionary->rr_leading_id = $model->obj_id;
