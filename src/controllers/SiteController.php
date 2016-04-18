@@ -73,13 +73,14 @@ class SiteController extends Controller
                     //an: Для comon мы выкладываем паралельно и dictionary. В данный момент это реализовано на уровне хардкода тут. В будущем, когда появится больше
                     // взаимосвязанныъ проектов - нужно подумать как это объединить в целостную систему
 
-                    if (in_array($model->project->project_name, ['comon', 'whotrades'])
+                    $projectName = $model->project->project_name;
+                    if (in_array($projectName, ['comon', 'whotrades'])
                         && $dictionaryProject = Project::model()->findByAttributes(['project_name' => 'dictionary'])) {
                         $dictionary = new ReleaseRequest();
                         $dictionary->rr_user = $model->rr_user;
                         $dictionary->rr_project_obj_id = $dictionaryProject->obj_id;
                         $dictionary->rr_comment =
-                            $model->rr_comment . " [slave for " . $model->project->project_name . "-$model->rr_build_version]";
+                            $model->rr_comment . " [slave for " . $projectName . "-$model->rr_build_version]";
                         $dictionary->rr_release_version = $model->rr_release_version;
                         $dictionary->rr_build_version = $dictionary->project->getNextVersion($dictionary->rr_release_version);
                         $dictionary->rr_leading_id = $model->obj_id;
@@ -90,11 +91,19 @@ class SiteController extends Controller
                         $model->save();
                     }
 
-                    //an: Отправку задач в rabbit делаем по-ближе к комиту транзакции, что бы не получилось что задачи уже
+                    // an: Отправку задач в rabbit делаем по-ближе к комиту транзакции, что бы не получилось что задачи уже
                     // начали выполняться, а транзакция ещё не отправлена и билда у нас в базе ещё нет
-                    $model->createAndSendBuildTasks();
-                    if (!empty($dictionary)) {
-                        $dictionary->createAndSendBuildTasks();
+                    if ('whotrades' == $projectName) {
+                        // warl: для проекта whotrades важно, чтобы словарь уже был новый, поэтому сначала собираем его
+                        if (!empty($dictionary)) {
+                            $dictionary->createAndSendBuildTasks();
+                        }
+                        $model->createAndSendBuildTasks();
+                    } else {
+                        $model->createAndSendBuildTasks();
+                        if (!empty($dictionary)) {
+                            $dictionary->createAndSendBuildTasks();
+                        }
                     }
                     $transaction->commit();
 
