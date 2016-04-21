@@ -3,7 +3,7 @@ class WebSockets extends CApplicationComponent
 {
     public $server;
     public $zmqHost;
-    public $zmqPort;
+    public $zmqPorts;
     public $maxRetries = 50;
     public $retryDelay = 50;
 
@@ -19,7 +19,7 @@ class WebSockets extends CApplicationComponent
     {
         $this->webSocketsManager = new \ServiceBase_WebSocketsManager(
             $this->zmqHost,
-            $this->zmqPort,
+            $this->zmqPorts,
             Yii::app()->debugLogger
         );
     }
