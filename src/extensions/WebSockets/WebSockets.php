@@ -7,7 +7,26 @@ class WebSockets extends CApplicationComponent
     public $maxRetries = 50;
     public $retryDelay = 50;
 
+    /**
+     * @var ServiceBase_WebSocketsManager
+     */
+    public $webSocketsManager;
+
+    /**
+     * Инициализация сервиса вебсокетов
+     */
+    public function init()
+    {
+        $this->webSocketsManager = new \ServiceBase_WebSocketsManager(
+            $this->zmqHost,
+            $this->zmqPort,
+            Yii::app()->debugLogger
+        );
+    }
+
     public function registerScripts () {
+
+
         $assets=dirname(__FILE__).'/assets';
         $baseUrl=Yii::app()->assetManager->publish($assets);
         if(is_dir($assets)){
@@ -60,6 +79,6 @@ here
 
     public function send($channel, $data)
     {
-        \CoreLight::getInstance()->getWebSocketsManager()->send($channel, $data);
+        $this->webSocketsManager->sendEvent($channel, null, $data);
     }
 }
