@@ -93,23 +93,23 @@ class SiteController extends Controller
 
                     // an: Отправку задач в rabbit делаем по-ближе к комиту транзакции, что бы не получилось что задачи уже
                     // начали выполняться, а транзакция ещё не отправлена и билда у нас в базе ещё нет
-                    if ('whotrades' == $projectName) {
-                        // warl: для проекта whotrades важно, чтобы словарь уже был новый, поэтому сначала собираем его
-                        if (!empty($dictionary)) {
-                            $dictionary->createAndSendBuildTasks();
-                        }
-                        $model->createAndSendBuildTasks();
-                    } else {
-                        $model->createAndSendBuildTasks();
-                        if (!empty($dictionary)) {
-                            $dictionary->createAndSendBuildTasks();
-                        }
+                    $model->createBuildTasks();
+                    if (!empty($dictionary)) {
+                        $dictionary->createBuildTasks();
                     }
                     $transaction->commit();
 
-                    $model->sendBuildTasks();
-                    if (!empty($dictionary)) {
-                        $dictionary->sendBuildTasks();
+                    if ('whotrades' == $projectName) {
+                        // warl: для проекта whotrades важно, чтобы словарь уже был новый, поэтому сначала собираем его
+                        if (!empty($dictionary)) {
+                            $dictionary->sendBuildTasks();
+                        }
+                        $model->sendBuildTasks();
+                    } else {
+                        $model->sendBuildTasks();
+                        if (!empty($dictionary)) {
+                            $dictionary->sendBuildTasks();
+                        }
                     }
 
                     Yii::app()->webSockets->send('updateAllReleaseRequests', []);

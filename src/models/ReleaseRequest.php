@@ -300,7 +300,10 @@ class ReleaseRequest extends ActiveRecord
         return $this->project->project_name."-".$this->rr_build_version;
     }
 
-    public function createAndSendBuildTasks()
+    /**
+     * @throws Exception
+     */
+    public function createBuildTasks()
     {
         $this->project->incrementBuildVersion($this->rr_release_version);
         $list = Project2worker::model()->findAllByAttributes(array(
