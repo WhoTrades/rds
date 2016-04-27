@@ -130,7 +130,13 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
         return [
             AlertLog::WTS_LAMP_NAME => new \AlertLog\PhpLogsDataProvider($this->debugLogger, 'PhpLogs', $config['phpLogs']['url']),
-            AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(['WhoTrades_AcceptanceTests'], 'TeamCity: Acceptance Tests'),
+            AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(
+                [
+                    'WhoTrades_AcceptanceTests',
+                    'WhoTrades_AcceptanceTests_WhoTradesSite',
+                ],
+                'TeamCity: Acceptance Tests'
+            ),
             AlertLog::PHPLOGS_DEV_LAMP_NAME => new \AlertLog\PhpLogsDataProvider($this->debugLogger, 'PhpLogsDEV', $config['phpLogsDEV']['url']),
         ];
     }
