@@ -16,7 +16,7 @@
         function webSocketSubscribe(channel, callback)
         {
             webSocketSession.subscribe(channel, function (topic, event) {
-                callback(event.data);
+                callback(event.data.data);
             });
         }
     </script>
