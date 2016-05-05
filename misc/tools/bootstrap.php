@@ -14,7 +14,6 @@ if (!empty($matches[1])) {
 
 require_once __DIR__ . '/../../init-libraries.php';
 
-//$Core = Cronjob\RequestHandler\Core::getInstance(__DIR__ . "/../../")->init(array());
 $Core = Cronjob\RequestHandler\Core::getInstance(__DIR__ . "/../../")->init(array());
 
 class Config
@@ -26,10 +25,7 @@ class Config
         $path = dirname(__FILE__) . '/../../';
         foreach (array(
                  'config/config.db.php', // vdm: подключил т.к. он используется внутри config.pgq
-                 'config/config.comon.php',
-                 'config/config.taskssystem.php',
                  'config/config.servicebase.php',
-                 'config/config.stm.php', // vdm: подключаем сразу после config.services.php
                  'config/config.services.php',
                  'config/config.pgq.php', // vdm: NB: см config.pgq.php
                  'config/config.cronjob.php', // ad: #WTS-855

@@ -22,6 +22,6 @@
         "whotrades/phpcs-stash": "0.0.10",
         "escapestudios/symfony2-coding-standard": "2.9.0",
         "php": ">=5.4.0",
-        "raven/raven": "^0.13.0"
+        "sentry/sentry": "0.16.0"
     }
 }
