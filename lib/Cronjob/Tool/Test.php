@@ -16,9 +16,8 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $t = microtime(true);
-        Yii::app()->webSockets->send('aa', 'bb');
-
-        $this->debugLogger->message(microtime(true) - $t);
+        $c = new CompanyInfrastructure\WtTeamCityClient($this->debugLogger);
+        $list = $c->startBuild('WhoTrades_WhoTradesPHPUnit_Phpunit', 'master', 'test');
+        var_export($list);
     }
 }

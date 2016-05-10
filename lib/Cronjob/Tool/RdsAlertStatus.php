@@ -150,7 +150,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      */
     private function getTeamCityDataProvider(array $projects, $name = 'TeamCity')
     {
-        $teamCityClient = new \CompanyInfrastructure\WtTeamCityClient();
+        $teamCityClient = new \CompanyInfrastructure\WtTeamCityClient($this->debugLogger);
 
         $dataProviders = [];
 
