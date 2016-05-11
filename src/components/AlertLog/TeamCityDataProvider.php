@@ -40,7 +40,7 @@ class TeamCityDataProvider implements IAlertDataProvider
      * @param TeamCityClient $teamCityClient
      * @param string $projectId Идентификатор проекта в TeamCity
      */
-    public function __construct(\ServiceBase_IDebugLogger $debugLogger, TeamCityClient $teamCityClient, $projectId = 'Whotrades')
+    public function __construct(\ServiceBase_IDebugLogger $debugLogger, \CompanyInfrastructure\WtTeamCityClient $teamCityClient, $projectId = 'Whotrades')
     {
         $this->debugLogger = $debugLogger;
         $this->teamCityClient = $teamCityClient;
