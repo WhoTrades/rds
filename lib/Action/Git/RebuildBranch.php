@@ -37,22 +37,22 @@ class RebuildBranch
 
         $map = [
             'develop' => [
-                \Jira\Status::STATUS_MERGE_TO_DEVELOP,
-                \Jira\Status::STATUS_WAITING_FOR_TEST,
-                \Jira\Status::STATUS_TESTING,
+                \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_DEVELOP,
+                \CompanyInfrastructure\Jira\Status::STATUS_WAITING_FOR_TEST,
+                \CompanyInfrastructure\Jira\Status::STATUS_TESTING,
 
-                \Jira\Status::STATUS_MERGE_TO_STAGING,
-                \Jira\Status::STATUS_READY_FOR_CHECK,
-                \Jira\Status::STATUS_CHECKING,
-                \Jira\Status::STATUS_READY_FOR_STAGING,
-                \Jira\Status::STATUS_PACKED_FOR_RELEASE,
+                \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_STAGING,
+                \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_CHECK,
+                \CompanyInfrastructure\Jira\Status::STATUS_CHECKING,
+                \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_STAGING,
+                \CompanyInfrastructure\Jira\Status::STATUS_PACKED_FOR_RELEASE,
             ],
             'staging' => [
-                \Jira\Status::STATUS_MERGE_TO_STAGING,
-                \Jira\Status::STATUS_READY_FOR_CHECK,
-                \Jira\Status::STATUS_CHECKING,
+                \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_STAGING,
+                \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_CHECK,
+                \CompanyInfrastructure\Jira\Status::STATUS_CHECKING,
 
-                \Jira\Status::STATUS_PACKED_FOR_RELEASE,
+                \CompanyInfrastructure\Jira\Status::STATUS_PACKED_FOR_RELEASE,
             ],
         ];
 
