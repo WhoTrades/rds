@@ -37,7 +37,7 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
 
         //\CoreLight::getInstance()->getFatalWatcher()->stop();
         include("yii/yii.php");
-
+        \Yii::$enableIncludePath = false;
 
         require_once(__DIR__.'/../protected/components/WebApplication.php');
         try {
