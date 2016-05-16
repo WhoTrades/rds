@@ -131,6 +131,13 @@ class ServiceRdsProdTL1
             new Comment("Пересборка веток"),
             new CronCommand(Cronjob_Tool_Git_RebuildBranch::getToolCommand(['--branch=develop'], $verbosity = 3), '39 10 20 * * *', 'rds_rebuild_develop'),
             new CronCommand(Cronjob_Tool_Git_RebuildBranch::getToolCommand(['--branch=staging'], $verbosity = 3), '39 30 20 * * *', 'rds_rebuild_staging'),
+
+            new Comment("Интеграция с Zoho"),
+            new MultiCommandToCron(
+                \PgQ_EventProcessor_RdsTeamCityBuildComplete::getPgqConsumer('rds_zoho_integration', 'rds_zoho_integration_consumer', 'simple+retry', 'DSN_DB4', 1, [], 3),
+                '* * * * * *',
+                'rds_zoho_integration'
+            ),
         ];
     }
 
