@@ -134,7 +134,7 @@ class ServiceRdsProdTL1
 
             new Comment("Интеграция с Zoho"),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsTeamCityBuildComplete::getPgqConsumer('rds_zoho_integration', 'rds_zoho_integration_consumer', 'simple+retry', 'DSN_DB4', 1, [], 3),
+                \PgQ_EventProcessor_ZohoAsync::getPgqConsumer('rds_zoho_integration', 'rds_zoho_integration_consumer', 'simple+retry', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_zoho_integration'
             ),
