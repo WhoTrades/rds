@@ -1,5 +1,11 @@
 <?php
 /**
+ * @package rds\zoho
+ */
+
+/**
+ * @author Artem Naumenko
+ *
  * This is the model class for table "rds.pgq_zoho_integration".
  *
  * The followings are the available columns in table 'rds.pgq_zoho_integration':
@@ -10,7 +16,6 @@
  * @property string $task
  * @property string $data
  */
-
 class PgqZohoIntegration extends CActiveRecord
 {
     // an: Указание номера тикета jira в тикете zoho, при автоматическом создании последнего

@@ -1,6 +1,10 @@
 <?php
 /**
- * Class WtflowModule
+ * @package rds\zoho
+ */
+
+/**
+ * @author Artem Naumenko
  */
 class ZohoModule extends CWebModule
 {

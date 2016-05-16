@@ -1,5 +1,9 @@
 <?php
 /**
+ * @package rds\zoho
+ */
+
+/**
  * Консьюмер, который двигает статусы тикетов из Ready for deploy -> Ready for acceptance в случае выкатывания релиза, и обратно в случае откатывания
  *
  * @author Artem Naumenko
