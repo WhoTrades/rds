@@ -53,7 +53,7 @@
                 'key' => $toolJob->key,
                 'projectId' => $Project->obj_id,
             ])?>" class="ajax-url">
-                <?=TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'font-size: 2em; color: green',])?>
+                <?=TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'font-size: 2em; color: green'])?>
             </a><br />
         <?php } else {?>
             <div style="white-space: nowrap">
