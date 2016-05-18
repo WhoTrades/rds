@@ -200,7 +200,7 @@ class JsonController extends Controller
                 );
             }
 
-            Yii::app()->webSockets->send('updateToolJonPerformanceStats', [
+            Yii::app()->webSockets->send('updateToolJobPerformanceStats', [
                 'key' => $key,
                 'version' => $version,
                 'project' => $project,

@@ -1,6 +1,11 @@
 <?php
+/**
+ * @author Artem Naumenko
+ * Контроллер по управлению фотовыми задачами
+ * @see https://rds.whotrades.com/cronjobs/index
+ */
 
-class CronJobsController extends Controller
+class CronjobsController extends Controller
 {
     const KILL_SIGNAL = 15; //SIGTERM
 
@@ -77,7 +82,14 @@ class CronJobsController extends Controller
         ]);
     }
 
-    public function actionStop($key, $projectId, $interval, $url = '/cronjobs/index')
+    /**
+     * @param string $key - key of tool job
+     * @param int $projectId - project of tool job
+     * @param string $interval - strftime format
+     *
+     * @throws Exception
+     */
+    public function actionStop($key, $projectId, $interval)
     {
         $project = Project::model()->findByPk($projectId);
         if (!$project) {
@@ -96,18 +108,43 @@ class CronJobsController extends Controller
 
         Log::createLogMessage("Остановлена фоновая задача $key на $interval");
 
-        $this->redirect($url);
+        $this->updateToolJobRow($key, $project->obj_id);
     }
 
-    public function actionStart($key, $projectId, $url)
+    private function updateToolJobRow($key, $projectId)
+    {
+        $toolJob = ToolJob::model()->findByAttributes([
+            'key' => $key,
+            'project_obj_id' => $projectId,
+            'obj_status_did' => 1,
+        ]);
+
+        if (!$toolJob) {
+            return;
+        }
+
+        Yii::app()->webSockets->send('updateToolJobRow-' . $toolJob->project->project_name, [
+            'id' => $toolJob->getLoggerTag(),
+            'projectName' => $toolJob->project->project_name,
+            'html' => $this->renderToolJobRow($toolJob),
+        ]);
+    }
+
+    /**
+     * @param string $key
+     * @param int $projectId
+     *
+     * @throws CDbException
+     * @throws Exception
+     */
+    public function actionStart($key, $projectId)
     {
         if ($stopper = ToolJobStopped::model()->findByAttributes(['key' => $key, 'project_obj_id' => $projectId])) {
             $stopper->delete();
             Log::createLogMessage("Запущена фоновая задача $key");
         }
 
-
-        $this->redirect($url);
+        $this->updateToolJobRow($key, $projectId);
     }
 
     public function actionKill($key, $project, $signal = self::KILL_SIGNAL)
@@ -228,5 +265,35 @@ class CronJobsController extends Controller
         $this->render('cpuUsageReport', [
             'data' => $data,
         ]);
+    }
+
+    /**
+     * @param ToolJob $toolJob
+     * @param array $cpuUsages
+     *
+     * @return string
+     */
+    public function renderToolJobRow(ToolJob $toolJob, $cpuUsages = null)
+    {
+        if ($cpuUsages === null) {
+            $cpuUsage = CpuUsage::model()->findByAttributes([
+                'key' => $toolJob->key,
+                'project_name' => $toolJob->project->project_name,
+            ]);
+
+            if ($cpuUsage) {
+                $cpuUsages = [
+                    $toolJob->key => [
+                        $toolJob->project->project_name => $cpuUsage,
+                    ],
+                ];
+            }
+        }
+
+        return $this->renderPartial('_toolJobRow', [
+            'toolJob' => $toolJob,
+            'Project' => $toolJob->project,
+            'cpuUsages' => $cpuUsages,
+        ], true);
     }
 }

@@ -42,7 +42,7 @@
 
 <script>
     $().ready(function() {
-        webSocketSubscribe('updateToolJonPerformanceStats', function (event) {
+        webSocketSubscribe('updateToolJobPerformanceStats', function (event) {
             var obj = $('.cpu-usage.__key-' + event.key + '.__project-' + event.project);
             obj.html(event.cpuTime.toFixed(2) + ' сек');
             obj.css({'font-weight': 'bold'});
