@@ -181,10 +181,6 @@ $this->pageTitle = "Фоновые процессы";
             console.log('str', str);
             var obj = $(str);
             obj.html($(event.html).html());
-            obj.addClass('updated');
-            setTimeout(function(){
-                obj.removeClass('updated');
-            }, 500);
         });
     });
 
@@ -207,7 +203,7 @@ $this->pageTitle = "Фоновые процессы";
 </script>
 
 <style type="text/css">
-    tr.selected, tr.updated {
+    tr.selected {
         background-color: #ecf8be !important;
     }
 </style>
