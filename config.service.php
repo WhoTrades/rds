@@ -20,6 +20,3 @@ $this->serviceRds['alerts']['dataProvider'] = [
         'url' => 'http://phplogs.dev.whotrades.net/status/list',
     ],
 ];
-
-// an: хак, пока не выпилим phplogs изо-всех сервисов
-unset($this->phpLogsSystem);
