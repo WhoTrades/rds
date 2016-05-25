@@ -202,4 +202,22 @@ class Project extends ActiveRecord
         $this->project_current_version = $version;
         $this->save(false);
     }
+
+    /**
+     * Возвращает ссылку в stash на исходный код миграции
+     *
+     * @param string $migration
+     * @param string $type - pre|post|hard
+     *
+     * @return string
+     */
+    public function getMigrationUrl($migration, $type)
+    {
+        $config = Yii::app()->params['projectMigrationUrlMask'];
+        if (isset($config[$this->project_name])) {
+            return $config[$this->project_name]($migration, $this->project_name, $type);
+        } else {
+            return $config['*']($migration, $this->project_name, $type);
+        }
+    }
 }

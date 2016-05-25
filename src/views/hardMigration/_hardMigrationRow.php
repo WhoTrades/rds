@@ -106,12 +106,9 @@ return array(
     [
         'name' => 'migration_name',
         'value' => function (HardMigration $migration) {
+
             $text = "<a
-                href='http://stash.finam.ru/projects/".
-                JiraJsonController::PULL_REQUEST_PROJECT.
-                "/repos/".
-                JiraJsonController::PULL_REQUEST_REPOSITORY.
-                "/browse/migration/{$migration->project->project_name}/hard/$migration->migration_name.php'
+                href='" . $migration->project->getMigrationUrl($migration->migration_name, 'hard') . "'
                 target='_blank'
                 title='Посмотреть исходный код миграции'
             >
