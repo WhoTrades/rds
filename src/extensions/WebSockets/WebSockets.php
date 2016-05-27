@@ -18,8 +18,7 @@ class WebSockets extends CApplicationComponent
     public function init()
     {
         $this->webSocketsManager = new \ServiceBase_WebSocketsManager(
-            $this->zmqHost,
-            $this->zmqPorts,
+            $this->zmqLocations,
             Yii::app()->debugLogger
         );
     }
