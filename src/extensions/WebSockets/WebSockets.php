@@ -2,8 +2,7 @@
 class WebSockets extends CApplicationComponent
 {
     public $server;
-    public $zmqHost;
-    public $zmqPorts;
+    public $zmqLocations;
     public $maxRetries = 50;
     public $retryDelay = 50;
 
