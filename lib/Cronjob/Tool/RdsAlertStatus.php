@@ -114,7 +114,8 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      */
     private function sendEmail($subject, $text, $receiver)
     {
-        $mailHeaders = "From: $receiver\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=utf-8";
+        $from = \Config::getInstance()->serviceRds['alerts']['lampFromEmail'];
+        $mailHeaders = "From: $from\r\nMIME-Version: 1.0\r\nContent-type: text/html; charset=utf-8";
 
         $this->debugLogger->message("Sending alert email");
         mail($receiver, $subject, $text, $mailHeaders);

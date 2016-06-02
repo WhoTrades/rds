@@ -10,6 +10,7 @@ $this->serviceRds['jira']['mergeTasks'] = false;
 $this->serviceRds['jira']['asyncRpc'] = false;
 $this->serviceRds['stash']['createPullRequest'] = false;
 $this->environment = 'main';
+$this->serviceRds['alerts']['lampFromEmail'] = 'rds-lamp@whotrades.org';
 $this->serviceRds['alerts']['lampOnEmail'] = 'oops+lamp-on@whotrades.org';
 $this->serviceRds['alerts']['lampOffEmail'] = 'oops+lamp-off@whotrades.org';
 $this->serviceRds['alerts']['dataProvider'] = [
