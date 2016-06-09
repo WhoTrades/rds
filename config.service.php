@@ -15,9 +15,15 @@ $this->serviceRds['alerts']['lampOnEmail'] = 'oops+lamp-on@whotrades.org';
 $this->serviceRds['alerts']['lampOffEmail'] = 'oops+lamp-off@whotrades.org';
 $this->serviceRds['alerts']['dataProvider'] = [
     'phpLogs' => [
-        'url'=> 'http://phplogs.whotrades.net/status/list',
+        'url' => 'http://phplogs.whotrades.net/status/list',
     ],
     'phpLogsDEV' => [
         'url' => 'http://phplogs.dev.whotrades.net/status/list',
+    ],
+    'monitoring' => [
+        'url' => 'http://monitoring.whotrades.net/?json=1',
+    ],
+    'monitoringDEV' => [
+        'url' => 'http://monitoring.dev.whotrades.net/?json=1',
     ],
 ];
