@@ -167,6 +167,7 @@ class AlertController extends Controller
     {
         return [
             AlertLog::WTS_LAMP_NAME,
+            AlertLog::CRM_LAMP_NAME,
             AlertLog::TEAM_CITY_LAMP_NAME,
             AlertLog::PHPLOGS_DEV_LAMP_NAME,
         ];

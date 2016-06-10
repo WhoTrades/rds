@@ -12,6 +12,7 @@
  * @property string $red_lamp_wts_timeout
  * @property string $red_lamp_team_city_timeout
  * @property string $red_lamp_phplogs_dev_timeout
+ * @property string $crm_lamp_timeout
  * @property string $preprod_online
  * @property string $cpu_usage_last_truncate
  */
@@ -40,11 +41,20 @@ class RdsDbConfig extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('red_lamp_wts_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, preprod_online, is_tst_updating_enabled', 'safe'),
+            array('obj_status_did', 'numerical', 'integerOnly' => true),
+            array(
+                'red_lamp_wts_timeout, crm_lamp_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, '
+                    . 'preprod_online, is_tst_updating_enabled',
+                'safe',
+            ),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, is_tst_updating_enabled, red_lamp_wts_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, cpu_usage_last_truncate', 'safe', 'on'=>'search'),
+            array(
+                'obj_id, obj_created, obj_modified, crm_lamp_timeout, obj_status_did, is_tst_updating_enabled,'
+                    . ' red_lamp_wts_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, '
+                    . 'cpu_usage_last_truncate', 'safe',
+                'on' => 'search',
+            ),
         );
     }
 
@@ -73,6 +83,7 @@ class RdsDbConfig extends ActiveRecord
             'red_lamp_wts_timeout' => 'Red Lamp Wts Timeout',
             'red_lamp_team_city_timeout' => 'Red Lamp TeamCity Timeout',
             'red_lamp_phplogs_dev_timeout' => 'Red Lamp PhpLogsDEV Timeout',
+            'crm_lamp_timeout' => 'CRM Lamp Timeout',
             'cpu_usage_last_truncate' => 'Cpu Usage last truncate',
         );
     }
@@ -103,6 +114,7 @@ class RdsDbConfig extends ActiveRecord
         $criteria->compare('red_lamp_wts_timeout',$this->red_lamp_wts_timeout,true);
         $criteria->compare('red_lamp_team_city_timeout',$this->red_lamp_team_city_timeout,true);
         $criteria->compare('red_lamp_phplogs_dev_timeout',$this->red_lamp_phplogs_dev_timeout,true);
+        $criteria->compare('crm_lamp_timeout', $this->crm_lamp_timeout, true);
         $criteria->compare('cpu_usage_last_truncate',$this->cpu_usage_last_truncate,true);
 
         return new CActiveDataProvider($this, array(
