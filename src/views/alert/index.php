@@ -2,6 +2,7 @@
 <?
     $lampNameMap = [
         AlertLog::WTS_LAMP_NAME => '[PROD] Phplogs',
+        AlertLog::CRM_LAMP_NAME => '[CRM] Phplogs',
         AlertLog::TEAM_CITY_LAMP_NAME => 'TeamCity',
         AlertLog::PHPLOGS_DEV_LAMP_NAME => '[DEV] Phplogs',
     ];
