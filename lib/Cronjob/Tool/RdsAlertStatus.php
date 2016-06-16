@@ -132,11 +132,11 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         return [
             AlertLog::WTS_LAMP_NAME => new \AlertLog\CompoundDataProvider($this->debugLogger, 'phplogs && monitoring', [
                 new \AlertLog\PhpLogsDataProvider($this->debugLogger, 'PhpLogs', $config['phpLogs']['url']),
-                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoringDEV']['url']),
+                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
             ]),
             AlertLog::CRM_LAMP_NAME => new \AlertLog\CompoundDataProvider($this->debugLogger, 'phplogs && monitoring', [
                 new \AlertLog\PhpLogsDataProvider($this->debugLogger, 'PhpLogs', $config['phpLogs']['url']),
-                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoringDEV']['url']),
+                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
             ]),
             AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(
                 [
@@ -146,7 +146,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
             ),
             AlertLog::PHPLOGS_DEV_LAMP_NAME => new \AlertLog\CompoundDataProvider($this->debugLogger, 'phplogs && monitoring', [
                 new \AlertLog\PhpLogsDataProvider($this->debugLogger, 'PhpLogsDEV', $config['phpLogsDEV']['url']),
-                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'MonitoringDEV', $config['monitoring']['url']),
+                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'MonitoringDEV', $config['monitoringDEV']['url']),
             ]),
         ];
     }
