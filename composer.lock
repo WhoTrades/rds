@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0f516ae466dbb9f6866b3d1485e21083",
-    "content-hash": "03b0ce2b19595616059f846603a30b6e",
+    "hash": "e9fff6056afbf6a8339a1df125b9725e",
+    "content-hash": "04218c07b527f086a7246cb0a183bfcb",
     "packages": [
         {
             "name": "escapestudios/symfony2-coding-standard",
@@ -582,17 +582,17 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "2.6.0",
+            "version": "2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "84a8cfbe442b8182bdfefabb7caca106cf0856c0"
+                "reference": "b94c13627928b8faf8173a8b8dd8db2a05f9e088"
             },
             "dist": {
                 "type": "tar",
-                "url": "https://git.whotrades.net/external/dist/squizlabs-php_codesniffer-2.6.0-f9e2d5.tar",
-                "reference": "84a8cfbe442b8182bdfefabb7caca106cf0856c0",
-                "shasum": "c82d835cba823ec7c745197390a67c31e1d81ccb"
+                "url": "https://git.whotrades.net/external/dist/squizlabs-php_codesniffer-2.6.1-9ff02e.tar",
+                "reference": "b94c13627928b8faf8173a8b8dd8db2a05f9e088",
+                "shasum": "ab76d5ade4f2ca0eb471755e4185eff9b83022a2"
             },
             "require": {
                 "ext-simplexml": "*",
@@ -660,21 +660,21 @@
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki",
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer"
             },
-            "time": "2016-04-03 22:58:34"
+            "time": "2016-05-30 22:24:32"
         },
         {
             "name": "whotrades/phpcs-stash",
-            "version": "0.0.10",
+            "version": "0.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/phpcs-stash.git",
-                "reference": "2c4d10b7011265e15b8c99037d89f33d2c28cbfd"
+                "reference": "bd0712523847ea605a288348f592fa37cb4e7854"
             },
             "dist": {
                 "type": "tar",
-                "url": "https://git.whotrades.net/external/dist/whotrades-phpcs-stash-0.0.10-078380.tar",
-                "reference": "2c4d10b7011265e15b8c99037d89f33d2c28cbfd",
-                "shasum": "a4d26b83a50a3c8e3a93b4424fe35f6f3232ecbb"
+                "url": "https://git.whotrades.net/external/dist/whotrades-phpcs-stash-0.0.12-2355b1.tar",
+                "reference": "bd0712523847ea605a288348f592fa37cb4e7854",
+                "shasum": "432ebe34dbeb27774aadf6327631782c1961e043"
             },
             "require": {
                 "guzzlehttp/guzzle": "~5.3",
@@ -689,7 +689,7 @@
                 }
             },
             "description": "Integration between phpcs and atlassian stash",
-            "time": "2016-03-22 09:22:52"
+            "time": "2016-06-14 13:25:17"
         }
     ],
     "packages-dev": [],
@@ -699,7 +699,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4.0"
+        "php": ">=5.6.0"
     },
     "platform-dev": []
 }
