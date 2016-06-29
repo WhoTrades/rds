@@ -127,29 +127,53 @@ class SiteController extends Controller
         return ['model' => $model];
     }
 
+    /**
+     * Страница создания запрета на релиз
+     * @throws Exception
+     */
     public function actionCreateReleaseReject()
     {
-        $model=new ReleaseReject;
+        $model = new ReleaseReject();
 
-        if(isset($_POST['ReleaseReject'])) {
-            $model->attributes = $_POST['ReleaseReject'];
-            $model->rr_user = \Yii::app()->user->name;
-            if ($model->save()) {
-                Log::createLogMessage("Создан {$model->getTitle()}");
-                $text = "{$model->rr_user} rejected {$model->project->project_name}. {$model->rr_comment}";
-                foreach (explode(",", \Yii::app()->params['notify']['releaseReject']['phones']) as $phone) {
-                    if (!$phone) {
-                        continue;
-                    }
-                    Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+        if (isset($_POST['ReleaseReject'])) {
+            $projectNames = [];
+            foreach ($_POST['ReleaseReject']['rr_project_obj_id'] as $projectId) {
+                /** @var $project Project */
+                $project = Project::model()->findByPk($projectId);
+                if (!$project) {
+                    continue;
                 }
-                Yii::app()->EmailNotifier->sendRdsReleaseRejectNotification($model->rr_user, $model->project->project_name, $model->rr_comment);
-                $this->redirect(array('index'));
+                $model = new ReleaseReject();
+                $model->rr_user = \Yii::app()->user->name;
+                $model->rr_project_obj_id = $projectId;
+                $model->rr_release_version = $_POST['ReleaseReject']['rr_release_version'];
+                $model->rr_comment = $_POST['ReleaseReject']['rr_comment'];
+                if ($model->save()) {
+                    $projectNames[] = $project->project_name;
+                }
             }
+            $projects = implode(", ", $projectNames);
+            Log::createLogMessage("Создан запрет релизов $projectNames");
+            foreach (explode(",", \Yii::app()->params['notify']['releaseReject']['phones']) as $phone) {
+                if (!$phone) {
+                    continue;
+                }
+                $text = "{$model->rr_user} rejected $projects. {$model->rr_comment}";
+                Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+            }
+            Yii::app()->EmailNotifier->sendRdsReleaseRejectNotification(
+                $model->rr_user,
+                $projects,
+                $model->rr_comment
+            );
+
+            Yii::app()->webSockets->send('updateAllReleaseRejects', []);
+
+            $this->redirect(array('index'));
         }
 
-        $this->render('createReleaseReject',array(
-            'model'=>$model,
+        $this->render('createReleaseReject', array(
+            'model' => $model,
         ));
     }
 
@@ -203,6 +227,7 @@ class SiteController extends Controller
                 Log::createLogMessage("Удален {$model->getTitle()}");
                 $model->delete();
                 $transaction->commit();
+                Yii::app()->webSockets->send('updateAllReleaseRejects', []);
             } catch (\Exception $e) {
                 $transaction->rollback();
             }

@@ -287,7 +287,13 @@ class ReleaseRequest extends ActiveRecord
 
     public static function getInstalledStatuses()
     {
-        return [self::STATUS_INSTALLED, self::STATUS_OLD, self::STATUS_USED, self::STATUS_USED_ATTEMPT];
+        return [
+            self::STATUS_INSTALLED,
+            self::STATUS_OLD,
+            self::STATUS_USED,
+            self::STATUS_USED_ATTEMPT,
+            self::STATUS_CODES,
+        ];
     }
 
     public static function getUsedStatuses()
