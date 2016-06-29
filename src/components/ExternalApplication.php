@@ -7,4 +7,12 @@ class ExternalApplication extends WebApplication
     {
         //ничего не делаем
     }
+
+    /**
+     * @return null
+     */
+    public function getTheme()
+    {
+        return null;
+    }
 }

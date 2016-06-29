@@ -142,7 +142,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                         $jiraVersion->save(false);
                     }
 
-                    Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
+                    Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                     foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
                         if (!$phone) continue;
                         Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
@@ -153,7 +153,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 $title = "Failed to install $project->project_name";
                 $text = "Проект $project->project_name не удалось собрать. <a href='".Yii::app()->createAbsoluteUrl('build/view', array('id' => $build->obj_id))."'>Подробнее</a>";
 
-                Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
+                Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                 foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
                     if (!$phone) continue;
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
@@ -182,7 +182,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     $releaseRequest->save();
                 }
 
-                Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendReleaseRejectCustomNotification'}('success', $title, $version, $text);
+                Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                 foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
                     if (!$phone) continue;
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);

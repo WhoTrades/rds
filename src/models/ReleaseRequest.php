@@ -322,7 +322,7 @@ class ReleaseRequest extends ActiveRecord
             $tasks[] = $task;
         }
 
-        Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRequestNotification'}($this->rr_user, $this->project->project_name, $this->rr_comment);
+        Yii::app()->EmailNotifier->sendRdsReleaseRequestNotification($this->rr_user, $this->project->project_name, $this->rr_comment);
         $text = "{$this->rr_user} requested {$this->project->project_name}. {$this->rr_comment}";
         foreach (explode(",", \Yii::app()->params['notify']['releaseRequest']['phones']) as $phone) {
             if (!$phone) continue;

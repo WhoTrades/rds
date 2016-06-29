@@ -138,10 +138,12 @@ class SiteController extends Controller
                 Log::createLogMessage("Создан {$model->getTitle()}");
                 $text = "{$model->rr_user} rejected {$model->project->project_name}. {$model->rr_comment}";
                 foreach (explode(",", \Yii::app()->params['notify']['releaseReject']['phones']) as $phone) {
-                    if (!$phone) continue;
+                    if (!$phone) {
+                        continue;
+                    }
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
                 }
-                Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsReleaseRejectNotification'}($model->rr_user, $model->project->project_name, $model->rr_comment);
+                Yii::app()->EmailNotifier->sendRdsReleaseRejectNotification($model->rr_user, $model->project->project_name, $model->rr_comment);
                 $this->redirect(array('index'));
             }
         }
@@ -151,10 +153,16 @@ class SiteController extends Controller
         ));
     }
 
+    /**
+     * @param int $id
+     *
+     * @throws CDbException
+     * @throws Exception
+     */
     public function actionDeleteReleaseRequest($id)
     {
-        $model=ReleaseRequest::model()->findByPk($id);
-        if(!$model) {
+        $model = ReleaseRequest::model()->findByPk($id);
+        if (!$model) {
             return;
         }
 

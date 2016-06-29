@@ -65,6 +65,13 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         $this->debugLogger->message("Message accepted");
     }
 
+    /**
+     * @param Message\Merge\TaskResult $message
+     * @param MessagingRdsMs           $model
+     *
+     * @throws ApplicationException
+     * @throws \ServiceBase\HttpRequest\Exception\ResponseCode
+     */
     public function actionProcessMergeFeatureResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
     {
         $transitionMap = [
@@ -78,6 +85,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         if (!$feature) {
             $this->debugLogger->error("Feature #$message->featureId not found");
             $message->accepted();
+
             return;
         }
 
@@ -87,6 +95,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         } catch (\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
             $this->debugLogger->error("Skip accepting ticket $feature->jf_ticket, as it was deleted");
             $message->accepted();
+
             return;
         }
 
@@ -100,18 +109,20 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 //an: Если не смержилась - просто пишем комент с ошибками мержа
                 $this->debugLogger->message("Branch was merged fail, sending comment");
                 $mergeFix = $message->targetBranch == 'master' ? "$message->targetBranch в $message->sourceBranch" : "$message->sourceBranch в $message->targetBranch";
-                $text = "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. Разрешите эти ошибки путем мержа $mergeFix:\n".implode("\n", $message->errors);
-                if ($jira->addCommentOrModifyMyComment($feature->jf_ticket, $text)) {
+                $text = "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. " .
+                        "Разрешите эти ошибки путем мержа $mergeFix:\n" . implode("\n", $message->errors);
 
+                if ($jira->addCommentOrModifyMyComment($feature->jf_ticket, $text)) {
                     $text = str_replace("\r", "", $text);
                     $text = preg_replace('~^h\d\.(.*)~', '<b>$1</b>', $text);
                     $text = preg_replace('~\nh\d\.(.*)~', "\n<b>$1</b>", $text);
                     $text = preg_replace('~{quote}(.*?){quote}~sui', '<pre>$1</pre>', $text);
 
-                    Yii::app()->whotrades->{'getMailingSystemFactory.getPhpLogsNotificationModel.sendRdsConflictNotification'}(
+                    Yii::app()->EmailNotifier->sendRdsConflictNotification(
                         $feature->developer->finam_email,
-                        strtolower(preg_replace('~(\w+)\-\d+~', '$1', $feature->jf_ticket)).'@whotrades.org',
-                        'Merge conflict at '.$feature->jf_ticket.", branch=$message->targetBranch, developer={$feature->developer->finam_email}",
+                        strtolower(preg_replace('~(\w+)\-\d+~', '$1', $feature->jf_ticket)) . '@whotrades.org',
+                        $feature->jf_ticket,
+                        $message->targetBranch,
                         $text
                     );
                 }

@@ -9,15 +9,22 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 {
     const PACKAGES_TIMEOUT = 30;
 
+    /**
+     * @return array
+     */
     public static function getCommandLineSpec()
     {
         return [] + parent::getCommandLineSpec();
     }
 
+    /**
+     * @param \Cronjob\ICronjob $cronJob
+     *
+     * @throws CException
+     * @throws phpmailerException
+     */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $c = new CompanyInfrastructure\WtTeamCityClient($this->debugLogger);
-        $list = $c->startBuild('WhoTrades_WhoTradesPHPUnit_Phpunit', 'master', 'test');
-        var_export($list);
+        Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification('preved', 'medved');
     }
 }
