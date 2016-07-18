@@ -46,7 +46,6 @@ class ReleaseRequest extends ActiveRecord
     const STATUS_INSTALLED           = 'installed';
     const STATUS_CODES               = 'codes';
     const STATUS_USING               = 'using';
-    const STATUS_USED_ATTEMPT        = 'used_attempt';
     const STATUS_USED                = 'used';
     const STATUS_OLD                 = 'old';
     const STATUS_CANCELLING          = 'cancelling';
@@ -57,37 +56,38 @@ class ReleaseRequest extends ActiveRecord
     const MIGRATION_STATUS_FAILED    = 'failed';
     const MIGRATION_STATUS_UP        = 'up';
 
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
-	{
-		return 'rds.release_request';
-	}
+    /**
+     * @return string the associated database table name
+     */
+    public function tableName()
+    {
+        return 'rds.release_request';
+    }
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
-	public function rules()
-	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
-		return array(
-			array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_release_version', 'required'),
-			array('obj_status_did, rr_project_obj_id', 'numerical', 'integerOnly'=>true),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_status', 'safe', 'on'=>'search'),
-			array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on'=>'use'),
+    /**
+     * @return array validation rules for model attributes.
+     */
+    public function rules()
+    {
+        // NOTE: you should only define rules for those attributes that
+        // will receive user inputs.
+        return array(
+            array('obj_created, obj_modified, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_release_version', 'required'),
+            array('obj_status_did, rr_project_obj_id', 'numerical', 'integerOnly' => true),
+            array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_status', 'safe', 'on' => 'search'),
+            array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on' => 'use'),
             array('rr_release_version', 'checkForReleaseReject'),
-            //array('rr_release_version', 'checkForTeamCityHasNoErrors'),
             array('rr_release_version', 'checkNotExistsHardMigrationOfPreviousRelease'),
-		);
-	}
+        );
+    }
 
+    /**
+     * @param string $attribute
+     * @param array $params
+     */
     public function checkForReleaseReject($attribute, $params)
     {
-        //an: Правило действует только для новых запросов на релиз
+        // an: Правило действует только для новых запросов на релиз
         if (!$this->isNewRecord || !$this->rr_project_obj_id) {
             return;
         }
@@ -100,102 +100,85 @@ class ReleaseRequest extends ActiveRecord
         if ($rejects) {
             $messages = '';
             foreach ($rejects as $reject) {
-                $messages[] = $reject->rr_comment." (".$reject->rr_user.")";
+                $messages[] = "$reject->rr_comment ($reject->rr_user)";
             }
-            $this->addError($attribute, 'Запрет на релиз: '.implode("; ", $messages));
+            $this->addError($attribute, 'Запрет на релиз: ' . implode("; ", $messages));
         }
 
     }
 
-    public function checkForTeamCityHasNoErrors($attribute, $params)
-    {
-        //an: Правило действует только для новых запросов на релиз
-        if (!$this->isNewRecord || !$this->rr_build_version || empty(Yii::app()->params['checkCiHasNoErrors'])) {
-            return;
-        }
-
-        $c = new CDbCriteria();
-        $c->compare('alert_version', $this->rr_release_version);
-        $c->compare('alert_name', AlertLog::WTS_LAMP_NAME);
-        $c->order = 'obj_id desc';
-        $one = AlertLog::model()->find($c);
-        if ($one && $one->alert_status == AlertLog::STATUS_ERROR) {
-            foreach (explode(", ", $one->alert_text) as $url) {
-                $this->addError($attribute, 'Ошибка сборки CI: <a href="'.$url.'">'.$url."</a>");
-            }
-        }
-    }
-
+    /**
+     * @param string $attribute
+     * @param array $params
+     */
     public function checkNotExistsHardMigrationOfPreviousRelease($attribute, $params)
     {
         $c = new CDbCriteria();
         $c->with = 'releaseRequest';
-        $c->compare("rr_release_version", "<".$this->rr_release_version);
-        $c->compare("migration_status", "<>".HardMigration::MIGRATION_STATUS_DONE);
+        $c->compare("rr_release_version", "<" . $this->rr_release_version);
+        $c->compare("migration_status", "<>" . HardMigration::MIGRATION_STATUS_DONE);
         $c->compare("migration_project_obj_id", $this->rr_project_obj_id);
         $count = HardMigration::model()->count($c);
         if ($count) {
-            $this->addError($attribute, "Есть невыполненные тяжелая миграции ($count шт) от предыдущего релиза: <a href='".Yii::app()->createUrl('hardMigration/index', [
-                'HardMigration[build_version]' => '<='.$this->rr_release_version,
-                'HardMigration[migration_status]' => '<>'.HardMigration::MIGRATION_STATUS_DONE,
+            $this->addError($attribute, "Есть невыполненные тяжелая миграции ($count шт) от предыдущего релиза: <a href='" . Yii::app()->createUrl('hardMigration/index', [
+                'HardMigration[build_version]' => '<=' . $this->rr_release_version,
+                'HardMigration[migration_status]' => '<>' . HardMigration::MIGRATION_STATUS_DONE,
                 'HardMigration[migration_project_obj_id]' => $this->rr_project_obj_id,
-            ])."' target='_blank'>Посмотреть</a>");
+            ]) . "' target='_blank'>Посмотреть</a>");
         }
     }
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
+    /**
+     * @return array relational rules.
+     */
+    public function relations()
+    {
+        // NOTE: you may need to adjust the relation name and the related
+        // class name for the relations automatically generated below.
+        return array(
             'project' => array(self::BELONGS_TO, 'Project', 'rr_project_obj_id'),
             'builds' => array(self::HAS_MANY, 'Build', 'build_release_request_obj_id'),
             'hardMigrations' => array(self::HAS_MANY, 'HardMigration', 'migration_release_request_obj_id'),
             'leader' => array(self::BELONGS_TO, 'ReleaseRequest', 'rr_leading_id'),
-		);
-	}
+        );
+    }
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'obj_id' => 'ID',
-			'obj_created' => 'Created',
-			'obj_modified' => 'Modified',
-			'obj_status_did' => 'Status Did',
-			'rr_user' => 'User',
-			'rr_status' => 'Status',
-			'rr_comment' => 'Comment',
-			'rr_project_obj_id' => 'Project',
-			'rr_build_version' => 'Build',
-			'rr_project_owner_code' => 'Project owner code',
-			'rr_release_engineer_code' => 'Release engineer code',
-			'rr_release_version' => 'Release version',
-		);
-	}
+    /**
+     * @return array customized attribute labels (name=>label)
+     */
+    public function attributeLabels()
+    {
+        return array(
+            'obj_id' => 'ID',
+            'obj_created' => 'Created',
+            'obj_modified' => 'Modified',
+            'obj_status_did' => 'Status Did',
+            'rr_user' => 'User',
+            'rr_status' => 'Status',
+            'rr_comment' => 'Comment',
+            'rr_project_obj_id' => 'Project',
+            'rr_build_version' => 'Build',
+            'rr_project_owner_code' => 'Project owner code',
+            'rr_release_engineer_code' => 'Release engineer code',
+            'rr_release_version' => 'Release version',
+        );
+    }
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
-
-		$criteria=new CDbCriteria;
+    /**
+     * Retrieves a list of models based on the current search/filter conditions.
+     *
+     * Typical usecase:
+     * - Initialize the model fields with values from filter form.
+     * - Execute this method to get CActiveDataProvider instance which will filter
+     * models according to data in model fields.
+     * - Pass data provider to CGridView, CListView or any similar widget.
+     *
+     * @return CActiveDataProvider the data provider that can return the models
+     * based on the search/filter conditions.
+     */
+    public function search()
+    {
+        $criteria = new CDbCriteria();
 
         $criteria->compare('t.obj_id', $this->obj_id);
         $criteria->compare('t.obj_created', $this->obj_created);
@@ -209,16 +192,20 @@ class ReleaseRequest extends ActiveRecord
         $criteria->order = 't.obj_created desc';
         $criteria->with = array('builds', 'builds.worker', 'builds.project', 'hardMigrations');
 
-		return new ReleaseRequestSearchDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
+        return new ReleaseRequestSearchDataProvider($this, array(
+            'criteria' => $criteria,
+        ));
+    }
 
+    /**
+     * @return int
+     */
     public function countNotFinishedBuilds()
     {
         $c = new CDbCriteria();
         $c->compare('build_release_request_obj_id', $this->obj_id);
-        $c->compare('build_status', '<>'.Build::STATUS_INSTALLED);
+        $c->compare('build_status', '<>' . Build::STATUS_INSTALLED);
+
         return Build::model()->count($c);
     }
 
@@ -240,70 +227,100 @@ class ReleaseRequest extends ActiveRecord
         ));
     }
 
-	/**
-	 * Returns the static model of the specified AR class.
-	 * Please note that you should have this exact method in all your CActiveRecord descendants!
-	 * @param string $className active record class name.
-	 * @return ReleaseRequest the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+    /**
+     * Returns the static model of the specified AR class.
+     * Please note that you should have this exact method in all your CActiveRecord descendants!
+     * @param string $className active record class name.
+     * @return ReleaseRequest the static model class
+     */
+    public static function model($className = null)
+    {
+        return parent::model($className ?: __CLASS__);
+    }
 
+    /**
+     * @return bool
+     */
     public function canBeUsed()
     {
         return in_array($this->rr_status, array(self::STATUS_INSTALLED, self::STATUS_OLD));
     }
 
+    /**
+     * @return bool
+     */
     public function canByUsedImmediately()
     {
-        return !empty(Yii::app()->params['useImmediately']) || (in_array($this->rr_status, array(self::STATUS_OLD)) && (time() - $this->getLastTimeOnProdTimestamp() < self::IMMEDIATELY_TIME));
+        return !empty(Yii::app()->params['useImmediately'])
+                || (
+                    in_array($this->rr_status, array(self::STATUS_OLD))
+                    && (time() - $this->getLastTimeOnProdTimestamp() < self::IMMEDIATELY_TIME)
+                );
     }
 
+    /**
+     * @return int
+     */
     public function getLastTimeOnProdTimestamp()
     {
-        if ($this->rr_status == self::STATUS_USED || $this->rr_status == self::STATUS_USED_ATTEMPT) {
+        if ($this->rr_status == self::STATUS_USED) {
             return time();
         }
 
         return $this->rr_last_time_on_prod ? strtotime($this->rr_last_time_on_prod) : 0;
     }
 
+    /**
+     * @return string
+     */
     public function getTitle()
     {
         return "Запрос релиза #$this->obj_id {$this->project->project_name}::{$this->rr_build_version} ($this->rr_comment)";
     }
 
+    /**
+     * @return bool
+     */
     public function isInstalledStatus()
     {
         return in_array($this->rr_status, self::getInstalledStatuses());
     }
 
+    /**
+     * @return bool
+     */
     public function isUsedStatus()
     {
         return in_array($this->rr_status, self::getUsedStatuses());
     }
 
+    /**
+     * @return array
+     */
     public static function getInstalledStatuses()
     {
         return [
             self::STATUS_INSTALLED,
             self::STATUS_OLD,
             self::STATUS_USED,
-            self::STATUS_USED_ATTEMPT,
             self::STATUS_CODES,
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function getUsedStatuses()
     {
-        return [self::STATUS_USED, self::STATUS_USED_ATTEMPT];
+        return [self::STATUS_USED];
     }
 
+    /**
+     * @return string
+     */
     public function getBuildTag()
     {
-        return $this->project->project_name."-".$this->rr_build_version;
+        return $this->project->project_name . "-" . $this->rr_build_version;
     }
 
     /**
@@ -331,33 +348,47 @@ class ReleaseRequest extends ActiveRecord
         Yii::app()->EmailNotifier->sendRdsReleaseRequestNotification($this->rr_user, $this->project->project_name, $this->rr_comment);
         $text = "{$this->rr_user} requested {$this->project->project_name}. {$this->rr_comment}";
         foreach (explode(",", \Yii::app()->params['notify']['releaseRequest']['phones']) as $phone) {
-            if (!$phone) continue;
+            if (!$phone) {
+                continue;
+            }
             Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
         }
 
         Log::createLogMessage("Создан {$this->getTitle()}");
     }
 
+    /**
+     * Отправляет задачи на сборку проекта
+     */
     public function sendBuildTasks()
     {
         foreach ($this->builds as $build) {
             $c = new CDbCriteria();
-            $c->compare('rr_build_version', '<'.$build->releaseRequest->rr_build_version);
+            $c->compare('rr_build_version', '<' . $build->releaseRequest->rr_build_version);
             $c->compare('rr_status', ReleaseRequest::getInstalledStatuses());
             $c->compare('rr_project_obj_id', $build->releaseRequest->rr_project_obj_id);
             $c->order = 'rr_build_version desc';
             $lastSuccess = ReleaseRequest::model()->find($c);
 
-            //an: Отправляем задачу в Rabbit на сборку
+            // an: Отправляем задачу в Rabbit на сборку
             (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($build->worker->worker_name, new \RdsSystem\Message\BuildTask(
-                $build->obj_id, $build->project->project_name, $build->releaseRequest->rr_build_version, $build->releaseRequest->rr_release_version,
-                $lastSuccess ? $lastSuccess->project->project_name.'-'.$lastSuccess->rr_build_version : null,
+                $build->obj_id,
+                $build->project->project_name,
+                $build->releaseRequest->rr_build_version,
+                $build->releaseRequest->rr_release_version,
+                $lastSuccess ? $lastSuccess->project->project_name . '-' . $lastSuccess->rr_build_version : null,
                 RdsDbConfig::get()->preprod_online
             ));
         }
     }
 
-    public function sendUseTasks()
+    /**
+     * Отправляет задачи на переключение на сборку
+     * @param string $initiatorUserName
+     *
+     * @throws Exception
+     */
+    public function sendUseTasks($initiatorUserName)
     {
         $this->rr_status = \ReleaseRequest::STATUS_USING;
         $this->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
@@ -370,10 +401,8 @@ class ReleaseRequest extends ActiveRecord
                     $this->project->project_name,
                     $this->obj_id,
                     $this->rr_build_version,
-                    \ReleaseRequest::STATUS_USED
-//                    $this->rr_build_version > $this->project->project_current_version
-//                        ? \ReleaseRequest::STATUS_USED_ATTEMPT
-//                        : \ReleaseRequest::STATUS_USED
+                    \ReleaseRequest::STATUS_USED,
+                    $initiatorUserName
                 )
             );
         }
@@ -382,7 +411,9 @@ class ReleaseRequest extends ActiveRecord
         Yii::app()->webSockets->send('updateAllReleaseRequests', []);
     }
 
-
+    /**
+     * @return string
+     */
     public function getCronConfigCleaned()
     {
         $text = $this->rr_cron_config;
@@ -392,6 +423,11 @@ class ReleaseRequest extends ActiveRecord
         return $text;
     }
 
+    /**
+     * @param string $forcePackage
+     *
+     * @throws Exception
+     */
     public function parseCronConfig($forcePackage = null)
     {
         $group = null;
@@ -437,7 +473,7 @@ class ReleaseRequest extends ActiveRecord
             $job->command = $line;
 
             if (!$job->save()) {
-                $debugLogger->message("Can't save ToolJob: ".json_encode($job->errors, JSON_UNESCAPED_UNICODE));
+                $debugLogger->message("Can't save ToolJob: " . json_encode($job->errors, JSON_UNESCAPED_UNICODE));
             }
         }
     }

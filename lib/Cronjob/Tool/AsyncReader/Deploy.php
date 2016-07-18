@@ -16,71 +16,70 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         return array() + parent::getCommandLineSpec();
     }
 
-
     /**
-     * Performs actual work
+     * @param \Cronjob\ICronjob $cronJob
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readTaskStatusChanged(false, function(Message\TaskStatusChanged $message) use ($model) {
-            $this->debugLogger->message("Received status changed message: ".json_encode($message));
+        $model->readTaskStatusChanged(false, function (Message\TaskStatusChanged $message) use ($model) {
+            $this->debugLogger->message("Received status changed message: " . json_encode($message));
             $this->actionSetStatus($message, $model);
         });
 
-        $model->readBuildPatch(false, function(Message\ReleaseRequestBuildPatch $message) use ($model) {
-            $this->debugLogger->message("Received build patch message: ".json_encode($message));
+        $model->readBuildPatch(false, function (Message\ReleaseRequestBuildPatch $message) use ($model) {
+            $this->debugLogger->message("Received build patch message: " . json_encode($message));
             $this->actionSetBuildPatch($message, $model);
         });
 
-        $model->readMigrations(false, function(Message\ReleaseRequestMigrations $message) use ($model) {
-            $this->debugLogger->message("Received migrations message: ".json_encode($message));
+        $model->readMigrations(false, function (Message\ReleaseRequestMigrations $message) use ($model) {
+            $this->debugLogger->message("Received migrations message: " . json_encode($message));
             $this->actionSetMigrations($message, $model);
         });
 
-        $model->readCronConfig(false, function(Message\ReleaseRequestCronConfig $message) use ($model) {
-            $this->debugLogger->message("Received cron config message: ".json_encode($message));
+        $model->readCronConfig(false, function (Message\ReleaseRequestCronConfig $message) use ($model) {
+            $this->debugLogger->message("Received cron config message: " . json_encode($message));
             $this->actionSetCronConfig($message, $model);
         });
 
-        $model->readUseError(false, function(Message\ReleaseRequestUseError $message) use ($model) {
-            $this->debugLogger->message("Received use error message: ".json_encode($message));
+        $model->readUseError(false, function (Message\ReleaseRequestUseError $message) use ($model) {
+            $this->debugLogger->message("Received use error message: " . json_encode($message));
             $this->actionSetUseError($message, $model);
         });
 
-        $model->readOldVersion(false, function(Message\ReleaseRequestOldVersion $message) use ($model) {
-            $this->debugLogger->message("Received old version message: ".json_encode($message));
+        $model->readOldVersion(false, function (Message\ReleaseRequestOldVersion $message) use ($model) {
+            $this->debugLogger->message("Received old version message: " . json_encode($message));
             $this->actionSetOldVersion($message, $model);
         });
 
-        $model->readUsedVersion(false, function(Message\ReleaseRequestUsedVersion $message) use ($model) {
-            $this->debugLogger->message("Received used version message: ".json_encode($message));
+        $model->readUsedVersion(false, function (Message\ReleaseRequestUsedVersion $message) use ($model) {
+            $this->debugLogger->message("Received used version message: " . json_encode($message));
             $this->actionSetUsedVersion($message, $model);
         });
 
-        $model->readCurrentStatusRequest(false, function(Message\ReleaseRequestCurrentStatusRequest $message) use ($model) {
-            $this->debugLogger->message("Received request of release request status: ".json_encode($message));
+        $model->readCurrentStatusRequest(false, function (Message\ReleaseRequestCurrentStatusRequest $message) use ($model) {
+            $this->debugLogger->message("Received request of release request status: " . json_encode($message));
             $this->replyToCurrentStatusRequest($message, $model);
         });
 
-        $model->readGetProjectsRequest(false, function(Message\ProjectsRequest $message) use ($model) {
-            $this->debugLogger->message("Received request of projects list: ".json_encode($message));
+        $model->readGetProjectsRequest(false, function (Message\ProjectsRequest $message) use ($model) {
+            $this->debugLogger->message("Received request of projects list: " . json_encode($message));
             $this->actionReplyProjectsList($message, $model);
         });
 
-        $model->readGetProjectBuildsToDeleteRequest(false, function(Message\ProjectBuildsToDeleteRequest $message) use ($model) {
-            $this->debugLogger->message("Received request of projects to delete: ".json_encode($message));
+        $model->readGetProjectBuildsToDeleteRequest(false, function (Message\ProjectBuildsToDeleteRequest $message) use ($model) {
+            $this->debugLogger->message("Received request of projects to delete: " . json_encode($message));
             $this->actionReplyProjectsBuildsToDelete($message, $model);
         });
 
-        $model->readRemoveReleaseRequest(false, function(Message\RemoveReleaseRequest $message) use ($model) {
-            $this->debugLogger->message("Received remove release request message: ".json_encode($message));
+        $model->readRemoveReleaseRequest(false, function (Message\RemoveReleaseRequest $message) use ($model) {
+            $this->debugLogger->message("Received remove release request message: " . json_encode($message));
             $this->actionRemoveReleaseRequest($message, $model);
         });
 
-        $model->readMigrationStatus(false, function(Message\ReleaseRequestMigrationStatus $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received request of release request status: ".json_encode($message));
+        $model->readMigrationStatus(false, function (Message\ReleaseRequestMigrationStatus $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received request of release request status: " . json_encode($message));
             $this->actionSetMigrationStatus($message, $model);
         });
 
@@ -89,7 +88,12 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $this->waitForMessages($model, $cronJob);
     }
 
-
+    /**
+     * @param Message\TaskStatusChanged $message
+     * @param MessagingRdsMs            $model
+     *
+     * @throws Exception
+     */
     public function actionSetStatus(Message\TaskStatusChanged $message, MessagingRdsMs $model)
     {
         $status = $message->status;
@@ -99,8 +103,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         /** @var $build Build*/
         $build = Build::model()->findByPk($message->taskId);
         if (!$build) {
-            $this->debugLogger->error("Build $message->taskId not found, message=".json_encode($message));
+            $this->debugLogger->error("Build $message->taskId not found, message=" . json_encode($message));
             $message->accepted();
+
             return;
         }
 
@@ -126,14 +131,16 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     $title = "Success installed $project->project_name v.$version";
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
                     foreach ($builds as $val) {
-                        $text .= "<a href='".Yii::app()->createAbsoluteUrl('build/view', array('id' => $val->obj_id))."'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
+                        $text .= "<a href='" .
+                            Yii::app()->createAbsoluteUrl('build/view', array('id' => $val->obj_id)) .
+                            "'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
                     }
 
                     foreach (Yii::app()->params['jiraProjects'] as $jiraProject) {
                         $jiraVersion = new JiraCreateVersion();
                         $jiraVersion->attributes = [
-                                'jira_name' => $project->project_name."-".$build->releaseRequest->rr_build_version,
-                                'jira_description' => 'Сборка #'.$build->build_release_request_obj_id.', '.$build->releaseRequest->rr_user.' [auto]',
+                                'jira_name' => $project->project_name . "-" . $build->releaseRequest->rr_build_version,
+                                'jira_description' => 'Сборка #' . $build->build_release_request_obj_id . ', ' . $build->releaseRequest->rr_user . ' [auto]',
                                 'jira_project' => $jiraProject,
                                 'jira_archived' => true,
                                 'jira_released' => false,
@@ -144,18 +151,24 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
                     Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                     foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
-                        if (!$phone) continue;
+                        if (!$phone) {
+                            continue;
+                        }
                         Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                     }
                 }
                 break;
             case Build::STATUS_FAILED:
                 $title = "Failed to install $project->project_name";
-                $text = "Проект $project->project_name не удалось собрать. <a href='".Yii::app()->createAbsoluteUrl('build/view', array('id' => $build->obj_id))."'>Подробнее</a>";
+                $text = "Проект $project->project_name не удалось собрать. <a href='" .
+                    Yii::app()->createAbsoluteUrl('build/view', array('id' => $build->obj_id)) .
+                    "'>Подробнее</a>";
 
                 Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                 foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
-                    if (!$phone) continue;
+                    if (!$phone) {
+                        continue;
+                    }
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
                 break;
@@ -167,7 +180,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 break;
             case Build::STATUS_CANCELLED:
                 $title = "Failed to install $project->project_name";
-                $text = "Проект $project->project_name не удалось собрать. <a href='".Yii::app()->createAbsoluteUrl('build/view', array('id' => $build->obj_id))."'>Подробнее</a>";
+                $text = "Проект $project->project_name не удалось собрать. <a href='" .
+                    Yii::app()->createAbsoluteUrl('build/view', array('id' => $build->obj_id)) .
+                    "'>Подробнее</a>";
 
                 $c = new CDbCriteria(array(
                         'with' => array('project', 'project.project2workers', 'builds'),
@@ -184,7 +199,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
                 Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                 foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
-                    if (!$phone) continue;
+                    if (!$phone) {
+                        continue;
+                    }
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
                 break;
@@ -195,6 +212,12 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\ReleaseRequestBuildPatch $message
+     * @param MessagingRdsMs                   $model
+     *
+     * @throws Exception
+     */
     public function actionSetBuildPatch(Message\ReleaseRequestBuildPatch $message, MessagingRdsMs $model)
     {
         if (!$Project = Project::model()->findByAttributes(['project_name' => $message->project])) {
@@ -251,6 +274,12 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\ReleaseRequestMigrations $message
+     * @param MessagingRdsMs                   $model
+     *
+     * @throws Exception
+     */
     public function actionSetMigrations(Message\ReleaseRequestMigrations $message, MessagingRdsMs $model)
     {
         /** @var $project Project */
@@ -258,6 +287,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         if (!$project) {
             $this->debugLogger->error(404, 'Project not found');
             $message->accepted();
+
             return;
         }
 
@@ -269,6 +299,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         if (!$releaseRequest) {
             $this->debugLogger->error('Release request not found');
             $message->accepted();
+
             return;
         }
         if ($message->type == 'pre') {
@@ -294,9 +325,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     ];
                     if (!$hm->save()) {
                         if (count($hm->errors) != 1 || !isset($hm->errors["migration_name"])) {
-                            $this->debugLogger->error("Can't save HardMigration: ".json_encode($hm->errors));
+                            $this->debugLogger->error("Can't save HardMigration: " . json_encode($hm->errors));
                         } else {
-                            $this->debugLogger->message("Skip migration $migration as already exists in DB (".json_encode($hm->errors).")");
+                            $this->debugLogger->message("Skip migration $migration as already exists in DB (" . json_encode($hm->errors) . ")");
                         }
                     }
                 }
@@ -310,6 +341,13 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\ReleaseRequestCronConfig $message
+     * @param MessagingRdsMs                   $model
+     *
+     * @throws CDbException
+     * @throws Exception
+     */
     public function actionSetCronConfig(Message\ReleaseRequestCronConfig $message, MessagingRdsMs $model)
     {
         $transaction = Build::model()->dbConnection->beginTransaction();
@@ -320,6 +358,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             if (!$build) {
                 $this->debugLogger->error("Build #$message->taskId not found");
                 $message->accepted();
+
                 return;
             }
             $releaseRequest = $build->releaseRequest;
@@ -327,6 +366,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             if (!$releaseRequest) {
                 $this->debugLogger->error("Build #$message->taskId has no release request");
                 $message->accepted();
+
                 return;
             }
 
@@ -336,19 +376,22 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
             $releaseRequest->parseCronConfig();
 
-            ToolJob::model()->updateAll([
-                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED
-            ], 'project_obj_id=:id AND "version"=:version', [
-                ':id' => $releaseRequest->rr_project_obj_id,
-                ':version' => $releaseRequest->rr_build_version,
-            ]);
+            ToolJob::model()->updateAll(
+                [
+                    'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED,
+                ],
+                'project_obj_id=:id AND "version"=:version',
+                [
+                    ':id' => $releaseRequest->rr_project_obj_id,
+                    ':version' => $releaseRequest->rr_build_version,
+                ]
+            );
 
             self::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
             $transaction->commit();
 
             $message->accepted();
-
         } catch (\Exception $e) {
             $transaction->rollback();
             throw $e;
@@ -356,12 +399,19 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
     }
 
+    /**
+     * @param Message\ReleaseRequestUseError $message
+     * @param MessagingRdsMs                 $model
+     *
+     * @throws Exception
+     */
     public function actionSetUseError(Message\ReleaseRequestUseError $message, MessagingRdsMs $model)
     {
         $releaseRequest = \ReleaseRequest::model()->findByPk($message->releaseRequestId);
         if (!$releaseRequest) {
             $this->debugLogger->error("Release Request #$message->releaseRequestId not found");
             $message->accepted();
+
             return;
         }
         $releaseRequest->rr_use_text = $message->text;
@@ -373,6 +423,12 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\ReleaseRequestOldVersion $message
+     * @param MessagingRdsMs                   $model
+     *
+     * @throws Exception
+     */
     public function actionSetOldVersion(Message\ReleaseRequestOldVersion $message, MessagingRdsMs $model)
     {
         $releaseRequest = \ReleaseRequest::model()->findByPk($message->releaseRequestId);
@@ -380,6 +436,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         if (!$releaseRequest) {
             $this->debugLogger->error("Release Request #$message->releaseRequestId not found");
             $message->accepted();
+
             return;
         }
 
@@ -393,18 +450,27 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\ReleaseRequestUsedVersion $message
+     * @param MessagingRdsMs                    $model
+     *
+     * @throws CDbException
+     * @throws Exception
+     */
     public function actionSetUsedVersion(Message\ReleaseRequestUsedVersion $message, MessagingRdsMs $model)
     {
         $worker = Worker::model()->findByAttributes(array('worker_name' => $message->worker));
         if (!$worker) {
             $this->debugLogger->error("Worker $message->worker not found");
             $message->accepted();
+
             return;
         }
 
-        if (!in_array($message->status, array(\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT))) {
-            $this->debugLogger->error('Forbidden, invalid status '.$message->status);
+        if ($message->status != \ReleaseRequest::STATUS_USED) {
+            $this->debugLogger->error("Forbidden, invalid status $message->status");
             $message->accepted();
+
             return;
         }
 
@@ -413,6 +479,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         if (!$project) {
             $this->debugLogger->error("Project $message->project not found");
             $message->accepted();
+
             return;
         }
 
@@ -472,10 +539,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $project->save(false);
 
             $oldUsed = \ReleaseRequest::model()->findByAttributes(array(
-                'rr_status' => array(
-                    \ReleaseRequest::STATUS_USED,
-                    \ReleaseRequest::STATUS_USED_ATTEMPT,
-                ),
+                'rr_status' => \ReleaseRequest::STATUS_USED,
                 'rr_project_obj_id' => $project->obj_id,
             ));
 
@@ -495,33 +559,41 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 if ($message->status == \ReleaseRequest::STATUS_USED) {
                     $jiraUse = new JiraUse();
                     $jiraUse->attributes = [
-                        'jira_use_from_build_tag' => $project->project_name.'-'.$oldVersion,
+                        'jira_use_from_build_tag' => $project->project_name . '-' . $oldVersion,
                         'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
                     ];
                     $jiraUse->save();
                 }
             }
 
-            ToolJob::model()->updateAll([
-                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED
-            ], "project_obj_id=:id", [
-                ':id' => $releaseRequest->rr_project_obj_id,
-            ]);
+            ToolJob::model()->updateAll(
+                [
+                    'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED,
+                ],
+                "project_obj_id=:id",
+                [
+                    ':id' => $releaseRequest->rr_project_obj_id,
+                ]
+            );
 
-            ToolJob::model()->updateAll([
-                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE
-            ], 'project_obj_id=:id AND "version"=:version', [
-                ':id' => $releaseRequest->rr_project_obj_id,
-                ':version' => $releaseRequest->rr_build_version,
-            ]);
+            ToolJob::model()->updateAll(
+                [
+                    'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
+                ],
+                'project_obj_id=:id AND "version"=:version',
+                [
+                    ':id' => $releaseRequest->rr_project_obj_id,
+                    ':version' => $releaseRequest->rr_build_version,
+                ]
+            );
 
-            //an: Асинхронная задача на email/sms/... оповещение
+            // an: Асинхронная задача на email/sms/... оповещение
             $notificationItem = new JiraNotificationQueue();
             $notificationItem->jnq_project_obj_id = $project->obj_id;
             $notificationItem->jnq_old_version = $oldVersion;
             $notificationItem->jnq_new_version = $message->version;
             if (!$notificationItem->save()) {
-                $this->debugLogger->error("Can't send notification task: ".json_encode($notificationItem->errors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                $this->debugLogger->error("Can't send notification task: " . json_encode($notificationItem->errors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
             }
         }
 
@@ -534,18 +606,24 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\ReleaseRequestCurrentStatusRequest $message
+     * @param MessagingRdsMs                             $model
+     */
     public function replyToCurrentStatusRequest(Message\ReleaseRequestCurrentStatusRequest $message, MessagingRdsMs $model)
     {
         $releaseRequest = ReleaseRequest::model()->findByPk($message->releaseRequestId);
 
-        //an: В любом случае что-то ответить нужно, даже если запрос релиза уже удалили. Иначе будет таймаут у системы, которые запросила данные
+        // an: В любом случае что-то ответить нужно, даже если запрос релиза уже удалили. Иначе будет таймаут у системы, которые запросила данные
         $model->sendCurrentStatusReply(new Message\ReleaseRequestCurrentStatusReply($releaseRequest ? $releaseRequest->rr_status : null, $message->getUniqueTag()));
 
         $message->accepted();
     }
 
-
-
+    /**
+     * @param Message\ProjectsRequest $message
+     * @param MessagingRdsMs          $model
+     */
     public function actionReplyProjectsList(Message\ProjectsRequest $message, MessagingRdsMs $model)
     {
         $projects = Project::model()->findAll();
@@ -563,6 +641,12 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\ProjectBuildsToDeleteRequest $message
+     * @param MessagingRdsMs                       $model
+     *
+     * @throws CException
+     */
     public function actionReplyProjectsBuildsToDelete(Message\ProjectBuildsToDeleteRequest $message, MessagingRdsMs $model)
     {
         $builds = $message->allBuilds;
@@ -570,18 +654,18 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $result = array();
         foreach ($builds as $build) {
             if (!preg_match('~\d{2,3}\.\d\d\.\d+\.\d+~', $build['version']) && !preg_match('~2014\.\d{2,3}\.\d\d\.\d+\.\d+~', $build['version'])) {
-                //an: неизвестный формат версии, лучше не будем удалять :) фиг его знает что это
+                // an: неизвестный формат версии, лучше не будем удалять :) фиг его знает что это
                 continue;
             }
             /** @var $project Project */
             $project = Project::model()->findByAttributes(['project_name' => $build['project']]);
             if (!$project) {
-                //an: непонятно что и зачем это нам прислали, лучше не будем удалять
+                // an: непонятно что и зачем это нам прислали, лучше не будем удалять
                 continue;
             }
 
             if ($build['version'] == $project->project_current_version) {
-                //an: Ну никак нельзя удалять ту версию, что сейчас зарелижена
+                // an: Ну никак нельзя удалять ту версию, что сейчас зарелижена
                 continue;
             }
 
@@ -591,38 +675,36 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             ]);
 
             if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime('-1 week'))) {
-                //an: Не удаляем те билды, что были на проде меньше недели назад
+                // an: Не удаляем те билды, что были на проде меньше недели назад
                 continue;
             }
 
             $numbersOfTest = explode(".", $build['version']);
-            if ($numbersOfTest[0] == 2014) array_shift($numbersOfTest);
 
             $numbersOfCurrent = explode(".", $project->project_current_version);
-            if ($numbersOfCurrent[0] == 2014) array_shift($numbersOfCurrent);
 
             if ($numbersOfCurrent[0] - 1 > $numbersOfTest[0] || $numbersOfCurrent[0] == $numbersOfTest[0]) {
                 $c = new CDbCriteria();
                 $c->compare('rr_project_obj_id', $project->obj_id);
-                $c->compare('rr_build_version', '>'.$build['version']);
-                $c->compare('rr_build_version', '<'.$project->project_current_version);
+                $c->compare('rr_build_version', '>' . $build['version']);
+                $c->compare('rr_build_version', '<' . $project->project_current_version);
                 $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
                 $count = \ReleaseRequest::model()->count($c);
 
                 if ($count > 10) {
-                    //an: Нужно наличие минимум 10 версий от текущей, что бы было куда откатываться
+                    // an: Нужно наличие минимум 10 версий от текущей, что бы было куда откатываться
                     $result[] = $build;
                 }
-            } elseif($numbersOfCurrent[0] - 1 == $numbersOfTest[0]) {
+            } elseif ($numbersOfCurrent[0] - 1 == $numbersOfTest[0]) {
                 $c = new CDbCriteria();
                 $c->compare('rr_project_obj_id', $project->obj_id);
-                $c->compare('rr_build_version', '>'.$build['version']);
-                $c->compare('rr_build_version', '<'.$numbersOfCurrent[0].".00.000.000");
+                $c->compare('rr_build_version', '>' . $build['version']);
+                $c->compare('rr_build_version', '<' . $numbersOfCurrent[0] . ".00.000.000");
                 $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
                 $count = \ReleaseRequest::model()->count($c);
 
                 if ($count > 5) {
-                    //an: Нужно наличие минимум 2 версий в текущем релизе, что бы точно могли откатиться
+                    // an: Нужно наличие минимум 2 версий в текущем релизе, что бы точно могли откатиться
                     $result[] = $build;
                 }
             }
@@ -636,12 +718,19 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\RemoveReleaseRequest $message
+     * @param MessagingRdsMs               $model
+     *
+     * @throws CDbException
+     */
     public function actionRemoveReleaseRequest(Message\RemoveReleaseRequest $message, MessagingRdsMs $model)
     {
         $project = Project::model()->findByAttributes(['project_name' => $message->projectName]);
         if (!$project) {
             $message->accepted();
-            $this->debugLogger->message("Skipped removing release request $message->projectName-$message->version as project not exists");;
+            $this->debugLogger->message("Skipped removing release request $message->projectName-$message->version as project not exists");
+
             return;
         }
 
@@ -651,28 +740,37 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         ]);
 
         if ($rr) {
-            $this->debugLogger->message("Removed release request $message->projectName-$message->version");;
+            $this->debugLogger->message("Removed release request $message->projectName-$message->version");
             $rr->delete();
         }
-        $this->debugLogger->message("Skipped removing release request $message->projectName-$message->version as not exists");;
+        $this->debugLogger->message("Skipped removing release request $message->projectName-$message->version as not exists");
 
         $message->accepted();
     }
 
+    /**
+     * @param Message\ReleaseRequestMigrationStatus $message
+     * @param MessagingRdsMs                        $model
+     *
+     * @throws CDbException
+     * @throws Exception
+     */
     public function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message, MessagingRdsMs $model)
     {
         $projectObj = Project::model()->findByAttributes(array('project_name' => $message->project));
 
         if (!$projectObj) {
-            $this->debugLogger->error('unknown project '.$message->project);
+            $this->debugLogger->error('unknown project ' . $message->project);
             $message->accepted();
+
             return;
         }
         $releaseRequest = ReleaseRequest::model()->findByAttributes(array('rr_build_version' => $message->version, 'rr_project_obj_id' => $projectObj->obj_id));
 
         if (!$releaseRequest) {
-            $this->debugLogger->error('unknown release request: project='.$message->project.", build_version=".$message->version);
+            $this->debugLogger->error('unknown release request: project=' . $message->project . ", build_version=" . $message->version);
             $message->accepted();
+
             return;
         }
 
@@ -709,19 +807,24 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param int $id
+     */
     public static function sendReleaseRequestUpdated($id)
     {
         /** @var $debugLogger \ServiceBase_IDebugLogger */
         $debugLogger = Yii::app()->debugLogger;
 
         $releaseRequest = ReleaseRequest::model()->findByPk($id);
-        if (!$releaseRequest){ return;}
+        if (!$releaseRequest) {
+            return;
+        }
 
         $debugLogger->message("Sending to comet new data of releaseRequest $id");
-        Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application') . "/../main/www/assets/");
         Yii::app()->assetManager->setBaseUrl("/assets/");
         Yii::app()->urlManager->setBaseUrl('');
-        $filename = Yii::getPathOfAlias('application.views.site._releaseRequestRow').'.php';
+        $filename = Yii::getPathOfAlias('application.views.site._releaseRequestRow') . '.php';
         $rowTemplate = include($filename);
 
         list($controller, $action) = Yii::app()->createController('/');
@@ -729,11 +832,17 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         Yii::app()->setController($controller);
         $model = ReleaseRequest::model();
         $model->obj_id = $id;
-        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'yiistrap.widgets.TbGridView', [
-            'dataProvider'=>$model->search(),
-            'columns'=>$rowTemplate,
-            'rowCssClassExpression' => function() use ($releaseRequest) {return 'rowItem release-request-'.$releaseRequest->obj_id.' release-request-'.$releaseRequest->rr_status;},
-        ]);
+        $widget = Yii::app()->getWidgetFactory()->createWidget(
+            Yii::app(),
+            'yiistrap.widgets.TbGridView',
+            [
+                'dataProvider' => $model->search(),
+                'columns' => $rowTemplate,
+                'rowCssClassExpression' => function () use ($releaseRequest) {
+                    return 'rowItem release-request-' . $releaseRequest->obj_id . ' release-request-' . $releaseRequest->rr_status;
+                },
+            ]
+        );
         $widget->init();
         ob_start();
         $widget->run();
@@ -743,9 +852,16 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $debugLogger->message("Sended");
     }
 
+    /**
+     * @param string $route
+     * @param array $params
+     *
+     * @return mixed
+     */
     public function createUrl($route, $params)
     {
         Yii::app()->urlManager->setBaseUrl('');
+
         return Yii::app()->createAbsoluteUrl($route, $params);
     }
 }

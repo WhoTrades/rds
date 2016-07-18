@@ -22,7 +22,6 @@
                 ReleaseRequest::STATUS_USING        => array(TbHtml::ICON_REFRESH, 'Активируем', 'orange'),
                 ReleaseRequest::STATUS_CODES        => array(TbHtml::ICON_TIME, 'Ждем ввода кодов', 'orange'),
                 ReleaseRequest::STATUS_USED         => array(TbHtml::ICON_OK, 'Активная версия', '#32cd32'),
-                ReleaseRequest::STATUS_USED_ATTEMPT => array(TbHtml::ICON_TIME, 'Временная версия', 'blue'),
                 ReleaseRequest::STATUS_OLD          => array(TbHtml::ICON_TIME, 'Старая версия', 'grey'),
                 ReleaseRequest::STATUS_CANCELLING   => array(TbHtml::ICON_REFRESH, 'Отменяем...', 'orange'),
                 ReleaseRequest::STATUS_CANCELLED    => array(TbHtml::ICON_OK, 'Отменено', 'red'),
@@ -85,7 +84,6 @@
             ReleaseRequest::STATUS_USING => ReleaseRequest::STATUS_USING,
             ReleaseRequest::STATUS_CODES => ReleaseRequest::STATUS_CODES,
             ReleaseRequest::STATUS_USED => ReleaseRequest::STATUS_USED,
-            ReleaseRequest::STATUS_USED_ATTEMPT => ReleaseRequest::STATUS_USED_ATTEMPT,
             ReleaseRequest::STATUS_OLD => ReleaseRequest::STATUS_OLD,
             ReleaseRequest::STATUS_CANCELLING => ReleaseRequest::STATUS_CANCELLING,
             ReleaseRequest::STATUS_CANCELLED => ReleaseRequest::STATUS_CANCELLED,
@@ -182,8 +180,6 @@
             } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_CODES) {
                 return "<a href='" . Yii::app()->createUrl('/use/index', array('id' => $releaseRequest->obj_id)) .
                     "' onclick='showForm($releaseRequest->obj_id); return false;'>Enter codes</a>";
-            } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED_ATTEMPT) {
-                return "<a href='" . Yii::app()->createUrl('/use/fixAttempt', array('id' => $releaseRequest->obj_id)) . "' class='ajax-url'>Make stable</a>";
             } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
                 if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest($releaseRequest->rr_project_obj_id, $releaseRequest->rr_old_version)) {
                     if ($oldReleaseRequest->canBeUsed()) {

@@ -15,7 +15,12 @@ class ReleaseRequestSearchDataProvider extends CActiveDataProvider
 
     private $oldReleaseRequests = [];
 
-    public function getData($refresh=false)
+    /**
+     * @param bool $refresh
+     *
+     * @return array
+     */
+    public function getData($refresh = false)
     {
         $data = parent::getData($refresh);
         if ($refresh || !$this->additionalDataFetched) {
@@ -43,7 +48,7 @@ class ReleaseRequestSearchDataProvider extends CActiveDataProvider
 
         $currentUsed = \ReleaseRequest::model()->findAllByAttributes([
             'rr_project_obj_id' => $projectIds,
-            'rr_status' => [\ReleaseRequest::STATUS_USED, \ReleaseRequest::STATUS_USED_ATTEMPT],
+            'rr_status' => \ReleaseRequest::STATUS_USED,
         ]);
         foreach ($currentUsed as $releaseRequest) {
             $this->currentUsed[$releaseRequest->rr_project_obj_id] = $releaseRequest;
@@ -62,6 +67,7 @@ class ReleaseRequestSearchDataProvider extends CActiveDataProvider
 
     /**
      * Возвращает текущий выложенный запрос релиза для проекта. Может вернуть null, если в этом проекте нет выложенной версии (например, новый проект)
+     * @param int $projectId
      * @return ReleaseRequest|null
      */
     public function getCurrentUsedReleaseRequest($projectId)
@@ -71,6 +77,8 @@ class ReleaseRequestSearchDataProvider extends CActiveDataProvider
 
     /**
      * Возвращает сборку, на которую будет откатываться от текущей
+     * @param int $projectId
+     * @param string $buildVersion
      * @return ReleaseRequest|null
      */
     public function getOldReleaseRequest($projectId, $buildVersion)

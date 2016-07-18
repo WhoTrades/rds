@@ -3,38 +3,39 @@
 class UseController extends Controller
 {
 
-	/**
-	 * @return array action filters
-	 */
-	public function filters()
-	{
-		return array(
-			'accessControl', // perform access control for CRUD operations
-		);
-	}
+    /**
+     * @return array action filters
+     */
+    public function filters()
+    {
+        return array(
+            'accessControl', // perform access control for CRUD operations
+        );
+    }
 
-	/**
-	 * Specifies the access control rules.
-	 * This method is used by the 'accessControl' filter.
-	 * @return array access control rules
-	 */
-	public function accessRules()
-	{
-		return array(
-			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'users'=>array('@'),
-			),
-			array('deny',  // deny all users
-				'users'=>array('*'),
-			),
-		);
-	}
+    /**
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     * @return array access control rules
+     */
+    public function accessRules()
+    {
+        return array(
+            array('allow',  // allow all users to perform 'index' and 'view' actions
+                'users' => array('@'),
+            ),
+            array('deny',  // deny all users
+                'users' => array('*'),
+            ),
+        );
+    }
 
-	/**
-	 * Lists all models.
-	 */
-	public function actionCreate($id)
-	{
+    /**
+     * @param int $id
+     * Lists all models.
+     */
+    public function actionCreate($id)
+    {
         $releaseRequest = $this->loadModel($id);
         if (!$releaseRequest->canBeUsed()) {
             throw new CHttpException(500, 'Wrong release request status');
@@ -45,46 +46,55 @@ class UseController extends Controller
                 'rr_leading_id' => $releaseRequest->obj_id,
                 'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
             ]);
-            $releaseRequest->sendUseTasks();
+            $releaseRequest->sendUseTasks(\Yii::app()->user->name);
             foreach ($slaveList as $slave) {
                 /** @var $slave ReleaseRequest */
-                $slave->sendUseTasks();
+                $slave->sendUseTasks(\Yii::app()->user->name);
             }
             if (!empty($_GET['ajax'])) {
                 echo "using";
+
                 return;
             } else {
                 $this->redirect('/');
             }
         }
 
-        $code1 = rand(pow(10, 2), pow(10, 3)-1);
-        $code2 = rand(pow(10, 2), pow(10, 3)-1);
+        $code1 = rand(pow(10, 2), pow(10, 3) - 1);
+        $code2 = rand(pow(10, 2), pow(10, 3) - 1);
         $releaseRequest->rr_project_owner_code = $code1;
         $releaseRequest->rr_release_engineer_code = $code2;
         $releaseRequest->rr_project_owner_code_entered = false;
         $releaseRequest->rr_release_engineer_code_entered = true;
         $releaseRequest->rr_status = \ReleaseRequest::STATUS_CODES;
 
-        $text ="Code: %s. USE {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}";
+        $text = "Code: %s. USE {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}";
         Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}(Yii::app()->user->phone, sprintf($text, $code1));
 
         if ($releaseRequest->save()) {
             Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
-            if ($currentUsed = ReleaseRequest::model()->findByAttributes([
+            $currentUsed = ReleaseRequest::model()->findByAttributes([
                 'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
                 'rr_status' => ReleaseRequest::STATUS_USED,
-            ])) {
+            ]);
+            if ($currentUsed) {
                 Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($currentUsed->obj_id);
             }
 
             Log::createLogMessage("CODES {$releaseRequest->getTitle()}");
         }
 
-        $this->redirect($this->createUrl('/use/index', array('id' => $id)));
-	}
+        $this->redirect($this->createUrl('/use/index', ['id' => $id]));
+    }
 
+    /**
+     * @param int $id
+     * @param string $type
+     *
+     * @throws CHttpException
+     * @throws Exception
+     */
     public function actionMigrate($id, $type)
     {
         $releaseRequest = $this->loadModel($id);
@@ -136,11 +146,12 @@ class UseController extends Controller
         }
     }
 
-	/**
-	 * Lists all models.
-	 */
-	public function actionIndex($id)
-	{
+    /**
+     * @param int $id
+     * Lists all models.
+    */
+    public function actionIndex($id)
+    {
         $releaseRequest = $this->loadModel($id);
         if ($releaseRequest->rr_status != \ReleaseRequest::STATUS_CODES) {
             $this->redirect('/');
@@ -156,7 +167,7 @@ class UseController extends Controller
             $this->performAjaxValidation($model);
 
             if ($releaseRequest->rr_project_owner_code_entered) {
-                $releaseRequest->sendUseTasks();
+                $releaseRequest->sendUseTasks(\Yii::app()->user->name);
 
                 $slaveList = ReleaseRequest::model()->findAllByAttributes([
                     'rr_leading_id' => $releaseRequest->obj_id,
@@ -164,7 +175,7 @@ class UseController extends Controller
                 ]);
                 foreach ($slaveList as $slave) {
                     /** @var $slave ReleaseRequest */
-                    $slave->sendUseTasks();
+                    $slave->sendUseTasks(\Yii::app()->user->name);
                 }
             }
             $releaseRequest->save();
@@ -174,55 +185,30 @@ class UseController extends Controller
             'model' => $model,
             'releaseRequest' => $releaseRequest,
         ));
-	}
-
-    public function actionFixAttempt($id)
-    {
-        $releaseRequest = $this->loadModel($id);
-        if ($releaseRequest->rr_status != \ReleaseRequest::STATUS_USED_ATTEMPT) {
-            $this->redirect('/');
-        }
-
-        $releaseRequest->rr_status = \ReleaseRequest::STATUS_USED;
-
-        if ($releaseRequest->save()) {
-            Yii::app()->webSockets->send('updateAllReleaseRequests', []);
-            Log::createLogMessage("Помечен стабильным {$releaseRequest->getTitle()}");
-
-            $jiraUse = new JiraUse();
-            $jiraUse->attributes = [
-                'jira_use_from_build_tag' => $releaseRequest->project->project_name."-".$releaseRequest->rr_old_version,
-                'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
-            ];
-            $jiraUse->save();
-
-            Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($id);
-        }
-
-        $this->redirect('/');
     }
 
     /**
-     * @param $id
+     * @param int $id
      *
      * @return ReleaseRequest
      * @throws CHttpException
      */
     public function loadModel($id)
     {
-        $model=ReleaseRequest::model()->findByPk($id);
-        if($model===null)
-            throw new CHttpException(404,'The requested page does not exist.');
+        $model = ReleaseRequest::model()->findByPk($id);
+        if ($model == null) {
+            throw new CHttpException(404, 'The requested page does not exist.');
+        }
+
         return $model;
     }
 
     protected function performAjaxValidation($model)
     {
-        if(isset($_POST['ajax']) && $_POST['ajax']==='release-request-use-form')
-        {
+        if (isset($_POST['ajax']) && $_POST['ajax'] == 'release-request-use-form') {
             $result = [];
-            foreach($model->getErrors() as $attribute=>$errors) {
-                $result[CHtml::activeId($model,$attribute)]=$errors;
+            foreach ($model->getErrors() as $attribute => $errors) {
+                $result[CHtml::activeId($model, $attribute)] = $errors;
             }
             echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
             Yii::app()->end();
