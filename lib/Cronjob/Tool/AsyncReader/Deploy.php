@@ -467,13 +467,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
-        if ($message->status != \ReleaseRequest::STATUS_USED) {
-            $this->debugLogger->error("Forbidden, invalid status $message->status");
-            $message->accepted();
-
-            return;
-        }
-
         /** @var $project Project */
         $project = \Project::model()->findByAttributes(array('project_name' => $message->project));
         if (!$project) {
@@ -513,6 +506,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $build->save();
         }
 
+        /** @var $p2w Project2worker */
         $p2w = Project2worker::model()->findByAttributes(array(
             'worker_obj_id' => $worker->obj_id,
             'project_obj_id' => $project->obj_id,
@@ -539,7 +533,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $project->save(false);
 
             $oldUsed = \ReleaseRequest::model()->findByAttributes(array(
-                'rr_status' => \ReleaseRequest::STATUS_USED,
+                'rr_status' => ReleaseRequest::STATUS_USED,
                 'rr_project_obj_id' => $project->obj_id,
             ));
 
@@ -553,17 +547,16 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             }
 
             if ($releaseRequest) {
-                $releaseRequest->rr_status = $message->status;
+                $releaseRequest->rr_status = ReleaseRequest::STATUS_USED;
                 $releaseRequest->save(false);
 
-                if ($message->status == \ReleaseRequest::STATUS_USED) {
-                    $jiraUse = new JiraUse();
-                    $jiraUse->attributes = [
-                        'jira_use_from_build_tag' => $project->project_name . '-' . $oldVersion,
-                        'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
-                    ];
-                    $jiraUse->save();
-                }
+                $jiraUse = new JiraUse();
+                $jiraUse->attributes = [
+                    'jira_use_from_build_tag' => $project->project_name . '-' . $oldVersion,
+                    'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
+                    'jira_use_initiator_user_name' => $message->initiatorUserName,
+                ];
+                $jiraUse->save();
             }
 
             ToolJob::model()->updateAll(

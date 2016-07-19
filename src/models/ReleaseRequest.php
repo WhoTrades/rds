@@ -401,7 +401,6 @@ class ReleaseRequest extends ActiveRecord
                     $this->project->project_name,
                     $this->obj_id,
                     $this->rr_build_version,
-                    \ReleaseRequest::STATUS_USED,
                     $initiatorUserName
                 )
             );

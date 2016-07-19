@@ -29,6 +29,7 @@ class SiteController extends Controller
 
 	public function actionIndex()
 	{
+        Yii::app()->whotrades;
         $releaseRequestSearchModel=new ReleaseRequest('search');
         $releaseRequestSearchModel->unsetAttributes();  // clear any default values
         if(isset($_GET['ReleaseRequest']))

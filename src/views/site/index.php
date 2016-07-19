@@ -1,7 +1,7 @@
 <?php
-/* @var $this SiteController */
-/* @var $releaseRejectSearchModel ReleaseReject */
-/* @var $releaseRequestSearchModel ReleaseRequest */
+/** @var $this SiteController */
+/** @var $releaseRejectSearchModel ReleaseReject */
+/** @var $releaseRequestSearchModel ReleaseRequest */
 ?>
 
 <?php $this->widget('yiistrap.widgets.TbModal', array(
@@ -56,16 +56,20 @@
     </div>
     <div class="col-md-8" style="float: right">
         <div class="row">
-            <?foreach ($mainProjects as $project) {?>
+            <?php foreach ($mainProjects as $project) {?>
                 <div style="float: right">
-                    <?/** @var $project Project */?>
-                    <?php echo TbHtml::button('Собрать '.$project->project_name, array(
+                    <?php /** @var $project Project */ ?>
+                    <?php echo TbHtml::button('Собрать ' . $project->project_name, array(
                         'data-toggle' => 'modal',
                         'data-target' => '#release-request-form-modal',
-                        'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id}); setTimeout(function(){ $('#release-request-form-modal .modal-body input:first').focus();}, 500);",
+                        'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id});
+                                        setTimeout(function(){
+                                            $('#release-request-form-modal .modal-body input:first').focus();
+                                            $('#ReleaseRequest_rr_project_obj_id').change();
+                                        }, 500);",
                     )); ?>
                 </div>
-            <?}?>
+            <?php }?>
         </div>
     </div>
 
