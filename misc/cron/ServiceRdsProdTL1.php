@@ -57,6 +57,11 @@ class ServiceRdsProdTL1
                 'rds_jira_use'
             ),
             new MultiCommandToCron(
+                \PgQ_EventProcessor_RdsJiraUseExternalNotifier::getPgqConsumer('rds_jira_use', 'rds_jira_use_external_notifier_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                '* * * * * *',
+                'rds_jira_use'
+            ),
+            new MultiCommandToCron(
                 \PgQ_EventProcessor_JiraMoveTicket::getPgqConsumer('rds_jira_move_ticket', 'rds_jira_move_ticket_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_move_ticket'
