@@ -6,16 +6,25 @@ use RdsSystem\Message;
  */
 class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 {
-
+    /**
+     * @return array
+     */
     public static function getCommandLineSpec()
     {
         return [];
     }
 
+    /**
+     * @param \Cronjob\ICronjob $cronJob
+     *
+     * @return int
+     * @throws Exception
+     */
     public function run(\Cronjob\ICronjob $cronJob)
     {
         if (!Yii::app()->params['alertLampEnabled']) {
             $this->debugLogger->message("Lamp disabled");
+
             return 0;
         }
 
@@ -23,7 +32,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
             /** @var \AlertLog\AlertData[] $errors */
             $errors = [];
             foreach ($dataProvider->getData() as $alertData) {
-                if($alertData->isError()) {
+                if ($alertData->isError()) {
                     $errors[$alertData->getName()] = $alertData;
 
                     $this->debugLogger->error("Error with {$alertData->getName()}, {$alertData->getText()}");
@@ -35,15 +44,15 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
             $c->compare('alert_provider', $dataProvider->getName());
             $alertLog = AlertLog::model()->findAll($c);
 
-            foreach($alertLog as $alert) {
-                if(isset($errors[$alert->alert_name])) {
-                    if($alert->alert_status !== AlertLog::STATUS_ERROR) {
+            foreach ($alertLog as $alert) {
+                if (isset($errors[$alert->alert_name])) {
+                    if ($alert->alert_status !== AlertLog::STATUS_ERROR) {
                         $alert->setStatus(AlertLog::STATUS_ERROR);
                         $this->sendEmailError($alert);
                     }
                     unset($errors[$alert->alert_name]);
                 } else {
-                    if($alert->alert_status !== AlertLog::STATUS_OK) {
+                    if ($alert->alert_status !== AlertLog::STATUS_OK) {
                         $alert->setStatus(AlertLog::STATUS_OK);
                         $this->sendEmailOK($alert);
                     }
@@ -65,6 +74,8 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
                 $this->sendEmailError($new);
             }
         }
+
+        return 0;
     }
 
     /**
@@ -130,24 +141,10 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         $config = \Config::getInstance()->serviceRds['alerts']['dataProvider'];
 
         return [
-            AlertLog::WTS_LAMP_NAME => new \AlertLog\CompoundDataProvider($this->debugLogger, 'phplogs && monitoring', [
-                new \AlertLog\PhpLogsDataProvider($this->debugLogger, 'PhpLogs', $config['phpLogs']['url']),
-                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
-            ]),
-            AlertLog::CRM_LAMP_NAME => new \AlertLog\CompoundDataProvider($this->debugLogger, 'phplogs && monitoring', [
-                new \AlertLog\PhpLogsDataProvider($this->debugLogger, 'PhpLogs', $config['phpLogs']['url']),
-                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
-            ]),
-            AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(
-                [
-                    'WhoTrades_AcceptanceTests_WhoTradesSite',
-                ],
-                'TeamCity: Acceptance Tests'
-            ),
-            AlertLog::PHPLOGS_DEV_LAMP_NAME => new \AlertLog\CompoundDataProvider($this->debugLogger, 'phplogs && monitoring', [
-                new \AlertLog\PhpLogsDataProvider($this->debugLogger, 'PhpLogsDEV', $config['phpLogsDEV']['url']),
-                new \AlertLog\MonitoringDataProvider($this->debugLogger, 'MonitoringDEV', $config['monitoringDEV']['url']),
-            ]),
+            AlertLog::WTS_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
+            AlertLog::CRM_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
+            AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(['WhoTrades_AcceptanceTests_WhoTradesSite'], 'TeamCity: Acceptance Tests'),
+            AlertLog::WTS_DEV_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'MonitoringDEV', $config['monitoringDEV']['url']),
         ];
     }
 
