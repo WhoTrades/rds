@@ -1,10 +1,10 @@
 <?/** @var $lamps array*/?>
 <?
     $lampNameMap = [
-        AlertLog::WTS_LAMP_NAME => '[PROD] Phplogs',
-        AlertLog::CRM_LAMP_NAME => '[CRM] Phplogs',
+        AlertLog::WTS_LAMP_NAME => '[PROD] Monitoring',
+        AlertLog::CRM_LAMP_NAME => '[CRM] Monitoring',
         AlertLog::TEAM_CITY_LAMP_NAME => 'TeamCity',
-        AlertLog::PHPLOGS_DEV_LAMP_NAME => '[DEV] Phplogs',
+        AlertLog::WTS_DEV_LAMP_NAME => '[DEV] Monitoring',
     ];
 ?>
 <table>
