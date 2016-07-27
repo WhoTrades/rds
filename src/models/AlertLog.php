@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This is the model class for table "rds.alert_log".
  *
@@ -23,7 +22,7 @@ class AlertLog extends ActiveRecord
 {
     const WTS_LAMP_NAME = 'red_lamp_wts';
     const TEAM_CITY_LAMP_NAME = 'red_lamp_team_city';
-    const PHPLOGS_DEV_LAMP_NAME = 'red_lamp_phplogs_dev';
+    const WTS_DEV_LAMP_NAME = 'red_lamp_wts_dev';
     const CRM_LAMP_NAME = 'crm_lamp';
     const STATUS_OK = 'ok';
     const STATUS_ERROR = 'error';
@@ -35,12 +34,17 @@ class AlertLog extends ActiveRecord
         return 'rds.alert_log';
     }
 
-    public function afterConstruct() {
+    /**
+     * Устанавливаем значения по-умолчанию
+     */
+    public function afterConstruct()
+    {
         if ($this->isNewRecord) {
             $this->alert_detect_at = date("r");
             $this->alert_ignore_timeout = date("r");
         }
-        return parent::afterConstruct();
+
+        parent::afterConstruct();
     }
 
     /**
@@ -52,14 +56,14 @@ class AlertLog extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified, alert_detect_at, alert_lamp, alert_provider, alert_name, alert_status', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('alert_lamp', 'length', 'max'=>32),
-            array('alert_provider', 'length', 'max'=>64),
-            array('alert_name', 'length', 'max'=>256),
+            array('obj_status_did', 'numerical', 'integerOnly' => true),
+            array('alert_lamp', 'length', 'max' => 32),
+            array('alert_provider', 'length', 'max' => 64),
+            array('alert_name', 'length', 'max' => 256),
             array('alert_text', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, alert_lamp, alert_provider, alert_name, alert_status, alert_text', 'safe', 'on'=>'search'),
+            array('obj_id, obj_created, obj_modified, obj_status_did, alert_lamp, alert_provider, alert_name, alert_status, alert_text', 'safe', 'on' => 'search'),
         );
     }
 
@@ -68,10 +72,7 @@ class AlertLog extends ActiveRecord
      */
     public function relations()
     {
-        // NOTE: you may need to adjust the relation name and the related
-        // class name for the relations automatically generated below.
-        return array(
-        );
+        return array();
     }
 
     /**
@@ -107,22 +108,20 @@ class AlertLog extends ActiveRecord
      */
     public function search()
     {
-        // @todo Please modify the following code to remove attributes that should not be searched.
+        $criteria = new CDbCriteria();
 
-        $criteria=new CDbCriteria;
-
-        $criteria->compare('obj_id',$this->obj_id);
-        $criteria->compare('obj_created',$this->obj_created,true);
-        $criteria->compare('obj_modified',$this->obj_modified,true);
-        $criteria->compare('obj_status_did',$this->obj_status_did);
-        $criteria->compare('alert_lamp',$this->alert_name,true);
-        $criteria->compare('alert_provider',$this->alert_name,true);
-        $criteria->compare('alert_name',$this->alert_name,true);
-        $criteria->compare('alert_status',$this->alert_status,true);
-        $criteria->compare('alert_text',$this->alert_text,true);
+        $criteria->compare('obj_id', $this->obj_id);
+        $criteria->compare('obj_created', $this->obj_created);
+        $criteria->compare('obj_modified', $this->obj_modified);
+        $criteria->compare('obj_status_did', $this->obj_status_did);
+        $criteria->compare('alert_lamp', $this->alert_lamp, true);
+        $criteria->compare('alert_provider', $this->alert_provider, true);
+        $criteria->compare('alert_name', $this->alert_name, true);
+        $criteria->compare('alert_status', $this->alert_status, true);
+        $criteria->compare('alert_text', $this->alert_text, true);
 
         return new CActiveDataProvider($this, array(
-            'criteria'=>$criteria,
+            'criteria' => $criteria,
         ));
     }
 
@@ -132,7 +131,7 @@ class AlertLog extends ActiveRecord
     public function setStatus($status)
     {
         $this->alert_status = $status;
-        if($status === self::STATUS_ERROR) {
+        if ($status == self::STATUS_ERROR) {
             $this->alert_detect_at = date('r');
         }
         $this->save();
@@ -144,9 +143,9 @@ class AlertLog extends ActiveRecord
      * @param string $className active record class name.
      * @return AlertLog the static model class
      */
-    public static function model($className=__CLASS__)
+    public static function model($className = null)
     {
-        return parent::model($className);
+        return parent::model($className ?: __CLASS__);
     }
 
     /**
