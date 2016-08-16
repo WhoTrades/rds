@@ -50,10 +50,10 @@ class Cronjob_Tool_Test_ApplicationInstallation extends Cronjob\Tool\ToolBase
             Yii::app()->graphite->protocol . "://" . Yii::app()->graphite->host . ":" . Yii::app()->graphite->port
         ));
 
-        $container->addChecker(new UrlAcceptable(Yii::app()->whotrades->getUrl()));
-        $container->addChecker(new UrlAcceptable(Yii::app()->modules['SingleLogin']['components']['auth']['crmUrl']));
-        $container->addChecker(new UrlAcceptable(Yii::app()->params['jira']['baseRdsJiraUrl']));
-        $container->addChecker(new UrlAcceptable(StashApi::DEFAULT_STASH_URL));
+        $container->addChecker(new UrlAcceptable(Yii::app()->whotrades->getUrl()), 'Whotrades URL');
+        $container->addChecker(new UrlAcceptable(Yii::app()->modules['SingleLogin']['components']['auth']['crmUrl']), 'CRM URL');
+        $container->addChecker(new UrlAcceptable(Yii::app()->params['jira']['baseRdsJiraUrl']), 'JIRA URL');
+        $container->addChecker(new UrlAcceptable(StashApi::DEFAULT_STASH_URL), 'Stash/Bitbucket URL');
         $container->addChecker(new UrlAcceptable('tcp://' . MessagingRdsMs::HOST . ":" . MessagingRdsMs::PORT));
     }
 }
