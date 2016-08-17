@@ -169,7 +169,7 @@ class AlertController extends Controller
             AlertLog::WTS_LAMP_NAME,
             AlertLog::CRM_LAMP_NAME,
             AlertLog::TEAM_CITY_LAMP_NAME,
-            AlertLog::PHPLOGS_DEV_LAMP_NAME,
+            AlertLog::WTS_DEV_LAMP_NAME,
         ];
     }
 }
