@@ -9,11 +9,6 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
     protected $config;
 
     /**
-     * @var \PhpLogsSystem\Factory
-     */
-    protected $factory;
-
-    /**
      * @var \ServiceBase_IDebugLogger
      */
     protected $debugLogger;
