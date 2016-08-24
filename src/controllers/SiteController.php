@@ -166,7 +166,7 @@ class SiteController extends Controller
                 }
             }
             $projects = implode(", ", $projectNames);
-            Log::createLogMessage("Создан запрет релизов $projectNames");
+            Log::createLogMessage("Создан запрет релизов $projects");
             foreach (explode(",", \Yii::app()->params['notify']['releaseReject']['phones']) as $phone) {
                 if (!$phone) {
                     continue;

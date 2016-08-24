@@ -161,7 +161,7 @@
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                         foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
                             $text .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, 'pre') . ">";
-                            //$text .= "<a href='http://stash.finam.ru/projects/".
+                            //$text .= "<a href='http://git.finam.ru/projects/".
                             //    JiraJsonController::PULL_REQUEST_PROJECT.
                             //    "/repos/".
                             //    JiraJsonController::PULL_REQUEST_REPOSITORY.
