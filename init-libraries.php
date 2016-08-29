@@ -18,6 +18,7 @@ set_include_path(join(PATH_SEPARATOR, array_merge($includePaths, array(
     __DIR__ . '/../../lib/pear/',
     __DIR__ . '/../../lib/creole',
     __DIR__ . '/protected/modules/Wtflow',
+    __DIR__ . '/protected/components',	
 ))));
 require_once(__DIR__ . "/vendor/autoload.php");
 require_once('Autoload.php');
