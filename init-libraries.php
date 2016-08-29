@@ -8,6 +8,7 @@ set_include_path(join(PATH_SEPARATOR, array_merge($includePaths, array(
     // local
     __DIR__ . '/',
     __DIR__ . '/misc/cron/',
+    __DIR__ . '/protected/modules/Zoho/',
     // an: prod
     __DIR__ . '/lib',
     __DIR__ . '/lib/creole',
