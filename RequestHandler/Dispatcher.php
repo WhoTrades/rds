@@ -13,12 +13,20 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
      */
     protected $debugLogger;
 
-    function __construct(\ServiceBase_IDebugLogger $debugLogger)
+    /**
+     * Dispatcher constructor.
+     *
+     * @param \ServiceBase_IDebugLogger $debugLogger
+     */
+    public function __construct(\ServiceBase_IDebugLogger $debugLogger)
     {
         $this->debugLogger = $debugLogger;
     }
 
-    function handleRequest()
+    /**
+     * @return bool
+     */
+    public function handleRequest()
     {
         $debugLogger = $this->debugLogger;
 
@@ -26,21 +34,19 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
         $oper = $debugLogger->startOperation('handleRequestBase');
         $debugLogger->debug("process=http_request, method={$_SERVER['REQUEST_METHOD']}, request_uri={$_SERVER['REQUEST_URI']}, query_string={$_SERVER['QUERY_STRING']}");
 
-        $config=dirname(__FILE__).'/../protected/config/main.php';
-        defined('YII_DEBUG') or define('YII_DEBUG',true);
-        defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL',3);
+        $config = dirname(__FILE__) . '/../protected/config/main.php';
+        defined('YII_DEBUG') or define('YII_DEBUG', true);
+        defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 
-        //\CoreLight::getInstance()->getFatalWatcher()->stop();
-        include("yii/yii.php");
         \Yii::$enableIncludePath = false;
 
-        require_once(__DIR__.'/../protected/components/WebApplication.php');
+        require_once(__DIR__ . '/../protected/components/WebApplication.php');
         try {
             $application = \Yii::createApplication('WebApplication', $config);
             $application->debugLogger = $debugLogger;
 
-            if (is_dir(__DIR__.'/../lib/MigrationSystem')) {
-                \Yii::setPathOfAlias('MigrationSystem', __DIR__.'/../lib/MigrationSystem');
+            if (is_dir(__DIR__ . '/../lib/MigrationSystem')) {
+                \Yii::setPathOfAlias('MigrationSystem', __DIR__ . '/../lib/MigrationSystem');
             } else {
                 \Yii::setPathOfAlias('MigrationSystem', __DIR__ . '/../../../lib/MigrationSystem');
             }
@@ -53,8 +59,7 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
         }
 
         $oper->success();
+
         return true;
     }
-
-
 }
