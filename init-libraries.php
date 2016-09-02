@@ -15,7 +15,6 @@ set_include_path(join(PATH_SEPARATOR, array_merge($includePaths, array(
     // developer's
     __DIR__ . '/../../lib/',
     __DIR__ . '/../../lib/libcore/',
-    __DIR__ . '/../../lib/pear/',
     __DIR__ . '/../../lib/creole',
     __DIR__ . '/protected/modules/Wtflow',
     __DIR__ . '/protected/components',	
