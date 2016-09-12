@@ -26,7 +26,9 @@
                     style="width: 60%" />
         <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>" rel="30">tail&nbsp;-30</button>
         <button style="width: 10%" class="__get-log-tail" tag="<?=$tag?>" rel="100">tail&nbsp;-100</button>
-        <button style="width: 10%" onclick="window.open('/cronjobs/log/?tag=<?=$tag?>&lines=1000&plainText=1&project=<?=$Project->project_name?>')">tail&nbsp;-1000</button><br /><br />
+        <button style="width: 10%" onclick="window.open('/cronjobs/log/?tag=<?=$tag?>&lines=1000&plainText=1&project=<?=$Project->project_name?>')">
+            tail&nbsp;-1000
+        </button><br /><br />
     </td>
     <td>
         <div style="white-space: nowrap">
