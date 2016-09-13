@@ -20,6 +20,7 @@
  * @property string           $project_notification_subject
  * @property ReleaseRequest[] $releaseRequests
  * @property ProjectConfig[]  $projectConfigs
+ * @property Project2Worker[] $project2workers
  */
 class Project extends ActiveRecord
 {

@@ -110,13 +110,20 @@ class UseController extends Controller
             $logMessage = "Запущены post миграции {$releaseRequest->getTitle()}";
         }
 
-        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendMigrationTask(
-            new \RdsSystem\Message\MigrationTask(
-                $releaseRequest->project->project_name,
-                $releaseRequest->rr_build_version,
-                $type
-            )
-        );
+        foreach ($releaseRequest->project->project2workers as $p2w) {
+            /** @var Project2worker $p2w */
+            $worker = $p2w->worker;
+            (new RdsSystem\Factory(Yii::app()->debugLogger))->
+                getMessagingRdsMsModel()->
+                sendMigrationTask(
+                    $worker->worker_name,
+                    new \RdsSystem\Message\MigrationTask(
+                        $releaseRequest->project->project_name,
+                        $releaseRequest->rr_build_version,
+                        $type
+                    )
+                );
+        }
 
         if ($releaseRequest->save()) {
             Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);

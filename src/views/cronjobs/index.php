@@ -122,6 +122,7 @@ $this->pageTitle = "Фоновые процессы";
             $.ajax({
                 url: '<?=$this->createUrl('log')?>',
                 data: {
+                    project: '<?=$Project->project_name?>',
                     tag: $(this).attr('tag'),
                     lines: $(this).attr('rel')
                 }

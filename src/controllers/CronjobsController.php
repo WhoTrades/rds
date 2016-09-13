@@ -155,30 +155,43 @@ class CronjobsController extends Controller
         $result = [];
         $res = null;
 
+        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+
         do {
             if (!empty($res)) {
                 $servers[] = $res->server;
                 $result[] = $res;
             }
 
-            $res = $model->sendToolKillTask(
-                new RdsSystem\Message\Tool\KillTask($key, $project, $signal), RdsSystem\Message\Tool\KillResult::type()
-            );
+            foreach ($Project->project2workers as $p2w) {
+                /** @var $p2w Project2Worker */
+                $res = $model->sendToolKillTask(
+                    $p2w->worker->worker_name,
+                    new RdsSystem\Message\Tool\KillTask($key, $project, $signal),
+                    RdsSystem\Message\Tool\KillResult::type()
+                );
+            }
         } while (!in_array($res->server, $servers));
 
-        $data = array_map(function(RdsSystem\Message\Tool\KillResult $val){
+        $data = array_map(function (RdsSystem\Message\Tool\KillResult $val) {
             return ['server' => $val->server, 'processes' => $val->result];
         }, $result);
 
-        usort($data, function($a, $b){
+        usort($data, function ($a, $b) {
             return $a['server'] > $b['server'];
         });
 
-        Log::createLogMessage("Убиты процессы с сигналом -$signal: ".json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        Log::createLogMessage("Убиты процессы с сигналом -$signal: " . json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
         $this->renderPartial('kill', ['result' => $data]);
     }
 
+    /**
+     * @param string $key
+     * @param string $project
+     *
+     * @throws CException
+     */
     public function actionGetInfo($key, $project)
     {
         $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
@@ -187,32 +200,52 @@ class CronjobsController extends Controller
         $result = [];
         $res = null;
 
+        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+
         do {
             if (!empty($res)) {
                 $servers[] = $res->server;
                 $result[] = $res;
             }
 
-            $res = $model->sendToolGetInfoTask(
-                new RdsSystem\Message\Tool\GetInfoTask($key, $project), RdsSystem\Message\Tool\GetInfoResult::type()
-            );
+            foreach ($Project->project2workers as $p2w) {
+                /** @var $p2w Project2Worker */
+                $res = $model->sendToolGetInfoTask(
+                    $p2w->worker->worker_name,
+                    new RdsSystem\Message\Tool\GetInfoTask($key, $project),
+                    RdsSystem\Message\Tool\GetInfoResult::type()
+                );
+            }
         } while (!in_array($res->server, $servers));
 
-        $data = array_map(function(RdsSystem\Message\Tool\GetInfoResult $val){
+        $data = array_map(function (RdsSystem\Message\Tool\GetInfoResult $val) {
             return ['server' => $val->server, 'processes' => $val->result];
         }, $result);
 
-        usort($data, function($a, $b){
+        usort($data, function ($a, $b) {
             return $a['server'] > $b['server'];
         });
 
         $this->renderPartial('getInfo', ['result' => $data]);
     }
 
-    public function actionLog($tag, $lines, $plainText = false)
+    /**
+     * @param string  $project
+     * @param string  $tag
+     * @param int     $lines
+     * @param bool    $plainText
+     *
+     * @throws CException
+     */
+    public function actionLog($project, $tag, $lines, $plainText = null)
     {
-        $lines = min((int)$lines, 1000);
+        if ($plainText === null) {
+            $plainText = false;
+        }
+
+        $lines = min((int) $lines, 1000);
         $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+        $Project = Project::model()->findByAttributes(['project_name' => $project]);
 
         $servers = [];
         $result = [];
@@ -224,16 +257,22 @@ class CronjobsController extends Controller
                 $result[] = $res;
             }
 
-            $res = $model->sendToolGetToolLogTail(
-                new RdsSystem\Message\Tool\ToolLogTail($tag, $lines), RdsSystem\Message\Tool\ToolLogTailResult::type(), 1
-            );
+            foreach ($Project->project2workers as $p2w) {
+                /** @var $p2w Project2Worker */
+                $res = $model->sendToolGetToolLogTail(
+                    $p2w->worker->worker_name,
+                    new RdsSystem\Message\Tool\ToolLogTail($tag, $lines),
+                    RdsSystem\Message\Tool\ToolLogTailResult::type(),
+                    1
+                );
+            }
         } while (!in_array($res->server, $servers));
 
-        $data = array_map(function(RdsSystem\Message\Tool\ToolLogTailResult $val){
+        $data = array_map(function (RdsSystem\Message\Tool\ToolLogTailResult $val) {
             return ['server' => $val->server, 'log' => $val->result];
         }, $result);
 
-        usort($data, function($a, $b){
+        usort($data, function ($a, $b) {
             return $a['server'] > $b['server'];
         });
 
@@ -243,6 +282,10 @@ class CronjobsController extends Controller
         ]);
     }
 
+    /**
+     * Обнуление счетчиков CPU
+     * @throws Exception
+     */
     public function actionTruncateCpuUsage()
     {
         $config = RdsDbConfig::get();
@@ -253,6 +296,9 @@ class CronjobsController extends Controller
         Log::model()->createLogMessage("Cronjobs cpu usage обнулены");
     }
 
+    /**
+     * Отчет об использовании CPU фоновыми процессами
+     */
     public function actionCpuUsageReport()
     {
         $sql = "select project_name, \"group\", command, substring(command from 'local2.info -t (.*)'), cpu_time / 1000 as round, cpu_usage.key, project_name

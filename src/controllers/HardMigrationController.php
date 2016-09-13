@@ -54,9 +54,18 @@ class HardMigrationController extends Controller
         $migration->migration_status = HardMigration::MIGRATION_STATUS_STARTED;
         $migration->save(false);
 
-        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendHardMigrationTask(new \RdsSystem\Message\HardMigrationTask(
-           $migration->migration_name, $migration->project->project_name, $migration->project->project_current_version
-        ));
+        foreach ($migration->project->project2workers as $p2w) {
+            /** @var Project2worker $p2w*/
+            $worker = $p2w->worker;
+            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendHardMigrationTask(
+                $worker->worker_name,
+                new \RdsSystem\Message\HardMigrationTask(
+                    $migration->migration_name,
+                    $migration->project->project_name,
+                    $migration->project->project_current_version
+                )
+            );
+        }
 
         $this->redirect('/hardMigration/index');
     }
@@ -93,9 +102,14 @@ class HardMigrationController extends Controller
     {
         $migration = $this->loadModel($id);
 
-        (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendUnixSignal(new \RdsSystem\Message\UnixSignal(
-            $migration->migration_pid, $signal
-        ));
+        foreach ($migration->project->project2workers as $p2w) {
+            /** @var Project2worker $p2w */
+            $worker = $p2w->worker;
+            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendUnixSignal(
+                $worker->worker_name,
+                new \RdsSystem\Message\UnixSignal($migration->migration_pid, $signal)
+            );
+        }
 
         if ($newStatus) {
             HardMigration::model()->updateByPk($id, ['migration_status' => $newStatus]);

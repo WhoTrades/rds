@@ -168,7 +168,13 @@ class MaintenanceTool extends ActiveRecord
 
         if ($mtr->save()) {
             $messageModel = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
-            $messageModel->sendMaintenanceToolStart(new \RdsSystem\Message\MaintenanceTool\Start($mtr->obj_id, $this->mt_command));
+            foreach (Worker::model()->findAll() as $worker) {
+                /** @var $worker Worker */
+                $messageModel->sendMaintenanceToolStart(
+                    $worker->worker_name,
+                    new \RdsSystem\Message\MaintenanceTool\Start($mtr->obj_id, $this->mt_command)
+                );
+            }
         }
 
         return $mtr;
@@ -189,8 +195,12 @@ class MaintenanceTool extends ActiveRecord
         Log::createLogMessage("Остановлен тул {$this->getTitle()}", $user);
 
         $messageModel = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
-        $messageModel->sendUnixSignalToGroup(new \RdsSystem\Message\UnixSignalToGroup(
-            $mtr->mtr_pid
-        ));
+        foreach (Worker::model()->findAll() as $worker) {
+            /** @var $worker Worker */
+            $messageModel->sendUnixSignalToGroup(
+                $worker->worker_name,
+                new \RdsSystem\Message\UnixSignalToGroup($mtr->mtr_pid)
+            );
+        }
     }
 }

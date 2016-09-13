@@ -24,8 +24,10 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readMergeTaskResult(false, function(Message\Merge\TaskResult $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received merge result: ".json_encode($message));
+        $workerName = \Config::getInstance()->workerName;
+
+        $model->readMergeTaskResult($workerName, false, function (Message\Merge\TaskResult $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received merge result: " . json_encode($message));
 
             if ($message->type == Message\Merge\Task::MERGE_TYPE_BUILD) {
                 $this->actionProcessMergeBuildResult($message, $model);
@@ -34,8 +36,8 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             }
         });
 
-        $model->readDroppedBranches(false, function(Message\Merge\DroppedBranches $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received merge result: ".json_encode($message));
+        $model->readDroppedBranches(false, function (Message\Merge\DroppedBranches $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received merge result: " . json_encode($message));
             $this->actionProcessDroppedBranches($message, $model);
         });
 
@@ -46,7 +48,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
     private function actionProcessDroppedBranches(Message\Merge\DroppedBranches $message, MessagingRdsMs $model)
     {
-        $this->debugLogger->message("Received removed branches: branch=$message->branch, skippedRepositories: ".json_encode($message->skippedRepositories));
+        $this->debugLogger->message("Received removed branches: branch=$message->branch, skippedRepositories: " . json_encode($message->skippedRepositories));
         $c = new CDbCriteria();
         $c->compare("jf_branch", $message->branch);
         $c->compare('jf_status', JiraFeature::STATUS_REMOVING);
@@ -184,7 +186,10 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
             //an: Если собирали ради пересборки develop/staging и все успешно смержилось - тогда пушим пересоздаем ветки
             if (in_array($gitBuild->additional_data, ["develop", "staging"]) && $errorsCount == 0) {
-                $model->sendMergeCreateBranch(new Message\Merge\CreateBranch($gitBuild->additional_data, $gitBuild->branch, true));
+                $model->sendMergeCreateBranch(
+                    \Yii::app()->modules['Wtflow']['workerName'],
+                    new Message\Merge\CreateBranch($gitBuild->additional_data, $gitBuild->branch, true)
+                );
                 mail("dev-test-rebuilt-success@whotrades.org", "[RDS] $gitBuild->additional_data успешно пересобрана", "Все вмержилось, новый код можно смотреть на тестовом контуре");
             } else {
                 mail("dev-test-rebuilt-failed@whotrades.org", "[RDS] Собрка ветки $gitBuild->additional_data завершилась неудачей", "Часть задач не вмержились");
