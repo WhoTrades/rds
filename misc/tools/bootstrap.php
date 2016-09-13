@@ -20,7 +20,12 @@ class Config
 {
     protected static $instance;
 
-    function __construct($configLocations)
+    /**
+     * Config constructor.
+     *
+     * @param array $configLocations
+     */
+    public function __construct($configLocations)
     {
         $path = dirname(__FILE__) . '/../../';
         foreach (array(
@@ -46,16 +51,27 @@ class Config
         }
     }
 
+    /**
+     * @param array $config
+     *
+     * @return Config
+     */
     public static function createInstance($config = array())
     {
         return self::getInstance($config);
     }
 
+    /**
+     * @param array $config
+     *
+     * @return Config
+     */
     public static function getInstance($config = array())
     {
         if (null === self::$instance) {
             self::$instance = new self($config);
         }
+
         return self::$instance;
     }
 }

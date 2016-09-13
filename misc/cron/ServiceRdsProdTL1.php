@@ -124,7 +124,7 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity = 1), '*/28 * * * * *', 'rds_hard_migration_log_rotator'),
 
             new Comment("Удаление старых веток из git"),
-            new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity = 3), '37 10 0 * * *', 'rds_git_drop_feature_branch'),
+            new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity = 3), '37 10 20 * * *', 'rds_git_drop_feature_branch'),
 
             new Comment("Уведомления о релизах"),
             new MultiCommandToCron(
