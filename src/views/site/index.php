@@ -6,12 +6,12 @@
 
 <?php $this->widget('yiistrap.widgets.TbModal', array(
     'id' => 'release-request-form-modal',
-    'header' => 'Release request',
+    'header' => 'Запрос релиза',
     'content' => $this->renderPartial('createReleaseRequest', ['model' => $releaseRequest['model']], true),
 )); ?>
 <?php $this->widget('yiistrap.widgets.TbModal', array(
     'id' => 'release-request-use-form-modal',
-    'header' => 'USE',
+    'header' => 'Активировать',
     'content' => '',
 )); ?>
 <?php $this->widget('yiistrap.widgets.TbModal', array(
@@ -63,11 +63,12 @@
                         'data-toggle' => 'modal',
                         'data-target' => '#release-request-form-modal',
                         'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id});
-                                        setTimeout(function(){
-                                            $('#release-request-form-modal .modal-body input:first').focus();
-                                            $('#ReleaseRequest_rr_project_obj_id').change();
-                                        }, 500);",
+                            setTimeout(function(){
+                                $('#release-request-form-modal .modal-body input:first').focus();
+                                $('#ReleaseRequest_rr_project_obj_id').change();
+                            }, 500);",
                     )); ?>
+                    &nbsp;
                 </div>
             <?php }?>
         </div>

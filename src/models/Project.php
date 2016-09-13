@@ -120,7 +120,7 @@ class Project extends ActiveRecord
             'obj_created' => 'Created',
             'obj_modified' => 'Modified',
             'obj_status_did' => 'Status Did',
-            'project_name' => 'Project Name',
+            'project_name' => 'Проект',
             'project_notification_email' => 'Email оповещеиня о выкладке',
             'project_notification_subject' => 'Тема оповещения о выкладке',
         ];

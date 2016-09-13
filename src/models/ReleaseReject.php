@@ -57,13 +57,14 @@ class ReleaseReject extends ActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'obj_id' => 'ID',
-			'obj_created' => 'Created',
+			'obj_id' => 'Номер',
+			'obj_created' => 'Дата создания',
 			'obj_modified' => 'Modified',
 			'obj_status_did' => 'Status Did',
-			'rr_user' => 'User',
-			'rr_comment' => 'Comment',
-			'rr_project_obj_id' => 'Project ID',
+			'rr_user' => 'Пользователь',
+			'rr_comment' => 'Комментарий',
+			'rr_project_obj_id' => 'Номер проекта',
+			'rr_release_version' => 'Версия',
 		);
 	}
 

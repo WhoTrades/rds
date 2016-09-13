@@ -149,18 +149,18 @@ class ReleaseRequest extends ActiveRecord
     public function attributeLabels()
     {
         return array(
-            'obj_id' => 'ID',
-            'obj_created' => 'Created',
-            'obj_modified' => 'Modified',
-            'obj_status_did' => 'Status Did',
-            'rr_user' => 'User',
-            'rr_status' => 'Status',
-            'rr_comment' => 'Comment',
-            'rr_project_obj_id' => 'Project',
-            'rr_build_version' => 'Build',
-            'rr_project_owner_code' => 'Project owner code',
-            'rr_release_engineer_code' => 'Release engineer code',
-            'rr_release_version' => 'Release version',
+            'obj_id' => 'Номер',
+            'obj_created' => 'Дата создания',
+            'obj_modified' => 'Дата модификаии',
+            'obj_status_did' => 'Системный статус',
+            'rr_user' => 'Пользователь',
+            'rr_status' => 'Статус',
+            'rr_comment' => 'Комментарий',
+            'rr_project_obj_id' => 'Проект',
+            'rr_build_version' => 'Версия',
+            'rr_project_owner_code' => 'SMS Код',
+            'rr_release_engineer_code' => 'Код 2',
+            'rr_release_version' => 'Основная версия',
         );
     }
 

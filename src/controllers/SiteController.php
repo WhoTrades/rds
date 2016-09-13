@@ -50,7 +50,18 @@ class SiteController extends Controller
             $releaseRejectSearchModel->attributes = $_GET['ReleaseRequest'];
         }
 
-        $mainProjects = Project::model()->findAllByAttributes(['project_name' => ['comon', 'service-crm', 'whotrades']]);
+
+        $sql = "SELECT rr_project_obj_id, COUNT(*)
+                FROM rds.release_request
+                WHERE obj_created > NOW() - interval '3 month'
+                AND rr_user=:user
+                GROUP BY 1
+                ORDER BY 2 DESC
+                LIMIT 5";
+
+        $ids = Yii::app()->db->createCommand($sql)->queryColumn([':user' => Yii::app()->user->name]);
+
+        $mainProjects = Project::model()->findAllByPk($ids);
 
         $this->render('index', array(
             'releaseRequestSearchModel' => $releaseRequestSearchModel,
