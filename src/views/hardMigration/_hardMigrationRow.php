@@ -121,7 +121,7 @@ return array(
     ],
     [
         'name' => 'migration_ticket',
-        'value' => function (HardMigration $migration){
+        'value' => function (HardMigration $migration) {
             return "<a href='https://jira.finam.ru/browse/$migration->migration_ticket' target='_blank' title='Перейти в JIRA'>$migration->migration_ticket</a>";
         },
         'type' => 'html',
