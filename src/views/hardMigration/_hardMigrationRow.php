@@ -97,7 +97,7 @@ return array(
                 TbHtml::icon($icon, ['style' => 'margin-right: 1px;']).
                 "$migration->migration_status</span><br />";
             if ($migration->migration_log) {
-                echo "<a href='".Yii::app()->createAbsoluteUrl('/hardMigration/log', ['id' => $migration->obj_id])."'>LOG</a>";
+                echo "<a href='" .Yii::app()->createAbsoluteUrl('/hardMigration/log', ['id' => $migration->obj_id])."'>LOG</a>";
             }
         },
         'filter' => array_combine(HardMigration::getAllStatuses(), HardMigration::getAllStatuses()),
@@ -121,8 +121,8 @@ return array(
     ],
     [
         'name' => 'migration_ticket',
-        'value' => function(HardMigration $migration){
-            return "<a href='http://jira/browse/$migration->migration_ticket' target='_blank' title='Перейти в JIRA'>$migration->migration_ticket</a>";
+        'value' => function (HardMigration $migration){
+            return "<a href='https://jira.finam.ru/browse/$migration->migration_ticket' target='_blank' title='Перейти в JIRA'>$migration->migration_ticket</a>";
         },
         'type' => 'html',
     ],
@@ -131,7 +131,7 @@ return array(
 
     [
         'name' => 'migration_progress_action',
-        'value' => function(HardMigration $migration){
+        'value' => function (HardMigration $migration){
             echo "<div class='progress-action-$migration->obj_id'>$migration->migration_progress_action</div>";
         },
         'type' => 'html',
