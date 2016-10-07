@@ -48,7 +48,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
             $lines = array_filter(explode("\n", str_replace("\r", "", $text)));
             $processList = [];
             foreach ($lines as $line) {
-                preg_match('~^\s*(?<pid>\d+)\s*(?<time>(?:\d\d:\d\d)|(?:\w{3} \d\d))\s*(?<command>.*)$~', $line, $ans);
+                preg_match('~^\s*(?<pid>\d+)\s*(?<time>(?:\d\d:\d\d)|(?:\w{3}[: ]\d\d))\s*(?<command>.*)$~', $line, $ans);
                 $processList[(int) $ans['pid']] = $ans;
             }
 
