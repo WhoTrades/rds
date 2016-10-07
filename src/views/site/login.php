@@ -1,11 +1,6 @@
 <?php
-/* @var $this SiteController */
-/* @var $model LoginForm */
-/* @var $form CActiveForm  */
+/** @var $this yii\web\View */
 
-$this->pageTitle=Yii::app()->name . ' - Login';
-$this->breadcrumbs=array(
-	'Login',
-);
+$this->title = \Yii::$app->name . ' - Авторизация';
 ?>
-<h2 style="text-align: center"><a href="<?=Yii::app()->getModule('SingleLogin')->auth->getAuthUrl()?>">Авторизация через crm</h2>
+<h2 style="text-align: center"><a href="<?=\Yii::$app->getModule('SingleLogin')->auth->getAuthUrl()?>">Авторизация через crm</h2>

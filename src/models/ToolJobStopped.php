@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "cronjobs.tool_job_stopped".
@@ -20,7 +23,7 @@ class ToolJobStopped extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'cronjobs.tool_job_stopped';
     }
@@ -34,7 +37,7 @@ class ToolJobStopped extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified, project_obj_id, key, stopped_till', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
+            array('obj_status_did', 'number', 'integerOnly'=>true),
             array('key', 'length', 'max'=>12),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.

@@ -36,14 +36,14 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
             return 1;
         }
 
-        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        $Project = Project::findByAttributes(['project_name' => $project]);
         if (!$Project) {
             $this->debugLogger->error("Project $project not exists at DB");
             return 2;
         }
 
         /** @var $rr ReleaseRequest */
-        $rr = ReleaseRequest::model()->findByAttributes([
+        $rr = ReleaseRequest::findByAttributes([
             'rr_project_obj_id' => $Project->obj_id,
             'rr_build_version' => $Project->project_current_version,
         ]);
@@ -55,9 +55,9 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
 
         $rr->rr_cron_config = file_get_contents($filename);
 
-        $transaction = ToolJob::model()->getDbConnection()->beginTransaction();
+        $transaction = ToolJob::getDbConnection()->beginTransaction();
         try {
-            ToolJob::model()->deleteAllByAttributes([
+            ToolJob::deleteAllByAttributes([
                 'project_obj_id' => $Project->obj_id,
             ]);
 

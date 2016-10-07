@@ -8,7 +8,7 @@ $this->breadcrumbs=array(
     'Manage',
 );
 
-Yii::app()->clientScript->registerScript('search', "
+\Yii::$app->clientScript->registerScript('search', "
 $('.search-button').click(function(){
     $('.search-form').toggle();
     return false;
@@ -31,7 +31,7 @@ $('.search-form form').submit(function(){
 
 <?php echo CHtml::link('Advanced Search','#',array('class'=>'search-button')); ?>
 <div class="search-form" style="display:none">
-<?php $this->renderPartial('_search',array(
+<?php echo $this->render('_search',array(
     'model'=>$model,
 )); ?>
 </div><!-- search-form -->

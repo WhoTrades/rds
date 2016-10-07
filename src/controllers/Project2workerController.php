@@ -152,7 +152,7 @@ class Project2workerController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Project2worker::model()->findByPk($id);
+		$model=Project2worker::findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -167,7 +167,7 @@ class Project2workerController extends Controller
 		if(isset($_POST['ajax']) && $_POST['ajax']==='project2worker-form')
 		{
 			echo CActiveForm::validate($model);
-			Yii::app()->end();
+			\Yii::$app->end();
 		}
 	}
 }

@@ -1,39 +1,31 @@
 <?php
-/** @var $this SiteController */
-/** @var $model ReleaseRequest */
-/** @var $form TbActiveForm */
-?>
+use yii\helpers\Html;
+use yii\bootstrap\ActiveForm;
+use app\models\ReleaseReject;
+use app\models\Project;
+use app\models\ReleaseVersion;
 
+/** @var $this SiteController */
+/** @var $model ReleaseReject */
+/** @var $form ActiveForm */
+
+?>
 <div class="form" style="width: 400px; margin: auto">
 
-    <?php $form = $this->beginWidget('yiistrap.widgets.TbActiveForm', array(
-        'enableAjaxValidation' => false,
-        'htmlOptions' => array(
-            'enctype' => 'multipart/form-data',
-        ),
-    ));?>
+    <?php $form = ActiveForm::begin(array());?>
 
-    <p class="note">Fields with <span class="required">*</span> are required.</p>
+    <?php echo $form->field($model, 'rr_comment')->textInput(); ?>
+    <?php echo $form->field($model, 'rr_project_obj_id[]')->dropDownList(Project::forList(), [
+        'multiple' => true,
+        'style' => 'height: ' . min(300, count(Project::forList()) * 18) . 'px',
+    ]); ?>
 
-    <?php echo $form->errorSummary($model); ?>
-
-    <?php echo $form->textFieldControlGroup($model, 'rr_comment'); ?>
-
-    <?php echo $form->dropDownListControlGroup(
-        $model,
-        'rr_project_obj_id[]',
-        \Project::model()->forList(),
-        [
-            'multiple' => true,
-            'style' => 'height: ' . min(300, count(\Project::model()->forList()) * 18) . 'px',
-        ]
-    ); ?>
-    <?php echo $form->dropDownListControlGroup($model, 'rr_release_version', \ReleaseVersion::model()->forList()); ?>
+    <?php echo $form->field($model, 'rr_release_version')->dropDownList(ReleaseVersion::forList()); ?>
 
     <div class="row buttons">
-        <?php echo TbHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+        <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
     </div>
 
-    <?php $this->endWidget(); ?>
+    <?php ActiveForm::end(); ?>
 
 </div><!-- form -->

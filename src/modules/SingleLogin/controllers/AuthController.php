@@ -1,29 +1,35 @@
 <?php
+namespace app\modules\SingleLogin\controllers;
 
-class AuthController extends Controller
+class AuthController extends \Controller
 {
-	public function actionLogin($code)
-	{
-        $auth = Yii::app()->getModule('SingleLogin')->auth;
+    /**
+     * @param string $code
+     */
+    public function actionLogin($code)
+    {
+        $auth = \Yii::$app->getModule('SingleLogin')->auth;
         $user = $auth->authorize($code);
 
         if ($user) {
-            Yii::app()->user->login($user, 3600*24*30);
+            \Yii::$app->user->login($user, 3600*24*30);
         }
 
+        $this->redirect('/');
+    }
 
-		$this->redirect('/');
-	}
-
+    /**
+     * @return void
+     */
     public function actionRights()
     {
         $result = array(
             'result' => array(
                 'data' => array(
                     'status' => 'OK',
-                    'list' => array_keys(\Yii::app()->authManager->getAuthItems()),
+                    'list' => array_keys(\Yii::$app->authManager->getAuthItems()),
                 ),
-            )
+            ),
         );
         echo json_encode($result);
     }

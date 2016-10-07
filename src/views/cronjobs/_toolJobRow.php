@@ -4,7 +4,7 @@
 ?>
 <tr id="<?=$toolJob->getLoggerTag()?>" class="active-tr project-<?=$toolJob->project->project_name?>">
     <td style="font-family: Menlo, Monaco, Consolas, monospace">
-        <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_LINK, [
+        <?=TbHtml::tooltip(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_LINK, [
             'class' => 'active-link',
             'style' => 'cursor: pointer',
             'border' => 'solid 1px #eee',
@@ -38,8 +38,8 @@
                 Активен
             <?php }?>
             <?=TbHtml::tooltip(
-                TbHtml::icon(TbHtml::ICON_INFO_SIGN),
-                $this->createUrl("/cronjobs/getInfo", [
+                yii\bootstrap\BaseHtml::icon(TbHtml::ICON_INFO_SIGN),
+                yii\helpers\Url::to("/cronjobs/getInfo", [
                     'key' => $toolJob->key,
                     'project' => $Project->project_name,
                 ]),
@@ -51,18 +51,18 @@
             )?>
         </div>
         <?php if ($stopper) {?>
-            <a href="<?=$this->createUrl("/cronjobs/start", [
+            <a href="<?=yii\helpers\Url::to("/cronjobs/start", [
                 'key' => $toolJob->key,
                 'projectId' => $Project->obj_id,
             ])?>" class="ajax-url">
-                <?=TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'font-size: 2em; color: green'])?>
+                <?=yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PLAY, ['style' => 'font-size: 2em; color: green'])?>
             </a><br />
         <?php } else {?>
             <div style="white-space: nowrap">
                 <?php foreach (['0.7em' => '5 minutes', '1em' => '15 minutes', '1.3em' => '1 hour', '1.7em' => '3 hours', '2.0em' => '1 day'] as $size => $interval) {?>
                     <?=TbHtml::tooltip(
-                        TbHtml::icon(TbHtml::ICON_STOP),
-                        $this->createUrl("/cronjobs/stop", [
+                        yii\bootstrap\BaseHtml::icon(TbHtml::ICON_STOP),
+                        yii\helpers\Url::to("/cronjobs/stop", [
                             'key' => $toolJob->key,
                             'interval' => $interval,
                             'projectId' => $Project->obj_id,
@@ -77,8 +77,8 @@
             </div>
         <?php }?>
         <?=TbHtml::tooltip(
-            TbHtml::icon(TbHtml::ICON_REMOVE_CIRCLE),
-            $this->createUrl("/cronjobs/kill", [
+            yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REMOVE_CIRCLE),
+            yii\helpers\Url::to("/cronjobs/kill", [
                 'key' => $toolJob->key,
                 'project' => $Project->project_name,
             ]),
@@ -90,8 +90,8 @@
         )?>
         &nbsp;
         <?=TbHtml::tooltip(
-            TbHtml::icon(TbHtml::ICON_REMOVE),
-            $this->createUrl("/cronjobs/kill", [
+            yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REMOVE),
+            yii\helpers\Url::to("/cronjobs/kill", [
                 'key' => $toolJob->key,
                 'signal' => 9,
                 'project' => $Project->project_name,

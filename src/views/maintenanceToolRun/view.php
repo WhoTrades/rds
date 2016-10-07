@@ -4,7 +4,7 @@ $this->breadcrumbs=array(
     'Maintenance Tool Runs'=>array('index'),
 );
 
-$this->pageTitle = "Выполнение процесса ".$model->mtrMaintenanceTool->mt_name;
+$this->title = "Выполнение процесса ".$model->mtrMaintenanceTool->mt_name;
 
 $this->menu=array(
     array('label'=>'List MaintenanceToolRun','url'=>array('index')),

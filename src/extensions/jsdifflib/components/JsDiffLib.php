@@ -16,7 +16,7 @@ class JsDiffLib extends CApplicationComponent
 	 */
 	public function registerAllCss()
 	{
-		Yii::app()->clientScript->registerCssFile($this->getAssetsUrl().'/css/diffview.css');
+		\Yii::$app->clientScript->registerCssFile($this->getAssetsUrl().'/css/diffview.css');
 	}
 
 	/**
@@ -26,7 +26,7 @@ class JsDiffLib extends CApplicationComponent
 	protected function registerJS($position = CClientScript::POS_HEAD)
 	{
 		/** @var CClientScript $cs */
-		$cs = Yii::app()->getClientScript();
+		$cs = \Yii::$app->getClientScript();
 		$cs->registerCoreScript('jquery');
 		$cs->registerScriptFile($this->getAssetsUrl().'/js/difflib.js', $position);
 		$cs->registerScriptFile($this->getAssetsUrl().'/js/diffview.js', $position);
@@ -53,8 +53,8 @@ class JsDiffLib extends CApplicationComponent
 			return $this->_assetsUrl;
 		else
 		{
-			$assetsPath = Yii::getPathOfAlias('jsdifflib.assets');
-			$assetsUrl = Yii::app()->assetManager->publish($assetsPath, true, -1, $this->forceCopyAssets);
+			$assetsPath = \Yii::getPathOfAlias('jsdifflib.assets');
+			$assetsUrl = \Yii::$app->assetManager->publish($assetsPath, true, -1, $this->forceCopyAssets);
 			return $this->_assetsUrl = $assetsUrl;
 		}
 	}

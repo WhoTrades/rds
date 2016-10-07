@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.maintenance_tool".
@@ -24,7 +27,7 @@ class MaintenanceTool extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.maintenance_tool';
     }
@@ -38,7 +41,7 @@ class MaintenanceTool extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified, mt_name, mt_command', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
+            array('obj_status_did', 'number', 'integerOnly'=>true),
             array('mt_name, mt_command', 'length', 'max'=>256),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
@@ -123,12 +126,12 @@ class MaintenanceTool extends ActiveRecord
         $c->order = 'obj_id desc';
         $c->limit = 1;
 
-        return $this->lastRunLocal = MaintenanceToolRun::model()->find($c);
+        return $this->lastRunLocal = MaintenanceToolRun::find($c);
     }
 
     public function canBeStarted()
     {
-        return 0 == MaintenanceToolRun::model()->countByAttributes([
+        return 0 == MaintenanceToolRun::countByAttributes([
             'mtr_maintenance_tool_obj_id' => $this->obj_id,
             'mtr_status' => [MaintenanceToolRun::STATUS_IN_PROGRESS, MaintenanceToolRun::STATUS_NEW],
         ]);
@@ -167,8 +170,8 @@ class MaintenanceTool extends ActiveRecord
         ];
 
         if ($mtr->save()) {
-            $messageModel = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
-            foreach (Worker::model()->findAll() as $worker) {
+            $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
+            foreach (Worker::find()->all() as $worker) {
                 /** @var $worker Worker */
                 $messageModel->sendMaintenanceToolStart(
                     $worker->worker_name,
@@ -183,7 +186,7 @@ class MaintenanceTool extends ActiveRecord
     public function stop($user)
     {
         /** @var $mtr MaintenanceToolRun */
-        $mtr = MaintenanceToolRun::model()->findByAttributes([
+        $mtr = MaintenanceToolRun::findByAttributes([
             'mtr_maintenance_tool_obj_id' => $this->obj_id,
             'mtr_status' => [MaintenanceToolRun::STATUS_IN_PROGRESS],
         ]);
@@ -194,8 +197,8 @@ class MaintenanceTool extends ActiveRecord
 
         Log::createLogMessage("Остановлен тул {$this->getTitle()}", $user);
 
-        $messageModel = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
-        foreach (Worker::model()->findAll() as $worker) {
+        $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
+        foreach (Worker::find()->all() as $worker) {
             /** @var $worker Worker */
             $messageModel->sendUnixSignalToGroup(
                 $worker->worker_name,

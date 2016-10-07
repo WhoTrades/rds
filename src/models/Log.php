@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.log".
@@ -16,7 +19,7 @@ class Log extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.log';
     }
@@ -29,13 +32,13 @@ class Log extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('log_user', 'length', 'max'=>128),
-            array('log_text', 'safe'),
+            array(['obj_created', 'obj_modified'], 'required'),
+            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['log_user'], 'string', 'max' => 128),
+            array(['log_text'], 'safe'),
         // The following rule is used by search().
         // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, log_user, log_text', 'safe', 'on'=>'search'),
+            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'log_user', 'log_text'], 'safe', 'on' => 'search'),
         );
     }
 
@@ -117,7 +120,7 @@ class Log extends ActiveRecord
     public static function createLogMessage($text, $user = null)
     {
         if ($user == null) {
-            $user = \Yii::app()->user->name;
+            $user = \Yii::$app->user->getIdentity()->username;
         }
         $log = new self();
         $log->log_text = $text;

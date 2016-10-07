@@ -76,7 +76,7 @@ class ProjectController extends Controller
         $this->render('create', array(
             'model' => $model,
             'list' => $list,
-            'workers' => Worker::model()->findAll(),
+            'workers' => Worker::find()->all(),
         ));
     }
 
@@ -93,11 +93,11 @@ class ProjectController extends Controller
             $model->attributes = $_POST['Project'];
             $model->project_config = str_replace("\r", "", $model->project_config);
             $transaction = $model->getDbConnection()->beginTransaction();
-            $existingProject = Project::model()->findByPk($model->obj_id);
+            $existingProject = Project::findByPk($model->obj_id);
 
             if ($model->save()) {
                 Log::createLogMessage("Удалены все связки {$model->project_name}");
-                Project2worker::model()->deleteAllByAttributes(array('project_obj_id' => $model->obj_id));
+                Project2worker::deleteAllByAttributes(array('project_obj_id' => $model->obj_id));
                 foreach ($_POST['workers'] as $workerId) {
                     $projectWorker = new Project2worker();
                     $projectWorker->worker_obj_id = $workerId;
@@ -111,7 +111,7 @@ class ProjectController extends Controller
 
                 foreach ($_POST['project_config'] as $filename => $content) {
                     /** @var $projectConfig ProjectConfig */
-                    $projectConfig = ProjectConfig::model()->findByAttributes([
+                    $projectConfig = ProjectConfig::findByAttributes([
                         'pc_filename'       => $filename,
                         'pc_project_obj_id' => $model->obj_id,
                     ]);
@@ -125,7 +125,7 @@ class ProjectController extends Controller
                         continue;
                     }
 
-                    $diffStat = Yii::app()->diffStat->getDiffStat(
+                    $diffStat = \Yii::$app->diffStat->getDiffStat(
                         str_replace("\r", "", $projectConfig->pc_content),
                         str_replace("\r", "", $content)
                     );
@@ -146,7 +146,7 @@ class ProjectController extends Controller
                     $projectHistoryItem->pch_project_obj_id = $model->obj_id;
                     $projectHistoryItem->pch_filename = $filename;
                     $projectHistoryItem->pch_config = $content;
-                    $projectHistoryItem->pch_user = \Yii::app()->user->name;
+                    $projectHistoryItem->pch_user = \Yii::$app->user->getIdentity()->username;
                     $projectHistoryItem->save();
 
 
@@ -164,7 +164,7 @@ $diffStat<br />
                         $configs[$projectConfig->pc_filename] = $projectConfig->pc_content;
                     }
 
-                    (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
+                    (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
                         new \RdsSystem\Message\ProjectConfig(
                             $model->project_name,
                             $configs
@@ -191,7 +191,7 @@ $diffStat<br />
         $this->render('update', array(
             'model' => $model,
             'list' => $list,
-            'workers' => Worker::model()->findAll(),
+            'workers' => Worker::find()->all(),
         ));
     }
 
@@ -235,7 +235,7 @@ $diffStat<br />
 
         $this->render('admin', array(
             'model' => $model,
-            'workers' => Worker::model()->findAll(),
+            'workers' => Worker::find()->all(),
         ));
     }
 
@@ -248,7 +248,7 @@ $diffStat<br />
      */
     public function loadModel($id)
     {
-        $model = Project::model()->findByPk($id);
+        $model = Project::findByPk($id);
         if ($model === null) {
             throw new CHttpException(404, 'The requested page does not exist.');
         }
@@ -264,7 +264,7 @@ $diffStat<br />
     {
         if (isset($_POST['ajax']) && $_POST['ajax'] === 'project-form') {
             echo CActiveForm::validate($model);
-            Yii::app()->end();
+            \Yii::$app->end();
         }
     }
 }

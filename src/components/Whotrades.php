@@ -1,5 +1,5 @@
 <?php
-final class Whotrades extends CComponent
+final class Whotrades extends yii\base\Object
 {
     /** @var \JsonRpcClient */
     protected $rpc;
@@ -10,12 +10,12 @@ final class Whotrades extends CComponent
 
     public function __construct()
     {
-        $this->rpc = new \JsonRpcClient($this->url, \Yii::app()->debugLogger, true, $this->timeout);
+        $this->rpc = new \JsonRpcClient($this->url, \Yii::$app->debugLogger, true, $this->timeout);
     }
 
     private function reCreateJsonClient()
     {
-        $this->rpc = new \JsonRpcClient($this->url, \Yii::app()->debugLogger, true, $this->timeout);
+        $this->rpc = new \JsonRpcClient($this->url, \Yii::$app->debugLogger, true, $this->timeout);
     }
 
     public function setUrl($url)

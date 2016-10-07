@@ -18,4 +18,4 @@ $this->menu=array(
 
 <h1>Update ReleaseVersion <?php echo $model->obj_id; ?></h1>
 
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<?php echo $this->render('_form', array('model'=>$model)); ?>

@@ -4,6 +4,6 @@ abstract class RdsEventProcessorBase extends PgQ\EventProcessor\EventProcessorBa
     /** @return \GraphiteSystem\Graphite */
     public function getEventProcessorGraphite()
     {
-        return \Yii::app()->graphite->getGraphite();
+        return \Yii::$app->graphite->getGraphite();
     }
 }

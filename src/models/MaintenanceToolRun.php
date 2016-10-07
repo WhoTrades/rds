@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.maintenance_tool_run".
@@ -29,7 +32,7 @@ class MaintenanceToolRun extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.maintenance_tool_run';
     }
@@ -43,7 +46,7 @@ class MaintenanceToolRun extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified, mtr_maintenance_tool_obj_id, mtr_runner_user, mtr_status', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
+            array('obj_status_did', 'number', 'integerOnly'=>true),
             array('mtr_runner_user', 'length', 'max'=>256),
             array('mtr_log, mtr_pid', 'safe'),
             // The following rule is used by search().
@@ -145,7 +148,7 @@ class MaintenanceToolRun extends ActiveRecord
         $c->order = 'obj_id desc';
         $c->limit = 1;
         /** @var $lastSuccessBefore MaintenanceToolRun */
-        $lastSuccessBefore = self::model()->find($c);
+        $lastSuccessBefore = self::find($c);
         //var_dump($lastSuccessBefore->attributes);
         if (empty($lastSuccessBefore)) {
             return $this->progressPercent = null;

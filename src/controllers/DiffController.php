@@ -7,9 +7,9 @@ class DiffController extends Controller
     public function actionIndex($id1, $id2)
     {
         /** @var $rr1 ReleaseRequest */
-        $rr1 = ReleaseRequest::model()->findByPk($id1);
+        $rr1 = ReleaseRequest::findByPk($id1);
         /** @var $rr2 ReleaseRequest */
-        $rr2 = ReleaseRequest::model()->findByPk($id2);
+        $rr2 = ReleaseRequest::findByPk($id2);
 
         $this->render('index', array(
             'projectName' => $rr1->project->project_name,
@@ -24,7 +24,7 @@ class DiffController extends Controller
     public function actionProject_config($id)
     {
         /** @var $rr1 ProjectConfigHistory */
-        $rr1 = ProjectConfigHistory::model()->findByPk($id);
+        $rr1 = ProjectConfigHistory::findByPk($id);
 
         $c = new CDbCriteria();
         $c->compare('pch_project_obj_id', $rr1->pch_project_obj_id);
@@ -34,7 +34,7 @@ class DiffController extends Controller
         $c->limit = 1;
 
         /** @var $rr2 ProjectConfigHistory */
-        $rr2 = ProjectConfigHistory::model()->find($c);
+        $rr2 = ProjectConfigHistory::find($c);
 
         $this->render('index', array(
             'projectName' => $rr1->project->project_name,

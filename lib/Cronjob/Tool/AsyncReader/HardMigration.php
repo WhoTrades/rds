@@ -37,7 +37,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
     public function actionUpdateHardMigrationStatus(Message\HardMigrationStatus $message, MessagingRdsMs $model)
     {
         /** @var $migration HardMigration */
-        $migration = HardMigration::model()->findByAttributes([
+        $migration = HardMigration::findByAttributes([
             'migration_name' => $message->migration,
             'migration_environment' => $model->getEnv(),
         ]);
@@ -88,7 +88,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
             }
         }
 
-        HardMigration::model()->updateByPk($migration->obj_id, ['migration_status' => $message->status]);
+        HardMigration::updateByPk($migration->obj_id, ['migration_status' => $message->status]);
 
         $this->sendHardMigrationUpdated($migration->obj_id);
         $message->accepted();
@@ -97,21 +97,21 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
     public static function sendHardMigrationUpdated($id)
     {
         /** @var $debugLogger \ServiceBase_IDebugLogger */
-        $debugLogger = Yii::app()->debugLogger;
+        $debugLogger = \Yii::$app->debugLogger;
 
         $debugLogger->message("Sending to comet new data of hard migration #$id");
-        Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
-        Yii::app()->assetManager->setBaseUrl("/assets/");
-        Yii::app()->urlManager->setBaseUrl('/');
-        $filename = Yii::getPathOfAlias('application.views.hardMigration._hardMigrationRow').'.php';
+        Yii::$app->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::$app->assetManager->setBaseUrl("/assets/");
+        Yii::$app->urlManager->setBaseUrl('/');
+        $filename = \Yii::getPathOfAlias('application.views.hardMigration._hardMigrationRow').'.php';
 
-        list($controller, $action) = Yii::app()->createController('/');
+        list($controller, $action) = \Yii::$app->createController('/');
         $controller->setAction($controller->createAction($action));
-        Yii::app()->setController($controller);
+        Yii::$app->setController($controller);
         $model = HardMigration::model();
         $model->obj_id = $id;
         $rowTemplate = include($filename);
-        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'yiistrap.widgets.TbGridView', [
+        $widget = \Yii::$app->getWidgetFactory()->createWidget(Yii::$app,'yiistrap.widgets.TbGridView', [
             'dataProvider'=>new CActiveDataProvider($model, $model->search()),
             'columns'=>$rowTemplate,
             'rowCssClassExpression' => function(){return 'rowItem';},
@@ -123,14 +123,14 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         $debugLogger->message("html code generated");
 
         /** @var $migration HardMigration */
-        $migration = HardMigration::model()->findByPk($id);
-        Yii::app()->webSockets->send('hardMigrationChanged', ['rr_id' => str_replace("/", "", "{$migration->migration_name}_$migration->migration_environment"), 'html' => $html]);
+        $migration = HardMigration::findByPk($id);
+        Yii::$app->webSockets->send('hardMigrationChanged', ['rr_id' => str_replace("/", "", "{$migration->migration_name}_$migration->migration_environment"), 'html' => $html]);
         $debugLogger->message("Sended");
     }
 
     public function createUrl($route, $params)
     {
-        Yii::app()->urlManager->setBaseUrl('');
-        return Yii::app()->createAbsoluteUrl($route, $params);
+        Yii::$app->urlManager->setBaseUrl('');
+        return \Yii::$app->createAbsoluteUrl($route, $params);
     }
 }

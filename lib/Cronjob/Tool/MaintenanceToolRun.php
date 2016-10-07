@@ -19,7 +19,7 @@ class Cronjob_Tool_MaintenanceToolRun extends RdsSystem\Cron\RabbitDaemon
 
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $tool = MaintenanceTool::model()->findByAttributes(['mt_name' => $cronJob->getOption('tool-name')]);
+        $tool = MaintenanceTool::findByAttributes(['mt_name' => $cronJob->getOption('tool-name')]);
         if (!$tool) {
             $this->debugLogger->error("Tool not found");
             return 1;

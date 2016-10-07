@@ -1,4 +1,8 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
+
 /**
  * @author Artem Naumenko
  *
@@ -18,7 +22,7 @@ class ProjectConfig extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.project_config';
     }
@@ -30,7 +34,7 @@ class ProjectConfig extends ActiveRecord
     {
         return [
             ['obj_created, obj_modified, pc_project_obj_id, pc_filename', 'required'],
-            ['obj_status_did', 'numerical', 'integerOnly' => true],
+            ['obj_status_did', 'number', 'integerOnly' => true],
             ['pc_filename', 'length', 'max' => 128],
             ['pc_content', 'ext.validators.PhpSyntaxValidator'],
             ['obj_id, obj_created, obj_modified, obj_status_did, pc_project_obj_id, pc_filename, pc_content', 'safe', 'on' => 'search'],

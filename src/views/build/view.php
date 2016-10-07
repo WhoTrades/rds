@@ -33,7 +33,6 @@ $this->menu=array(
             'type'=>'html',
             'value' => function(Build $build){
                 $data = json_decode($build->build_time_log, true);
-                ob_start();
                 ?>
                     <table>
                         <thead>
@@ -71,7 +70,6 @@ $this->menu=array(
                         <?}?>
                     </table>
                 <?
-                return ob_get_clean();
             }
         ],
 		array(

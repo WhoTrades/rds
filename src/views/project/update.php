@@ -17,4 +17,4 @@ $this->menu=array(
 
 <h1>Update Project <?php echo $model->obj_id; ?></h1>
 
-<?php $this->renderPartial('_form', array('model'=>$model, 'list' => $list, 'workers' => $workers)); ?>
+<?php echo $this->render('_form', array('model'=>$model, 'list' => $list, 'workers' => $workers)); ?>

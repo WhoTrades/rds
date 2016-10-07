@@ -7,13 +7,13 @@
 /** @var $currentText string */
 /** @var $currentTtitle string */
 
-Yii::app()->jsdifflib->register();
+\Yii::$app->jsdifflib->register();
 
-$this->pageTitle = "$projectName/$filename";
+$this->title = "$projectName/$filename";
 ?>
-<h1>Изменения <?=$this->pageTitle?></h1>
+<h1>Изменения <?=$this->title?></h1>
 <div class="diff">
-    <?=TbHtml::icon(TbHtml::ICON_MINUS, ['style' => 'float: right ;border: solid 1px #eee; cursor: pointer', 'onclick' => 'togglePanelMode()',], 'div');?>
+    <?=yii\bootstrap\BaseHtml::icon(TbHtml::ICON_MINUS, ['style' => 'float: right ;border: solid 1px #eee; cursor: pointer', 'onclick' => 'togglePanelMode()',], 'div');?>
     <div class="item">
         <input type="checkbox" id="inline" style="float: left" onchange="diffUsingJS();" />
         <label for="inline">В одну колонку</label>
@@ -29,7 +29,7 @@ $this->pageTitle = "$projectName/$filename";
     </div>
     <div class="item">
         <?
-        $diffStat = Yii::app()->diffStat->getDiffStat(str_replace("\r", "", $currentText), str_replace("\r", "", $newText));
+        $diffStat = \Yii::$app->diffStat->getDiffStat(str_replace("\r", "", $currentText), str_replace("\r", "", $newText));
         $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
         $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
         ?>

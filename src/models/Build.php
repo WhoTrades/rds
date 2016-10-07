@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.build".
@@ -32,112 +35,75 @@ class Build extends ActiveRecord
     const STATUS_PREPROD_USING = 'preprod_using';
     const STATUS_PREPROD_MIGRATIONS = 'preprod_migrations';
 
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
-	{
-		return 'rds.build';
-	}
+    /**
+     * @return string the associated database table name
+     */
+    public static function tableName()
+    {
+        return 'rds.build';
+    }
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
-	public function rules()
-	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
-		return array(
-			array('obj_created, obj_modified, build_worker_obj_id', 'required'),
-			array('obj_status_did', 'numerical', 'integerOnly'=>true),
-			array('build_status', 'safe'),
-			// The following rule is used by search().
-			// @todo Please remove those attributes that should not be searched.
-			array('obj_id, obj_created, obj_modified, obj_status_did, build_worker_obj_id, build_status, build_attach', 'safe', 'on'=>'search'),
-		);
-	}
+    /**
+     * @return array validation rules for model attributes.
+     */
+    public function rules()
+    {
+        // NOTE: you should only define rules for those attributes that
+        // will receive user inputs.
+        return array(
+            array(['obj_created', 'obj_modified', 'build_worker_obj_id'], 'required'),
+            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['build_status'], 'safe'),
+            // The following rule is used by search().
+            // @todo Please remove those attributes that should not be searched.
+            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'build_worker_obj_id', 'build_status', 'build_attach'], 'safe', 'on' => 'search'),
+        );
+    }
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'worker' => array(self::BELONGS_TO, 'Worker', 'build_worker_obj_id'),
-			'project' => array(self::BELONGS_TO, 'Project', 'build_project_obj_id'),
-			'releaseRequest' => array(self::BELONGS_TO, 'ReleaseRequest', 'build_release_request_obj_id'),
-		);
-	}
+    /**
+     * @return Worker
+     */
+    public function getWorker()
+    {
+        return $this->hasOne(Worker::className(), ['obj_id' => 'build_worker_obj_id'])->one();
+    }
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'obj_id' => 'ID',
-			'obj_created' => 'Created',
-			'obj_modified' => 'Modified',
-			'obj_status_did' => 'Status Did',
-			'build_worker_obj_id' => 'Worker ID',
-			'build_status' => 'Status',
-			'build_attach' => 'Attach',
-		);
-	}
+    /**
+     * @return Project
+     */
+    public function getProject()
+    {
+        return $this->hasOne(Project::className(), ['obj_id' => 'build_project_obj_id'])->one();
+    }
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 *
-	 * Typical usecase:
-	 * - Initialize the model fields with values from filter form.
-	 * - Execute this method to get CActiveDataProvider instance which will filter
-	 * models according to data in model fields.
-	 * - Pass data provider to CGridView, CListView or any similar widget.
-	 *
-	 * @return CActiveDataProvider the data provider that can return the models
-	 * based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// @todo Please modify the following code to remove attributes that should not be searched.
+    public function getReleaseRequest()
+    {
+        return ReleaseRequest::find()->where(['obj_id' => $this->build_release_request_obj_id])->one();
+    }
 
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('obj_id',$this->obj_id);
-		$criteria->compare('obj_created',$this->obj_created,true);
-		$criteria->compare('obj_modified',$this->obj_modified,true);
-		$criteria->compare('obj_status_did',$this->obj_status_did);
-		$criteria->compare('build_worker_obj_id',$this->build_worker_obj_id);
-		$criteria->compare('build_status',$this->build_status,true);
-		$criteria->compare('build_attach',$this->build_attach,true);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
-	/**
-	 * Returns the static model of the specified AR class.
-	 * Please note that you should have this exact method in all your CActiveRecord descendants!
-	 * @param string $className active record class name.
-	 * @return build the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+    /**
+     * @return array customized attribute labels (name=>label)
+     */
+    public function attributeLabels()
+    {
+        return array(
+            'obj_id' => 'ID',
+            'obj_created' => 'Created',
+            'obj_modified' => 'Modified',
+            'obj_status_did' => 'Status Did',
+            'build_worker_obj_id' => 'Worker ID',
+            'build_status' => 'Status',
+            'build_attach' => 'Attach',
+        );
+    }
 
     public function getProgressbarInfo()
     {
-        $c = new CDbCriteria();
-        $c->compare('build_status', [Build::STATUS_INSTALLED, Build::STATUS_USED]);
-        $c->compare('build_project_obj_id', $this->build_project_obj_id);
-        $c->compare('build_worker_obj_id', $this->build_worker_obj_id);
-        $c->order = 'obj_id desc';
-        $prev = \Build::model()->find($c);
-
+        $prev = self::find()->where([
+            'build_status' => [Build::STATUS_INSTALLED, Build::STATUS_USED],
+            'build_project_obj_id' => $this->build_project_obj_id,
+            'build_worker_obj_id' => $this->build_worker_obj_id,
+        ])->orderBy('obj_id desc')->one();
 
         $dataCurrent = array_reverse(array_keys(json_decode($this->build_time_log, true)));
 
@@ -181,7 +147,7 @@ class Build extends ActiveRecord
             if (preg_match($regex, $this->build_attach, $ans)) {
                 $i = 0;
                 return str_replace(array_map(function() use (&$i){
-                    return '$'.($i++);
+                    return '$' . ($i++);
                 }, $ans), $ans, $text);
             }
         }

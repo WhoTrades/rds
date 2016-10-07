@@ -10,7 +10,7 @@ return array(
 //        'value' => function(HardMigration $migration){
 //            return $migration->project->project_name;
 //        },
-//        'filter' => Project::model()->forList(),
+//        'filter' => Project::forList(),
 //    ],
     array(
         'class'=>'yiistrap.widgets.TbButtonColumn',
@@ -18,47 +18,47 @@ return array(
         'buttons' => [
             'start' => [
                 'visible' => '$data->canBeStarted()',
-                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/start",array("id"=>$data->primaryKey))',
-                'label' => TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
+                'url' => '\Yii::$app->controller->createAbsoluteUrl("/hardMigration/start",array("id"=>$data->primaryKey))',
+                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Запустить миграцию',
                 ],
             ],
             'stop' => [
                 'visible' => '$data->canBeStopped()',
-                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/stop",array("id"=>$data->primaryKey))',
-                'label' => TbHtml::icon(TbHtml::ICON_STOP, ['style' => 'color: red']),
+                'url' => '\Yii::$app->controller->createAbsoluteUrl("/hardMigration/stop",array("id"=>$data->primaryKey))',
+                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_STOP, ['style' => 'color: red']),
                 'options' => [
                     'title' => 'Остановить миграцию',
                 ],
             ],
             'pause' => [
                 'visible' => '$data->canBePaused()',
-                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/pause",array("id"=>$data->primaryKey))',
-                'label' => TbHtml::icon(TbHtml::ICON_PAUSE, ['style' => 'color: #32cd32']),
+                'url' => '\Yii::$app->controller->createAbsoluteUrl("/hardMigration/pause",array("id"=>$data->primaryKey))',
+                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PAUSE, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Поставить на паузу',
                 ],
             ],
             'resume' => [
                 'visible' => '$data->canBeResumed()',
-                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/resume",array("id"=>$data->primaryKey))',
-                'label' => TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
+                'url' => '\Yii::$app->controller->createAbsoluteUrl("/hardMigration/resume",array("id"=>$data->primaryKey))',
+                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Запустить миграцию',
                 ],
             ],
             'restart' => [
                 'visible' => '$data->canBeRestarted()',
-                'url' => 'Yii::app()->controller->createAbsoluteUrl("/hardMigration/restart",array("id"=>$data->primaryKey))',
-                'label' => TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
+                'url' => '\Yii::$app->controller->createAbsoluteUrl("/hardMigration/restart",array("id"=>$data->primaryKey))',
+                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Перезапустить миграцию',
                 ],
             ],
             'warning' => [
                 'visible' => '!$data->doesMigrationReleased()',
-                'label' => TbHtml::icon(TbHtml::ICON_LOCK, ['style' => 'color: black; cursor: default']),
+                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_LOCK, ['style' => 'color: black; cursor: default']),
                 'options' => [
                     'title' => 'Проект ещё не выложен, миграции пока нет на серверах, потому её нельзя накатить',
                 ],
@@ -94,10 +94,10 @@ return array(
 
             list($icon, $text, $color) = $map[$migration->migration_status];
             echo "<span title='{$text}' style='color: $color; font-weight: bold'>".
-                TbHtml::icon($icon, ['style' => 'margin-right: 1px;']).
+                yii\bootstrap\BaseHtml::icon($icon, ['style' => 'margin-right: 1px;']).
                 "$migration->migration_status</span><br />";
             if ($migration->migration_log) {
-                echo "<a href='" . Yii::app()->createAbsoluteUrl('/hardMigration/log', ['id' => $migration->obj_id]) . "'>LOG</a>";
+                echo "<a href='" . \Yii::$app->createAbsoluteUrl('/hardMigration/log', ['id' => $migration->obj_id]) . "'>LOG</a>";
             }
         },
         'filter' => array_combine(HardMigration::getAllStatuses(), HardMigration::getAllStatuses()),

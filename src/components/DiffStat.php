@@ -1,10 +1,10 @@
 <?php
-final class DiffStat extends CComponent
+final class DiffStat extends yii\base\Object
 {
     public function getDiffStat($text1, $text2)
     {
-        $filename1 = Yii::app()->runtimePath."/".md5($text1).".txt";
-        $filename2 = Yii::app()->runtimePath."/".md5($text2).".txt";
+        $filename1 = \Yii::$app->runtimePath."/".md5($text1).".txt";
+        $filename2 = \Yii::$app->runtimePath."/".md5($text2).".txt";
         if (!file_exists($filename1)) {
             file_put_contents($filename1, $text1);
         }

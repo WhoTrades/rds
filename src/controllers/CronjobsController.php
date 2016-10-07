@@ -32,12 +32,12 @@ class CronjobsController extends Controller
 
     public function actionIndex($project = 'comon')
     {
-        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        $Project = Project::findByAttributes(['project_name' => $project]);
         if (!$Project) {
             throw new CHttpException(404, "Проект $project не найден");
         }
 
-        $projects = Project::model()->findAll();
+        $projects = Project::find()->all();
 
         $packages = array_map(function(Project $project){
             return $project->project_name."-".$project->project_current_version;
@@ -48,7 +48,7 @@ class CronjobsController extends Controller
         $c->with = 'project';
         $c->order = '"group"';
 
-        $list = ToolJob::model()->findAll($c);
+        $list = ToolJob::findAll($c);
 
         $cronJobs = [];
         $keys = [];
@@ -67,7 +67,7 @@ class CronjobsController extends Controller
         }
 
         $cpuUsagesOrdered = [];
-        $cpuUsages = CpuUsage::model()->findAllByAttributes(['key' => array_unique($keys)]);
+        $cpuUsages = CpuUsage::findAllByAttributes(['key' => array_unique($keys)]);
         foreach ($cpuUsages as $cpuUsage) {
             /** @var $cpuUsage CpuUsage*/
             $cpuUsagesOrdered[$cpuUsage->key][$cpuUsage->project_name] = $cpuUsage;
@@ -91,12 +91,12 @@ class CronjobsController extends Controller
      */
     public function actionStop($key, $projectId, $interval)
     {
-        $project = Project::model()->findByPk($projectId);
+        $project = Project::findByPk($projectId);
         if (!$project) {
             return;
         }
 
-        if (!$stopper = ToolJobStopped::model()->findByAttributes(['key' => $key, 'project_obj_id' => $project->obj_id])) {
+        if (!$stopper = ToolJobStopped::findByAttributes(['key' => $key, 'project_obj_id' => $project->obj_id])) {
             $stopper = new ToolJobStopped();
             $stopper->key = $key;
             $stopper->project_name = $project->project_name;
@@ -113,7 +113,7 @@ class CronjobsController extends Controller
 
     private function updateToolJobRow($key, $projectId)
     {
-        $toolJob = ToolJob::model()->findByAttributes([
+        $toolJob = ToolJob::findByAttributes([
             'key' => $key,
             'project_obj_id' => $projectId,
             'obj_status_did' => 1,
@@ -123,7 +123,7 @@ class CronjobsController extends Controller
             return;
         }
 
-        Yii::app()->webSockets->send('updateToolJobRow-' . $toolJob->project->project_name, [
+        \Yii::$app->webSockets->send('updateToolJobRow-' . $toolJob->project->project_name, [
             'id' => $toolJob->getLoggerTag(),
             'projectName' => $toolJob->project->project_name,
             'html' => $this->renderToolJobRow($toolJob),
@@ -139,7 +139,7 @@ class CronjobsController extends Controller
      */
     public function actionStart($key, $projectId)
     {
-        if ($stopper = ToolJobStopped::model()->findByAttributes(['key' => $key, 'project_obj_id' => $projectId])) {
+        if ($stopper = ToolJobStopped::findByAttributes(['key' => $key, 'project_obj_id' => $projectId])) {
             $stopper->delete();
             Log::createLogMessage("Запущена фоновая задача $key");
         }
@@ -149,13 +149,13 @@ class CronjobsController extends Controller
 
     public function actionKill($key, $project, $signal = self::KILL_SIGNAL)
     {
-        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+        $model = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
 
         $servers = [];
         $result = [];
         $res = null;
 
-        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        $Project = Project::findByAttributes(['project_name' => $project]);
 
         do {
             if (!empty($res)) {
@@ -194,13 +194,13 @@ class CronjobsController extends Controller
      */
     public function actionGetInfo($key, $project)
     {
-        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+        $model = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
 
         $servers = [];
         $result = [];
         $res = null;
 
-        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        $Project = Project::findByAttributes(['project_name' => $project]);
 
         do {
             if (!empty($res)) {
@@ -244,8 +244,8 @@ class CronjobsController extends Controller
         }
 
         $lines = min((int) $lines, 1000);
-        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
-        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        $model = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
+        $Project = Project::findByAttributes(['project_name' => $project]);
 
         $servers = [];
         $result = [];
@@ -289,11 +289,11 @@ class CronjobsController extends Controller
     public function actionTruncateCpuUsage()
     {
         $config = RdsDbConfig::get();
-        CpuUsage::model()->deleteAll();
+        CpuUsage::deleteAll();
         $config->cpu_usage_last_truncate = date('Y-m-d H:i:s');
         $config->save();
 
-        Log::model()->createLogMessage("Cronjobs cpu usage обнулены");
+        Log::createLogMessage("Cronjobs cpu usage обнулены");
     }
 
     /**
@@ -306,7 +306,7 @@ class CronjobsController extends Controller
                 join rds.project USING(project_name)
                 JOIN cronjobs.tool_job ON cronjobs.cpu_usage.key=cronjobs.tool_job.key and project.obj_id=project_obj_id AND tool_job.obj_status_did=".\ServiceBase_IHasStatus::STATUS_ACTIVE."
                 order by cpu_time desc";
-        $data = Yii::app()->db->createCommand($sql)->queryAll();
+        $data = \Yii::$app->db->createCommand($sql)->queryAll();
 
         $this->render('cpuUsageReport', [
             'data' => $data,
@@ -322,7 +322,7 @@ class CronjobsController extends Controller
     public function renderToolJobRow(ToolJob $toolJob, $cpuUsages = null)
     {
         if ($cpuUsages === null) {
-            $cpuUsage = CpuUsage::model()->findByAttributes([
+            $cpuUsage = CpuUsage::findByAttributes([
                 'key' => $toolJob->key,
                 'project_name' => $toolJob->project->project_name,
             ]);

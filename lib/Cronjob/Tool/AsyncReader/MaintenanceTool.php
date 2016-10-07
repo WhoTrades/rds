@@ -54,13 +54,13 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
     {
         $message->accepted();
 
-        $mtr = MaintenanceToolRun::model()->findByPk($message->id);
+        $mtr = MaintenanceToolRun::findByPk($message->id);
         if (!$mtr) {
             $this->debugLogger->error("MTR id=$message->id not found");
             return;
         }
 
-        MaintenanceToolRun::model()->updateByPk($message->id, ['mtr_status' => $message->status, 'mtr_pid' => $message->pid]);
+        MaintenanceToolRun::updateByPk($message->id, ['mtr_status' => $message->status, 'mtr_pid' => $message->pid]);
 
         self::sendMaintenanceToolUpdated($message->id);
 
@@ -71,15 +71,15 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
     {
         $message->accepted();
 
-        $mtr = MaintenanceToolRun::model()->findByPk($message->id);
+        $mtr = MaintenanceToolRun::findByPk($message->id);
         if (!$mtr) {
             $this->debugLogger->error("MTR id=$message->id not found");
             return;
         }
 
-        $sql = "UPDATE ".MaintenanceToolRun::model()->tableName()." SET mtr_log=COALESCE(mtr_log, '')||:log WHERE obj_id=:id";
+        $sql = "UPDATE ".MaintenanceToolRun::tableName()." SET mtr_log=COALESCE(mtr_log, '')||:log WHERE obj_id=:id";
 
-        MaintenanceToolRun::model()->getDbConnection()->createCommand($sql)->execute([
+        MaintenanceToolRun::getDbConnection()->createCommand($sql)->execute([
             'id' => $message->id,
             'log' => $message->text,
         ]);
@@ -89,13 +89,13 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
 
         $this->debugLogger->message("commet id=maintenance_tool_log_$message->id");
 
-        Yii::app()->webSockets->send("maintenance_tool_log_$message->id", ['text' => $message->text]);
+        Yii::$app->webSockets->send("maintenance_tool_log_$message->id", ['text' => $message->text]);
 
         /** @var $mtr MaintenanceToolRun */
-        $mtr = MaintenanceToolRun::model()->findByPk($message->id);
+        $mtr = MaintenanceToolRun::findByPk($message->id);
         if ($pair = $mtr->getProgressPercentAndKey()) {
             list($percent, $key) = $pair;
-            Yii::app()->webSockets->send("maintenanceToolProgressbarChanged", ['id' => $message->id, 'percent' => $percent, 'key' => $key]);
+            Yii::$app->webSockets->send("maintenanceToolProgressbarChanged", ['id' => $message->id, 'percent' => $percent, 'key' => $key]);
             $this->debugLogger->message("Percentage of tool updated to percent=$percent");
         }
 
@@ -111,28 +111,28 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
     public static function sendMaintenanceToolUpdated($id)
     {
         /** @var $debugLogger \ServiceBase_IDebugLogger */
-        $debugLogger = Yii::app()->debugLogger;
+        $debugLogger = \Yii::$app->debugLogger;
 
         /** @var $mtr MaintenanceToolRun */
-        $mtr = MaintenanceToolRun::model()->findByPk($id);
+        $mtr = MaintenanceToolRun::findByPk($id);
         if (!$mtr) {
             return;
         }
 
         $debugLogger->message("Sending to comet new data of maintenance tool run #$id");
-        Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
-        Yii::app()->assetManager->setBaseUrl("/assets/");
-        Yii::app()->urlManager->setBaseUrl('/');
-        $filename = Yii::getPathOfAlias('application.views.maintenanceTool._maintenanceToolRow').'.php';
+        Yii::$app->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
+        Yii::$app->assetManager->setBaseUrl("/assets/");
+        Yii::$app->urlManager->setBaseUrl('/');
+        $filename = \Yii::getPathOfAlias('application.views.maintenanceTool._maintenanceToolRow').'.php';
 
-        list($controller, $action) = Yii::app()->createController('/');
+        list($controller, $action) = \Yii::$app->createController('/');
         $controller->setAction($controller->createAction($action));
-        Yii::app()->setController($controller);
+        Yii::$app->setController($controller);
         $model = MaintenanceTool::model();
         $model->obj_id = $mtr->mtr_maintenance_tool_obj_id;
 
         $rowTemplate = include($filename);
-        $widget = Yii::app()->getWidgetFactory()->createWidget(Yii::app(),'yiistrap.widgets.TbGridView', [
+        $widget = \Yii::$app->getWidgetFactory()->createWidget(Yii::$app,'yiistrap.widgets.TbGridView', [
             'dataProvider'=>new CActiveDataProvider($model, $model->search()),
             'columns'=>$rowTemplate,
             'rowCssClassExpression' => function(){return 'rowItem';},
@@ -144,13 +144,13 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $debugLogger->message("html code generated, html=".$html);
 
         /** @var $migration HardMigration */
-        Yii::app()->webSockets->send('maintenanceToolChanged', ['id' => $mtr->mtr_maintenance_tool_obj_id, 'html' => $html]);
+        Yii::$app->webSockets->send('maintenanceToolChanged', ['id' => $mtr->mtr_maintenance_tool_obj_id, 'html' => $html]);
         $debugLogger->message("Sended");
     }
 
     public function createUrl($route, $params)
     {
-        Yii::app()->urlManager->setBaseUrl('');
-        return Yii::app()->createAbsoluteUrl($route, $params);
+        Yii::$app->urlManager->setBaseUrl('');
+        return \Yii::$app->createAbsoluteUrl($route, $params);
     }
 }

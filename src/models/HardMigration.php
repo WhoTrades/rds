@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.hard_migration".
@@ -42,7 +45,7 @@ class HardMigration extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.hard_migration';
     }
@@ -55,16 +58,22 @@ class HardMigration extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, migration_type, migration_name, migration_environment', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
-            array('migration_progress', 'numerical'),
-            array('migration_name', 'checkMigrationNameIsUnique'),
-            array('migration_type, migration_ticket, migration_status', 'length', 'max'=>16),
-            array('migration_name, migration_progress_action', 'length', 'max'=>255),
-            array('migration_release_request_obj_id, migration_project_obj_id, migration_retry_count', 'safe'),
-            // The following rule is used by search().
-            // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, migration_release_request_obj_id, migration_project_obj_id, migration_type, migration_name, migration_ticket, migration_status, migration_retry_count, migration_progress, migration_progress_action, project_obj_id, build_version, migration_environment', 'safe', 'on'=>'search'),
+            array(['obj_created', 'obj_modified', 'migration_type', 'migration_name', 'migration_environment'], 'required'),
+            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['migration_progress'], 'number'),
+            array(['migration_name'], 'checkMigrationNameIsUnique'),
+            array(['migration_type, migration_ticket, migration_status'], 'string', 'max' => 16),
+            array(['migration_name, migration_progress_action'], 'string', 'max' => 255),
+            array(['migration_release_request_obj_id, migration_project_obj_id, migration_retry_count'], 'safe'),
+            array(
+                [
+                    'obj_id, obj_created, obj_modified, obj_status_did, migration_release_request_obj_id, migration_project_obj_id,
+                    migration_type, migration_name, migration_ticket, migration_status, migration_retry_count, migration_progress,
+                    migration_progress_action, project_obj_id, build_version, migration_environment',
+                ],
+                'safe',
+                'on' => 'search',
+            ),
         );
     }
 
@@ -77,22 +86,25 @@ class HardMigration extends ActiveRecord
             $c->compare("obj_id", '<>'.$this->obj_id);
         }
         $c->limit = 1;
-        if (self::model()->find($c)) {
+        if (self::find($c)) {
             $this->addError($attribute, "Migration $this->migration_name:$this->migration_environment already exists in DB");
         }
     }
 
     /**
-     * @return array relational rules.
+     * @return Project
      */
-    public function relations()
+    public function getProject()
     {
-        // NOTE: you may need to adjust the relation name and the related
-        // class name for the relations automatically generated below.
-        return array(
-            'releaseRequest' => array(self::BELONGS_TO, 'ReleaseRequest', 'migration_release_request_obj_id'),
-            'project' => array(self::BELONGS_TO, 'Project', 'migration_project_obj_id'),
-        );
+        return $this->hasOne(Project::className(), ['obj_id' => 'migration_project_obj_id'])->one();
+    }
+
+    /**
+     * @return ReleaseRequest
+     */
+    public function getReleaseRequest()
+    {
+        return $this->hasOne(ReleaseRequest::className(), ['obj_id' => 'migration_release_request_obj_id'])->one();
     }
 
     /**

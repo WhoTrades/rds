@@ -42,14 +42,14 @@ class UseController extends Controller
         }
 
         if ($releaseRequest->canByUsedImmediately()) {
-            $slaveList = ReleaseRequest::model()->findAllByAttributes([
+            $slaveList = ReleaseRequest::findAllByAttributes([
                 'rr_leading_id' => $releaseRequest->obj_id,
                 'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
             ]);
-            $releaseRequest->sendUseTasks(\Yii::app()->user->name);
+            $releaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
             foreach ($slaveList as $slave) {
                 /** @var $slave ReleaseRequest */
-                $slave->sendUseTasks(\Yii::app()->user->name);
+                $slave->sendUseTasks(\Yii::$app->user->getIdentity()->username);
             }
             if (!empty($_GET['ajax'])) {
                 echo "using";
@@ -69,12 +69,12 @@ class UseController extends Controller
         $releaseRequest->rr_status = \ReleaseRequest::STATUS_CODES;
 
         $text = "Code: %s. USE {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}";
-        Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}(Yii::app()->user->phone, sprintf($text, $code1));
+        \Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}(\Yii::$app->user->phone, sprintf($text, $code1));
 
         if ($releaseRequest->save()) {
             Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
-            $currentUsed = ReleaseRequest::model()->findByAttributes([
+            $currentUsed = ReleaseRequest::findByAttributes([
                 'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
                 'rr_status' => ReleaseRequest::STATUS_USED,
             ]);
@@ -113,7 +113,7 @@ class UseController extends Controller
         foreach ($releaseRequest->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
             $worker = $p2w->worker;
-            (new RdsSystem\Factory(Yii::app()->debugLogger))->
+            (new RdsSystem\Factory(\Yii::$app->debugLogger))->
                 getMessagingRdsMsModel()->
                 sendMigrationTask(
                     $worker->worker_name,
@@ -174,15 +174,15 @@ class UseController extends Controller
             $this->performAjaxValidation($model);
 
             if ($releaseRequest->rr_project_owner_code_entered) {
-                $releaseRequest->sendUseTasks(\Yii::app()->user->name);
+                $releaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
 
-                $slaveList = ReleaseRequest::model()->findAllByAttributes([
+                $slaveList = ReleaseRequest::findAllByAttributes([
                     'rr_leading_id' => $releaseRequest->obj_id,
                     'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
                 ]);
                 foreach ($slaveList as $slave) {
                     /** @var $slave ReleaseRequest */
-                    $slave->sendUseTasks(\Yii::app()->user->name);
+                    $slave->sendUseTasks(\Yii::$app->user->getIdentity()->username);
                 }
             }
             $releaseRequest->save();
@@ -202,7 +202,7 @@ class UseController extends Controller
      */
     public function loadModel($id)
     {
-        $model = ReleaseRequest::model()->findByPk($id);
+        $model = ReleaseRequest::findByPk($id);
         if ($model == null) {
             throw new CHttpException(404, 'The requested page does not exist.');
         }
@@ -218,7 +218,7 @@ class UseController extends Controller
                 $result[CHtml::activeId($model, $attribute)] = $errors;
             }
             echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
-            Yii::app()->end();
+            \Yii::$app->end();
         }
     }
 }

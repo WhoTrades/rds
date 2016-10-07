@@ -36,7 +36,7 @@ class PgQ_EventProcessor_ZohoAsync extends RdsEventProcessorBase
 
                 $requestSender = new \ServiceBase\HttpRequest\RequestSender($this->debugLogger);
 
-                $jira = new \JiraApi(Yii::app()->debugLogger);
+                $jira = new \JiraApi(\Yii::$app->debugLogger);
                 $ticketInfo = $jira->getTicketInfo($jiraIssueKey);
 
                 if (!$requestId = $this->parseZohoRequestId($ticketInfo)) {

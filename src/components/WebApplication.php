@@ -1,18 +1,25 @@
 <?php
-class WebApplication extends CWebApplication
+class WebApplication extends \yii\web\Application
 {
     /** @var \ServiceBase_IDebugLogger */
     public $debugLogger;
 
-    public function end($status=0,$exit=true)
+    /**
+     * @param int  $status
+     * @param bool $exit
+     *
+     * @throws \yii\base\ExitException
+     */
+    public function end($status = 0, $exit = true)
     {
         if ($exit) {
             CoreLight::getInstance()->getFatalWatcher()->stop();
         }
-
-        return parent::end();
     }
 
+    /**
+     * @param Exception $exception
+     */
     public function handleException(Exception $exception)
     {
         if (!$exception instanceof CHttpException) {
@@ -39,7 +46,7 @@ class WebApplication extends CWebApplication
     public function setRuntimePath($path)
     {
         //an: Создаем папку для временных файлов, если её ещё нету
-        if(!is_dir($path)) {
+        if (!is_dir($path)) {
             mkdir($path, 0777);
         }
 

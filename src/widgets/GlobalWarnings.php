@@ -1,20 +1,22 @@
 <?php
-class GlobalWarnings extends CWidget
+namespace app\widgets;
+
+class GlobalWarnings extends \yii\base\Widget
 {
     public function init()
     {
-        if (Yii::app()->user->isGuest) {
+        if (\Yii::$app->user->isGuest) {
             return;
         }
 
         $warnings = [];
-        $config = RdsDbConfig::get();
+        $config = app\models\RdsDbConfig::get();
 
         if (!$config->is_tst_updating_enabled) {
             $warnings[] = new GlobalWarningItem(
                 "Обновление tst контура остановлено",
-                TbHtml::ICON_WARNING_SIGN,
-                TbHtml::ALERT_COLOR_WARNING
+                \TbHtml::ICON_WARNING_SIGN,
+                \TbHtml::ALERT_COLOR_WARNING
             );
         }
 

@@ -1,4 +1,8 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
+
 /**
  * This is the model class for table "rds.alert_log".
  *
@@ -14,9 +18,6 @@
  * @property string $alert_status
  * @property string $alert_text
  * @property string $alert_ignore_timeout
- *
- * @method AlertLog[] findAll($condition = '', $params = array())
- * @method AlertLog findByPk($pk,$condition='',$params=array())
  */
 class AlertLog extends ActiveRecord
 {
@@ -29,7 +30,7 @@ class AlertLog extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.alert_log';
     }
@@ -37,14 +38,14 @@ class AlertLog extends ActiveRecord
     /**
      * Устанавливаем значения по-умолчанию
      */
-    public function afterConstruct()
+    public function __construct()
     {
         if ($this->isNewRecord) {
             $this->alert_detect_at = date("r");
             $this->alert_ignore_timeout = date("r");
         }
 
-        parent::afterConstruct();
+        parent::__construct();
     }
 
     /**
@@ -55,24 +56,20 @@ class AlertLog extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, alert_detect_at, alert_lamp, alert_provider, alert_name, alert_status', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly' => true),
-            array('alert_lamp', 'length', 'max' => 32),
-            array('alert_provider', 'length', 'max' => 64),
-            array('alert_name', 'length', 'max' => 256),
-            array('alert_text', 'safe'),
+            array(['obj_created', 'obj_modified', 'alert_detect_at', 'alert_lamp', 'alert_provider', 'alert_name', 'alert_status'], 'required'),
+            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['alert_lamp'], 'string', 'max' => 32),
+            array('alert_provider', 'string', 'max' => 64),
+            array(['alert_name'], 'string', 'max' => 256),
+            array(['alert_text'], 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, alert_lamp, alert_provider, alert_name, alert_status, alert_text', 'safe', 'on' => 'search'),
+            array(
+                ['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'alert_lamp', 'alert_provider', 'alert_name', 'alert_status', 'alert_text'],
+                'safe',
+                'on' => 'search',
+            ),
         );
-    }
-
-    /**
-     * @return array relational rules.
-     */
-    public function relations()
-    {
-        return array();
     }
 
     /**
@@ -95,37 +92,6 @@ class AlertLog extends ActiveRecord
     }
 
     /**
-     * Retrieves a list of models based on the current search/filter conditions.
-     *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
-     */
-    public function search()
-    {
-        $criteria = new CDbCriteria();
-
-        $criteria->compare('obj_id', $this->obj_id);
-        $criteria->compare('obj_created', $this->obj_created);
-        $criteria->compare('obj_modified', $this->obj_modified);
-        $criteria->compare('obj_status_did', $this->obj_status_did);
-        $criteria->compare('alert_lamp', $this->alert_lamp, true);
-        $criteria->compare('alert_provider', $this->alert_provider, true);
-        $criteria->compare('alert_name', $this->alert_name, true);
-        $criteria->compare('alert_status', $this->alert_status, true);
-        $criteria->compare('alert_text', $this->alert_text, true);
-
-        return new CActiveDataProvider($this, array(
-            'criteria' => $criteria,
-        ));
-    }
-
-    /**
      * @param string $status
      */
     public function setStatus($status)
@@ -135,17 +101,6 @@ class AlertLog extends ActiveRecord
             $this->alert_detect_at = date('r');
         }
         $this->save();
-    }
-
-    /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     * @param string $className active record class name.
-     * @return AlertLog the static model class
-     */
-    public static function model($className = null)
-    {
-        return parent::model($className ?: __CLASS__);
     }
 
     /**

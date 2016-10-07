@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.rds_db_config".
@@ -21,7 +24,7 @@ class RdsDbConfig extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.rds_db_config';
     }
@@ -29,9 +32,8 @@ class RdsDbConfig extends ActiveRecord
     /** @return RdsDbConfig */
     public static function get()
     {
-        return self::model()->find();
+        return self::find()->one();
     }
-	
     /**
      * @return array validation rules for model attributes.
      */
@@ -41,7 +43,7 @@ class RdsDbConfig extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly' => true),
+            array('obj_status_did', 'number', 'integerOnly' => true),
             array(
                 'red_lamp_wts_timeout, crm_lamp_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, '
                     . 'preprod_online, is_tst_updating_enabled',
@@ -55,17 +57,6 @@ class RdsDbConfig extends ActiveRecord
                     . 'cpu_usage_last_truncate', 'safe',
                 'on' => 'search',
             ),
-        );
-    }
-
-    /**
-     * @return array relational rules.
-     */
-    public function relations()
-    {
-        // NOTE: you may need to adjust the relation name and the related
-        // class name for the relations automatically generated below.
-        return array(
         );
     }
 
@@ -86,50 +77,5 @@ class RdsDbConfig extends ActiveRecord
             'crm_lamp_timeout' => 'CRM Lamp Timeout',
             'cpu_usage_last_truncate' => 'Cpu Usage last truncate',
         );
-    }
-
-    /**
-     * Retrieves a list of models based on the current search/filter conditions.
-     *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
-     */
-    public function search()
-    {
-        // @todo Please modify the following code to remove attributes that should not be searched.
-
-        $criteria=new CDbCriteria;
-
-        $criteria->compare('obj_id',$this->obj_id,true);
-        $criteria->compare('obj_created',$this->obj_created,true);
-        $criteria->compare('obj_modified',$this->obj_modified,true);
-        $criteria->compare('obj_status_did',$this->obj_status_did);
-        $criteria->compare('is_tst_updating_enabled',$this->is_tst_updating_enabled);
-        $criteria->compare('red_lamp_wts_timeout',$this->red_lamp_wts_timeout,true);
-        $criteria->compare('red_lamp_team_city_timeout',$this->red_lamp_team_city_timeout,true);
-        $criteria->compare('red_lamp_phplogs_dev_timeout',$this->red_lamp_phplogs_dev_timeout,true);
-        $criteria->compare('crm_lamp_timeout', $this->crm_lamp_timeout, true);
-        $criteria->compare('cpu_usage_last_truncate',$this->cpu_usage_last_truncate,true);
-
-        return new CActiveDataProvider($this, array(
-            'criteria'=>$criteria,
-        ));
-    }
-
-    /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     * @param string $className active record class name.
-     * @return RdsDbConfig the static model class
-     */
-    public static function model($className=__CLASS__)
-    {
-        return parent::model($className);
     }
 }

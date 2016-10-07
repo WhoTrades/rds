@@ -5,4 +5,4 @@
 
 <h1>Create ReleaseReject</h1>
 
-<?php $this->renderPartial('_releaseRejectForm', array('model'=>$model)); ?>
+<?php echo $this->render('_releaseRejectForm', array('model'=>$model)); ?>

@@ -40,19 +40,19 @@ class Cronjob_Tool_Test_ApplicationInstallation extends Cronjob\Tool\ToolBase
     private function addRdsCheckers(Container $container)
     {
         $container->addChecker(new FileAccessible(dirname(dirname(dirname(dirname(__DIR__)))) . '/config.local.php', true, true));
-        $container->addChecker(new DirectoryAccessible(Yii::app()->runtimePath, true, true, true));
+        $container->addChecker(new DirectoryAccessible(Yii::$app->runtimePath, true, true, true));
 
-        foreach (Yii::app()->webSockets->zmqLocations as $url) {
+        foreach (Yii::$app->webSockets->zmqLocations as $url) {
             $container->addChecker(new UrlAcceptable($url, 0.1));
         }
 
         $container->addChecker(new UrlAcceptable(
-            Yii::app()->graphite->protocol . "://" . Yii::app()->graphite->host . ":" . Yii::app()->graphite->port
+            Yii::$app->graphite->protocol . "://" . \Yii::$app->graphite->host . ":" . \Yii::$app->graphite->port
         ));
 
-        $container->addChecker(new UrlAcceptable(Yii::app()->whotrades->getUrl()), 'Whotrades URL');
-        $container->addChecker(new UrlAcceptable(Yii::app()->modules['SingleLogin']['components']['auth']['crmUrl']), 'CRM URL');
-        $container->addChecker(new UrlAcceptable(Yii::app()->params['jira']['baseRdsJiraUrl']), 'JIRA URL');
+        $container->addChecker(new UrlAcceptable(Yii::$app->whotrades->getUrl()), 'Whotrades URL');
+        $container->addChecker(new UrlAcceptable(Yii::$app->modules['SingleLogin']['components']['auth']['crmUrl']), 'CRM URL');
+        $container->addChecker(new UrlAcceptable(Yii::$app->params['jira']['baseRdsJiraUrl']), 'JIRA URL');
         $container->addChecker(new UrlAcceptable(StashApi::DEFAULT_STASH_URL), 'Stash/Bitbucket URL');
         $container->addChecker(new UrlAcceptable('tcp://' . MessagingRdsMs::HOST . ":" . MessagingRdsMs::PORT));
     }

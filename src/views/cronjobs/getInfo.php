@@ -16,7 +16,7 @@ foreach ($result as $val) {
     } else {
         $text .= "<i>Процессы не найдены</i> " .
             TbHtml::tooltip(
-                TbHtml::icon(TbHtml::ICON_INFO_SIGN),
+                yii\bootstrap\BaseHtml::icon(TbHtml::ICON_INFO_SIGN),
                 '#',
                 'То что процессов нет при работающем кроне - это нормально. Это случается, например, если тул запускается раз в минуту и отрабатывает за 5 секунд'
             ) . "<br />";

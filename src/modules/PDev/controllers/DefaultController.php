@@ -59,7 +59,7 @@ class DefaultController extends Controller
             }
 
             // an: Отправляем задачу в Rabbit на переключение ветки
-            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel()->sendPDevSwitchBranch(
+            (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendPDevSwitchBranch(
                 new \RdsSystem\Message\PDev\SwitchBranch(self::DEFAULT_PATH, $branch)
             );
 

@@ -25,7 +25,7 @@ class PhpSyntaxValidator extends CValidator
             throw new CException("Не могу записать в файл $tempName");
         }
 
-        $commandExecutor = new \RdsSystem\lib\CommandExecutor(Yii::app()->debugLogger);
+        $commandExecutor = new \RdsSystem\lib\CommandExecutor(\Yii::$app->debugLogger);
 
         try {
             $command = PHP_BINDIR.DIRECTORY_SEPARATOR."php -l -ddisplay_errors=On $tempName 2>&1";

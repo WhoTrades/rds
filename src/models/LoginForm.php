@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * LoginForm class.
@@ -68,7 +71,7 @@ class LoginForm extends CFormModel
 		if($this->_identity->errorCode===UserIdentity::ERROR_NONE)
 		{
 			$duration=$this->rememberMe ? 3600*24*30 : 0; // 30 days
-			Yii::app()->user->login($this->_identity,$duration);
+			\Yii::$app->user->login($this->_identity,$duration);
 			return true;
 		}
 		else

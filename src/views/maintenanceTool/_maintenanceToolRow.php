@@ -7,7 +7,7 @@ return [
         'value' => function(MaintenanceTool $tool){
             return
                 $tool->lastRun
-                    ? "<a href='".Yii::app()->createAbsoluteUrl("/maintenanceToolRun/view", ['id' => $tool->lastRun->obj_id])."'>".$tool->lastRun->mtr_status."</a>"
+                    ? "<a href='".\Yii::$app->createAbsoluteUrl("/maintenanceToolRun/view", ['id' => $tool->lastRun->obj_id])."'>".$tool->lastRun->mtr_status."</a>"
                     : "<i>never runed</i>";
         },
         'type' => 'html',
@@ -32,7 +32,7 @@ return [
     [
         'header' => 'Run log',
         'value' => function(MaintenanceTool $tool){
-            return '<a href="'.Yii::app()->createAbsoluteUrl("/maintenanceToolRun/index", ['MaintenanceToolRun[mtr_maintenance_tool_obj_id]' => $tool->obj_id]).'">view all runs</a>';
+            return '<a href="'.\Yii::$app->createAbsoluteUrl("/maintenanceToolRun/index", ['MaintenanceToolRun[mtr_maintenance_tool_obj_id]' => $tool->obj_id]).'">view all runs</a>';
         },
         'type' => 'html',
     ],
@@ -42,16 +42,16 @@ return [
         'buttons' => [
             'start' => [
                 'visible' => '$data->canBeStarted()',
-                'url' => 'Yii::app()->controller->createAbsoluteUrl("/maintenanceTool/start",array("id"=>$data->primaryKey))',
-                'label' => TbHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
+                'url' => '\Yii::$app->controller->createAbsoluteUrl("/maintenanceTool/start",array("id"=>$data->primaryKey))',
+                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Запустить команду',
                 ],
             ],
             'stop' => [
                 'visible' => '$data->canBeKilled()',
-                'url' => 'Yii::app()->controller->createAbsoluteUrl("/maintenanceTool/stop",array("id"=>$data->primaryKey))',
-                'label' => TbHtml::icon(TbHtml::ICON_STOP, ['style' => 'color: red']),
+                'url' => '\Yii::$app->controller->createAbsoluteUrl("/maintenanceTool/stop",array("id"=>$data->primaryKey))',
+                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_STOP, ['style' => 'color: red']),
                 'options' => [
                     'title' => 'Остановить команду',
                 ],

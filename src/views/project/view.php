@@ -40,7 +40,7 @@ $this->menu=array(
         array(
             'class'=>'yiistrap.widgets.TbButtonColumn',
             'template' => '{view}',
-            'viewButtonUrl' => 'Yii::app()->controller->createUrl("/diff/project_config",array("id"=>$data->primaryKey))',
+            'viewButtonUrl' => '\Yii::$app->controller->createUrl("/diff/project_config",array("id"=>$data->primaryKey))',
         ),
     ),
 )); ?>

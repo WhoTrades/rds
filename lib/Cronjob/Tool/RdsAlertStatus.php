@@ -22,7 +22,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        if (!Yii::app()->params['alertLampEnabled']) {
+        if (!Yii::$app->params['alertLampEnabled']) {
             $this->debugLogger->message("Lamp disabled");
 
             return 0;
@@ -42,7 +42,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
             $c = new CDbCriteria();
             $c->compare('alert_lamp', $lampName);
             $c->compare('alert_provider', $dataProvider->getName());
-            $alertLog = AlertLog::model()->findAll($c);
+            $alertLog = AlertLog::findAll($c);
 
             foreach ($alertLog as $alert) {
                 if (isset($errors[$alert->alert_name])) {

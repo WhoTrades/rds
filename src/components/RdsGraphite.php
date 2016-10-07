@@ -1,7 +1,7 @@
 <?php
 use \GraphiteSystem\Graphite;
 
-class RdsGraphite extends CComponent
+class RdsGraphite extends yii\base\Object
 {
     public $host;
     public $port;

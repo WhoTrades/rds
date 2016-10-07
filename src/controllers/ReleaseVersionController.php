@@ -139,7 +139,7 @@ class ReleaseVersionController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=ReleaseVersion::model()->findByPk($id);
+		$model=ReleaseVersion::findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -154,7 +154,7 @@ class ReleaseVersionController extends Controller
 		if(isset($_POST['ajax']) && $_POST['ajax']==='release-version-form')
 		{
 			echo CActiveForm::validate($model);
-			Yii::app()->end();
+			\Yii::$app->end();
 		}
 	}
 }

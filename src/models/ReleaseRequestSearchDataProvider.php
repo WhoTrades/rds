@@ -1,4 +1,8 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
+
 /**
  * Класс для отображения списка запросов на релиз на главной странице RDS
  * Кроме стандартных колонок ещё подтягивает дополнительные - к какому релизу откатываться, по сравнению с каким считать diff и т.д.
@@ -46,7 +50,7 @@ class ReleaseRequestSearchDataProvider extends CActiveDataProvider
         $projectIds = array_unique($projectIds);
         $oldVersions = array_filter(array_unique($oldVersions));
 
-        $currentUsed = \ReleaseRequest::model()->findAllByAttributes([
+        $currentUsed = \ReleaseRequest::findAllByAttributes([
             'rr_project_obj_id' => $projectIds,
             'rr_status' => \ReleaseRequest::STATUS_USED,
         ]);
@@ -54,7 +58,7 @@ class ReleaseRequestSearchDataProvider extends CActiveDataProvider
             $this->currentUsed[$releaseRequest->rr_project_obj_id] = $releaseRequest;
         }
 
-        $list = ReleaseRequest::model()->findAllByAttributes(array(
+        $list = ReleaseRequest::findAllByAttributes(array(
             'rr_build_version' => $oldVersions,
             'rr_project_obj_id' => $projectIds,
         ));

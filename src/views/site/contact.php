@@ -3,7 +3,7 @@
 /* @var $model ContactForm */
 /* @var $form TbActiveForm */
 
-$this->pageTitle=Yii::app()->name . ' - Contact Us';
+$this->title=\Yii::$app->name . ' - Contact Us';
 $this->breadcrumbs=array(
 	'Contact',
 );
@@ -11,7 +11,7 @@ $this->breadcrumbs=array(
 
 <h1>Contact Us</h1>
 
-<?php if(Yii::app()->user->hasFlash('contact')): ?>
+<?php if(\Yii::$app->user->hasFlash('contact')): ?>
 
     <?php $this->widget('yiistrap.widgets.TbAlert', array(
         'alerts'=>array('contact'),

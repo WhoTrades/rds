@@ -1,9 +1,11 @@
 <?php
-class PostMigration extends CWidget
+namespace app\widgets;
+
+class PostMigration extends \yii\base\Widget
 {
     public function init()
     {
-        if (Yii::app()->user->isGuest) {
+        if (\Yii::$app->user->isGuest) {
             return;
         }
         $sql = "select * from (
@@ -17,13 +19,13 @@ class PostMigration extends CWidget
                     ) as rr_obj_id from rds.project
                 )  as subquery where not rr_obj_id is null";
 
-        $ids = Yii::app()->db->createCommand($sql)->queryColumn();
+        $ids = \Yii::$app->db->createCommand($sql)->queryColumn();
         $c = new CDbCriteria();
         $c->compare('t.obj_id', $ids);
         $c->compare('t.rr_post_migration_status', '<>'.ReleaseRequest::MIGRATION_STATUS_UP);
         $c->addCondition("rr_new_post_migrations != '' and rr_new_post_migrations != '[]' and not rr_new_post_migrations is null");
         $c->with = ['project'];
-        $releaseRequests = ReleaseRequest::model()->findAll($c);
+        $releaseRequests = ReleaseRequest::findAll($c);
 
         $this->render('application.views.widgets.PostMigration', [
             'releaseRequests' => $releaseRequests,

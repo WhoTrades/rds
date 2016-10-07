@@ -57,7 +57,7 @@ class HardMigrationController extends Controller
         foreach ($migration->project->project2workers as $p2w) {
             /** @var Project2worker $p2w*/
             $worker = $p2w->worker;
-            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendHardMigrationTask(
+            (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendHardMigrationTask(
                 $worker->worker_name,
                 new \RdsSystem\Message\HardMigrationTask(
                     $migration->migration_name,
@@ -105,14 +105,14 @@ class HardMigrationController extends Controller
         foreach ($migration->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
             $worker = $p2w->worker;
-            (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendUnixSignal(
+            (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($migration->migration_environment)->sendUnixSignal(
                 $worker->worker_name,
                 new \RdsSystem\Message\UnixSignal($migration->migration_pid, $signal)
             );
         }
 
         if ($newStatus) {
-            HardMigration::model()->updateByPk($id, ['migration_status' => $newStatus]);
+            HardMigration::updateByPk($id, ['migration_status' => $newStatus]);
         }
 
         $this->redirect('/hardMigration/index');
@@ -131,7 +131,7 @@ class HardMigrationController extends Controller
      */
     public function loadModel($id)
     {
-        $model=HardMigration::model()->findByPk($id);
+        $model=HardMigration::findByPk($id);
         if($model===null)
             throw new CHttpException(404,'The requested page does not exist.');
         return $model;
@@ -146,7 +146,7 @@ class HardMigrationController extends Controller
         if(isset($_POST['ajax']) && $_POST['ajax']==='hard-migration-form')
         {
             echo CActiveForm::validate($model);
-            Yii::app()->end();
+            \Yii::$app->end();
         }
     }
 }

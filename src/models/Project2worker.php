@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.project2worker".
@@ -20,7 +23,7 @@ class Project2worker extends ActiveRecord
 	/**
 	 * @return string the associated database table name
 	 */
-	public function tableName()
+	public static function tableName()
 	{
 		return 'rds.project2worker';
 	}
@@ -34,7 +37,7 @@ class Project2worker extends ActiveRecord
 		// will receive user inputs.
 		return array(
 			array('obj_created, obj_modified, worker_obj_id, project_obj_id', 'required'),
-			array('obj_status_did', 'numerical', 'integerOnly'=>true),
+			array('obj_status_did', 'number', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('obj_id, obj_created, obj_modified, obj_status_did, worker_obj_id, project_obj_id', 'safe', 'on'=>'search'),

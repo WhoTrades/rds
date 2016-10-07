@@ -57,7 +57,7 @@
                                 } ?>
 
                                 <?= TbHtml::em(
-                                    TbHtml::submitButton(TbHtml::icon($iconMap[$type]), [
+                                    TbHtml::submitButton(yii\bootstrap\BaseHtml::icon($iconMap[$type]), [
                                         'name' => "ignore[$alert->obj_id]",
                                         'value' => $ignoreTimeMap[$type],
                                         'size' => "xs",

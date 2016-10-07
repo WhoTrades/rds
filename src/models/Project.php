@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.project".
@@ -31,7 +34,7 @@ class Project extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.project';
     }
@@ -43,7 +46,7 @@ class Project extends ActiveRecord
     {
         return [
             ['obj_created, obj_modified, project_name', 'required'],
-            ['obj_status_did', 'numerical', 'integerOnly' => true],
+            ['obj_status_did', 'number', 'integerOnly' => true],
             ['project_notification_email', 'email'], ['project_config', 'safe'],
             
             ['project_notification_email, project_notification_subject', 'length', 'max' => 64],
@@ -95,7 +98,7 @@ class Project extends ActiveRecord
             SET project_build_version=$this->project_build_version+1, project_build_subversion = project_build_subversion || '$releaseVersion=>$subversion'::hstore
             WHERE obj_id=$this->obj_id";
 
-        Yii::app()->db->createCommand($sql)->execute();
+        \Yii::$app->db->createCommand($sql)->execute();
     }
 
     /**
@@ -164,7 +167,7 @@ class Project extends ActiveRecord
      * Возвращает список проектов для вывода в <select>
      * @return array
      */
-    public function forList()
+    public static function forList()
     {
         static $cache = null;
         if ($cache !== null) {
@@ -172,26 +175,12 @@ class Project extends ActiveRecord
         }
         $list = ['' => " - Project - "];
 
-        $c = new CDbCriteria();
-        $c->order = 'project_name';
-        foreach ($this->findAll($c) as $val) {
+        $projects = static::find()->orderBy('project_name')->all();
+        foreach ($projects as $val) {
             $list[$val->obj_id] = $val->project_name;
         }
 
         return $cache = $list;
-    }
-
-    /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     *
-     * @param string $className active record class name.
-     *
-     * @return Project the static model class
-     */
-    public static function model($className = __CLASS__)
-    {
-        return parent::model($className);
     }
 
     /**
@@ -214,7 +203,7 @@ class Project extends ActiveRecord
      */
     public function getMigrationUrl($migration, $type)
     {
-        $config = Yii::app()->params['projectMigrationUrlMask'];
+        $config = \Yii::$app->params['projectMigrationUrlMask'];
         if (isset($config[$this->project_name])) {
             return $config[$this->project_name]($migration, $this->project_name, $type);
         } else {

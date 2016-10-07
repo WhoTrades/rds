@@ -15,4 +15,4 @@ $this->menu=array(
 
 <h1>Create ReleaseVersion</h1>
 
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<?php echo $this->render('_form', array('model'=>$model)); ?>

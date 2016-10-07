@@ -4,7 +4,7 @@ class JsonController extends Controller
     public function actionGetReleaseRequests($project)
     {
         /** @var $Project Project */
-        $Project = Project::model()->findByAttributes(['project_name' => $project]);
+        $Project = Project::findByAttributes(['project_name' => $project]);
         if (!$Project) {
             throw new CHttpException(404, 'Project not found');
         }
@@ -40,7 +40,7 @@ class JsonController extends Controller
         $c->order = "obj_id desc";
 
         if ($project) {
-            $projectObj = Project::model()->findByAttributes([
+            $projectObj = Project::findByAttributes([
                 'project_name' => $project,
             ]);
 
@@ -53,7 +53,7 @@ class JsonController extends Controller
         }
 
         $result = [];
-        $releaseRequests = ReleaseRequest::model()->findAll($c);
+        $releaseRequests = ReleaseRequest::findAll($c);
         foreach ($releaseRequests as $releaseRequest) {
             /** @var $releaseRequest ReleaseRequest */
             $result[] = $releaseRequest->getBuildTag();
@@ -68,7 +68,7 @@ class JsonController extends Controller
 
     public function actionGetAllowedReleaseBranches()
     {
-        $versions = ReleaseVersion::model()->findAll();
+        $versions = ReleaseVersion::find()->all();
 
         $result = [];
         foreach ($versions as $version) {
@@ -85,14 +85,14 @@ class JsonController extends Controller
     public function actionGetProjectCurrentVersion($projectName)
     {
         /** @var $project Project */
-        $project = Project::model()->findByAttributes(['project_name' => $projectName]);
+        $project = Project::findByAttributes(['project_name' => $projectName]);
 
         echo $project ? $project->project_current_version : null;
     }
 
     public function actionGetSecondsAfterLastSuccessfulRunOfMaintenanceTool($toolName)
     {
-        $tool = MaintenanceTool::model()->findByAttributes([
+        $tool = MaintenanceTool::findByAttributes([
             'mt_name' => $toolName,
         ]);
 
@@ -105,7 +105,7 @@ class JsonController extends Controller
         $c->order = 'obj_created desc';
         $c->compare('mtr_maintenance_tool_obj_id', $tool->obj_id);
         $c->compare('mtr_status', MaintenanceToolRun::STATUS_DONE);
-        $mtr = MaintenanceToolRun::model()->find($c);
+        $mtr = MaintenanceToolRun::find($c);
 
         //an: если тул ни разу не запускали - считаем что его запустили в начале времен
         if (!$mtr) {
@@ -117,7 +117,7 @@ class JsonController extends Controller
 
     public function actionAddWtFlowStat()
     {
-        $developer = Developer::model()->findByAttributes(['whotrades_email' => $_POST['developer']]);
+        $developer = Developer::findByAttributes(['whotrades_email' => $_POST['developer']]);
         
         if (!$developer) {
             echo "Unknown developer ".$_POST['developer'];
@@ -135,7 +135,7 @@ class JsonController extends Controller
     {
         $c = new CDbCriteria();
         $c->addCondition("stopped_till > NOW()");
-        $list = ToolJobStopped::model()->findAll($c);
+        $list = ToolJobStopped::findAll($c);
         $result = [];
         foreach ($list as $val) {
             $result[] = [$val->project_name, $val->key];
@@ -153,7 +153,7 @@ class JsonController extends Controller
             return;
         }
 
-        $transaction = Yii::app()->db->beginTransaction();
+        $transaction = \Yii::$app->db->beginTransaction();
 
         foreach ($data as $line => $val) {
             if (!preg_match('~--sys__package=([\w-]+)-([\d.]+)~', $line, $ans)) {
@@ -177,21 +177,21 @@ class JsonController extends Controller
                 ':duration' => (int)$val['time'] / $val['count'],
             ];
 
-            $row = Yii::app()->db->createCommand("SELECT * FROM cronjobs.add_cronjobs_cpu_usage(:project, :key, :cpu, :last_run, :exit_code, :duration)")->queryRow(true, $bind);
+            $row = \Yii::$app->db->createCommand("SELECT * FROM cronjobs.add_cronjobs_cpu_usage(:project, :key, :cpu, :last_run, :exit_code, :duration)")->queryRow(true, $bind);
 
-            $toolJob = ToolJob::model()->findByAttributes([
+            $toolJob = ToolJob::findByAttributes([
                 'key' => $key,
                 'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
             ]);
             if ($toolJob) {
-                Yii::app()->graphite->getGraphite()->gauge(
+                \Yii::$app->graphite->getGraphite()->gauge(
                     \GraphiteSystem\Metrics::dynamicName(
                         \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMEREAL,
                         [$project, $toolJob->getLoggerTag() . "-" . $key]
                     ),
                     $val['time'] / $val['count']
                 );
-                Yii::app()->graphite->getGraphite()->gauge(
+                \Yii::$app->graphite->getGraphite()->gauge(
                     \GraphiteSystem\Metrics::dynamicName(
                         \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMECPU,
                         [$project, $toolJob->getLoggerTag() . "-" . $key]
@@ -200,7 +200,7 @@ class JsonController extends Controller
                 );
             }
 
-            Yii::app()->webSockets->send('updateToolJobPerformanceStats', [
+            \Yii::$app->webSockets->send('updateToolJobPerformanceStats', [
                 'key' => $key,
                 'version' => $version,
                 'project' => $project,
@@ -234,7 +234,7 @@ class JsonController extends Controller
         $branch = trim($branch) ? html_entity_decode(strip_tags($branch)) : 'master';
         $issueKey = trim($issueKey) ? html_entity_decode(strip_tags($issueKey)) : '';
 
-        $jiraApi = new JiraApi(Yii::app()->debugLogger);
+        $jiraApi = new JiraApi(\Yii::$app->debugLogger);
         try {
             $ticket = $jiraApi->getTicketInfo($issueKey);
         } catch(\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
@@ -248,9 +248,9 @@ class JsonController extends Controller
         }
 
         $result = array();
-        $projectsAllowed = Yii::app()->params['teamCityProjectAllowed'];
-        $parameterName = Yii::app()->params['teamCityBuildComponentParameter'];
-        $teamCity = new CompanyInfrastructure\WtTeamCityClient(Yii::app()->debugLogger);
+        $projectsAllowed = \Yii::$app->params['teamCityProjectAllowed'];
+        $parameterName = \Yii::$app->params['teamCityBuildComponentParameter'];
+        $teamCity = new CompanyInfrastructure\WtTeamCityClient(\Yii::$app->debugLogger);
         $components = $ticket['fields']['components'];
 
         foreach ($projectsAllowed as $project) {
@@ -291,7 +291,7 @@ class JsonController extends Controller
         join cronjobs.tool_job ON cpu_usage.key=tool_job.key AND tool_job.obj_status_did=1
         ";
 
-        $result = Yii::app()->db->createCommand($sql)->queryAll();
+        $result = \Yii::$app->db->createCommand($sql)->queryAll();
 
         header("Content-type: application/javascript");
         echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -313,7 +313,7 @@ class JsonController extends Controller
         }
 
         $action = new \Action\Git\RebuildBranch();
-        $action->run('staging', 'JIRA-hook', (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel(), false);
+        $action->run('staging', 'JIRA-hook', (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel(), false);
 
         echo 'OK';
     }

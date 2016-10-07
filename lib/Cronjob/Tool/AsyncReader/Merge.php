@@ -61,7 +61,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             $update['jf_status'] = JiraFeature::STATUS_REMOVED;
         }
 
-        JiraFeature::model()->updateAll($update, $c);
+        JiraFeature::updateAll($update, $c);
 
         $message->accepted();
         $this->debugLogger->message("Message accepted");
@@ -83,7 +83,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         ];
 
         /** @var $feature JiraFeature */
-        $feature = JiraFeature::model()->findByPk($message->featureId);
+        $feature = JiraFeature::findByPk($message->featureId);
         if (!$feature) {
             $this->debugLogger->error("Feature #$message->featureId not found");
             $message->accepted();
@@ -120,7 +120,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                     $text = preg_replace('~\nh\d\.(.*)~', "\n<b>$1</b>", $text);
                     $text = preg_replace('~{quote}(.*?){quote}~sui', '<pre>$1</pre>', $text);
 
-                    Yii::app()->EmailNotifier->sendRdsConflictNotification(
+                    Yii::$app->EmailNotifier->sendRdsConflictNotification(
                         $feature->developer->finam_email,
                         strtolower(preg_replace('~(\w+)\-\d+~', '$1', $feature->jf_ticket)) . '@whotrades.org',
                         $feature->jf_ticket,
@@ -130,7 +130,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 }
             }
 
-            JiraFeature::model()->updateAll([
+            JiraFeature::updateAll([
                 'jf_last_merge_request_to_develop_time' => null,
                 'jf_last_merge_request_to_staging_time' => null,
                 'jf_last_merge_request_to_master_time' => null,
@@ -154,7 +154,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
     public function actionProcessMergeBuildResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
     {
         /** @var $gitBuild GitBuild */
-        $gitBuild = GitBuild::model()->findByPk($message->featureId);
+        $gitBuild = GitBuild::findByPk($message->featureId);
         if (!$gitBuild) {
             $this->debugLogger->message("Can't find build $message->featureId, skip message");
             $message->accepted();
@@ -162,7 +162,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         }
 
         /** @var $gitBuildBranch GitBuildBranch */
-        $gitBuildBranch = GitBuildBranch::model()->findByAttributes([
+        $gitBuildBranch = GitBuildBranch::findByAttributes([
             'git_build_id' => $gitBuild->obj_id,
             'branch' => $message->sourceBranch,
         ]);
@@ -172,14 +172,14 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         $gitBuildBranch->save();
 
 
-        if (0 == GitBuildBranch::model()->countByAttributes([
+        if (0 == GitBuildBranch::countByAttributes([
             'git_build_id' => $gitBuild->obj_id,
             'status' => GitBuildBranch::STATUS_NEW,
         ])) {
             $this->debugLogger->message("Build #$gitBuild->obj_id finished");
             //an: Если смержили (с ошибками или успешно) все ветки, но билд считаем завершенным
 
-            $errorsCount = GitBuildBranch::model()->countByAttributes([
+            $errorsCount = GitBuildBranch::countByAttributes([
                 'git_build_id' => $gitBuild->obj_id,
                 'status' => GitBuildBranch::STATUS_ERROR,
             ]);
@@ -187,7 +187,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             //an: Если собирали ради пересборки develop/staging и все успешно смержилось - тогда пушим пересоздаем ветки
             if (in_array($gitBuild->additional_data, ["develop", "staging"]) && $errorsCount == 0) {
                 $model->sendMergeCreateBranch(
-                    \Yii::app()->modules['Wtflow']['workerName'],
+                    \Yii::$app->modules['Wtflow']['workerName'],
                     new Message\Merge\CreateBranch($gitBuild->additional_data, $gitBuild->branch, true)
                 );
                 mail("dev-test-rebuilt-success@whotrades.org", "[RDS] $gitBuild->additional_data успешно пересобрана", "Все вмержилось, новый код можно смотреть на тестовом контуре");
@@ -213,20 +213,20 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
      */
     private static function updateGitBuildAtInterface(\GitBuild $gitBuild)
     {
-        \Yii::app()->assetManager->setBasePath(\Yii::getPathOfAlias('application')."/../main/www/assets/");
-        \Yii::app()->assetManager->setBaseUrl("/assets/");
-        \Yii::app()->urlManager->setBaseUrl('');
+        \Yii::$app->assetManager->setBasePath(\Yii::getPathOfAlias('application')."/../main/www/assets/");
+        \Yii::$app->assetManager->setBaseUrl("/assets/");
+        \Yii::$app->urlManager->setBaseUrl('');
         /** @var $controller \CController */
-        list($controller, $action) = \Yii::app()->createController('/');
+        list($controller, $action) = \Yii::$app->createController('/');
         $controller->setAction($controller->createAction($action));
-        \Yii::app()->setController($controller);
+        \Yii::$app->setController($controller);
 
         $filename = \Yii::getPathOfAlias('application.modules.Wtflow.views.gitBuild._gitBuildRow').'.php';
         $rowTemplate = include($filename);
         $model = \GitBuild::model();
         $model->obj_id = $gitBuild->obj_id;
         /** @var $widget \CWidget*/
-        $widget = \Yii::app()->getWidgetFactory()->createWidget(\Yii::app(),'yiistrap.widgets.TbGridView', [
+        $widget = \Yii::$app->getWidgetFactory()->createWidget(\Yii::$app,'yiistrap.widgets.TbGridView', [
             'dataProvider'=>$model->search(),
             'columns'=>$rowTemplate,
             'rowCssClassExpression' => function() use ($gitBuild){
@@ -238,7 +238,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         $widget->run();
         $html = ob_get_clean();
 
-        \Yii::app()->webSockets->send('gitBuildChanged', [
+        \Yii::$app->webSockets->send('gitBuildChanged', [
             'html' => $html,
             'git_build_id' => $gitBuild->obj_id,
         ]);

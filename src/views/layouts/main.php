@@ -1,17 +1,24 @@
-<?php /* @var $this Controller */ ?>
-<?php /* @var $content string */ ?>
+<?php
+use app\assets\AppAsset;
+use yii\helpers\Html;
+use yii\bootstrap\NavBar;
+use yii\bootstrap\Nav;
+
+/** @var $this yii\web\View */
+/** @var $content string */
+AppAsset::register($this);
+$this->beginPage();
+?>
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="language" content="en" />
 
-    <link rel="stylesheet" type="text/css" media="screen,handled" href="/css/styles.css" />
-
-	<title>RDS: <?php echo CHtml::encode($this->pageTitle); ?></title>
-
-	<?php Yii::app()->bootstrap->register(); ?>
-    <?php Yii::app()->webSockets->registerScripts()?>
+    <title>RDS: <?php echo Html::encode($this->title); ?></title>
+    <?= Html::csrfMetaTags() ?>
+    <?php $this->head() ?>
     <script>
         function webSocketSubscribe(channel, callback)
         {
@@ -23,65 +30,98 @@
 </head>
 
 <body>
+<?php
+$this->beginBody();
+NavBar::begin(['brandLabel' => 'RDS']);
+echo Nav::widget(
+    array(
+        'options' => ['class' => 'navbar-nav navbar-left'],
+        'items' => [
+            array(
+                'label' => 'Главная',
+                'url' => array('/site/index'),
+                'active' => \Yii::$app->controller->id == 'site',
+            ),
+            array(
+                'label' => 'Миграции',
+                'url' => array('/hardMigration/index'),
+                'visible' => !\Yii::$app->user->isGuest,
+                'active' => \Yii::$app->controller->id == 'hardMigration',
+            ),
 
-<?$this->widget('yiistrap.widgets.TbNavbar', array(
-        'display' => TbHtml::NAVBAR_DISPLAY_STATICTOP,
-        'brandLabel' => '',
-        'collapse' => true,
-        'items' => [[
-            'class' => 'yiistrap.widgets.TbNav',
-            'items'=> [
-                array('label'=>'Главная', 'url'=>array('/site/index'), 'active' => $this->getId() == 'site'),
-                array('label'=>'Миграции', 'url'=>array('/hardMigration/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'hardMigration'),
-
-                array('label'=>'Настройка сборки', 'url'=>array('/project/admin'), 'visible'=>!Yii::app()->user->isGuest, 'active' => in_array($this->getId(), ['project', 'worker', 'releaseVersion']), 'items' => [
-                    array('label'=>'Проекты', 'url'=>array('/project/admin'), 'active' => $this->getId() == 'project'),
-                    array('label'=>'Сборщики', 'url'=>array('/worker/admin'), 'active' => $this->getId() == 'worker'),
-                    array('label'=>'Версии', 'url'=>array('/releaseVersion/admin'), 'active' => $this->getId() == 'releaseVersion'),
-                ]),
-                array('label'=>'Интеграция', 'url'=>array('/Wtflow/jira/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => in_array($this->getId(), ['jira', 'developer', 'git']), 'items' => [
-                    ['label'=>'JIRA', 'url'=>array('/Wtflow/jira/index'), 'active' => $this->getId() == 'jira'],
-                    ['label'=>'Разработчики', 'url'=>array('/Wtflow/developer/index'), 'active' => $this->getId() == 'developer'],
-                    ['label'=>'Git', 'url'=>array('/Wtflow/git/index'), 'active' => $this->getId() == 'git' && $this->action->id == 'index'],
-                    ['label'=>'wtflow', 'url'=>array('/Wtflow/git/wtflowStat'), 'active' => $this->getId() == 'git' && $this->action->id == 'wtflowStat'],
-                ],),
-                array(
-                    'label'=>'Обслуживание',
-                    'url'=>array('/maintenanceTool/index'),
-                    'visible'=>!Yii::app()->user->isGuest,
-                    'active' => in_array($this->getId(), ['maintenanceTool', 'alert', 'cronjobs', 'gitBuild']),
-                    'items' => [
-                        //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => $this->getId() == 'maintenanceTool'],
-                        ['label'=>'Сигнализация', 'url'=>array('/alert/index'), 'active' => $this->getId() == 'alert'],
-                        ['label'=>'Фоновые задачи', 'url'=>array('/cronjobs/index'), 'active' => $this->getId() == 'cronjobs'],
-                        ['label'=>'Пересборка веток', 'url'=>array('/Wtflow/gitBuild'), 'active' => $this->getId() == 'gitBuild'],
-                    ]
-                ),
-                array('label'=>'Журнал', 'url'=>array('/log/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'log'),
-                array('icon'=>Tbhtml::ICON_LOG_OUT, 'label' => Yii::app()->user->name, 'url'=>array('/site/logout'), 'visible'=>!Yii::app()->user->isGuest)
-            ],
-        ]],
+            array(
+                'label' => 'Настройка сборки',
+                'url' => array('/project/admin'),
+                'visible' => !\Yii::$app->user->isGuest,
+                'active' => in_array(\Yii::$app->controller->id, ['project', 'worker', 'releaseVersion']),
+                'items' => [
+                    array('label' => 'Проекты', 'url' => array('/project/admin'), 'active' => \Yii::$app->controller->id == 'project'),
+                    array('label' => 'Сборщики', 'url' => array('/worker/admin'), 'active' => \Yii::$app->controller->id == 'worker'),
+                    array('label' => 'Версии', 'url' => array('/releaseVersion/admin'), 'active' => \Yii::$app->controller->id == 'releaseVersion'),
+                ],
+            ),
+            array(
+                'label' => 'Интеграция',
+                'url' => array('/Wtflow/jira/index'),
+                'visible' => !\Yii::$app->user->isGuest,
+                'active' => in_array(\Yii::$app->controller->id, ['jira', 'developer', 'git']),
+                'items' => [
+                    ['label' => 'JIRA', 'url' => array('/Wtflow/jira/index'), 'active' => \Yii::$app->controller->id == 'jira'],
+                    ['label' => 'Разработчики', 'url' => array('/Wtflow/developer/index'), 'active' => \Yii::$app->controller->id == 'developer'],
+                    ['label' => 'Git', 'url' => array('/Wtflow/git/index'), 'active' => \Yii::$app->controller->id == 'git' && $__action == 'index'],
+                    ['label' => 'wtflow', 'url' => array('/Wtflow/git/wtflowStat'), 'active' => \Yii::$app->controller->id == 'git' && $__action == 'wtflowStat'],
+                ],
+            ),
+            array(
+                'label' => 'Обслуживание',
+                'url' => array('/maintenanceTool/index'),
+                'visible' => !\Yii::$app->user->isGuest,
+                'active' => in_array(\Yii::$app->controller->id, ['maintenanceTool', 'alert', 'cronjobs', 'gitBuild']),
+                'items' => [
+                    //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => \Yii::$app->controller->id == 'maintenanceTool'],
+                    ['label' => 'Сигнализация', 'url' => array('/alert/index'), 'active' => \Yii::$app->controller->id == 'alert'],
+                    ['label' => 'Фоновые задачи', 'url' => array('/cronjobs/index'), 'active' => \Yii::$app->controller->id == 'cronjobs'],
+                    ['label' => 'Пересборка веток', 'url' => array('/Wtflow/gitBuild'), 'active' => \Yii::$app->controller->id == 'gitBuild'],
+                ],
+            ),
+            array(
+                'label' => 'Журнал',
+                'url' => array('/log/index'),
+                'visible' => !\Yii::$app->user->isGuest,
+                'active' => \Yii::$app->controller->id == 'log',
+            ),
+            array(
+                'label' => \Yii::$app->user->getIsGuest() ? "" : "Выйти " . \Yii::$app->user->getIdentity()->username,
+                'icon' => TbHtml::ICON_LOG_OUT,
+                'url' => array('/site/logout'),
+                'visible' => !\Yii::$app->user->isGuest,
+            ),
+        ],
     )
-); ?>
+);
+NavBar::end();
+?>
 
-<?$this->widget('GlobalWarnings', [])?>
-<?$this->widget('PostMigration', [])?>
+<?//=app\widgets\GlobalWarnings::widget([])?>
+<?//=app\widgets\PostMigration::widget([])?>
 
 
 <div id="page" class="container-fluid">
-	<?php echo $content; ?>
-	<div class="clear"></div>
+    <?php echo $content; ?>
+    <div class="clear"></div>
 </div><!-- page -->
 <script>
     $('body').on('click', '.ajax-url', function(e){
         var that = this;
         var html = this.innerHTML;
-        that.innerHTML = <?=json_encode(TbHtml::icon(TbHtml::ICON_REFRESH))?>;
+        that.innerHTML = <?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH))?>;
         $.ajax({url: this.href}).done(function(){
             that.innerHTML = html;
         });
         e.preventDefault();
     });
 </script>
+<?php $this->endBody() ?>
 </body>
 </html>
+<?php $this->endPage() ?>

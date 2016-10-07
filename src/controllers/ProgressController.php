@@ -6,7 +6,7 @@ class ProgressController extends Controller
     public function actionSetTime($action, $time, $taskId)
     {
         /** @var $build Build */
-        $build = Build::model()->findByPk($taskId);
+        $build = Build::findByPk($taskId);
         if (!$build) {
             throw new CHttpException(404, 'Build not found');
         }
@@ -42,7 +42,7 @@ class ProgressController extends Controller
      */
     private function sendGraphiteActionData($project, $build, $action, $value)
     {
-        Yii::app()->graphite->getGraphite()->gauge(
+        \Yii::$app->graphite->getGraphite()->gauge(
             \GraphiteSystem\Metrics::dynamicName(\GraphiteSystem\Metrics::PROJECT__ACTION__TIME, [$project, $action]),
             $value
         );
@@ -53,7 +53,7 @@ class ProgressController extends Controller
         $info = $build->getProgressbarInfo();
         if ($info) {
             list($percent, $key) = $info;
-            Yii::app()->webSockets->send('progressbarChanged', ['build_id' => $build->obj_id, 'percent' => $percent, 'key' => $key]);
+            \Yii::$app->webSockets->send('progressbarChanged', ['build_id' => $build->obj_id, 'percent' => $percent, 'key' => $key]);
         }
     }
 }

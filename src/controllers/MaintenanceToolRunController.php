@@ -61,7 +61,7 @@ class MaintenanceToolRunController extends Controller
      */
     public function loadModel($id)
     {
-        $model=MaintenanceToolRun::model()->findByPk($id);
+        $model=MaintenanceToolRun::findByPk($id);
         if($model===null)
             throw new CHttpException(404,'The requested page does not exist.');
         return $model;
@@ -76,7 +76,7 @@ class MaintenanceToolRunController extends Controller
         if(isset($_POST['ajax']) && $_POST['ajax']==='maintenance-tool-run-form')
         {
             echo CActiveForm::validate($model);
-            Yii::app()->end();
+            \Yii::$app->end();
         }
     }
 }

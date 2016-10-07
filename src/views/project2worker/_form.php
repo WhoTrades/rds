@@ -19,8 +19,8 @@
 
 	<?php echo $form->errorSummary($model); ?>
 
-    <?php echo $form->dropDownListControlGroup($model, 'worker_obj_id', \Worker::model()->forList()); ?>
-    <?php echo $form->dropDownListControlGroup($model, 'project_obj_id', \Project::model()->forList()); ?>
+    <?php echo $form->dropDownListControlGroup($model, 'worker_obj_id', \Worker::forList()); ?>
+    <?php echo $form->dropDownListControlGroup($model, 'project_obj_id', \Project::forList()); ?>
 
 	<div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

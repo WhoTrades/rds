@@ -3,7 +3,10 @@
  * @author Artem Naumenko
  * Класс, реализующий авторизацию через crm
  */
-final class SingleLoginAuth extends \CComponent
+
+namespace app\modules\SingleLogin\components;
+
+final class SingleLoginAuth extends \yii\base\Object
 {
     public $secretKey;
     public $crmUrl = 'http://crm.whotrades.com/';
@@ -22,20 +25,16 @@ final class SingleLoginAuth extends \CComponent
 
     public function getAuthUrl()
     {
-        $hash = md5(uniqid().microtime()."dfgldfgkidfg98789h4i".rand(1, PHP_INT_MAX));
-        $token = sha1($hash.'+'.$this->secretKey);
+        $hash = md5(uniqid() . microtime() . "dfgldfgkidfg98789h4i" . rand(1, PHP_INT_MAX));
+        $token = sha1($hash . '+' . $this->secretKey);
         $url = $this->crmUrl . "singlelogin/?" . http_build_query(array(
             'client_id' => $this->clientId,
             'hash' => $hash,
             'token' => $token,
             'return_url' => $this->getReturnUrl(),
         ));
+
         return $url;
-    }
-
-    public function init()
-    {
-
     }
 
     public function authorize($code)
@@ -50,7 +49,7 @@ final class SingleLoginAuth extends \CComponent
 
         $client = \CrmSystem\Factory::createRpcClient(
             $crmRpcConfig,
-            Yii::app()->debugLogger,
+            \Yii::$app->debugLogger,
             null,
             $this->timeout
         );
@@ -80,8 +79,6 @@ final class SingleLoginAuth extends \CComponent
 
     private function getReturnUrl()
     {
-        return Yii::app()->controller->createAbsoluteUrl($this->returnRoute);
+        return \yii\helpers\Url::to($this->returnRoute, true);
     }
 }
-
-

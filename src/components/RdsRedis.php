@@ -1,7 +1,7 @@
 <?php
 use RedisSystem\IRedisClient;
 
-class RdsRedis extends CComponent
+class RdsRedis extends yii\base\Object
 {
     public $host;
     public $port;
@@ -20,7 +20,7 @@ class RdsRedis extends CComponent
             'port' => $this->port,
             'timeout' => $this->timeout,
             'password' => $this->password,
-        ], Yii::app()->graphite->getGraphite());
+        ], \Yii::$app->graphite->getGraphite());
 
         $this->redisClient = $redisSystem->getRedisClient();
     }

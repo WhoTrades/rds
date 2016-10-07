@@ -4,11 +4,11 @@
 /** @var $projects Project[] - Список всех проектов с кронами */
 /** @var $cronJobs ToolJob[] - Список кронов */
 /** @var $cpuUsageLastTruncate date - Дата последнего сброса статистики по использованию CPU */
-$this->pageTitle = "Фоновые процессы";
+$this->title = "Фоновые процессы";
 ?>
 <h1>
-    <?=$this->pageTitle?>
-    <small><a href="<?=$this->createUrl("cpuUsageReport")?>">CPU usage report</a></small>
+    <?=$this->title?>
+    <small><a href="<?=yii\helpers\Url::to("cpuUsageReport")?>">CPU usage report</a></small>
 </h1>
 <div style="clear: both"></div>
 
@@ -32,10 +32,10 @@ $this->pageTitle = "Фоновые процессы";
                 'color' => TbHtml::BUTTON_COLOR_DANGER,
                 'onclick' => 'js:if (confirm("Вы уверены что хотите обнулить все показатели по использованию CPU")) {
                     var html = this.innerHTML;
-                    this.innerHTML = ' . json_encode(TbHtml::icon(TbHtml::ICON_REFRESH)) . ';
+                    this.innerHTML = ' . json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH)) . ';
                     this.disabled = true;
                     var obj = this;
-                    $.ajax({url: "' . $this->createUrl('truncateCpuUsage') . '"}).done(function(){
+                    $.ajax({url: "' . yii\helpers\Url::to('truncateCpuUsage') . '"}).done(function(){
                         obj.innerHTML = html;
                         obj.disabled = false;
                         location += "";
@@ -64,7 +64,7 @@ $this->pageTitle = "Фоновые процессы";
                     <?php if ($toolJob->group !== $group) {?>
                         <tr class="group-splitter active-tr" id="group-<?=$groupNormalized = preg_replace('~\W+~', '-', $toolJob->group)?>">
                             <td colspan="10">
-                                <?=TbHtml::tooltip(TbHtml::icon(TbHtml::ICON_LINK, [
+                                <?=TbHtml::tooltip(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_LINK, [
                                     'class' => 'active-link',
                                     'style' => 'cursor: pointer',
                                     'border' => 'solid 1px #eee',
@@ -97,7 +97,7 @@ $this->pageTitle = "Фоновые процессы";
             var td = $('td:first', $(this).parents('tr:first'));
             var that = this;
             var html = this.innerHTML;
-            that.innerHTML = <?=json_encode(TbHtml::icon(TbHtml::ICON_REFRESH))?>;
+            that.innerHTML = <?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH))?>;
 
             $.ajax({
                 url: this.href
@@ -120,7 +120,7 @@ $this->pageTitle = "Фоновые процессы";
             $('.alert', td).remove();
 
             $.ajax({
-                url: '<?=$this->createUrl('log')?>',
+                url: '<?=yii\helpers\Url::to('log')?>',
                 data: {
                     project: '<?=$Project->project_name?>',
                     tag: $(this).attr('tag'),

@@ -16,7 +16,7 @@
  * @property string $task
  * @property string $data
  */
-class PgqZohoIntegration extends CActiveRecord
+class PgqZohoIntegration extends ActiveRecord
 {
     // an: Указание номера тикета jira в тикете zoho, при автоматическом создании последнего
     const TASK_NAME_SYNC_ZOHO_TITLE = 'TASK_NAME_SYNC_ZOHO_TITLE';

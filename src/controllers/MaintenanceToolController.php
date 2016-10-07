@@ -53,7 +53,7 @@ class MaintenanceToolController extends Controller
         /** @var $tool MaintenanceTool */
         $tool = $this->loadModel($id);
 
-        $mtr = $tool->start(Yii::app()->user->name);
+        $mtr = $tool->start(\Yii::$app->user->getIdentity()->username);
 
         if (empty($mtr->errors)) {
             $this->redirect($this->createUrl('/maintenanceToolRun/view/', ['id' => $mtr->obj_id]));
@@ -67,7 +67,7 @@ class MaintenanceToolController extends Controller
         /** @var $tool MaintenanceTool */
         $tool = $this->loadModel($id);
 
-        $tool->stop(Yii::app()->user->name);
+        $tool->stop(\Yii::$app->user->getIdentity()->username);
 
         $this->redirect($this->createUrl('/maintenanceTool/'));
     }
@@ -81,7 +81,7 @@ class MaintenanceToolController extends Controller
      */
     public function loadModel($id)
     {
-        $model=MaintenanceTool::model()->findByPk($id);
+        $model=MaintenanceTool::findByPk($id);
         if($model===null)
             throw new CHttpException(404,'The requested page does not exist.');
         return $model;
@@ -96,7 +96,7 @@ class MaintenanceToolController extends Controller
         if(isset($_POST['ajax']) && $_POST['ajax']==='maintenance-tool-form')
         {
             echo CActiveForm::validate($model);
-            Yii::app()->end();
+            \Yii::$app->end();
         }
     }
 }

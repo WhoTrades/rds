@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "cronjobs.tool_job".
@@ -23,7 +26,7 @@ class ToolJob extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'cronjobs.tool_job';
     }
@@ -37,7 +40,7 @@ class ToolJob extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified, project_obj_id, key, command, version', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
+            array('obj_status_did', 'number', 'integerOnly'=>true),
             array('key', 'length', 'max'=>12),
             array('group', 'length', 'max'=>250),
             array('package', 'length', 'max'=>64),
@@ -120,7 +123,7 @@ class ToolJob extends ActiveRecord
     public function getToolJobStopped()
     {
         /** @var $stopped ToolJobStopped */
-        $stopped = ToolJobStopped::model()->findByAttributes([
+        $stopped = ToolJobStopped::findByAttributes([
             'project_obj_id' => $this->project_obj_id,
             'key' => $this->key,
         ]);
@@ -157,8 +160,8 @@ class ToolJob extends ActiveRecord
 
     private function getGraphiteCpuStatsUrl($type, $directImageUrl = true, $width = 100, $height = 60, $graphOnly = true)
     {
-        $baseUrl = Yii::app()->graphite->GUIUrl;
-        $env = Yii::app()->graphite->env;
+        $baseUrl = \Yii::$app->graphite->GUIUrl;
+        $env = \Yii::$app->graphite->env;
         $direct = $directImageUrl ? "render/" : "";
         $loggerTag = strtoupper($this->getLoggerTag())."-".strtoupper($this->key);
         $params = [

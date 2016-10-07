@@ -14,4 +14,4 @@ $this->menu=array(
 
 <h1>Create Project</h1>
 
-<?php $this->renderPartial('_form', array('model'=>$model, 'list' => $list, 'workers' => $workers)); ?>
+<?php echo $this->render('_form', array('model'=>$model, 'list' => $list, 'workers' => $workers)); ?>

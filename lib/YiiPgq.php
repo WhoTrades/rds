@@ -19,6 +19,6 @@ class YiiPgq extends PgQ\Cronjob\RequestHandler\Pgq
     /** @return IRedisClient */
     public function getRedisClient()
     {
-        return Yii::app()->redis->getRedisClient();
+        return \Yii::$app->redis->getRedisClient();
     }
 }

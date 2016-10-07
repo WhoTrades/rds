@@ -38,24 +38,23 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
         defined('YII_DEBUG') or define('YII_DEBUG', true);
         defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 
-        \Yii::$enableIncludePath = false;
-
+        require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
         require_once(__DIR__ . '/../protected/components/WebApplication.php');
         try {
-            $application = \Yii::createApplication('WebApplication', $config);
+            $application = new \WebApplication(require($config));
             $application->debugLogger = $debugLogger;
 
             if (is_dir(__DIR__ . '/../lib/MigrationSystem')) {
-                \Yii::setPathOfAlias('MigrationSystem', __DIR__ . '/../lib/MigrationSystem');
+                \Yii::setAlias('@MigrationSystem', __DIR__ . '/../lib/MigrationSystem');
             } else {
-                \Yii::setPathOfAlias('MigrationSystem', __DIR__ . '/../../../lib/MigrationSystem');
+                \Yii::setAlias('@MigrationSystem', __DIR__ . '/../../../lib/MigrationSystem');
             }
-
-            \Yii::import('MigrationSystem.components.*');
 
             $application->run();
         } catch (\Exception $e) {
-            \Yii::app()->handleException($e);
+            var_dump($e);
+            var_dump(\Yii::$app->getErrorHandler()); return;
+            \Yii::$app->getErrorHandler()->handleException($e);
         }
 
         $oper->success();

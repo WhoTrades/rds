@@ -22,7 +22,7 @@ class RebuildBranch
         }
 
         if ($checkForDuplicateTasks) {
-            $notReadyBranchesCount = \GitBuild::model()->countByAttributes([
+            $notReadyBranchesCount = \GitBuild::countByAttributes([
                 'additional_data' => $branch,
                 'status' => \GitBuild::STATUS_NEW,
             ]);
@@ -56,30 +56,30 @@ class RebuildBranch
             ],
         ];
 
-        $jira = new \JiraApi(\Yii::app()->debugLogger);
+        $jira = new \JiraApi(\Yii::$app->debugLogger);
 
-        $jql = "status IN (\"".implode('", "', $map[$branch])."\") AND project IN (".implode(", ", \Yii::app()->params['jiraProjects']).") ORDER BY updated ASC";
-        \Yii::app()->debugLogger->message("Getting tickets by jql=$jql");
+        $jql = "status IN (\"".implode('", "', $map[$branch])."\") AND project IN (".implode(", ", \Yii::$app->params['jiraProjects']).") ORDER BY updated ASC";
+        \Yii::$app->debugLogger->message("Getting tickets by jql=$jql");
 
         $tickets = $jira->getTicketsByJql($jql);
 
         $branches = [];
         foreach ($tickets['issues'] as $ticket) {
-            \Yii::app()->debugLogger->debug("Testing {$ticket['key']}");
-            if (!\JiraFeature::model()->countByAttributes(['jf_ticket' => $ticket['key']])) {
-                \Yii::app()->debugLogger->debug("Skip {$ticket['key']} as it is not known");
+            \Yii::$app->debugLogger->debug("Testing {$ticket['key']}");
+            if (!\JiraFeature::countByAttributes(['jf_ticket' => $ticket['key']])) {
+                \Yii::$app->debugLogger->debug("Skip {$ticket['key']} as it is not known");
                 //continue;
             }
 
             $branches[] = "feature/{$ticket['key']}";
         }
 
-        \Yii::app()->debugLogger->message("Branches: ".implode(", ", $branches));
+        \Yii::$app->debugLogger->message("Branches: ".implode(", ", $branches));
 
         if (!$branches) {
-            \Yii::app()->debugLogger->message("No branches, se just create $branch from master branch");
+            \Yii::$app->debugLogger->message("No branches, se just create $branch from master branch");
             $model->sendMergeCreateBranch(
-                \Yii::app()->modules['Wtflow']['workerName'],
+                \Yii::$app->modules['Wtflow']['workerName'],
                 new Message\Merge\CreateBranch($branch, "master", true)
             );
             return;
@@ -93,16 +93,16 @@ class RebuildBranch
         $build->additional_data = $branch;
         $build->save();
 
-        \Yii::app()->debugLogger->message("Target branch: $build->branch, sending create branch task");
+        \Yii::$app->debugLogger->message("Target branch: $build->branch, sending create branch task");
 
         $model->sendMergeTask(
-            \Yii::app()->modules['Wtflow']['workerName'],
+            \Yii::$app->modules['Wtflow']['workerName'],
             new Message\Merge\Task(-1, "master", $build->branch, Message\Merge\Task::MERGE_TYPE_FEATURE)
         );
 
         foreach ($branches as $val) {
 
-            if (!\GitBuildBranch::model()->countByAttributes([
+            if (!\GitBuildBranch::countByAttributes([
                 'git_build_id' => $build->obj_id,
                 'branch' => $val,
             ])) {
@@ -115,16 +115,16 @@ class RebuildBranch
             }
 
 
-            \Yii::app()->debugLogger->message("Branch: $val, sending merge branch task");
+            \Yii::$app->debugLogger->message("Branch: $val, sending merge branch task");
             $model->sendMergeTask(
-                \Yii::app()->modules['Wtflow']['workerName'],
+                \Yii::$app->modules['Wtflow']['workerName'],
                 new Message\Merge\Task($build->obj_id, $val, $build->branch, Message\Merge\Task::MERGE_TYPE_BUILD)
             );
         }
 
         \Log::createLogMessage("Заказана пересборка #$build->obj_id ветки $branch");
-        \Yii::app()->webSockets->send('gitBuildRefreshAll', []);
+        \Yii::$app->webSockets->send('gitBuildRefreshAll', []);
 
-        \Yii::app()->debugLogger->message("Tasks sent successfully");
+        \Yii::$app->debugLogger->message("Tasks sent successfully");
     }
 }

@@ -4,10 +4,10 @@
 
 <div>
     <?if ($migration->canBeStopped()) {?>
-        <button onclick="$.get('<?=$this->createUrl('/hardMigration/stop', ['id' => $migration->obj_id, 'returnUrl' => $_SERVER['REQUEST_URI']])?>'); $(this).hide('fast'); "><?=TbHtml::icon(TbHtml::ICON_STOP)?>Ctrl+C</button>
+        <button onclick="$.get('<?=yii\helpers\Url::to('/hardMigration/stop', ['id' => $migration->obj_id, 'returnUrl' => $_SERVER['REQUEST_URI']])?>'); $(this).hide('fast'); "><?=yii\bootstrap\BaseHtml::icon(TbHtml::ICON_STOP)?>Ctrl+C</button>
     <?}?>
     <?if ($migration->canBePaused()) {?>
-        <button onclick="$.get('<?=$this->createUrl('/hardMigration/pause', ['id' => $migration->obj_id, 'returnUrl' => $_SERVER['REQUEST_URI']])?>'); $(this).hide('fast');"><?=TbHtml::icon(TbHtml::ICON_PAUSE)?></span>Pause</button><br />
+        <button onclick="$.get('<?=yii\helpers\Url::to('/hardMigration/pause', ['id' => $migration->obj_id, 'returnUrl' => $_SERVER['REQUEST_URI']])?>'); $(this).hide('fast');"><?=yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PAUSE)?></span>Pause</button><br />
     <?}?>
     <br />
 </div>

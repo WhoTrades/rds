@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.project_config_history".
@@ -21,7 +24,7 @@ class ProjectConfigHistory extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.project_config_history';
     }
@@ -35,7 +38,7 @@ class ProjectConfigHistory extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified, pch_project_obj_id', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
+            array('obj_status_did', 'number', 'integerOnly'=>true),
             array('pch_user', 'length', 'max'=>128),
             array('pch_config', 'safe'),
             // The following rule is used by search().

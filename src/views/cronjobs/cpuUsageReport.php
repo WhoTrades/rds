@@ -18,7 +18,7 @@
                     <td>
                         <?=$val['substring']?>
                         <?=TbHtml::tooltip(
-                            TbHtml::icon(TbHtml::ICON_INFO_SIGN),
+                            yii\bootstrap\BaseHtml::icon(TbHtml::ICON_INFO_SIGN),
                             "", $val['command'], [
                                 'onclick' => 'js:$("span.command", $(this).parent().parent()).html("'.$val['command'].'"); return false;',
                             ]

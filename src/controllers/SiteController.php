@@ -1,51 +1,44 @@
 <?php
+namespace app\controllers;
 
-class SiteController extends Controller
+use app\models\ReleaseRequest;
+use app\models\ReleaseReject;
+use app\models\Project;
+use app\models\Log;
+use app\models\Build;
+use app\models\JiraCommit;
+use RdsSystem;
+
+class SiteController extends \Controller
 {
     public $pageTitle = 'Релизы и запреты';
 
     /**
      * @return array
      */
-    public function filters()
+    public function behaviors()
     {
-        return array(
-            'accessControl', // perform access control for CRUD operations
-        );
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    ['allow' => true, 'roles' => ['@']],
+                    ['allow' => true, 'actions' => ['login', 'secret']],
+                ],
+            ],
+        ];
     }
 
     /**
-     * @return array
-     */
-    public function accessRules()
-    {
-        return array(
-            array('allow',  // allow all users to perform 'index' and 'view' actions
-                'actions' => array('login', 'secret'),
-                'users' => array('*'),
-            ),
-            array('allow',  // allow all users to perform 'index' and 'view' actions
-                'users' => array('@'),
-            ),
-            array('deny',  // deny all users
-                'users' => array('*'),
-            ),
-        );
-    }
-
-    /**
-     * @throws Exception
      */
     public function actionIndex()
     {
-        $releaseRequestSearchModel = new ReleaseRequest('search');
-        $releaseRequestSearchModel->unsetAttributes();  // clear any default values
+        $releaseRequestSearchModel = new ReleaseRequest();
         if (isset($_GET['ReleaseRequest'])) {
             $releaseRequestSearchModel->attributes = $_GET['ReleaseRequest'];
         }
 
-        $releaseRejectSearchModel = new ReleaseReject('search');
-        $releaseRejectSearchModel->unsetAttributes();  // clear any default values
+        $releaseRejectSearchModel = new ReleaseReject();
         if (isset($_GET['ReleaseRequest'])) {
             $releaseRejectSearchModel->attributes = $_GET['ReleaseRequest'];
         }
@@ -59,11 +52,11 @@ class SiteController extends Controller
                 ORDER BY 2 DESC
                 LIMIT 5";
 
-        $ids = Yii::app()->db->createCommand($sql)->queryColumn([':user' => Yii::app()->user->name]);
+        $ids = \Yii::$app->db->createCommand($sql, [':user' => \Yii::$app->user->getIdentity()->username])->queryColumn();
 
-        $mainProjects = Project::model()->findAllByPk($ids);
+        $mainProjects = Project::find()->where(['obj_id' => $ids])->all();
 
-        $this->render('index', array(
+        echo $this->render('index', array(
             'releaseRequestSearchModel' => $releaseRequestSearchModel,
             'releaseRejectSearchModel' => $releaseRejectSearchModel,
             'mainProjects' => $mainProjects,
@@ -72,23 +65,22 @@ class SiteController extends Controller
     }
 
     /**
-     * @throws Exception
      */
     public function actionCreateReleaseRequest()
     {
-        $this->render('createReleaseRequest', $this->createReleaseRequest());
+        echo $this->render('createReleaseRequest', $this->createReleaseRequest());
     }
 
     private function createReleaseRequest()
     {
         $model = new ReleaseRequest();
 
-        $transaction = $model->dbConnection->beginTransaction();
+        $transaction = $model->getDbConnection()->beginTransaction();
 
         try {
             if (isset($_POST['ReleaseRequest'])) {
                 $model->attributes = $_POST['ReleaseRequest'];
-                $model->rr_user = \Yii::app()->user->name;
+                $model->rr_user = \Yii::$app->user->getIdentity()->username;
                 if ($model->rr_project_obj_id) {
                     $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
                 }
@@ -99,7 +91,7 @@ class SiteController extends Controller
 
                     $projectName = $model->project->project_name;
                     if (in_array($projectName, ['comon', 'whotrades'])
-                        && $dictionaryProject = Project::model()->findByAttributes(['project_name' => 'dictionary'])) {
+                        && $dictionaryProject = Project::findByAttributes(['project_name' => 'dictionary'])) {
                         $dictionary = new ReleaseRequest();
                         $dictionary->rr_user = $model->rr_user;
                         $dictionary->rr_project_obj_id = $dictionaryProject->obj_id;
@@ -136,13 +128,13 @@ class SiteController extends Controller
                         }
                     }
 
-                    Yii::app()->webSockets->send('updateAllReleaseRequests', []);
+                    \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
                     $this->redirect(array('index'));
                 }
             }
-        } catch (Exception $e) {
-            if ($transaction->active) {
+        } catch (\Exception $e) {
+            if ($transaction->isActive) {
                 $transaction->rollback();
             }
             throw $e;
@@ -153,7 +145,7 @@ class SiteController extends Controller
 
     /**
      * Страница создания запрета на релиз
-     * @throws Exception
+     * @throws \Exception
      */
     public function actionCreateReleaseReject()
     {
@@ -163,12 +155,12 @@ class SiteController extends Controller
             $projectNames = [];
             foreach ($_POST['ReleaseReject']['rr_project_obj_id'] as $projectId) {
                 /** @var $project Project */
-                $project = Project::model()->findByPk($projectId);
+                $project = Project::findOne(['obj_id' => $projectId]);
                 if (!$project) {
                     continue;
                 }
                 $model = new ReleaseReject();
-                $model->rr_user = \Yii::app()->user->name;
+                $model->rr_user = \Yii::$app->user->getIdentity()->username;
                 $model->rr_project_obj_id = $projectId;
                 $model->rr_release_version = $_POST['ReleaseReject']['rr_release_version'];
                 $model->rr_comment = $_POST['ReleaseReject']['rr_comment'];
@@ -178,25 +170,25 @@ class SiteController extends Controller
             }
             $projects = implode(", ", $projectNames);
             Log::createLogMessage("Создан запрет релизов $projects");
-            foreach (explode(",", \Yii::app()->params['notify']['releaseReject']['phones']) as $phone) {
+            foreach (explode(",", \Yii::$app->params['notify']['releaseReject']['phones']) as $phone) {
                 if (!$phone) {
                     continue;
                 }
                 $text = "{$model->rr_user} rejected $projects. {$model->rr_comment}";
-                Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+                \Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
             }
-            Yii::app()->EmailNotifier->sendRdsReleaseRejectNotification(
+            \Yii::$app->EmailNotifier->sendRdsReleaseRejectNotification(
                 $model->rr_user,
                 $projects,
                 $model->rr_comment
             );
 
-            Yii::app()->webSockets->send('updateAllReleaseRejects', []);
+            \Yii::$app->webSockets->send('updateAllReleaseRejects', []);
 
             $this->redirect(array('index'));
         }
 
-        $this->render('createReleaseReject', array(
+        echo $this->render('createReleaseReject', array(
             'model' => $model,
         ));
     }
@@ -204,19 +196,18 @@ class SiteController extends Controller
     /**
      * @param int $id
      *
-     * @throws CDbException
-     * @throws Exception
+     * @throws \Exception
      */
     public function actionDeleteReleaseRequest($id)
     {
-        $model = ReleaseRequest::model()->findByPk($id);
+        $model = ReleaseRequest::findByPk($id);
         if (!$model) {
             return;
         }
 
-        $messageModel = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+        $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
 
-        $transaction = $model->getDbConnection()->beginTransaction();
+        $transaction = $model->getDb()->beginTransaction();
         /** @var $model ReleaseRequest*/
         foreach ($model->builds as $build) {
             if (in_array($build->build_status, Build::getInstallingStatuses())) {
@@ -248,18 +239,18 @@ class SiteController extends Controller
     /**
      * @param int $id
      *
-     * @throws CDbException
+     * @throws \Exception
      */
     public function actionDeleteReleaseReject($id)
     {
-        $model = ReleaseReject::model()->findByPk($id);
+        $model = ReleaseReject::findByPk($id);
         if ($model) {
             $transaction = $model->getDbConnection()->beginTransaction();
             try {
                 Log::createLogMessage("Удален {$model->getTitle()}");
                 $model->delete();
                 $transaction->commit();
-                Yii::app()->webSockets->send('updateAllReleaseRejects', []);
+                \Yii::$app->webSockets->send('updateAllReleaseRejects', []);
             } catch (\Exception $e) {
                 $transaction->rollback();
             }
@@ -275,11 +266,11 @@ class SiteController extends Controller
      */
     public function actionError()
     {
-        if ($error = Yii::app()->errorHandler->error) {
-            if (Yii::app()->request->isAjaxRequest) {
+        if ($error = \Yii::$app->errorHandler->error) {
+            if (\Yii::$app->request->isAjaxRequest) {
                 echo $error['message'];
             } else {
-                $this->render('error', $error);
+                echo $this->render('error', $error);
             }
         }
     }
@@ -289,24 +280,23 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        $this->render('login');
+        echo $this->render('login');
     }
 
     /**
-     * @throws CException
+     * @throws \Exception
      */
     public function actionSecret()
     {
-        Yii::import('application.modules.SingleLogin.components.SingleLoginUser');
-        $user = new SingleLoginUser(1, 'anaumenko@corp.finam.ru');
+        $identity = new \app\modules\SingleLogin\components\SingleLoginUser(1, 'anaumenko@corp.finam.ru');
 
         $phone = '79160549864';
-        $user->setPersistentStates(array(
+        $identity->setPersistentStates(array(
             'phone' => $phone,
             'userRights' => array('admin'),
         ));
 
-        Yii::app()->user->login($user, 3600*24*30);
+        \Yii::$app->user->login($identity, 3600*24*30);
 
         $this->redirect('/');
     }
@@ -316,42 +306,41 @@ class SiteController extends Controller
      */
     public function actionLogout()
     {
-        Yii::app()->user->logout();
-        $this->redirect(Yii::app()->homeUrl);
+        \Yii::$app->user->logout();
+        $this->redirect(\Yii::$app->homeUrl);
     }
 
     /**
      * @param int  $id
      * @param bool $ajax
      *
-     * @throws CException
-     * @throws CHttpException
+     * @throws \Exception
      */
     public function actionCommits($id, $ajax = null)
     {
         /** @var $releaseRequest ReleaseRequest */
-        if (!$releaseRequest = ReleaseRequest::model()->findByPk($id)) {
-            throw new CHttpException(404, "Сборка #$id не найдена");
+        if (!$releaseRequest = ReleaseRequest::findByPk($id)) {
+            throw new \yii\web\NotFoundHttpException("Сборка #$id не найдена");
         }
 
         $c = new CDbCriteria();
         $c->order = 'jira_commit_repository';
         $c->compare('jira_commit_build_tag', $releaseRequest->getBuildTag());
 
-        $commits = JiraCommit::model()->findAll($c);
+        $commits = JiraCommit::findAll($c);
 
         if ($ajax) {
-            $this->renderPartial('commits', ['commits' => $commits]);
+            echo $this->renderPartial('commits', ['commits' => $commits]);
         } else {
-            $this->render('commits', ['commits' => $commits]);
+            echo $this->render('commits', ['commits' => $commits]);
         }
     }
-
     protected function performAjaxValidation($model)
     {
+        return true;
         if (isset($_POST['ajax']) && $_POST['ajax'] == 'release-request-form') {
-            echo CActiveForm::validate($model);
-            Yii::app()->end();
+            echo \yii\widgets\ActiveForm::validate($model);
+            \Yii::$app->end();
         }
     }
 }

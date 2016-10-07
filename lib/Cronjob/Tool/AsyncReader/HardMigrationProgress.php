@@ -38,11 +38,11 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
     {
         $message->accepted();
         $t = microtime(true);
-        $sql = "UPDATE ".HardMigration::model()->tableName()."
+        $sql = "UPDATE ".HardMigration::tableName()."
         SET migration_progress=:progress, migration_progress_action=:action, migration_pid=:pid
         WHERE migration_name=:name and migration_environment=:env";
 
-        \HardMigration::model()->getDbConnection()->createCommand($sql)->execute([
+        \HardMigration::getDbConnection()->createCommand($sql)->execute([
             'progress' => $message->progress,
             'action' => $message->action,
             'pid' => $message->pid,
@@ -60,6 +60,6 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
     private function sendMigrationProgressbarChanged($id, $percent, $key)
     {
         $this->debugLogger->message("Sending migraion progressbar to comet");
-        Yii::app()->webSockets->send('migrationProgressbarChanged', ['migration' => $id, 'percent' => (float)$percent, 'key' => $key]);
+        Yii::$app->webSockets->send('migrationProgressbarChanged', ['migration' => $id, 'percent' => (float)$percent, 'key' => $key]);
     }
 }

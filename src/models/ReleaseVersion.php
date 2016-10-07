@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.release_version".
@@ -16,7 +19,7 @@ class ReleaseVersion extends ActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.release_version';
     }
@@ -30,7 +33,7 @@ class ReleaseVersion extends ActiveRecord
         // will receive user inputs.
         return array(
             array('obj_created, obj_modified, rv_version, rv_name', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly'=>true),
+            array('obj_status_did', 'number', 'integerOnly'=>true),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array('obj_id, obj_created, obj_modified, obj_status_did, rv_version, rv_name', 'safe', 'on'=>'search'),
@@ -93,20 +96,9 @@ class ReleaseVersion extends ActiveRecord
         ));
     }
 
-    /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     * @param string $className active record class name.
-     * @return ReleaseVersion the static model class
-     */
-    public static function model($className=__CLASS__)
-    {
-        return parent::model($className);
-    }
-
-    public function forList(){
+    public static function forList(){
         $list = array();
-        foreach ($this->findAll() as $val)
+        foreach (static::find()->all() as $val)
             $list[$val->rv_version] = $val->rv_name." - ".$val->rv_version;
 
         return $list;

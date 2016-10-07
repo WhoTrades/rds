@@ -1,12 +1,13 @@
 <?php
 namespace Jira;
 
-class AsyncRpc extends \CComponent {
+class AsyncRpc extends \yii\base\Object
+{
     /** @var \ServiceBase_IDebugLogger */
     private $debugLogger;
 
     public function __construct(\ServiceBase_IDebugLogger $debugLogger) {
-        $this->debugLogger = \Yii::app()->debugLogger;
+        $this->debugLogger = \Yii::$app->debugLogger;
     }
 
     public function __call($method, $args)

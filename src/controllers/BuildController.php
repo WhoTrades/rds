@@ -123,7 +123,7 @@ class BuildController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Build::model()->findByPk($id);
+		$model=Build::findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -138,7 +138,7 @@ class BuildController extends Controller
 		if(isset($_POST['ajax']) && $_POST['ajax']==='build-form')
 		{
 			echo CActiveForm::validate($model);
-			Yii::app()->end();
+			\Yii::$app->end();
 		}
 	}
 

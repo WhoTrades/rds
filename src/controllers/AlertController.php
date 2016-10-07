@@ -1,6 +1,10 @@
 <?php
+namespace app\controllers;
 
-class AlertController extends Controller
+use app\models\RdsDbConfig;
+use app\models\AlertLog;
+
+class AlertController extends \Controller
 {
     const TIMEZONE = "Europe/Moscow";
 
@@ -14,22 +18,25 @@ class AlertController extends Controller
     const ALERT_LIST_TYPE_ERRORS = 'errors';
     const ALERT_LIST_TYPE_IGNORES = 'ignores';
 
+    /**
+     * @throws \Exception
+     */
     public function actionIndex()
     {
         if (!empty($_POST['disable'])) {
-            $conf = \RdsDbConfig::get();
+            $conf = RdsDbConfig::get();
             foreach ($_POST['disable'] as $key => $timeout) {
-                $conf->{$key."_timeout"} = date("Y-m-d H:i:s", strtotime($timeout));
+                $conf->{$key . "_timeout"} = date("Y-m-d H:i:s", strtotime($timeout));
             }
             $conf->save();
             $this->redirect("/alert/");
         }
 
         if (!empty($_POST['ignore'])) {
-            foreach($_POST['ignore'] as $id => $time) {
-                $alertLog = AlertLog::model()->findByPk($id);
+            foreach ($_POST['ignore'] as $id => $time) {
+                $alertLog = AlertLog::findByPk($id);
 
-                if($alertLog) {
+                if ($alertLog) {
                     $alertLog->alert_ignore_timeout = date(DATE_ISO8601, strtotime($time));
                     $alertLog->save();
                 }
@@ -76,10 +83,10 @@ class AlertController extends Controller
 
     public static function canBeLampLightedByTimeRanges()
     {
-        //an: Лампа всегда выключена до 10 утра МСК и после 20:00 МСК
+        // an: Лампа всегда выключена до 10 утра МСК и после 20:00 МСК
         $prev = date_default_timezone_get();
         date_default_timezone_set(self::TIMEZONE);
-        $hourAtMoscow = (int)date("H");
+        $hourAtMoscow = (int) date("H");
         date_default_timezone_set($prev);
 
         return $hourAtMoscow >= self::ALERT_START_HOUR && $hourAtMoscow < self::ALERT_END_HOUR;
@@ -101,7 +108,7 @@ class AlertController extends Controller
         $errors = $this->getLampErrors($lampName);
 
         foreach ($errors as $error) {
-            $result = $result || (strtotime($error->alert_detect_at) < strtotime('now -'.self::ALERT_TIMEOUT));
+            $result = $result || (strtotime($error->alert_detect_at) < strtotime('now -' . self::ALERT_TIMEOUT));
         }
 
         return $result;
@@ -116,14 +123,12 @@ class AlertController extends Controller
      */
     private function getLampErrors($lampName)
     {
-        $c = new CDbCriteria();
-        $c->compare('alert_lamp', $lampName);
-        $c->compare('alert_status', AlertLog::STATUS_ERROR);
-        $c->compare('alert_ignore_timeout', '<'.date(DATE_ISO8601));
-
-        $c->order = 'alert_detect_at DESC';
-
-        $alertLog = AlertLog::model()->findAll($c);
+        $alertLog = AlertLog::find()->where([
+            'alert_lamp' => $lampName,
+            'alert_status' => AlertLog::STATUS_ERROR,
+        ])->andWhere([
+            '<', 'alert_ignore_timeout', date(DATE_ISO8601),
+        ])->orderBy('alert_detect_at DESC')->all();
 
         return $alertLog;
     }
@@ -137,13 +142,11 @@ class AlertController extends Controller
      */
     private function getLampIgnores($lampName)
     {
-        $c = new CDbCriteria();
-        $c->compare('alert_lamp', $lampName);
-        $c->compare('alert_ignore_timeout', '>'.date(DATE_ISO8601));
-
-        $c->order = 'alert_ignore_timeout ASC';
-
-        $alertLog = AlertLog::model()->findAll($c);
+        $alertLog = AlertLog::find()->where([
+            'alert_lamp' => $lampName,
+        ])->andWhere([
+            '>', 'alert_ignore_timeout', date(DATE_ISO8601),
+        ])->orderBy('alert_ignore_timeout ASC')->all();
 
         return $alertLog;
     }
@@ -157,7 +160,7 @@ class AlertController extends Controller
      */
     private function getLampTimeout($lampName)
     {
-        return \RdsDbConfig::get()->{$lampName . "_timeout"};
+        return RdsDbConfig::get()->{$lampName . "_timeout"};
     }
 
     /**

@@ -43,9 +43,9 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
     public function actionProcessHardMigrationLogChunk(Message\HardMigrationLogChunk $message, MessagingRdsMs $model)
     {
         $t = microtime(true);
-        $sql = "UPDATE ".HardMigration::model()->tableName()." SET migration_log=COALESCE(migration_log, '')||:log WHERE migration_name=:name and migration_environment=:env";
+        $sql = "UPDATE ".HardMigration::tableName()." SET migration_log=COALESCE(migration_log, '')||:log WHERE migration_name=:name and migration_environment=:env";
 
-        HardMigration::model()->getDbConnection()->createCommand($sql)->execute([
+        HardMigration::getDbConnection()->createCommand($sql)->execute([
             'log' => $message->text,
             'name' => $message->migration,
             'env' => $model->getEnv(),
@@ -56,7 +56,7 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
 
         //an: Максимальный размер пакета, который умещается в comet - 8KB. Потому и нам нужно разбивать
         foreach (str_split($message->text, self::MAX_TEXT_SIZE) as $chunk) {
-            Yii::app()->webSockets->send("migrationLogChunk_$id", ['text' => $chunk]);
+            Yii::$app->webSockets->send("migrationLogChunk_$id", ['text' => $chunk]);
         }
 
         $message->accepted();
