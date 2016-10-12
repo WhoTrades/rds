@@ -39,29 +39,22 @@ class ToolJob extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, project_obj_id, key, command, version', 'required'),
-            array('obj_status_did', 'number', 'integerOnly'=>true),
-            array('key', 'length', 'max'=>12),
-            array('group', 'length', 'max'=>250),
-            array('package', 'length', 'max'=>64),
-            array('command', 'length', 'max'=>1000),
-            array('version', 'length', 'max'=>16),
-            // The following rule is used by search().
-            // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, project_obj_id, key, group, command, version', 'safe', 'on'=>'search'),
+            array(['obj_created', 'obj_modified', 'project_obj_id', 'key', 'command', 'version'], 'required'),
+            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['key'],     'string', 'max' => 12),
+            array(['group'],   'string', 'max' => 250),
+            array(['package'], 'string', 'max' => 64),
+            array(['command'], 'string', 'max' => 1000),
+            array(['version'], 'string', 'max' => 16),
         );
     }
 
     /**
-     * @return array relational rules.
+     * @return Project
      */
-    public function relations()
+    public function getProject()
     {
-        // NOTE: you may need to adjust the relation name and the related
-        // class name for the relations automatically generated below.
-        return array(
-            'project' => array(self::BELONGS_TO, 'Project', 'project_obj_id'),
-        );
+        return $this->hasOne(Project::className(), ['obj_id' => 'rr_project_obj_id'])->one();
     }
 
     /**
@@ -81,40 +74,6 @@ class ToolJob extends ActiveRecord
             'version' => 'Version',
             'package' => 'Package',
         );
-    }
-
-    /**
-     * Retrieves a list of models based on the current search/filter conditions.
-     *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
-     */
-    public function search()
-    {
-        // @todo Please modify the following code to remove attributes that should not be searched.
-
-        $criteria=new CDbCriteria;
-
-        $criteria->compare('obj_id',$this->obj_id,true);
-        $criteria->compare('obj_created',$this->obj_created,true);
-        $criteria->compare('obj_modified',$this->obj_modified,true);
-        $criteria->compare('obj_status_did',$this->obj_status_did);
-        $criteria->compare('project_obj_id',$this->project_obj_id,true);
-        $criteria->compare('key',$this->key,true);
-        $criteria->compare('group',$this->group,true);
-        $criteria->compare('command',$this->command,true);
-        $criteria->compare('version',$this->version,true);
-        $criteria->compare('package',$this->package,true);
-
-        return new CActiveDataProvider($this, array(
-            'criteria'=>$criteria,
-        ));
     }
 
     /**
@@ -139,6 +98,10 @@ class ToolJob extends ActiveRecord
         return null;
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function getLoggerTag()
     {
         if (!preg_match('~local2.info -t (\S*)~', $this->command, $ans)) {
@@ -148,11 +111,27 @@ class ToolJob extends ActiveRecord
         return $ans[1];
     }
 
+    /**
+     * @param bool $directImageUrl
+     * @param int  $width
+     * @param int  $height
+     * @param bool $graphOnly
+     *
+     * @return string
+     */
     public function getSmallCpuUsageGraphSrc($directImageUrl = true, $width = 100, $height = 60, $graphOnly = true)
     {
         return $this->getGraphiteCpuStatsUrl('timeCpu', $directImageUrl, $width, $height, $graphOnly);
     }
 
+    /**
+     * @param bool $directImageUrl
+     * @param int  $width
+     * @param int  $height
+     * @param bool $graphOnly
+     *
+     * @return string
+     */
     public function getSmallTimeRealGraphSrc($directImageUrl = true, $width = 100, $height = 60, $graphOnly = true)
     {
         return $this->getGraphiteCpuStatsUrl('timeReal', $directImageUrl, $width, $height, $graphOnly);
@@ -163,32 +142,24 @@ class ToolJob extends ActiveRecord
         $baseUrl = \Yii::$app->graphite->GUIUrl;
         $env = \Yii::$app->graphite->env;
         $direct = $directImageUrl ? "render/" : "";
-        $loggerTag = strtoupper($this->getLoggerTag())."-".strtoupper($this->key);
+        $loggerTag = strtoupper($this->getLoggerTag()) . "-" . strtoupper($this->key);
         $params = [
             'width'     => $width,
             'height'    => $height,
             'from'      => '-24hours',
-            'target'    => "sumSeries(stats.gauges.rds.$env.system.".strtoupper($this->getProjectName()).".tool.".$loggerTag.".$type)",
+            'target'    => "sumSeries(stats.gauges.rds.$env.system." . strtoupper($this->getProjectName()) . ".tool." . $loggerTag . ".$type)",
             'graphOnly' => json_encode($graphOnly),
             'yMin'      => 0,
         ];
 
-        return "{$baseUrl}{$direct}?".http_build_query($params);
-    }
-
-    public function getProjectName()
-    {
-        return preg_replace('~-[\d.]+$~', '', $this->package);
+        return "{$baseUrl}{$direct}?" . http_build_query($params);
     }
 
     /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     * @param string $className active record class name.
-     * @return ToolJob the static model class
+     * @return string
      */
-    public static function model($className=__CLASS__)
+    public function getProjectName()
     {
-        return parent::model($className);
+        return preg_replace('~-[\d.]+$~', '', $this->package);
     }
 }

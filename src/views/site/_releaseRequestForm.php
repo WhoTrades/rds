@@ -55,7 +55,7 @@
 
 </div><!-- form -->
 
-<script>
+<script type="text/javascript">
     updateStashUri = function(){
         var projectName = $('#ReleaseRequest_rr_project_obj_id option:selected').html();
         if (!projectName) return;
@@ -82,6 +82,6 @@
                 $('#diff-preview').html(<?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_STOP))?>).attr('a', '#');
             }
         });
-    }
-    updateStashUri();
+    };
+    document.onload.push(updateStashUri);
 </script>

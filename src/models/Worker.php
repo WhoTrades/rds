@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "rds.worker".
@@ -34,8 +35,8 @@ class Worker extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, worker_name', 'required'),
-            array('obj_status_did', 'number', 'integerOnly' => true),
+            array(['obj_created, obj_modified, worker_name'], 'required'),
+            array(['obj_status_did'], 'number', 'integerOnly' => true),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array('obj_id, obj_created, obj_modified, obj_status_did, worker_name', 'safe', 'on' => 'search'),
@@ -43,15 +44,11 @@ class Worker extends ActiveRecord
     }
 
     /**
-     * @return array relational rules.
+     * @return Project2Worker[]
      */
-    public function relations()
+    public function getProject2workers()
     {
-        // NOTE: you may need to adjust the relation name and the related
-        // class name for the relations automatically generated below.
-        return array(
-            'project2workers' => array(self::HAS_MANY, 'Project2worker', 'worker_obj_id'),
-        );
+        return $this->hasMany(Project2worker::class, ['project_obj_id' => 'obj_id'])->all();
     }
 
     /**
@@ -69,34 +66,28 @@ class Worker extends ActiveRecord
     }
 
     /**
-     * Retrieves a list of models based on the current search/filter conditions.
+     * @param array $params
      *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
+     * @return ActiveDataProvider
      */
-    public function search()
+    public function search($params)
     {
-        // @todo Please modify the following code to remove attributes that should not be searched.
+        $query = self::find();
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+        $this->load($params);
 
-        $criteria = new CDbCriteria();
+        if (!$this->validate()) {
+            return $dataProvider;
+        }
 
-        $criteria->compare('obj_id', $this->obj_id);
-        $criteria->compare('obj_created', $this->obj_created);
-        $criteria->compare('obj_modified', $this->obj_modified);
-        $criteria->compare('obj_status_did', $this->obj_status_did);
-        $criteria->compare('worker_name', $this->worker_name, true);
-
-        return new CActiveDataProvider($this, array(
-            'criteria' => $criteria,
-        ));
+        return $dataProvider;
     }
 
+    /**
+     * @return array
+     */
     public function forList()
     {
         $list = array('' => " - Worker - ");
@@ -105,16 +96,5 @@ class Worker extends ActiveRecord
         }
 
         return $list;
-    }
-
-    /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     * @param string $className active record class name.
-     * @return Worker the static model class
-     */
-    public static function model($className = __CLASS__)
-    {
-        return parent::model($className);
     }
 }

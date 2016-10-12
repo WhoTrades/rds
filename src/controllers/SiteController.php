@@ -33,16 +33,19 @@ class SiteController extends \Controller
      */
     public function actionIndex()
     {
-        $releaseRequestSearchModel = new ReleaseRequest();
+        $releaseRequestSearchModel = new ReleaseRequest('search');
+        $releaseRequestSearchModel->obj_created = null;
+        $releaseRequestSearchModel->obj_modified = null;
         if (isset($_GET['ReleaseRequest'])) {
             $releaseRequestSearchModel->attributes = $_GET['ReleaseRequest'];
         }
 
-        $releaseRejectSearchModel = new ReleaseReject();
-        if (isset($_GET['ReleaseRequest'])) {
-            $releaseRejectSearchModel->attributes = $_GET['ReleaseRequest'];
+        $releaseRejectSearchModel = new ReleaseReject('search');
+        $releaseRejectSearchModel->obj_created = null;
+        $releaseRejectSearchModel->obj_modified = null;
+        if (isset($_GET['ReleaseReject'])) {
+            $releaseRejectSearchModel->attributes = $_GET['ReleaseReject'];
         }
-
 
         $sql = "SELECT rr_project_obj_id, COUNT(*)
                 FROM rds.release_request
@@ -84,7 +87,6 @@ class SiteController extends \Controller
                 if ($model->rr_project_obj_id) {
                     $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
                 }
-                $this->performAjaxValidation($model);
                 if ($model->save()) {
                     // an: Для comon мы выкладываем паралельно и dictionary. В данный момент это реализовано на уровне хардкода тут. В будущем, когда появится больше
                     // взаимосвязанныъ проектов - нужно подумать как это объединить в целостную систему
@@ -262,20 +264,6 @@ class SiteController extends \Controller
     }
 
     /**
-     * Страница отображения ошибки
-     */
-    public function actionError()
-    {
-        if ($error = \Yii::$app->errorHandler->error) {
-            if (\Yii::$app->request->isAjaxRequest) {
-                echo $error['message'];
-            } else {
-                echo $this->render('error', $error);
-            }
-        }
-    }
-
-    /**
      * Форма авторизации
      */
     public function actionLogin()
@@ -296,6 +284,7 @@ class SiteController extends \Controller
             'userRights' => array('admin'),
         ));
 
+        \Yii::$app->session->set('currentUser', $identity);
         \Yii::$app->user->login($identity, 3600*24*30);
 
         $this->redirect('/');
@@ -333,14 +322,6 @@ class SiteController extends \Controller
             echo $this->renderPartial('commits', ['commits' => $commits]);
         } else {
             echo $this->render('commits', ['commits' => $commits]);
-        }
-    }
-    protected function performAjaxValidation($model)
-    {
-        return true;
-        if (isset($_POST['ajax']) && $_POST['ajax'] == 'release-request-form') {
-            echo \yii\widgets\ActiveForm::validate($model);
-            \Yii::$app->end();
         }
     }
 }

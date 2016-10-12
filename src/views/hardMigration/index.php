@@ -21,24 +21,21 @@ $this->breadcrumbs=['Hard Migrations'];
 <script type="text/javascript">
     //an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
     // А такое случается часто, когда мы заказываем сборку
-    $(document).ready(function(){
+    document.onload.push(function(){
         setTimeout(function(){
             $.fn.yiiGridView.update("hard-migration-grid");
         }, 1);
-    });
-</script>
-
-<script>
-    webSocketSubscribe('hardMigrationChanged', function(event){
-        console.log('Hard migration '+event.rr_id+' updated');
-        var html = event.html;
-        var trHtmlCode = $(html).find('tr.rowItem').first().html()
-        $('.hard-migration-'+event.rr_id).html(trHtmlCode);
-    });
-    webSocketSubscribe('migrationProgressbarChanged', function(event){
-        $('.progress-'+event.migration+' .progress-bar').css({width: event.percent+'%'});
-        var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
-        $('.progress-'+event.migration+' .progress-bar').html(html);
-        $('.progress-action-'+event.migration).html(event.key);
+        webSocketSubscribe('hardMigrationChanged', function(event){
+            console.log('Hard migration '+event.rr_id+' updated');
+            var html = event.html;
+            var trHtmlCode = $(html).find('tr.rowItem').first().html()
+            $('.hard-migration-'+event.rr_id).html(trHtmlCode);
+        });
+        webSocketSubscribe('migrationProgressbarChanged', function(event){
+            $('.progress-'+event.migration+' .progress-bar').css({width: event.percent+'%'});
+            var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
+            $('.progress-'+event.migration+' .progress-bar').html(html);
+            $('.progress-action-'+event.migration).html(event.key);
+        });
     });
 </script>

@@ -8,8 +8,8 @@ use yii\bootstrap\Nav;
 /** @var $content string */
 AppAsset::register($this);
 $this->beginPage();
+Yii::$app->webSockets->registerScripts($this);
 ?>
-
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -20,6 +20,7 @@ $this->beginPage();
     <?= Html::csrfMetaTags() ?>
     <?php $this->head() ?>
     <script>
+        document.onload = [];
         function webSocketSubscribe(channel, callback)
         {
             webSocketSession.subscribe(channel, function (topic, event) {
@@ -110,18 +111,27 @@ NavBar::end();
     <?php echo $content; ?>
     <div class="clear"></div>
 </div><!-- page -->
-<script>
-    $('body').on('click', '.ajax-url', function(e){
-        var that = this;
-        var html = this.innerHTML;
-        that.innerHTML = <?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH))?>;
-        $.ajax({url: this.href}).done(function(){
-            that.innerHTML = html;
-        });
-        e.preventDefault();
-    });
-</script>
 <?php $this->endBody() ?>
+<script>
+    document.onload.push(function() {
+        $('body').on('click', '.ajax-url', function (e) {
+            var that = this;
+            var html = this.innerHTML;
+            that.innerHTML = <?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH))?>;
+            $.ajax({url: this.href}).done(function () {
+                that.innerHTML = html;
+            });
+            e.preventDefault();
+        });
+    });
+
+    for (var i in document.onload) {
+        if (!document.onload.hasOwnProperty(i)) {
+            continue;
+        }
+        document.onload[i]();
+    }
+</script>
 </body>
 </html>
 <?php $this->endPage() ?>

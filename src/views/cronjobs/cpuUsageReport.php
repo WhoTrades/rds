@@ -41,7 +41,7 @@
 </div>
 
 <script>
-    $().ready(function() {
+    document.onload.push(function() {
         webSocketSubscribe('updateToolJobPerformanceStats', function (event) {
             var obj = $('.cpu-usage.__key-' + event.key + '.__project-' + event.project);
             obj.html(event.cpuTime.toFixed(2) + ' сек');

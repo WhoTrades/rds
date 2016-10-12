@@ -48,7 +48,7 @@ class Project extends ActiveRecord
             ['obj_created, obj_modified, project_name', 'required'],
             ['obj_status_did', 'number', 'integerOnly' => true],
             ['project_notification_email', 'email'], ['project_config', 'safe'],
-            
+
             ['project_notification_email, project_notification_subject', 'length', 'max' => 64],
             ['obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version, project_current_version', 'safe', 'on' => 'search'],
         ];
@@ -102,16 +102,35 @@ class Project extends ActiveRecord
     }
 
     /**
-     * @return array relational rules.
+     * @return ReleaseRequest[]
      */
-    public function relations()
+    public function getReleaseRequests()
     {
-        return [
-            'releaseRequests' => [self::HAS_MANY, 'ReleaseRequest', 'rr_project_obj_id'],
-            'releaseRejects'  => [self::HAS_MANY, 'ReleaseReject',  'rr_project_obj_id'],
-            'project2workers' => [self::HAS_MANY, 'Project2worker', 'project_obj_id'],
-            'projectConfigs'  => [self::HAS_MANY, 'ProjectConfig',  'pc_project_obj_id'],
-        ];
+        return $this->hasMany(ReleaseRequest::class, ['rr_project_obj_id' => 'obj_id'])->all();
+    }
+
+    /**
+     * @return ReleaseReject[]
+     */
+    public function getReleaseRejects()
+    {
+        return $this->hasMany(ReleaseRequest::class, ['rr_project_obj_id' => 'obj_id'])->all();
+    }
+
+    /**
+     * @return Project2Worker[]
+     */
+    public function getProject2workers()
+    {
+        return $this->hasMany(Project2worker::class, ['project_obj_id' => 'obj_id'])->all();
+    }
+
+    /**
+     * @return ProjectConfig[]
+     */
+    public function getProjectConfigs()
+    {
+        return $this->hasMany(ProjectConfig::class, ['pc_project_obj_id' => 'obj_id'])->all();
     }
 
     /**
@@ -128,39 +147,6 @@ class Project extends ActiveRecord
             'project_notification_email' => 'Email оповещеиня о выкладке',
             'project_notification_subject' => 'Тема оповещения о выкладке',
         ];
-    }
-
-    /**
-     * Retrieves a list of models based on the current search/filter conditions.
-     *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
-     */
-    public function search()
-    {
-        // @todo Please modify the following code to remove attributes that should not be searched.
-
-        $criteria = new CDbCriteria();
-
-        $criteria->compare('obj_id', $this->obj_id);
-        $criteria->compare('obj_created', $this->obj_created, true);
-        $criteria->compare('obj_modified', $this->obj_modified, true);
-        $criteria->compare('obj_status_did', $this->obj_status_did);
-        $criteria->compare('project_name', $this->project_name, true);
-        $criteria->compare('project_current_version', $this->project_current_version, true);
-
-        return new CActiveDataProvider($this, [
-            'criteria' => $criteria,
-            'pagination' => [
-                'pageSize' => 100,
-            ],
-        ]);
     }
 
     /**
@@ -185,7 +171,6 @@ class Project extends ActiveRecord
 
     /**
      * @param string $version
-     * @throws Exception
      */
     public function updateCurrentVersion($version)
     {

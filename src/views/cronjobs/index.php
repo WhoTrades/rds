@@ -83,7 +83,7 @@ $this->title = "Фоновые процессы";
 </div>
 
 <script type="text/javascript">
-    $().ready(function(){
+    document.onload.push(function(){
         $(document).on('click', '.__get-process-info, .__kill-process', function(e){
 
             if ($(this).hasClass('__kill-process') && !confirm("Вы уверены что хотите завершить процессы?")) {
@@ -183,23 +183,22 @@ $this->title = "Фоновые процессы";
             var obj = $(str);
             obj.html($(event.html).html());
         });
-    });
 
-
-    if (document.location.toString().indexOf('#') != -1) {
-        var id = a = document.location.toString().replace(/.*#(.*)/, '$1');
-        $('#' + id).addClass('selected');
-    }
-
-    $('.active-link').click(function(){
-        console.log(this);
-        if ($(this).parents('tr:first').hasClass('selected')) {
-            $(this).parents('tr:first').removeClass('selected');
-        } else {
-            $('.active-tr').removeClass('selected');
-            $(this).parents('tr:first').addClass('selected');
+        if (document.location.toString().indexOf('#') != -1) {
+            var id = a = document.location.toString().replace(/.*#(.*)/, '$1');
+            $('#' + id).addClass('selected');
         }
-        document.location = document.location.toString().replace(/.*#(.*)/, '') + '#' + $(this).parents('tr:first').attr('id');
+
+        $('.active-link').click(function(){
+            console.log(this);
+            if ($(this).parents('tr:first').hasClass('selected')) {
+                $(this).parents('tr:first').removeClass('selected');
+            } else {
+                $('.active-tr').removeClass('selected');
+                $(this).parents('tr:first').addClass('selected');
+            }
+            document.location = document.location.toString().replace(/.*#(.*)/, '') + '#' + $(this).parents('tr:first').attr('id');
+        });
     });
 </script>
 

@@ -78,9 +78,13 @@ class ReleaseRequest extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_release_version'], 'required'),
+            array(['obj_created', 'obj_modified', 'rr_user', 'rr_status', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_release_version'], 'required'),
             array(['obj_status_did', 'rr_project_obj_id'], 'number', 'integerOnly' => true),
-            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_status'], 'safe', 'on' => 'search'),
+            array(
+                ['obj_id', 'obj_created', 'obj_status_did', 'rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_status'],
+                'safe',
+                'on' => 'search',
+            ),
             array(['rr_project_owner_code', 'rr_release_engineer_code'], 'safe', 'on' => 'use'),
             array(['rr_release_version'], 'checkForReleaseReject'),
         );
@@ -134,47 +138,17 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * Retrieves a list of models based on the current search/filter conditions.
+     * @param array $params
      *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
+     * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search(array $params)
     {
-        $query = self::find();
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-        $this->load($params);
-
-        if (!$this->validate()) {
-            return $dataProvider;
-        }
+        $query = self::find()->where(array_filter($params));
+        $dataProvider = new ActiveDataProvider(['query' => $query]);
+        $this->load($params, 'search');
 
         return $dataProvider;
-
-        $criteria = new CDbCriteria();
-        $criteria->compare('t.obj_id', $this->obj_id);
-        $criteria->compare('t.obj_created', $this->obj_created);
-        $criteria->compare('t.obj_modified', $this->obj_modified);
-        $criteria->compare('t.obj_status_did', $this->obj_status_did);
-        $criteria->compare('t.rr_user', $this->rr_user, true);
-        $criteria->compare('t.rr_status', $this->rr_status);
-        $criteria->compare('t.rr_comment', $this->rr_comment, true);
-        $criteria->compare('t.rr_project_obj_id', $this->rr_project_obj_id);
-        $criteria->compare('t.rr_build_version', $this->rr_build_version, true);
-        $criteria->order = 't.obj_created desc';
-        $criteria->with = array('builds', 'builds.worker', 'builds.project', 'hardMigrations');
-
-        return new ReleaseRequestSearchDataProvider($this, array(
-            'criteria' => $criteria,
-        ));
     }
 
     /**

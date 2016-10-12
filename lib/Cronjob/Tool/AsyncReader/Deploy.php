@@ -1,6 +1,17 @@
 <?php
 use RdsSystem\Message;
-use \RdsSystem\Model\Rabbit\MessagingRdsMs;
+use RdsSystem\Model\Rabbit\MessagingRdsMs;
+use app\models\Build;
+use app\models\ReleaseRequest;
+use app\models\JiraCreateVersion;
+use app\models\Project;
+use app\models\JiraCommit;
+use app\models\HardMigration;
+use app\models\ToolJob;
+use app\models\Worker;
+use app\models\Project2worker;
+use app\models\JiraUse;
+use app\models\JiraNotificationQueue;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=AsyncReader_Deploy -vv
@@ -125,7 +136,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             case Build::STATUS_INSTALLED:
                 if ($build->releaseRequest && $build->releaseRequest->countNotFinishedBuilds() == 0) {
                     $builds = $build->releaseRequest->builds;
-                    $build->releaseRequest->rr_status = \ReleaseRequest::STATUS_INSTALLED;
+                    $build->releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLED;
                     $build->releaseRequest->rr_built_time = date("r");
                     $build->releaseRequest->save();
                     $title = "Success installed $project->project_name v.$version";
@@ -188,12 +199,12 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                         'with' => array('project', 'project.project2workers', 'builds'),
                 ));
                 $c->compare('project2workers.worker_obj_id', $build->build_worker_obj_id);
-                $c->compare('rr_status', array(\ReleaseRequest::STATUS_CANCELLING));
+                $c->compare('rr_status', array(ReleaseRequest::STATUS_CANCELLING));
                 $c->compare('build_status', Build::getInstallingStatuses());
-                $task = \ReleaseRequest::find($c);
+                $task = ReleaseRequest::findOne($c);
                 if (!$task && $build->releaseRequest) {
                     $releaseRequest = $build->releaseRequest;
-                    $releaseRequest->rr_status = \ReleaseRequest::STATUS_CANCELLED;
+                    $releaseRequest->rr_status = ReleaseRequest::STATUS_CANCELLED;
                     $releaseRequest->save();
                 }
 
@@ -227,7 +238,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
-        $releaseRequest = \ReleaseRequest::findByAttributes([
+        $releaseRequest = ReleaseRequest::findByAttributes([
             'rr_project_obj_id' => $Project->obj_id,
             'rr_build_version' => $message->version,
         ]);
@@ -350,7 +361,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public function actionSetCronConfig(Message\ReleaseRequestCronConfig $message, MessagingRdsMs $model)
     {
-        $transaction = Build::dbConnection->beginTransaction();
+        $transaction = Build::getDbConnection()->beginTransaction();
         try {
             /** @var $build Build */
             $build = Build::findByPk($message->taskId);
@@ -407,7 +418,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public function actionSetUseError(Message\ReleaseRequestUseError $message, MessagingRdsMs $model)
     {
-        $releaseRequest = \ReleaseRequest::findByPk($message->releaseRequestId);
+        $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
         if (!$releaseRequest) {
             $this->debugLogger->error("Release Request #$message->releaseRequestId not found");
             $message->accepted();
@@ -415,7 +426,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
         $releaseRequest->rr_use_text = $message->text;
-        $releaseRequest->rr_status = \ReleaseRequest::STATUS_FAILED;
+        $releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
         $releaseRequest->save();
 
         self::sendReleaseRequestUpdated($releaseRequest->obj_id);
@@ -431,7 +442,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public function actionSetOldVersion(Message\ReleaseRequestOldVersion $message, MessagingRdsMs $model)
     {
-        $releaseRequest = \ReleaseRequest::findByPk($message->releaseRequestId);
+        $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
 
         if (!$releaseRequest) {
             $this->debugLogger->error("Release Request #$message->releaseRequestId not found");
@@ -468,7 +479,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         }
 
         /** @var $project Project */
-        $project = \Project::findByAttributes(array('project_name' => $message->project));
+        $project = Project::findByAttributes(array('project_name' => $message->project));
         if (!$project) {
             $this->debugLogger->error("Project $message->project not found");
             $message->accepted();
@@ -476,15 +487,15 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
-        $transaction = $project->dbConnection->beginTransaction();
+        $transaction = $project->getDbConnection()->beginTransaction();
 
         /** @var $releaseRequest ReleaseRequest */
-        $releaseRequest = \ReleaseRequest::findByAttributes(array(
+        $releaseRequest = ReleaseRequest::findByAttributes(array(
             'rr_build_version' => $message->version,
             'rr_project_obj_id' => $project->obj_id,
         ));
 
-        $builds = \Build::findAllByAttributes(array(
+        $builds = Build::findAllByAttributes(array(
             'build_project_obj_id' => $project->obj_id,
             'build_worker_obj_id' => $worker->obj_id,
             'build_status' => Build::STATUS_USED,
@@ -497,7 +508,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         }
 
         if ($releaseRequest) {
-            $build = \Build::findByAttributes(array(
+            $build = Build::findByAttributes(array(
                 'build_project_obj_id' => $project->obj_id,
                 'build_worker_obj_id' => $worker->obj_id,
                 'build_release_request_obj_id' => $releaseRequest->obj_id,
@@ -515,7 +526,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $p2w->p2w_current_version = $message->version;
             $p2w->save();
         }
-        $list = \Project2worker::findAllByAttributes(array(
+        $list = Project2worker::findAllByAttributes(array(
             'project_obj_id' => $project->obj_id,
         ));
         $ok = true;
@@ -532,13 +543,13 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $project->project_current_version = $message->version;
             $project->save(false);
 
-            $oldUsed = \ReleaseRequest::findByAttributes(array(
+            $oldUsed = ReleaseRequest::findByAttributes(array(
                 'rr_status' => ReleaseRequest::STATUS_USED,
                 'rr_project_obj_id' => $project->obj_id,
             ));
 
             if ($oldUsed) {
-                $oldUsed->rr_status = \ReleaseRequest::STATUS_OLD;
+                $oldUsed->rr_status = ReleaseRequest::STATUS_OLD;
                 $oldUsed->rr_last_time_on_prod = date("r");
                 $oldUsed->rr_revert_after_time = null;
                 $oldUsed->save(false);
@@ -662,7 +673,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 continue;
             }
 
-            $releaseRequest = \ReleaseRequest::findByAttributes([
+            $releaseRequest = ReleaseRequest::findByAttributes([
                 'rr_project_obj_id' => $project->obj_id,
                 'rr_build_version' => $build['version'],
             ]);
@@ -681,8 +692,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 $c->compare('rr_project_obj_id', $project->obj_id);
                 $c->compare('rr_build_version', '>' . $build['version']);
                 $c->compare('rr_build_version', '<' . $project->project_current_version);
-                $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
-                $count = \ReleaseRequest::count($c);
+                $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
+                $count = ReleaseRequest::count($c);
 
                 if ($count > 10) {
                     // an: Нужно наличие минимум 10 версий от текущей, что бы было куда откатываться
@@ -693,8 +704,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 $c->compare('rr_project_obj_id', $project->obj_id);
                 $c->compare('rr_build_version', '>' . $build['version']);
                 $c->compare('rr_build_version', '<' . $numbersOfCurrent[0] . ".00.000.000");
-                $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
-                $count = \ReleaseRequest::count($c);
+                $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
+                $count = ReleaseRequest::count($c);
 
                 if ($count > 5) {
                     // an: Нужно наличие минимум 2 версий в текущем релизе, что бы точно могли откатиться

@@ -13,14 +13,16 @@
 </div>
 
 <script type="text/javascript">
-    webSocketSubscribe('migrationLogChunk_<?=str_replace("/", "", $migration->migration_name)?>_<?=$migration->migration_environment?>', function(event){
-        $('#pre').append('<span>' + event.text + '</span>');
-        var span = $('#pre span:last');
-        span.css({fontWeight: 'bold'});
-        setTimeout(function(){
-            span.css({fontWeight: 'normal'});
-        }, 250);
-        $('body').scrollTop($('body').height())
-    });
-    $('body').scrollTop($('body').height());
+    document.onload.push(function(){
+        webSocketSubscribe('migrationLogChunk_<?=str_replace("/", "", $migration->migration_name)?>_<?=$migration->migration_environment?>', function(event){
+            $('#pre').append('<span>' + event.text + '</span>');
+            var span = $('#pre span:last');
+            span.css({fontWeight: 'bold'});
+            setTimeout(function(){
+                span.css({fontWeight: 'normal'});
+            }, 250);
+            $('body').scrollTop($('body').height())
+        });
+        $('body').scrollTop($('body').height());
+    })
 </script>

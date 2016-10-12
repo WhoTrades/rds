@@ -69,15 +69,8 @@ class ReleaseReject extends ActiveRecord
      */
     public function search($params)
     {
-        $query = self::find();
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-        $this->load($params);
-
-        if (!$this->validate()) {
-            return $dataProvider;
-        }
+        $dataProvider = new ActiveDataProvider(['query' => self::find()]);
+        $this->load($params, 'search');
 
         return $dataProvider;
     }

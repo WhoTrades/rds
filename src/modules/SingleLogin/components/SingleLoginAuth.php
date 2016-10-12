@@ -74,6 +74,8 @@ final class SingleLoginAuth extends \yii\base\Object
             'userRights' => $result['userRights'],
         ));
 
+        \Yii::$app->session->set('currentUser', $user);
+
         return $user;
     }
 

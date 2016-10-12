@@ -86,7 +86,7 @@
 </table>
 
 <script>
-    $(document).ready(function(){
+    document.onload.push(function(){
         $('img.status-on').each(function(k, v){
             var max = 5;
             var min = 1;

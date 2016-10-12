@@ -58,22 +58,24 @@ $this->menu=array(
 )); ?>
 
 <script type="text/javascript">
-    webSocketSubscribe('maintenanceToolProgressbarChanged', function(event){
-        console.log(event);
-        $('.progress-'+event.id+' .bar').css({width: event.percent+'%'});
-        var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
-        $('.progress-'+event.id+' .bar').html(html);
-        $('.progress-action-'+event.id).html(event.key);
-    });
+    document.onload.push(function(){
+        webSocketSubscribe('maintenanceToolProgressbarChanged', function(event){
+            console.log(event);
+            $('.progress-'+event.id+' .bar').css({width: event.percent+'%'});
+            var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
+            $('.progress-'+event.id+' .bar').html(html);
+            $('.progress-action-'+event.id).html(event.key);
+        });
 
-    webSocketSubscribe('maintenance_tool_log_<?=$model->obj_id?>', function(event){
-        $('.pre').append('<span>' + event.text + '</span>');
-        var span = $('.pre span:last');
-        span.css({fontWeight: 'bold'});
-        setTimeout(function(){
-            span.css({fontWeight: 'normal'});
-        }, 250);
-        $('body').scrollTop($('body').height())
-    });
-    $('body').scrollTop($('body').height());
+        webSocketSubscribe('maintenance_tool_log_<?=$model->obj_id?>', function(event){
+            $('.pre').append('<span>' + event.text + '</span>');
+            var span = $('.pre span:last');
+            span.css({fontWeight: 'bold'});
+            setTimeout(function(){
+                span.css({fontWeight: 'normal'});
+            }, 250);
+            $('body').scrollTop($('body').height())
+        });
+        $('body').scrollTop($('body').height());
+    })
 </script>

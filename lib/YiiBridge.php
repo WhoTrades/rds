@@ -12,11 +12,10 @@ class YiiBridge
         defined('YII_DEBUG') or define('YII_DEBUG', true);
         defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 
-        \Yii::$enableIncludePath = false;
-
         require_once(__DIR__ . '/../protected/components/ExternalApplication.php');
-        $application = \Yii::createApplication('ExternalApplication', $config);
+        $application = new \ExternalApplication(require($config));
         $application->debugLogger = $debugLogger;
-        Yii::import("application.controllers.*");
+
+        $application->run();
     }
 }

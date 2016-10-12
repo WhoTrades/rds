@@ -6,7 +6,6 @@
 use app\models\ReleaseRequest;
 use app\models\Project;
 use app\models\Build;
-use app\models\ReleaseRequestSearchDataProvider;
 use yii\helpers\Html;
 
 return array(
@@ -14,12 +13,13 @@ return array(
     'obj_created',
     'rr_user',
     [
-        'label' => 'rr_comment',
+        'attribute' => 'rr_comment',
         'value' => function (ReleaseRequest $releaseRequest) {
             $result = strip_tags($releaseRequest->rr_comment) . "<br />";
 
             if ($releaseRequest->isInstalledStatus()) {
-                $result .= "<a href='" . yii\helpers\Url::to('/Wtflow/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id]) . "' target='_blank'>Тикеты</a><br />";
+                $result .= "<a href='" . yii\helpers\Url::to('/Wtflow/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id]) .
+                    "' target='_blank'>Тикеты</a><br />";
             }
             $result .= "<a href='/site/commits/$releaseRequest->obj_id' onclick=\"popup('test', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>";
 
@@ -89,7 +89,7 @@ return array(
 
             return implode("<br />", $result);
         },
-        'label' => 'rr_status',
+        'attribute' => 'rr_status',
         'filter' => array(
             ReleaseRequest::STATUS_NEW => ReleaseRequest::STATUS_NEW,
             ReleaseRequest::STATUS_FAILED => ReleaseRequest::STATUS_FAILED,
@@ -104,14 +104,14 @@ return array(
         'format' => 'html',
     ),
     array(
-        'label' => 'rr_project_obj_id',
+        'attribute' => 'rr_project_obj_id',
         'value' => function ($r) {
             return $r->builds[0]->project->project_name;
         },
         'filter' => Project::forList(),
     ),
     array(
-        'label' => 'rr_build_version',
+        'attribute' => 'rr_build_version',
         'value' => function (ReleaseRequest $r) {
             if ($r->rr_built_time) {
                 $time = strtotime($r->rr_built_time) - strtotime($r->obj_created);
@@ -202,7 +202,7 @@ return array(
                 }
             }
 
-            return null;
+            return "";
         },
         'format' => 'raw',
     ),

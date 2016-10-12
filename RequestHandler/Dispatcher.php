@@ -41,8 +41,7 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
         require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
         require_once(__DIR__ . '/../protected/components/WebApplication.php');
         try {
-            $application = new \WebApplication(require($config));
-            $application->debugLogger = $debugLogger;
+            $application = new \WebApplication(require($config), $debugLogger);
 
             if (is_dir(__DIR__ . '/../lib/MigrationSystem')) {
                 \Yii::setAlias('@MigrationSystem', __DIR__ . '/../lib/MigrationSystem');
@@ -52,8 +51,6 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
 
             $application->run();
         } catch (\Exception $e) {
-            var_dump($e);
-            var_dump(\Yii::$app->getErrorHandler()); return;
             \Yii::$app->getErrorHandler()->handleException($e);
         }
 

@@ -2,6 +2,7 @@
 namespace app\extensions\WebSockets;
 
 use yii\base\Component;
+use app\components\View;
 
 class WebSockets extends Component
 {
@@ -11,7 +12,7 @@ class WebSockets extends Component
     public $retryDelay = 50;
 
     /**
-     * @var ServiceBase_WebSocketsManager
+     * @var \ServiceBase_WebSocketsManager
      */
     public $webSocketsManager;
 
@@ -26,12 +27,27 @@ class WebSockets extends Component
         );
     }
 
-    public function registerScripts () {
-        $assets = dirname(__FILE__) . '/assets';
-        $baseUrl = \Yii::$app->assetManager->publish($assets);
-        if (is_dir($assets)) {
-            \Yii::$app->clientScript->registerScriptFile($baseUrl . '/autobahn.min.js', CClientScript::POS_HEAD);
-            \Yii::$app->clientScript->registerScript('websocketsServer', <<<here
+    /**
+     * @param View $view
+     */
+    public function registerScripts(View $view)
+    {
+        $view->registerJsFile(__DIR__ . "/assets/autobahn.min.js", $view::POS_BEGIN);
+        $view->registerJs($this->getInlineJs(), $view::POS_BEGIN);
+    }
+
+    /**
+     * @param string $channel
+     * @param array $data
+     */
+    public function send($channel, $data)
+    {
+        $this->webSocketsManager->sendEvent($channel, null, $data);
+    }
+
+    private function getInlineJs()
+    {
+        return <<<here
 var webSocketSession = null;
 webSocketSession = {
     subscribes: [],
@@ -70,15 +86,6 @@ ab.connect(
        'retryDelay': $this->retryDelay
    }
 );
-here
-                , CClientScript::POS_BEGIN);
-        } else {
-            throw new Exception('Realplexor - Error: Couldn\'t find assets to publish.');
-        }
-    }
-
-    public function send($channel, $data)
-    {
-        $this->webSocketsManager->sendEvent($channel, null, $data);
+here;
     }
 }

@@ -34,31 +34,6 @@ class RdsDbConfig extends ActiveRecord
     {
         return self::find()->one();
     }
-    /**
-     * @return array validation rules for model attributes.
-     */
-    public function rules()
-    {
-        // NOTE: you should only define rules for those attributes that
-        // will receive user inputs.
-        return array(
-            array('obj_created, obj_modified', 'required'),
-            array('obj_status_did', 'number', 'integerOnly' => true),
-            array(
-                'red_lamp_wts_timeout, crm_lamp_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, '
-                    . 'preprod_online, is_tst_updating_enabled',
-                'safe',
-            ),
-            // The following rule is used by search().
-            // @todo Please remove those attributes that should not be searched.
-            array(
-                'obj_id, obj_created, obj_modified, crm_lamp_timeout, obj_status_did, is_tst_updating_enabled,'
-                    . ' red_lamp_wts_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, '
-                    . 'cpu_usage_last_truncate', 'safe',
-                'on' => 'search',
-            ),
-        );
-    }
 
     /**
      * @return array customized attribute labels (name=>label)
