@@ -78,7 +78,10 @@ class RebuildBranch
 
         if (!$branches) {
             \Yii::app()->debugLogger->message("No branches, se just create $branch from master branch");
-            $model->sendMergeCreateBranch(new Message\Merge\CreateBranch($branch, "master", true));
+            $model->sendMergeCreateBranch(
+                \Yii::app()->modules['Wtflow']['workerName'],
+                new Message\Merge\CreateBranch($branch, "master", true)
+            );
             return;
         }
 
@@ -92,7 +95,10 @@ class RebuildBranch
 
         \Yii::app()->debugLogger->message("Target branch: $build->branch, sending create branch task");
 
-        $model->sendMergeTask(new Message\Merge\Task(-1, "master", $build->branch, Message\Merge\Task::MERGE_TYPE_FEATURE));
+        $model->sendMergeTask(
+            \Yii::app()->modules['Wtflow']['workerName'],
+            new Message\Merge\Task(-1, "master", $build->branch, Message\Merge\Task::MERGE_TYPE_FEATURE)
+        );
 
         foreach ($branches as $val) {
 
@@ -110,7 +116,10 @@ class RebuildBranch
 
 
             \Yii::app()->debugLogger->message("Branch: $val, sending merge branch task");
-            $model->sendMergeTask(new Message\Merge\Task($build->obj_id, $val, $build->branch, Message\Merge\Task::MERGE_TYPE_BUILD));
+            $model->sendMergeTask(
+                \Yii::app()->modules['Wtflow']['workerName'],
+                new Message\Merge\Task($build->obj_id, $val, $build->branch, Message\Merge\Task::MERGE_TYPE_BUILD)
+            );
         }
 
         \Log::createLogMessage("Заказана пересборка #$build->obj_id ветки $branch");

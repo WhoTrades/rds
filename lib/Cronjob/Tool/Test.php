@@ -25,6 +25,14 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification('preved', 'medved');
+        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+
+        $res = $model->sendToolGetToolLogTail(
+            'debian',
+            new RdsSystem\Message\Tool\ToolLogTail('test', 100),
+            RdsSystem\Message\Tool\ToolLogTailResult::type(),
+            1
+        );
+        var_dump($res);
     }
 }

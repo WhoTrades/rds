@@ -44,9 +44,9 @@
         ]
     ); ?>
 
-
-
-    <?php echo $form->dropDownListControlGroup($model, 'rr_release_version', \ReleaseVersion::model()->forList()); ?>
+    <div style="display: none">
+        <?php echo $form->dropDownListControlGroup($model, 'rr_release_version', \ReleaseVersion::model()->forList()); ?>
+    </div>
 
     <div class="row buttons">
         <?php echo TbHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
@@ -75,9 +75,9 @@
             if (version) {
                 var tag = projectName+'-'+version;
                 $('#diff-preview').
-                html('diff preview').
+                html('предпросмотр изменений').
                 attr({
-                    'href': 'http://stash.finam.ru/projects/WT/repos/sparta/pull-requests?create&targetBranch=refs%2Ftags%2F' + tag + '&sourceBranch=refs%2Fheads%2Fmaster'
+                    'href': 'http://git.finam.ru/projects/WT/repos/sparta/pull-requests?create&targetBranch=refs%2Ftags%2F' + tag + '&sourceBranch=refs%2Fheads%2Fmaster'
                 });
             } else {
                 $('#diff-preview').html(<?=json_encode(TbHtml::icon(TbHtml::ICON_STOP))?>).attr('a', '#');

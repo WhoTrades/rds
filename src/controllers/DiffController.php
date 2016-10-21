@@ -12,6 +12,8 @@ class DiffController extends Controller
         $rr2 = ReleaseRequest::model()->findByPk($id2);
 
         $this->render('index', array(
+            'projectName' => $rr1->project->project_name,
+            'filename' => 'cron-wt.d',
             'newText' => $rr1->getCronConfigCleaned(),
             'newTitle' => "$rr1->rr_build_version - CURRENT VERSION",
             'currentText' => $rr2->getCronConfigCleaned(),

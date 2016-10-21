@@ -123,12 +123,12 @@
                     $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
                     $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
                     echo "<a href='" . Yii::app()->createUrl('/diff/index/', ['id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id]) .
-                        "'>CRON changed<br />$diffStat</a><br />";
+                        "'>CRON изменен<br />$diffStat</a><br />";
                 }
 
                 if ($releaseRequest->hardMigrations) {
                     echo "<a href='" . Yii::app()->createUrl('hardMigration/index', ['HardMigration[migration_release_request_obj_id]' => $releaseRequest->obj_id]) .
-                        "'>Show hard migrations (" . count($releaseRequest->hardMigrations) . ")</a><br />";
+                        "'>Покажать тяжелые миграции (" . count($releaseRequest->hardMigrations) . ")</a><br />";
                 }
 
                 if ($releaseRequest->rr_new_migration_count) {
@@ -156,12 +156,12 @@
                     } else {
                         $text =
                             "<a href='" . Yii::app()->createUrl('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre')) .
-                                "' class='ajax-url'>RUN pre migrations</a><br />" .
-                                "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">show pre migrations</a>
+                                "' class='ajax-url'>Запустить pre-миграции</a><br />" .
+                                "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">Показать pre миграции</a>
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                         foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
                             $text .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, 'pre') . ">";
-                            //$text .= "<a href='http://stash.finam.ru/projects/".
+                            //$text .= "<a href='http://git.finam.ru/projects/".
                             //    JiraJsonController::PULL_REQUEST_PROJECT.
                             //    "/repos/".
                             //    JiraJsonController::PULL_REQUEST_REPOSITORY.
@@ -175,19 +175,19 @@
                     }
                 } else {
                     return "<a href='" . Yii::app()->createUrl('/use/create', array('id' => $releaseRequest->obj_id)) .
-                        "' --data-id='$releaseRequest->obj_id' class='use-button'>USE</a>";
+                        "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
                 }
             } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_CODES) {
                 return "<a href='" . Yii::app()->createUrl('/use/index', array('id' => $releaseRequest->obj_id)) .
-                    "' onclick='showForm($releaseRequest->obj_id); return false;'>Enter codes</a>";
+                    "' onclick='showForm($releaseRequest->obj_id); return false;'>Ввести sms код</a>";
             } elseif ($releaseRequest->rr_status == \ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
                 if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest($releaseRequest->rr_project_obj_id, $releaseRequest->rr_old_version)) {
                     if ($oldReleaseRequest->canBeUsed()) {
                         return "<a href='" . Yii::app()->createUrl('/use/create', array('id' => $oldReleaseRequest->obj_id)) .
-                            "' --data-id='$oldReleaseRequest->obj_id' class='use-button'>Revert to $releaseRequest->rr_old_version</a>";
+                            "' --data-id='$oldReleaseRequest->obj_id' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
                     } elseif ($oldReleaseRequest->rr_status == ReleaseRequest::STATUS_CODES) {
                         return "<a href='" . Yii::app()->createUrl('/use/index', array('id' => $oldReleaseRequest->obj_id)) .
-                            "' onclick='showForm($oldReleaseRequest->obj_id); return false;'>Codes for revert to $releaseRequest->rr_old_version</a>";
+                            "' onclick='showForm($oldReleaseRequest->obj_id); return false;'>Sms код для отката до $releaseRequest->rr_old_version</a>";
                     }
                 }
             }

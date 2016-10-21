@@ -66,7 +66,7 @@ class MonitoringDataProvider implements IAlertDataProvider
     }
 
     /**
-     * Загружает данные из PhpLogs
+     * Загружает данные из service-monitoring
      */
     private function loadDataIfNeeded()
     {

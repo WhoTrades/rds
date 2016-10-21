@@ -96,6 +96,7 @@ class ServiceRdsProdTL1
                 '* * * * * *',
                 'rds_create_pull_request'
             ),
+            new CronCommand(Cronjob_Tool_BitBucket2Graphite::getToolCommand([], $verbosity = 1), '0 * * * * *', 'rds_bitbucket_stat2graphite'),
 
             new Comment("Deployment"),
             new CronCommand(Cronjob_Tool_AsyncReader_Deploy::getToolCommand(['--max-duration=60'], $verbosity = 1), '* * * * * *', 'rds_async_reader_deploy'),
@@ -124,7 +125,7 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity = 1), '*/28 * * * * *', 'rds_hard_migration_log_rotator'),
 
             new Comment("Удаление старых веток из git"),
-            new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity = 3), '37 10 0 * * *', 'rds_git_drop_feature_branch'),
+            new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity = 3), '37 10 20 * * *', 'rds_git_drop_feature_branch'),
 
             new Comment("Уведомления о релизах"),
             new MultiCommandToCron(

@@ -67,8 +67,8 @@
                                     ]) . ' ' . $alertName,
                                     [
                                         'color' => $alert->alert_status === AlertLog::STATUS_ERROR
-                                            ? TbHtml::TEXT_COLOR_DANGER
-                                            : TbHtml::TEXT_COLOR_SUCCESS
+                                            ? TbHtml::TEXT_COLOR_ERROR
+                                            : TbHtml::TEXT_COLOR_SUCCESS,
                                     ]
                                 )?>
                             <? } ?>
