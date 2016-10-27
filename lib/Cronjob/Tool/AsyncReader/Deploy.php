@@ -171,6 +171,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     }
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
+                $releaseRequest = $build->releaseRequest;
+                $releaseRequest->rr_status = \ReleaseRequest::STATUS_FAILED;
+                $releaseRequest->save();
                 break;
             case Build::STATUS_BUILDING:
                 if (!empty($build->releaseRequest) && empty($build->releaseRequest->rr_build_started)) {
