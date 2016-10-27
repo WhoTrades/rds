@@ -98,43 +98,44 @@ class SiteController extends Controller
                     // взаимосвязанныъ проектов - нужно подумать как это объединить в целостную систему
 
                     $projectName = $model->project->project_name;
-                    if (in_array($projectName, ['comon', 'whotrades'])
-                        && $dictionaryProject = Project::model()->findByAttributes(['project_name' => 'dictionary'])) {
+                    if (in_array($projectName, ['comon'])
+                        && ($dictionaryProject = Project::model()->findByAttributes(['project_name' => 'dictionary']))
+                        && ($whotradesProject = Project::model()->findByAttributes(['project_name' => 'whotrades']))
+                    ) {
+                        /** @var $dictionaryProject Project */
+                        /** @var $whotradesProject Project */
                         $dictionary = new ReleaseRequest();
                         $dictionary->rr_user = $model->rr_user;
                         $dictionary->rr_project_obj_id = $dictionaryProject->obj_id;
                         $dictionary->rr_comment =
                             $model->rr_comment . " [slave for " . $projectName . "-$model->rr_build_version]";
                         $dictionary->rr_release_version = $model->rr_release_version;
-                        $dictionary->rr_build_version = $dictionary->project->getNextVersion($dictionary->rr_release_version);
+                        $dictionary->rr_build_version = $dictionaryProject->getNextVersion($dictionary->rr_release_version);
                         $dictionary->rr_leading_id = $model->obj_id;
                         $dictionary->save();
-                        $dictionary->save();
 
-                        $model->rr_comment = "$model->rr_comment [+dictionary-$dictionary->rr_build_version]";
+                        $whotrades = new ReleaseRequest();
+                        $whotrades->rr_user = $model->rr_user;
+                        $whotrades->rr_project_obj_id = $whotradesProject->obj_id;
+                        $whotrades->rr_comment =
+                            $model->rr_comment . " [slave for " . $projectName . "-$model->rr_build_version]";
+                        $whotrades->rr_release_version = $model->rr_release_version;
+                        $whotrades->rr_build_version = $whotradesProject->getNextVersion($whotrades->rr_release_version);
+                        $whotrades->rr_leading_id = $model->obj_id;
+                        $whotrades->save();
+
+                        $model->rr_comment = "$model->rr_comment";
                         $model->save();
                     }
 
                     // an: Отправку задач в rabbit делаем по-ближе к комиту транзакции, что бы не получилось что задачи уже
                     // начали выполняться, а транзакция ещё не отправлена и билда у нас в базе ещё нет
                     $model->createBuildTasks();
-                    if (!empty($dictionary)) {
+                    if (!empty($dictionary) && !empty($whotrades)) {
                         $dictionary->createBuildTasks();
+                        $whotrades->createBuildTasks();
                     }
                     $transaction->commit();
-
-                    if ('whotrades' == $projectName) {
-                        // warl: для проекта whotrades важно, чтобы словарь уже был новый, поэтому сначала собираем его
-                        if (!empty($dictionary)) {
-                            $dictionary->sendBuildTasks();
-                        }
-                        $model->sendBuildTasks();
-                    } else {
-                        $model->sendBuildTasks();
-                        if (!empty($dictionary)) {
-                            $dictionary->sendBuildTasks();
-                        }
-                    }
 
                     Yii::app()->webSockets->send('updateAllReleaseRequests', []);
 
