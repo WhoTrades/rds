@@ -137,6 +137,12 @@ class SiteController extends Controller
                     }
                     $transaction->commit();
 
+                    $model->sendBuildTasks();
+                    if (!empty($dictionary) && !empty($whotrades)) {
+                        $dictionary->sendBuildTasks();
+                        $whotrades->sendBuildTasks();
+                    }
+
                     Yii::app()->webSockets->send('updateAllReleaseRequests', []);
 
                     $this->redirect(array('index'));
