@@ -496,8 +496,17 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 'build_worker_obj_id' => $worker->obj_id,
                 'build_release_request_obj_id' => $releaseRequest->obj_id,
             ));
-            $build->build_status = Build::STATUS_USED;
-            $build->save();
+            if ($build) {
+                $build->build_status = Build::STATUS_USED;
+                $build->save();
+            } else {
+                $this->debugLogger->dump()->message('an', 'unknown_build_info', false, [
+                    'build_project_obj_id' => $project->obj_id,
+                    'build_worker_obj_id' => $worker->obj_id,
+                    'build_release_request_obj_id' => $releaseRequest->obj_id,
+                    'message' => $message,
+                ])->critical()->save();
+            }
         }
 
         /** @var $p2w Project2worker */
