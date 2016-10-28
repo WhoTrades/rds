@@ -13,12 +13,20 @@ class WebApplication extends CWebApplication
         return parent::end();
     }
 
-    public function handleException(Exception $exception)
+    public function handleException($exception)
     {
-        if (!$exception instanceof CHttpException) {
-            $this->debugLogger->dump()->exception('an', $exception)->critical()->save();
-        } else {
+        if ($exception instanceof CHttpException) {
             $this->debugLogger->dump()->exception('an', $exception)->notice()->save();
+        } elseif ($exception instanceof CHttpException) {
+            $this->debugLogger->dump()->exception('an', $exception)->critical()->save();
+        } elseif ($exception instanceof Error) {
+            $this->debugLogger->dump()->message('error', $exception->getMessage(), true, [
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ])->critical()->save();
         }
 
         parent::handleException($exception);
@@ -38,8 +46,8 @@ class WebApplication extends CWebApplication
 
     public function setRuntimePath($path)
     {
-        //an: Создаем папку для временных файлов, если её ещё нету
-        if(!is_dir($path)) {
+        // an: Создаем папку для временных файлов, если её ещё нету
+        if (!is_dir($path)) {
             mkdir($path, 0777);
         }
 
