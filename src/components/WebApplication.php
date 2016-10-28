@@ -13,20 +13,15 @@ class WebApplication extends CWebApplication
         return parent::end();
     }
 
-    public function handleException($exception)
+    /**
+     * @param Throwable $exception
+     */
+    public function handleException(Throwable $exception)
     {
         if ($exception instanceof CHttpException) {
             $this->debugLogger->dump()->exception('an', $exception)->notice()->save();
-        } elseif ($exception instanceof CHttpException) {
+        } else {
             $this->debugLogger->dump()->exception('an', $exception)->critical()->save();
-        } elseif ($exception instanceof Error) {
-            $this->debugLogger->dump()->message('error', $exception->getMessage(), true, [
-                'message' => $exception->getMessage(),
-                'code' => $exception->getCode(),
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-                'trace' => $exception->getTraceAsString(),
-            ])->critical()->save();
         }
 
         parent::handleException($exception);
