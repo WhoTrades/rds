@@ -171,6 +171,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     }
                     Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
+                $releaseRequest = $build->releaseRequest;
+                $releaseRequest->rr_status = \ReleaseRequest::STATUS_FAILED;
+                $releaseRequest->save();
                 break;
             case Build::STATUS_BUILDING:
                 if (!empty($build->releaseRequest) && empty($build->releaseRequest->rr_build_started)) {
@@ -179,23 +182,14 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 }
                 break;
             case Build::STATUS_CANCELLED:
-                $title = "Failed to install $project->project_name";
-                $text = "Проект $project->project_name не удалось собрать. <a href='" .
+                $title = "Cancelled installation of $project->project_name";
+                $text = "Сборка $project->project_name отменена. <a href='" .
                     Yii::app()->createAbsoluteUrl('build/view', array('id' => $build->obj_id)) .
                     "'>Подробнее</a>";
 
-                $c = new CDbCriteria(array(
-                        'with' => array('project', 'project.project2workers', 'builds'),
-                ));
-                $c->compare('project2workers.worker_obj_id', $build->build_worker_obj_id);
-                $c->compare('rr_status', array(\ReleaseRequest::STATUS_CANCELLING));
-                $c->compare('build_status', Build::getInstallingStatuses());
-                $task = \ReleaseRequest::model()->find($c);
-                if (!$task && $build->releaseRequest) {
-                    $releaseRequest = $build->releaseRequest;
-                    $releaseRequest->rr_status = \ReleaseRequest::STATUS_CANCELLED;
-                    $releaseRequest->save();
-                }
+                $releaseRequest = $build->releaseRequest;
+                $releaseRequest->rr_status = \ReleaseRequest::STATUS_CANCELLED;
+                $releaseRequest->save();
 
                 Yii::app()->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                 foreach (explode(",", \Yii::app()->params['notify']['status']['phones']) as $phone) {
@@ -502,8 +496,17 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 'build_worker_obj_id' => $worker->obj_id,
                 'build_release_request_obj_id' => $releaseRequest->obj_id,
             ));
-            $build->build_status = Build::STATUS_USED;
-            $build->save();
+            if ($build) {
+                $build->build_status = Build::STATUS_USED;
+                $build->save();
+            } else {
+                $this->debugLogger->dump()->message('an', 'unknown_build_info', false, [
+                    'build_project_obj_id' => $project->obj_id,
+                    'build_worker_obj_id' => $worker->obj_id,
+                    'build_release_request_obj_id' => $releaseRequest->obj_id,
+                    'message' => $message,
+                ])->critical()->save();
+            }
         }
 
         /** @var $p2w Project2worker */
