@@ -14,9 +14,9 @@ class WebApplication extends CWebApplication
     }
 
     /**
-     * @param Throwable $exception
+     * {@inheritdoc}
      */
-    public function handleException(Throwable $exception)
+    public function handleException($exception)
     {
         if ($exception instanceof CHttpException) {
             $this->debugLogger->dump()->exception('an', $exception)->notice()->save();
