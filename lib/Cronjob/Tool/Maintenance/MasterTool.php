@@ -18,6 +18,12 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
                 'useForBaseName' => true,
                 'valueRequired' => true,
             ],
+            'worker-name' => [
+                'desc' => 'Name of worker',
+                'required' => true,
+                'valueRequired' => true,
+                'useForBaseName' => true,
+            ],
         ] + parent::getCommandLineSpec();
     }
 
@@ -29,7 +35,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
         $server = $cronJob->getOption('server') ?: gethostname();
         $model = $this->getMessagingModel($cronJob);
         $commandExecutor = new \RdsSystem\lib\CommandExecutor($this->debugLogger);
-        $workerName = \Config::getInstance()->workerName;
+        $workerName = $cronJob->getOption('worker-name');
 
         $model->readToolGetInfoTaskRequest($workerName, false, function (RdsSystem\Message\Tool\GetInfoTask $task) use ($server, $model, $commandExecutor, $workerName) {
             $this->debugLogger->message("Received get process info message");
