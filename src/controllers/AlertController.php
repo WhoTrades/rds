@@ -12,7 +12,7 @@ class AlertController extends \Controller
 
     const ALERT_TIMEOUT = '5 minute';
     const ALERT_WAIT_TIMEOUT = '10 minutes';
-    const ALERT_START_HOUR = 10;
+    const ALERT_START_HOUR = 8;
     const ALERT_END_HOUR = 20;
 
     const ALERT_LIST_TYPE_ERRORS = 'errors';

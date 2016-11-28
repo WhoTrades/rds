@@ -336,9 +336,10 @@ class ReleaseRequest extends ActiveRecord
         $this->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
         Log::createLogMessage("USE {$this->getTitle()}");
 
-        foreach (Worker::find()->all() as $worker) {
+        foreach ($this->project->project2workers as $p2w) {
+            /** @var Project2worker $p2w */
             (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
-                $worker->worker_name,
+                $p2w->worker->worker_name,
                 new \RdsSystem\Message\UseTask(
                     $this->project->project_name,
                     $this->obj_id,

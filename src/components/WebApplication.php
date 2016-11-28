@@ -30,14 +30,14 @@ class WebApplication extends \yii\web\Application
     }
 
     /**
-     * @param Exception $exception
+     * @param Throwable $exception
      */
-    public function handleException(Exception $exception)
+    public function handleException(Throwable $exception)
     {
-        if (!$exception instanceof CHttpException) {
-            $this->debugLogger->dump()->exception('an', $exception)->critical()->save();
-        } else {
+        if ($exception instanceof CHttpException) {
             $this->debugLogger->dump()->exception('an', $exception)->notice()->save();
+        } else {
+            $this->debugLogger->dump()->exception('an', $exception)->critical()->save();
         }
 
         parent::handleException($exception);
@@ -57,7 +57,11 @@ class WebApplication extends \yii\web\Application
 
     public function setRuntimePath($path)
     {
+<<<<<<< HEAD
         //an: Создаем папку для временных файлов, если её ещё нету
+=======
+        // an: Создаем папку для временных файлов, если её ещё нету
+>>>>>>> origin/master
         if (!is_dir($path)) {
             mkdir($path, 0777);
         }

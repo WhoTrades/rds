@@ -144,7 +144,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
             AlertLog::WTS_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
             AlertLog::CRM_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
             AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(['WhoTrades_AcceptanceTests_WtSmokeTestProd'], 'TeamCity: Smoke Tests'),
-            AlertLog::WTS_DEV_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'MonitoringDEV', $config['monitoringDEV']['url']),
+            //AlertLog::WTS_DEV_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'MonitoringDEV', $config['monitoringDEV']['url']),
         ];
     }
 
