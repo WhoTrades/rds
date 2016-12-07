@@ -55,6 +55,7 @@
                         ['label'=>'Сигнализация', 'url'=>array('/alert/index'), 'active' => $this->getId() == 'alert'],
                         ['label'=>'Фоновые задачи', 'url'=>array('/cronjobs/index'), 'active' => $this->getId() == 'cronjobs'],
                         ['label'=>'Пересборка веток', 'url'=>array('/Wtflow/gitBuild'), 'active' => $this->getId() == 'gitBuild'],
+                        ['label' => 'Ограничение функциональности', 'url' => array('/system/index'), 'active' => $this->getId() == 'system'],
                     ]
                 ),
                 array('label'=>'Журнал', 'url'=>array('/log/index'), 'visible'=>!Yii::app()->user->isGuest, 'active' => $this->getId() == 'log'),
@@ -81,6 +82,18 @@
             that.innerHTML = html;
         });
         e.preventDefault();
+    });
+    webSocketSubscribe('deployment_status_changed', function(event){
+        if (event.deployment_enabled) {
+            var title = "Обновление серверов включено";
+            var body = <?=json_encode(TbHTml::alert(TbHtml::ALERT_COLOR_SUCCESS, "Теперь можно собирать, активировать сборки, синхронизировать конфигурацию"))?>
+        } else {
+            var title = "Обновление серверов отключено";
+            var body = <?=json_encode(TbHTml::alert(TbHtml::ALERT_COLOR_DANGER, "Сборки проектов, активация сборок и синронизация конфигов временно отключена"))?>
+        }
+        $("#modal-popup .modal-header h4").html(title);
+        $("#modal-popup .modal-body").html(body);
+        $("#modal-popup").modal("show");
     });
 </script>
 </body>

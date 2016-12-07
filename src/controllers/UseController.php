@@ -41,6 +41,11 @@ class UseController extends Controller
             throw new CHttpException(500, 'Wrong release request status');
         }
 
+        $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
+        if (!$deployment_enabled) {
+            throw new CHttpException(500, 'Deployment disabled');
+        }
+
         if ($releaseRequest->canByUsedImmediately()) {
             $slaveList = ReleaseRequest::model()->findAllByAttributes([
                 'rr_leading_id' => $releaseRequest->obj_id,
@@ -168,12 +173,16 @@ class UseController extends Controller
         if (isset($_POST['ReleaseRequest'])) {
             $model->attributes = $_POST['ReleaseRequest'];
 
+            $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
+            if (!$deployment_enabled) {
+                $model->addError('rr_project_owner_code', 'Обновление серверов временно отключено');
+            }
             // проверяем правильность ввода смс
             $this->checkReleaseCode($model, $releaseRequest);
 
             $this->performAjaxValidation($model);
 
-            if ($releaseRequest->rr_project_owner_code_entered) {
+            if ($releaseRequest->rr_project_owner_code_entered && $deployment_enabled) {
                 $releaseRequest->sendUseTasks(\Yii::app()->user->name);
 
                 $slaveList = ReleaseRequest::model()->findAllByAttributes([

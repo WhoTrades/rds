@@ -76,8 +76,8 @@ class ReleaseRequest extends ActiveRecord
             array('obj_status_did, rr_project_obj_id', 'numerical', 'integerOnly' => true),
             array('obj_id, obj_created, obj_modified, obj_status_did, rr_user, rr_comment, rr_project_obj_id, rr_build_version, rr_status', 'safe', 'on' => 'search'),
             array('rr_project_owner_code, rr_release_engineer_code', 'safe', 'on' => 'use'),
-            array('rr_release_version', 'checkForReleaseReject'),
-            array('rr_release_version', 'checkNotExistsHardMigrationOfPreviousRelease'),
+            array('rr_project_obj_id', 'checkForReleaseReject'),
+            array('rr_project_obj_id', 'checkDeploymentEnabled'),
         );
     }
 
@@ -111,20 +111,11 @@ class ReleaseRequest extends ActiveRecord
      * @param string $attribute
      * @param array $params
      */
-    public function checkNotExistsHardMigrationOfPreviousRelease($attribute, $params)
+    public function checkDeploymentEnabled($attribute, $params)
     {
-        $c = new CDbCriteria();
-        $c->with = 'releaseRequest';
-        $c->compare("rr_release_version", "<" . $this->rr_release_version);
-        $c->compare("migration_status", "<>" . HardMigration::MIGRATION_STATUS_DONE);
-        $c->compare("migration_project_obj_id", $this->rr_project_obj_id);
-        $count = HardMigration::model()->count($c);
-        if ($count) {
-            $this->addError($attribute, "Есть невыполненные тяжелая миграции ($count шт) от предыдущего релиза: <a href='" . Yii::app()->createUrl('hardMigration/index', [
-                'HardMigration[build_version]' => '<=' . $this->rr_release_version,
-                'HardMigration[migration_status]' => '<>' . HardMigration::MIGRATION_STATUS_DONE,
-                'HardMigration[migration_project_obj_id]' => $this->rr_project_obj_id,
-            ]) . "' target='_blank'>Посмотреть</a>");
+        $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
+        if (!$deployment_enabled) {
+            $this->addError($attribute, 'Деплой временно запрещен. Обратитесь к администратору');
         }
     }
 
