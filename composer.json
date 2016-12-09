@@ -5,7 +5,7 @@
     "repositories": [
         {
             "type": "composer",
-            "url": "https://git.whotrades.net/external/packages.json"
+            "url": "https://artifact.finam.ru/artifactory/api/composer/packagist-org"
         },
         {
             "packagist": false
