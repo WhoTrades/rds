@@ -51,3 +51,10 @@ $('.search-form form').submit(function(){
         'obj_id',
     ),
 )); ?>
+
+<script>
+    webSocketSubscribe('logUpdated', function(event){
+        console.log("websocket event received", event);
+        $.fn.yiiGridView.update("log-grid");
+    });
+</script>

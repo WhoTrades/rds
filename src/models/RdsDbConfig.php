@@ -15,6 +15,7 @@
  * @property string $crm_lamp_timeout
  * @property string $preprod_online
  * @property string $cpu_usage_last_truncate
+ * @property string $deployment_enabled
  */
 class RdsDbConfig extends ActiveRecord
 {

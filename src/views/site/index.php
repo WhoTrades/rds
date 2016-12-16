@@ -146,6 +146,11 @@
             }
 
             showForm($(obj).attr('--data-id'));
+        }).error(function(a, b, c) {
+            console.log(a, b, c);
+            $("#modal-popup .modal-header h4").html(a.status + " " + c);
+            $("#modal-popup .modal-body").html("<pre>" + a.responseText + "</pre>");
+            $("#modal-popup").modal("show");
         });
         e.preventDefault();
     });
@@ -177,7 +182,7 @@
             data: data
         }).done(function(html){
             $("#modal-popup .modal-body").html(html);
-        }).fail(function(a, b, c, d){
+        }).fail(function(a, b, c){
             $("#modal-popup .modal-body").html("<h1>"+ a.status + " " + c + "</h1>");
         });
     }

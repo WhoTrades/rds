@@ -88,8 +88,9 @@ class ProjectController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->loadModel($id);
+        $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
 
-        if (isset($_POST['Project'])) {
+        if (isset($_POST['Project']) && $deployment_enabled) {
             $model->attributes = $_POST['Project'];
             $model->project_config = str_replace("\r", "", $model->project_config);
             $transaction = $model->getDbConnection()->beginTransaction();
@@ -191,6 +192,7 @@ $diffStat<br />
         $this->render('update', array(
             'model' => $model,
             'list' => $list,
+            'deployment_enabled' => $deployment_enabled,
             'workers' => Worker::model()->findAll(),
         ));
     }
