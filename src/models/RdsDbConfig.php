@@ -32,7 +32,7 @@ class RdsDbConfig extends ActiveRecord
     {
         return self::model()->find();
     }
-	
+
     /**
      * @return array validation rules for model attributes.
      */
@@ -43,19 +43,10 @@ class RdsDbConfig extends ActiveRecord
         return array(
             array('obj_created, obj_modified', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly' => true),
-            array(
-                'red_lamp_wts_timeout, crm_lamp_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, '
-                    . 'preprod_online, is_tst_updating_enabled',
-                'safe',
-            ),
+            array('preprod_online, is_tst_updating_enabled', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array(
-                'obj_id, obj_created, obj_modified, crm_lamp_timeout, obj_status_did, is_tst_updating_enabled,'
-                    . ' red_lamp_wts_timeout, red_lamp_team_city_timeout, red_lamp_phplogs_dev_timeout, '
-                    . 'cpu_usage_last_truncate', 'safe',
-                'on' => 'search',
-            ),
+            array('obj_id, obj_created, obj_modified, obj_status_did, is_tst_updating_enabled,cpu_usage_last_truncate', 'safe', 'on' => 'search'),
         );
     }
 
@@ -81,10 +72,6 @@ class RdsDbConfig extends ActiveRecord
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
             'is_tst_updating_enabled' => 'Включено ли обновление tst контура',
-            'red_lamp_wts_timeout' => 'Red Lamp Wts Timeout',
-            'red_lamp_team_city_timeout' => 'Red Lamp TeamCity Timeout',
-            'red_lamp_phplogs_dev_timeout' => 'Red Lamp PhpLogsDEV Timeout',
-            'crm_lamp_timeout' => 'CRM Lamp Timeout',
             'cpu_usage_last_truncate' => 'Cpu Usage last truncate',
         );
     }
@@ -112,10 +99,6 @@ class RdsDbConfig extends ActiveRecord
         $criteria->compare('obj_modified',$this->obj_modified,true);
         $criteria->compare('obj_status_did',$this->obj_status_did);
         $criteria->compare('is_tst_updating_enabled',$this->is_tst_updating_enabled);
-        $criteria->compare('red_lamp_wts_timeout',$this->red_lamp_wts_timeout,true);
-        $criteria->compare('red_lamp_team_city_timeout',$this->red_lamp_team_city_timeout,true);
-        $criteria->compare('red_lamp_phplogs_dev_timeout',$this->red_lamp_phplogs_dev_timeout,true);
-        $criteria->compare('crm_lamp_timeout', $this->crm_lamp_timeout, true);
         $criteria->compare('cpu_usage_last_truncate',$this->cpu_usage_last_truncate,true);
 
         return new CActiveDataProvider($this, array(

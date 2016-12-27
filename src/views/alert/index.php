@@ -1,116 +1,138 @@
-<?/** @var $lamps array*/?>
-<?
-    $lampNameMap = [
-        AlertLog::WTS_LAMP_NAME => '[PROD] Monitoring',
-        AlertLog::CRM_LAMP_NAME => '[CRM] Monitoring',
-        AlertLog::TEAM_CITY_LAMP_NAME => 'TeamCity',
-        AlertLog::WTS_DEV_LAMP_NAME => '[DEV] Monitoring',
-    ];
-?>
-<table>
-    <?foreach ($lamps as $name => $lamp) {?>
-        <tr>
-            <td><?=$lampNameMap[$name]?> (<?=$name?>)</td>
-            <td><img src="/images/alarm.png" class="<?=$lamp['status'] ? 'status-on' : 'status-off'?>" /></td>
-            <td>
-                <?if ($lamp['status']) {?>
-                    <?= TbHtml::form() ?>
-                        <?= TbHtml::submitButton('Остановить на 10 минут', [ 'name' => "disable[$name]", 'value' => AlertController::ALERT_WAIT_TIMEOUT ]) ?>
-                    <?= TbHtml::endForm() ?>
-                <?} else if (strtotime($lamp['timeout']) > time()) { ?>
-                    <?= TbHtml::form() ?>
-                        Остановлена до <?= date('H:i:s', strtotime($lamp['timeout'])) ?>
-                        <?= TbHtml::submitButton('Включить', [ 'name' => "disable[$name]", 'value' => '-1 minutes' ]) ?>
-                    <?= TbHtml::endForm() ?>
-                <? } ?>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
+<?php /** @var $lamps Lamp[]*/ ?>
+<div class="container">
+    <?php foreach ($lamps as $lamp) {?>
+        <div style="border: solid 1px #eee; margin-bottom: 20px">
+            <?php /** @var $lamp Lamp */?>
+            <div class="row" style="margin: 0">
+                <div class="col-md-6">
+                    <h2 style="height: 80px; line-height: 80px; margin: 0">
+                        <?=$lamp->lamp_name ?><span style="font-size: 48px; text-align: center">
+                            <?=TbHtml::icon(TbHtml::ICON_HEART_EMPTY, [
+                                'style' => '',
+                                'class' => 'lamp-heart status-' . ($lamp->getLampStatus() ? 'on' : 'off'),
+                            ])?>
+                        </span>
+                    </h2>
+                </div>
+                <div class="col-md-6">
+                    <?= TbHtml::form(); ?>
+                    <?php if ($lamp->getLampStatus()) {?>
+                        <?= TbHtml::submitButton('Остановить на 10 минут', [ 'name' => "disable[$lamp->obj_id]", 'value' => Lamp::ALERT_WAIT_TIMEOUT ]) ?>
+                    <?php } elseif (strtotime($lamp->lamp_timeout) > time()) { ?>
+                        Остановлена до <?= date('H:i:s', strtotime($lamp->lamp_timeout)) ?>
+                        <?= TbHtml::submitButton('Включить', [ 'name' => "disable[$lamp->obj_id]", 'value' => '-1 minutes' ]) ?>
+                    <?php }?>
+                    <br />
+                    <?php $phone = Yii::app()->user->phone;
+                    if (empty($phone)) {
+                        echo TbHtml::alert(TbHtml::ALERT_COLOR_WARNING, 'Для подписки на SMS рассылку нужно указать свой телефон в CRM');
+                    } else {
+                        if ($lamp->isReceiverExists($phone)) {
+                            echo TbHtml::submitButton("Отписаться от SMS рассылки ($phone)", [
+                                'name' => "remove_receiver[$lamp->obj_id]",
+                                'value' => $phone,
+                                'color' => TbHtml::BUTTON_COLOR_WARNING,
+                            ]);
+                        } else {
+                            echo TbHtml::submitButton("Подписаться на SMS рассылку ($phone)", [
+                                'name' => "add_receiver[$lamp->obj_id]",
+                                'value' => $phone,
+                                'color' => TbHtml::BUTTON_COLOR_PRIMARY,
+                            ]);
+                        }
+                    }?>
+                    <?=TbHtml::endForm();?>
+                </div>
+            </div>
+            <div class="row" style="margin: 0">
                 <?= TbHtml::form() ?>
-                <table class="table table-bordered">
-                    <tr>
-                        <td>Ошибки</td>
-                        <td>Игнорируемые</td>
-                    </tr>
-                    <tr>
-                        <?
-                            $iconMap = [
-                                AlertController::ALERT_LIST_TYPE_ERRORS  => TbHtml::ICON_PAUSE,
-                                AlertController::ALERT_LIST_TYPE_IGNORES => TbHtml::ICON_PLAY,
-                            ];
 
-                            $ignoreTimeMap = [
-                                AlertController::ALERT_LIST_TYPE_ERRORS  => '+10 years',
-                                AlertController::ALERT_LIST_TYPE_IGNORES => '-1 minutes',
-                            ];
-                        ?>
+                    <?php
+                    $alerts = [
+                        [
+                            'header' => 'Ошибки',
+                            'list' => $lamp->getLampErrors(),
+                            'icon' => TbHtml::ICON_PAUSE,
+                            'ignoreTime' => '+10 years',
+                            'color' => TbHtml::BUTTON_COLOR_DANGER,
+                        ],
+                        [
+                            'header' => 'Игнорируемые',
+                            'list' => $lamp->getLampIgnores(),
+                            'icon' => TbHtml::ICON_PLAY,
+                            'ignoreTime' => '-1 minutes',
+                            'color' => TbHtml::BUTTON_COLOR_SUCCESS,
+                        ],
+                    ];
 
-                        <? foreach([AlertController::ALERT_LIST_TYPE_ERRORS, AlertController::ALERT_LIST_TYPE_IGNORES] as $type) { ?>
-                        <td>
-                            <? foreach($lamp[$type] as $alert) {?>
-                                <? /** @var AlertLog $alert */?>
-                                <? $alertName = $alert->alert_name; ?>
+                    foreach ($alerts as $val) {
+                        echo '<div class="col-md-6" style="border: solid 1px #eee; padding-bottom: 20px">';
+                        echo '<h3>' . $val['header'] . '</h3>';
+                        foreach ($val['list'] as $alert) {
+                            /** @var AlertLog $alert */
+                            $alertName = $alert->alert_name;
 
-                                <? if ($alert->hasLink()) {
-                                    $alertName = TbHtml::link($alertName, $alert->getLink(), ['target' => '_blank']);
-                                } ?>
+                            if ($alert->hasLink()) {
+                                $alertName = TbHtml::link($alertName, $alert->getLink(), ['target' => '_blank']);
+                            }
 
-                                <?= TbHtml::em(
-                                    TbHtml::submitButton(TbHtml::icon($iconMap[$type]), [
-                                        'name' => "ignore[$alert->obj_id]",
-                                        'value' => $ignoreTimeMap[$type],
-                                        'size' => "xs",
-                                        'color' => $alert->alert_status === AlertLog::STATUS_ERROR
-                                            ? TbHtml::BUTTON_COLOR_DANGER
-                                            : TbHtml::BUTTON_COLOR_SUCCESS,
-                                    ]) . ' ' . $alertName,
-                                    [
-                                        'color' => $alert->alert_status === AlertLog::STATUS_ERROR
-                                            ? TbHtml::TEXT_COLOR_ERROR
-                                            : TbHtml::TEXT_COLOR_SUCCESS,
-                                    ]
-                                )?>
-                            <? } ?>
-                            <? if (empty($lamp[$type])) { ?>
-                                <?= TbHtml::labelTb('None', ['color' => TbHtml::LABEL_COLOR_WARNING]) ?>
-                            <? } ?>
-                        </td>
-                        <? } ?>
-                    </tr>
-                </table>
-                <?= TbHtml::endForm() ?>
-            </td>
-        </tr>
-    <?}?>
-</table>
+                            echo TbHtml::em(
+                                TbHtml::submitButton(TbHtml::icon($val['icon']), [
+                                    'name' => "ignore[$alert->obj_id]",
+                                    'value' => $val['ignoreTime'],
+                                    'size' => "xs",
+                                    'color' => $val['color'],
+                                ]) . ' ' . $alertName,
+                                [
+                                    'color' => $val['color'],
+                                ]
+                            );
+                        }
+                        if (empty($val['list'])) {
+                            echo TbHtml::labelTb('Нет', ['color' => TbHtml::LABEL_COLOR_WARNING]);
+                        }
+                        echo '</div>';
+                    }
 
-<script>
-    $(document).ready(function(){
-        $('img.status-on').each(function(k, v){
-            var max = 5;
-            var min = 1;
-            var current = (min+max)/2;
-            console.log('aaa');
-            setInterval(function(){
-                var value = current > (max/2) ? max - current : current;
-                $(v).css({
-                    '-webkit-filter': 'saturate(' + value.toFixed(2) + ')'
-                });
-                current += 0.3;
-                if (current > max) current = min;
-                console.log("Saturation: " + value.toFixed(2));
-            }, 40);
-        });
-    });
-
-    setInterval(function(){location+='';}, 10000);
-</script>
-
-
+                    ?>
+                    <?= TbHtml::endForm() ?>
+                </td>
+            </div>
+        </div>
+    <?php }?>
+</div>
 <style>
-    img.status-off {
-        -webkit-filter: saturate(0);
-        filter: saturate(0);
+    .status-on {
+        font-weight: bold;;
+        color: #c24a4f;
+    }
+    .status-off {
+        animation: saturation 1.2s infinite linear;
+        color: black;
+        font-weight: bold;;
+    }
+
+    @keyframes saturation {
+        0% {
+            font-size: 1em;
+            margin-top: 0;
+        }
+        10% {
+            margin-top: 0.025em;
+            font-size: 1.05em;
+        }
+        20% {
+            margin-top: 0;
+            font-size: 1em;
+        }
+        30% {
+            margin-top: 0.025em;
+            font-size: 1.05em;
+        }
+        40% {
+            margin-top: 0;
+            font-size: 1em;
+        }
     }
 </style>
+
