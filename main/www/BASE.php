@@ -1,41 +1,38 @@
 <?php
 define('SCRIPT_START_TIME', microtime(true)); // save script start time
+
 // an: Этот код будет отрабатывать только на dev/tst контурах, и на специальном сервере PROD - nyr-ad1
-if (isset($_REQUEST['profile_xhprof']) && function_exists('xhprof_enable')) {
-    xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+if (isset($_REQUEST['profile_enable']) && function_exists('tideways_enable')) {
+    tideways_enable(TIDEWAYS_FLAGS_NO_SPANS);
 
     register_shutdown_function(function () {
-        $xhprof_data = xhprof_disable();
+        $data = tideways_disable();
 
-        $XHPROF_ROOT = "/var/www/xhprof/";
-        include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_lib.php";
-        include_once $XHPROF_ROOT . "/xhprof_lib/utils/xhprof_runs.php";
-
-        $xhprof_runs = new XHProfRuns_Default();
-        $runId = $xhprof_runs->save_run($xhprof_data, "xhprof_testing");
+        $runId = uniqid();
+        file_put_contents("/tmp/$runId.profiling.xhprof", serialize($data));
 
         if (isset($_SERVER['HTTP_HOST']) && false !== strpos($_SERVER['HTTP_HOST'], 'tst.whotrades.net')) {
             $host = "xhprof.tst.whotrades.net";
-        } elseif (isset($_SERVER['HTTP_HOST']) && false !== strpos($_SERVER['HTTP_HOST'], 'dev.whotrades.net')) {
+        } elseif (isset($_SERVER['HTTP_HOST']) && preg_match('~\.\w+.whotrades.net~', $_SERVER['HTTP_HOST'])) {
             $host = "xhprof.dev.whotrades.net";
         } else {
             $host = "xhprof.whotrades.net";
         }
 
         echo "<script>
-                      var div = document.createElement('div');
-                      div.style.position = 'fixed';
-                      div.style.top = '50px';
-                      div.style.left = '10px';
-                      div.style.width = '100px';
-                      div.style.backgroundColor = '#eee';
-                      div.style.border = '2px solid #aaa';
-                      div.style.padding = '10px';
-                      div.style.overflow = 'hidden';
-                      div.innerHTML = '<a target=\"_blank\" href=\"http://$host/xhprof_html/index.php?run={$runId}&source=xhprof_testing\">Profiler</a><br />';
-                      div.innerHTML += '<a target=\"_blank\" href=\"http://$host/xhprof_html/callgraph.php?run={$runId}&source=xhprof_testing\">Call graph</a>';
-                      document.body.appendChild(div);
-                  </script>";
+                  var div = document.createElement('div');
+                  div.style.position = 'fixed';
+                  div.style.top = '50px';
+                  div.style.left = '10px';
+                  div.style.width = '100px';
+                  div.style.backgroundColor = '#eee';
+                  div.style.border = '2px solid #aaa';
+                  div.style.padding = '10px';
+                  div.style.overflow = 'hidden';
+                  div.innerHTML = '<a target=\"_blank\" href=\"http://$host/xhprof_html/index.php?run={$runId}&source=profiling\">Profiler</a><br />';
+                  div.innerHTML += '<a target=\"_blank\" href=\"http://$host/xhprof_html/callgraph.php?run={$runId}&source=profiling\">Call graph</a>';
+                  document.body.appendChild(div);
+              </script>";
     });
 }
 
