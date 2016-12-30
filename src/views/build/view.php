@@ -3,7 +3,8 @@
 /** @var $model Build */
 ?>
 
-<h1>Сборка #<?php echo $model->obj_id; ?> (<?= $model->project->project_name ?>-<?= $model->releaseRequest->rr_build_version ?>)</h1>
+    <h1>Сборка #<?php echo $model->obj_id; ?> (<?= $model->project->project_name ?>
+        -<?= $model->releaseRequest->rr_build_version ?>)</h1>
 
 <?php $this->widget('TbDetailView', array(
     'data' => $model,
@@ -51,9 +52,9 @@
                             </td>
                             <td><?= sprintf("%.2f", $time) ?></td>
                         </tr>
-                        <?php $prev = $time; ?>
-                        <?php $prevName = $name; ?>
-                    <?php } ?>
+                        <?php $prev = $time;
+                        $prevName = $name;
+                    } ?>
                 </table>
                 <?php
 

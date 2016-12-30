@@ -171,7 +171,7 @@ here;
         $summaryUsers = 0;
         foreach ($errors as $error) {
             $text .= "<a href='{$error['permalink']}'>{$error['title']}</a><br />\n";
-            $text .= "Все ошибок: <b>{$error['count']}</b>, Пользователей затронуто: <b>{$error['userCount']}</b><br />\n";
+            $text .= "Всего ошибок: <b>{$error['count']}</b>, Пользователей затронуто: <b>{$error['userCount']}</b><br />\n";
             $summaryUsers += $error['userCount'];
             $text .= "<b>{$error['culprit']}</b><br />\n";
             $text .= "<span style='color: gray'>{$error['metadata']['value']}</span><br /><br />\n\n";
