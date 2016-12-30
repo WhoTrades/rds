@@ -150,4 +150,42 @@ here;
 
         return $mail->send();
     }
+
+    /**
+     * @param string $receiver
+     * @param string $tagTo
+     * @param array $errors
+     * @return bool
+     * @throws CException
+     * @throws phpmailerException
+     */
+    public function sentNewSentryErrors($receiver, $tagTo, $errors)
+    {
+        $mail = new YiiMailer();
+        $mail->setLayout('mail');
+        $mail->setFrom('report@whotrades.org', 'releases');
+        $mail->setTo($receiver);
+        $mail->setSubject("[RDS] Новые ошибки после релиза $tagTo");
+
+        $text = "<h1>Новые ошибки в релизе $tagTo:</h1>\n";
+        $summaryUsers = 0;
+        foreach ($errors as $error) {
+            $text .= "<a href='{$error['permalink']}'>{$error['title']}</a><br />\n";
+            $text .= "Все ошибок: <b>{$error['count']}</b>, Пользователей затронуто: <b>{$error['userCount']}</b><br />\n";
+            $summaryUsers += $error['userCount'];
+            $text .= "<b>{$error['culprit']}</b><br />\n";
+            $text .= "<span style='color: gray'>{$error['metadata']['value']}</span><br /><br />\n\n";
+        }
+
+        // an: Если ошибок много - добавляем в копию tml@whotrades.org
+        if ($summaryUsers > 10) {
+            $mail->setSubject("Ошибки в $tagTo, затронуто пользователей: $summaryUsers");
+            $mail->setCc('tml@whotrades.org');
+            $text = "+tml@whotrades.org<br /><br />\n$text";
+        }
+
+        $mail->setBody($text);
+
+        return $mail->send();
+    }
 }

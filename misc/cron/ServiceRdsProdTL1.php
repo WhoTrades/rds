@@ -59,7 +59,20 @@ class ServiceRdsProdTL1
             new MultiCommandToCron(
                 \PgQ_EventProcessor_RdsJiraUseExternalNotifier::getPgqConsumer('rds_jira_use', 'rds_jira_use_external_notifier_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
-                'rds_jira_use'
+                'rds_jira_use_external_notifier_consumer'
+            ),
+            new MultiCommandToCron(
+                \PgQ_EventProcessor_SentryAfterUseErrorsNotification::getPgqConsumer(
+                    'rds_jira_use',
+                    'sentry_after_use_errors_notification_consumer',
+                    'simple',
+                    'DSN_DB4',
+                    1,
+                    [],
+                    3
+                ),
+                '* * * * * *',
+                'rds_jira_use_sentry_after_use_errors_notification_consumer'
             ),
             new MultiCommandToCron(
                 \PgQ_EventProcessor_JiraMoveTicket::getPgqConsumer('rds_jira_move_ticket', 'rds_jira_move_ticket_consumer', 'simple', 'DSN_DB4', 1, [], 3),
