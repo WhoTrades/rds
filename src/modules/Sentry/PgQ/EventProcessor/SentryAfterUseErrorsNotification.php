@@ -24,17 +24,10 @@ class PgQ_EventProcessor_SentryAfterUseErrorsNotification extends RdsEventProces
     public function processEvent(PgQ\Event $event)
     {
         $data = $event->getData();
-        if (time() - strtotime($data['obj_created']) < self::INTERVAL_FROM_USE) {
-            $interval = self::INTERVAL_FROM_USE - (time() - strtotime($data['obj_created']));
-            $this->debugLogger->message("Data is not ready, retry for later ($interval seconds)");
-            $interval = 1;
-            $event->retry($interval);
 
-            return;
-        }
         $initiatorUserName = $data['jira_use_initiator_user_name'];
-        $tagFrom = $event->getData()['jira_use_from_build_tag'];
-        $tagTo = $event->getData()['jira_use_to_build_tag'];
+        $tagFrom = $data['jira_use_from_build_tag'];
+        $tagTo = $data['jira_use_to_build_tag'];
 
         // an: На откаты не реагируем
         if ($tagFrom > $tagTo) {
@@ -43,7 +36,15 @@ class PgQ_EventProcessor_SentryAfterUseErrorsNotification extends RdsEventProces
             return;
         }
 
-        $this->debugLogger->message("Processing event id={$event->getId()}, data = " . json_encode($event->getData(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        if (time() - strtotime($data['obj_created']) < self::INTERVAL_FROM_USE) {
+            $interval = self::INTERVAL_FROM_USE - (time() - strtotime($data['obj_created']));
+            $this->debugLogger->message("Data is not ready, retry for later ($interval seconds)");
+            $event->retry($interval);
+
+            return;
+        }
+
+        $this->debugLogger->message("Processing event id={$event->getId()}, data = " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         $res = parse_url(\Config::getInstance()->sentry['projects']['rds']['dsn']);
         $url = "{$res['scheme']}://{$res['host']}/";
