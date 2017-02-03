@@ -56,7 +56,17 @@ class PgQ_EventProcessor_SentryAfterUseErrorsNotification extends RdsEventProces
 
 
         $api = new \CompanyInfrastructure\SentryApi($this->debugLogger, $url);
-        $errors = iterator_to_array($api->getNewFatalErrorsIterator('sentry', $project, $buildVersion));
+        try {
+            $errors = iterator_to_array($api->getNewFatalErrorsIterator('sentry', $project, $buildVersion));
+        } catch (ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+            if ($e->getHttpCode() == 404 && $e->getResponse() == '{"detail": ""}') {
+                $this->debugLogger->warning("Project $project not integrated with sentry");
+
+                return;
+            } else {
+                throw $e;
+            }
+        }
 
         if (empty($errors)) {
             $this->debugLogger->message("No errors, skip email");
