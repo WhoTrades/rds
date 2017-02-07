@@ -16,6 +16,9 @@ class StopDeploymentForm extends CModel
         ];
     }
 
+    /**
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -23,6 +26,9 @@ class StopDeploymentForm extends CModel
         ];
     }
 
+    /**
+     * @return void
+     */
     public function check()
     {
         if (!$this->status && !$this->reason) {
