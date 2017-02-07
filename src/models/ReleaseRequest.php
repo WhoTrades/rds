@@ -115,7 +115,7 @@ class ReleaseRequest extends ActiveRecord
     {
         $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
         if (!$deployment_enabled) {
-            $this->addError($attribute, 'Деплой временно запрещен. Обратитесь к администратору');
+            $this->addError($attribute, 'Деплой временно запрещен. Обратитесь к администратору, причина: ' . RdsDbConfig::get()->deployment_enabled_reason);
         }
     }
 

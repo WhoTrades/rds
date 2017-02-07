@@ -35,19 +35,33 @@ class SystemController extends Controller
     {
         $config = RdsDbConfig::get();
 
-        if (isset($_POST['deployment_enabled'])) {
-            $config->deployment_enabled = (int) $_POST['deployment_enabled'];
-            $config->save();
+        $model = new StopDeploymentForm();
+        $model->status = !$config->deployment_enabled;
+        if (!empty($_POST['StopDeploymentForm'])) {
+            $model->attributes = $_POST['StopDeploymentForm'];
+            if ($model->validate()) {
+                $config->deployment_enabled = $model->status;
+                $config->deployment_enabled_reason = $model->reason;
+                $config->save();
 
-            Log::createLogMessage("Обновление серверов " . ($config->deployment_enabled ? "влючено" : "отключено"));
+                $str = "Обновление серверов " . ($config->deployment_enabled ? "влючено" : "отключено") . ($model->reason ? ", причина: " . $model->reason : '');
+                Log::createLogMessage($str);
 
-            Yii::app()->webSockets->send('deployment_status_changed', ['deployment_enabled' => $config->deployment_enabled]);
+                Yii::app()->webSockets->send(
+                    'deployment_status_changed',
+                    [
+                        'deployment_enabled' => $config->deployment_enabled,
+                        'reason' => $model->reason,
+                    ]
+                );
 
-            $this->refresh();
+                $this->refresh();
+            }
         }
 
         return $this->render('index', [
             'config' => $config,
+            'model' => $model,
         ]);
     }
 }
