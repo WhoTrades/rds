@@ -175,7 +175,7 @@ class UseController extends Controller
 
             $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
             if (!$deployment_enabled) {
-                $model->addError('rr_project_owner_code', 'Обновление серверов временно отключено');
+                $model->addError('rr_project_owner_code', 'Обновление серверов временно отключено, причина: ' . RdsDbConfig::get()->deployment_enabled_reason);
             }
             // проверяем правильность ввода смс
             $this->checkReleaseCode($model, $releaseRequest);

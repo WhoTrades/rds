@@ -16,6 +16,7 @@
  * @property string $preprod_online
  * @property string $cpu_usage_last_truncate
  * @property string $deployment_enabled
+ * @property string $deployment_enabled_reason
  */
 class RdsDbConfig extends ActiveRecord
 {

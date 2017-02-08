@@ -86,10 +86,11 @@
     webSocketSubscribe('deployment_status_changed', function(event){
         if (event.deployment_enabled) {
             var title = "Обновление серверов включено";
-            var body = <?=json_encode(TbHTml::alert(TbHtml::ALERT_COLOR_SUCCESS, "Теперь можно собирать, активировать сборки, синхронизировать конфигурацию"))?>
+            var body = <?=json_encode(TbHTml::alert(TbHtml::ALERT_COLOR_SUCCESS, "Теперь можно собирать, активировать сборки, синхронизировать конфигурацию"))?>;
         } else {
             var title = "Обновление серверов отключено";
-            var body = <?=json_encode(TbHTml::alert(TbHtml::ALERT_COLOR_DANGER, "Сборки проектов, активация сборок и синронизация конфигов временно отключена"))?>
+            var body = <?=json_encode(TbHTml::alert(TbHtml::ALERT_COLOR_DANGER, "Сборки проектов, активация сборок и синронизация конфигов временно отключена"))?>;
+            body += '<b>Причина</b>: ' + event.reason;
         }
         $("#modal-popup .modal-header h4").html(title);
         $("#modal-popup .modal-body").html(body);
