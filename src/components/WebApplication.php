@@ -30,9 +30,9 @@ class WebApplication extends \yii\web\Application
     }
 
     /**
-     * @param Throwable $exception
+     * {@inheritdoc}
      */
-    public function handleException(Throwable $exception)
+    public function handleException($exception)
     {
         if ($exception instanceof CHttpException) {
             $this->debugLogger->dump()->exception('an', $exception)->notice()->save();
@@ -57,11 +57,7 @@ class WebApplication extends \yii\web\Application
 
     public function setRuntimePath($path)
     {
-<<<<<<< HEAD
-        //an: Создаем папку для временных файлов, если её ещё нету
-=======
         // an: Создаем папку для временных файлов, если её ещё нету
->>>>>>> origin/master
         if (!is_dir($path)) {
             mkdir($path, 0777);
         }

@@ -2,6 +2,15 @@
     "name": "whotrades/rds",
     "type": "library",
     "description": "WhoTrades release deployment service",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://artifact.finam.ru/artifactory/api/composer/packagist-org"
+        },
+        {
+            "packagist": false
+        }
+    ],
     "autoload": {
         "psr-0": {
             "Whotrades_": "../../code-standard/Standards/"

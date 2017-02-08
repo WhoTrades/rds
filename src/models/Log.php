@@ -129,7 +129,7 @@ class Log extends ActiveRecord
             throw new Exception("Can't create log request: ".json_encode($log->errors));
         }
 
-
+        Yii::app()->webSockets->send('logUpdated', []);
 
         return $log;
     }

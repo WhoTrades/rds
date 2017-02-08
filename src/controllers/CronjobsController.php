@@ -4,8 +4,9 @@
  * Контроллер по управлению фотовыми задачами
  * @see https://rds.whotrades.com/cronjobs/index
  */
+namespace app\controllers;
 
-class CronjobsController extends Controller
+class CronjobsController extends \Controller
 {
     const KILL_SIGNAL = 15; //SIGTERM
 

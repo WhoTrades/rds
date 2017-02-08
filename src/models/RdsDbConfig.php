@@ -18,6 +18,8 @@ use app\components\ActiveRecord;
  * @property string $crm_lamp_timeout
  * @property string $preprod_online
  * @property string $cpu_usage_last_truncate
+ * @property string $deployment_enabled
+ * @property string $deployment_enabled_reason
  */
 class RdsDbConfig extends ActiveRecord
 {
@@ -46,10 +48,6 @@ class RdsDbConfig extends ActiveRecord
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
             'is_tst_updating_enabled' => 'Включено ли обновление tst контура',
-            'red_lamp_wts_timeout' => 'Red Lamp Wts Timeout',
-            'red_lamp_team_city_timeout' => 'Red Lamp TeamCity Timeout',
-            'red_lamp_phplogs_dev_timeout' => 'Red Lamp PhpLogsDEV Timeout',
-            'crm_lamp_timeout' => 'CRM Lamp Timeout',
             'cpu_usage_last_truncate' => 'Cpu Usage last truncate',
         );
     }

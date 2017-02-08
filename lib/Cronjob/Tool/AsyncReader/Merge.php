@@ -121,7 +121,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                     $text = preg_replace('~{quote}(.*?){quote}~sui', '<pre>$1</pre>', $text);
 
                     Yii::$app->EmailNotifier->sendRdsConflictNotification(
-                        $feature->developer->finam_email,
+                        $feature->developer->whotrades_email,
                         strtolower(preg_replace('~(\w+)\-\d+~', '$1', $feature->jf_ticket)) . '@whotrades.org',
                         $feature->jf_ticket,
                         $message->targetBranch,

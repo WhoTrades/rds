@@ -48,13 +48,13 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
                 if (isset($errors[$alert->alert_name])) {
                     if ($alert->alert_status !== AlertLog::STATUS_ERROR) {
                         $alert->setStatus(AlertLog::STATUS_ERROR);
-                        $this->sendEmailError($alert);
+                        $this->sendErrorNotification($alert);
                     }
                     unset($errors[$alert->alert_name]);
                 } else {
                     if ($alert->alert_status !== AlertLog::STATUS_OK) {
                         $alert->setStatus(AlertLog::STATUS_OK);
-                        $this->sendEmailOK($alert);
+                        $this->sendOKNotification($alert);
                     }
                 }
             }
@@ -71,7 +71,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
                 $new->save();
 
-                $this->sendEmailError($new);
+                $this->sendErrorNotification($new);
             }
         }
 
@@ -83,24 +83,25 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      *
      * @param AlertLog $alertLog
      */
-    private function sendEmailError(AlertLog $alertLog)
+    private function sendErrorNotification(AlertLog $alertLog)
     {
         $subject = "Ошибка \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
         $text = "$alertLog->alert_text<br />\n";
 
-        if (AlertController::canBeLampLightedByTimeRanges()) {
-            $prev = date_default_timezone_get();
-            date_default_timezone_set(AlertController::TIMEZONE);
-            $text .= "Лампа загорится через 5 минут в " . date("Y.m.d H:i:s", strtotime(AlertController::ALERT_TIMEOUT)) . " МСК<br />
-                        Взять ошибку в работу - http://rds.whotrades.net/alert/ (лампа погаснет на 10 минут)
-                        \n";
-            date_default_timezone_set($prev);
-        } else {
-            $text .= "Лампа загорится в " . AlertController::ALERT_START_HOUR . ":00 МСК<br />\n";
-        }
+        $prev = date_default_timezone_get();
+        date_default_timezone_set(AlertController::TIMEZONE);
+        $text .= "Лампа включена<br />Взять ошибку в работу - http://rds.whotrades.net/alert/ (лампа погаснет на 10 минут)\n";
+        date_default_timezone_set($prev);
 
         $receiver = \Config::getInstance()->serviceRds['alerts']['lampOnEmail'];
         $this->sendEmail($subject, $text, $receiver);
+
+        $lamp = Lamp::model()->findByLampName($alertLog->alert_lamp);
+
+        foreach ($lamp->getReceivers() as $phone) {
+            $sms = "[ERROR] $alertLog->alert_name";
+            Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $sms);
+        }
     }
 
     /**
@@ -108,12 +109,19 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      *
      * @param AlertLog $alertLog
      */
-    private function sendEmailOK(AlertLog $alertLog)
+    private function sendOKNotification(AlertLog $alertLog)
     {
         $subject = "Ошибка \"$alertLog->alert_name\", лампочка $alertLog->alert_lamp";
         $text = "Ошибка пропала<br />\n";
         $receiver = \Config::getInstance()->serviceRds['alerts']['lampOffEmail'];
         $this->sendEmail($subject, $text, $receiver);
+
+        $lamp = Lamp::model()->findByLampName($alertLog->alert_lamp);
+
+        foreach ($lamp->getReceivers() as $phone) {
+            $sms = "[OK] $alertLog->alert_name";
+            Yii::app()->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $sms);
+        }
     }
 
     /**
@@ -142,9 +150,8 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
         return [
             AlertLog::WTS_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
-            AlertLog::CRM_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
+            AlertLog::CRM_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring ', $config['monitoring']['url']),
             AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(['WhoTrades_AcceptanceTests_WtSmokeTestProd'], 'TeamCity: Smoke Tests'),
-            //AlertLog::WTS_DEV_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'MonitoringDEV', $config['monitoringDEV']['url']),
         ];
     }
 
