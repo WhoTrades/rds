@@ -32,7 +32,7 @@ class WebSockets extends Component
      */
     public function registerScripts(View $view)
     {
-        $view->registerJsFile(__DIR__ . "/assets/autobahn.min.js", $view::POS_BEGIN);
+        $view->registerJsFile(__DIR__ . "/assets/autobahn.min.js", ['position' => $view::POS_BEGIN]);
         $view->registerJs($this->getInlineJs(), $view::POS_BEGIN);
     }
 

@@ -33,14 +33,14 @@ class SiteController extends \Controller
      */
     public function actionIndex()
     {
-        $releaseRequestSearchModel = new ReleaseRequest('search');
+        $releaseRequestSearchModel = new ReleaseRequest();
         $releaseRequestSearchModel->obj_created = null;
         $releaseRequestSearchModel->obj_modified = null;
         if (isset($_GET['ReleaseRequest'])) {
             $releaseRequestSearchModel->attributes = $_GET['ReleaseRequest'];
         }
 
-        $releaseRejectSearchModel = new ReleaseReject('search');
+        $releaseRejectSearchModel = new ReleaseReject();
         $releaseRejectSearchModel->obj_created = null;
         $releaseRejectSearchModel->obj_modified = null;
         if (isset($_GET['ReleaseReject'])) {

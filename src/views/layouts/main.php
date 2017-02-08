@@ -83,7 +83,7 @@ echo Nav::widget(
                     ['label' => 'Сигнализация', 'url' => array('/alert/index'), 'active' => \Yii::$app->controller->id == 'alert'],
                     ['label' => 'Фоновые задачи', 'url' => array('/cronjobs/index'), 'active' => \Yii::$app->controller->id == 'cronjobs'],
                     ['label' => 'Пересборка веток', 'url' => array('/Wtflow/gitBuild'), 'active' => \Yii::$app->controller->id == 'gitBuild'],
-                    ['label' => 'Ограничение функциональности', 'url' => array('/system/index'), 'active' => $this->getId() == 'system'],
+                    ['label' => 'Ограничение функциональности', 'url' => array('/system/index'), 'active' => \Yii::$app->controller->id == 'system'],
                 ],
             ),
             array(
