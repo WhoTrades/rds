@@ -103,12 +103,18 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
         if (isset($transitionMap[$message->targetBranch])) {
             if ($message->status) {
-                //an: Если мерж прошел успешно - двигаем задачу в след. статус
+                // an: Если мерж прошел успешно - двигаем задачу в след. статус
                 $this->debugLogger->message("Branch was merged successful, transition ticket to next status");
                 $transition = $transitionMap[$message->targetBranch];
+                // ar: Сохраняем время мержа задачи в мастер
+                if ($message->targetBranch === 'master') {
+                    JiraFeature::model()->updateAll([
+                        'jf_merge_request_to_master_time' => date('Y-m-d H:i:s'),
+                    ], "jf_ticket=:ticket", ['ticket' => $feature->jf_ticket]);
+                }
                 $jira->transitionTicket($ticketInfo, $transition, "Задача была успешно слита в ветку $message->targetBranch", true);
             } else {
-                //an: Если не смержилась - просто пишем комент с ошибками мержа
+                // an: Если не смержилась - просто пишем комент с ошибками мержа
                 $this->debugLogger->message("Branch was merged fail, sending comment");
                 $mergeFix = $message->targetBranch == 'master' ? "$message->targetBranch в $message->sourceBranch" : "$message->sourceBranch в $message->targetBranch";
                 $text = "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. " .
@@ -136,7 +142,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 'jf_last_merge_request_to_master_time' => null,
             ], "jf_ticket=:ticket", ['ticket' => $feature->jf_ticket]);
 
-            //an: И если исполнитель все ещё RDS (могли руками переназначить) -  отправляем задачу обратно разработчику
+            // an: И если исполнитель все ещё RDS (могли руками переназначить) -  отправляем задачу обратно разработчику
             // (если не смержилась - пусто мержит, если смержилась - пусть дальше работает :) )
             if (($lastDeveloper = $jira->getLastDeveloperNotRds($ticketInfo)) && ($ticketInfo['fields']['assignee']['name'] == $jira->getUserName())) {
                 try {
