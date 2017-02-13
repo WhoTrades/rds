@@ -109,7 +109,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 // ar: Сохраняем время мержа задачи в мастер
                 if ($message->targetBranch === 'master') {
                     JiraFeature::model()->updateAll([
-                        'jf_merge_request_to_master_time' => date('Y-m-d H:i:s'),
+                        'jf_merged_to_master_time' => date('Y-m-d H:i:s'),
                     ], "jf_ticket=:ticket", ['ticket' => $feature->jf_ticket]);
                 }
                 $jira->transitionTicket($ticketInfo, $transition, "Задача была успешно слита в ветку $message->targetBranch", true);
