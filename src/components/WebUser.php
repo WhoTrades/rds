@@ -9,7 +9,7 @@ class WebUser extends CWebUser
     protected function changeIdentity($id, $name, $states)
     {
         // an: Указываем false, что бы корректно работало с nutracker
-        Yii::app()->getSession()->regenerateID(false);
+        \Yii::$app->getSession()->regenerateID(false);
         $this->setId($id);
         $this->setName($name);
         $this->loadIdentityStates($states);

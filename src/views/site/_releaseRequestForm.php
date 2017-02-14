@@ -57,7 +57,7 @@
 
 <script type="text/javascript">
     updateStashUri = function(){
-        var projectName = $('#ReleaseRequest_rr_project_obj_id option:selected').html();
+        var projectName = $('#releaserequest-rr_project_obj_id option:selected').html();
         if (!projectName) return;
         if (typeof this.ajax != 'undefined') {
             this.ajax.abort();

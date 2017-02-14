@@ -9,7 +9,7 @@ use app\models\Build;
 use app\models\JiraCommit;
 use RdsSystem;
 
-class SiteController extends \Controller
+class SiteController extends Controller
 {
     public $pageTitle = 'Релизы и запреты';
 

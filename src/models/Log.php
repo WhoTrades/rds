@@ -43,17 +43,6 @@ class Log extends ActiveRecord
     }
 
     /**
-     * @return array relational rules.
-     */
-    public function relations()
-    {
-        // NOTE: you may need to adjust the relation name and the related
-        // class name for the relations automatically generated below.
-        return array(
-        );
-    }
-
-    /**
      * @return array customized attribute labels (name=>label)
      */
     public function attributeLabels()
@@ -107,17 +96,11 @@ class Log extends ActiveRecord
     }
 
     /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     * @param string $className active record class name.
-     * @return Log the static model class
+     * @param string $text
+     * @param string $user
+     * @return Log
      */
-    public static function model($className=__CLASS__)
-    {
-        return parent::model($className);
-    }
-
-    public static function createLogMessage($text, $user = null)
+    public static function createLogMessage(string $text, string $user = null)
     {
         if ($user == null) {
             $user = \Yii::$app->user->getIdentity()->username;
@@ -126,10 +109,10 @@ class Log extends ActiveRecord
         $log->log_text = $text;
         $log->log_user = $user;
         if (!$log->save()) {
-            throw new Exception("Can't create log request: ".json_encode($log->errors));
+            throw new Exception("Can't create log request: " . json_encode($log->errors));
         }
 
-        Yii::app()->webSockets->send('logUpdated', []);
+        \Yii::$app->webSockets->send('logUpdated', []);
 
         return $log;
     }

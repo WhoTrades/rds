@@ -4,9 +4,13 @@
  * All controller classes for this application should extend from this base class.
  */
 
-use yii\base\InlineAction;
+namespace app\controllers;
 
-class Controller extends yii\web\Controller
+use Yii;
+use yii\base\InlineAction;
+use yii\web\Controller as ControllerBase;
+
+class Controller extends ControllerBase
 {
     /**
      * @var string the default layout for the controller view. Defaults to '//layouts/column1',

@@ -1,4 +1,8 @@
 <?php
+namespace app\controllers;
+
+use app\models\ProjectConfigHistory;
+use app\models\ReleaseRequest;
 
 class DiffController extends Controller
 {

@@ -47,7 +47,7 @@ class SystemController extends Controller
                 $str = "Обновление серверов " . ($config->deployment_enabled ? "влючено" : "отключено") . ($model->reason ? ", причина: " . $model->reason : '');
                 Log::createLogMessage($str);
 
-                Yii::app()->webSockets->send(
+                \Yii::$app->webSockets->send(
                     'deployment_status_changed',
                     [
                         'deployment_enabled' => $config->deployment_enabled,

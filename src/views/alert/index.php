@@ -22,7 +22,7 @@
                     <?= TbHtml::submitButton('Включить', [ 'name' => "disable[$lamp->obj_id]", 'value' => '-1 minutes' ]) ?>
                 <?php }?>
                 <br />
-                <?php $phone = Yii::app()->user->phone;
+                <?php $phone = \Yii::$app->user->phone;
                 if (empty($phone)) {
                     echo TbHtml::alert(TbHtml::ALERT_COLOR_WARNING, 'Для подписки на SMS рассылку нужно указать свой телефон в CRM');
                 } else {

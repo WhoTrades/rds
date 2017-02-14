@@ -137,7 +137,7 @@ return array(
                     $diffStat = \Yii::$app->diffStat->getDiffStat($currentUsed->getCronConfigCleaned(), $releaseRequest->getCronConfigCleaned());
                     $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
                     $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
-                    $result .= "<a href='" . yii\helpers\Url::to('/diff/index/', ['id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id]) .
+                    $result .= "<a href='" . yii\helpers\Url::to(['/diff/index/', 'id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id]) .
                         "'>CRON изменен<br />$diffStat</a><br />";
                 }
 

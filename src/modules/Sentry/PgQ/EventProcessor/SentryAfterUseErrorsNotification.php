@@ -76,7 +76,7 @@ class PgQ_EventProcessor_SentryAfterUseErrorsNotification extends RdsEventProces
 
         $this->debugLogger->message("Errors count: " . count($errors));
 
-        Yii::app()->EmailNotifier->sentNewSentryErrors(
+        \Yii::$app->EmailNotifier->sentNewSentryErrors(
             $initiatorUserName,
             $tagTo,
             $errors
