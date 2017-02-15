@@ -62,7 +62,7 @@ class SiteController extends Controller
 
         $ids = Yii::app()->db->createCommand($sql)->queryColumn([
             ':user'     => Yii::app()->user->name,
-            ':status'   => \ServiceBase_IHasStatus::STATUS_DELETED,
+            ':status'   => \ServiceBase_IHasStatus::STATUS_ACTIVE,
         ]);
 
         $mainProjects = Project::model()->findAllByPk($ids);
