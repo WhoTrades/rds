@@ -1,6 +1,8 @@
 <?php
 namespace app\controllers;
 
+use app\models\MaintenanceToolRun;
+
 class MaintenanceToolRunController extends Controller
 {
     /**
@@ -46,7 +48,7 @@ class MaintenanceToolRunController extends Controller
      */
     public function actionIndex()
     {
-        $model=new MaintenanceToolRun('search');
+        $model = new MaintenanceToolRun('search');
         if(isset($_GET['MaintenanceToolRun']))
             $model->attributes=$_GET['MaintenanceToolRun'];
 
@@ -62,7 +64,7 @@ class MaintenanceToolRunController extends Controller
      */
     public function loadModel($id)
     {
-        $model=MaintenanceToolRun::findByPk($id);
+        $model = MaintenanceToolRun::findByPk($id);
         if($model===null)
             throw new CHttpException(404,'The requested page does not exist.');
         return $model;

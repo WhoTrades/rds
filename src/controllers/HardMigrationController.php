@@ -1,6 +1,9 @@
 <?php
 namespace app\controllers;
 
+use app\models\Log;
+use app\models\HardMigration;
+
 class HardMigrationController extends Controller
 {
     public $pageTitle = 'Тяжелые миграции';
@@ -33,7 +36,7 @@ class HardMigrationController extends Controller
 
     public function actionIndex()
     {
-        $model=new HardMigration('search');
+        $model = new HardMigration('search');
         if(isset($_GET['HardMigration']))
             $model->attributes=$_GET['HardMigration'];
 
@@ -131,7 +134,7 @@ class HardMigrationController extends Controller
      */
     public function loadModel($id)
     {
-        $model=HardMigration::findByPk($id);
+        $model = HardMigration::findByPk($id);
         if($model===null)
             throw new CHttpException(404,'The requested page does not exist.');
         return $model;

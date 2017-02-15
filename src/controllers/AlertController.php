@@ -3,6 +3,7 @@ namespace app\controllers;
 
 use app\models\RdsDbConfig;
 use app\models\AlertLog;
+use app\models\Lamp;
 
 class AlertController extends Controller
 {

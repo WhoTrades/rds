@@ -1,6 +1,10 @@
 <?php
 namespace app\controllers;
 
+use app\models\Log;
+use app\models\RdsDbConfig;
+use app\models\ReleaseRequest;
+
 class UseController extends Controller
 {
 
@@ -72,7 +76,7 @@ class UseController extends Controller
         $releaseRequest->rr_release_engineer_code = $code2;
         $releaseRequest->rr_project_owner_code_entered = false;
         $releaseRequest->rr_release_engineer_code_entered = true;
-        $releaseRequest->rr_status = \ReleaseRequest::STATUS_CODES;
+        $releaseRequest->rr_status = ReleaseRequest::STATUS_CODES;
 
         $text = "Code: %s. USE {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}";
         \Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}(\Yii::$app->user->phone, sprintf($text, $code1));
@@ -166,7 +170,7 @@ class UseController extends Controller
     public function actionIndex($id)
     {
         $releaseRequest = $this->loadModel($id);
-        if ($releaseRequest->rr_status != \ReleaseRequest::STATUS_CODES) {
+        if ($releaseRequest->rr_status != ReleaseRequest::STATUS_CODES) {
             $this->redirect('/');
         }
 

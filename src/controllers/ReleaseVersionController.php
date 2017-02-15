@@ -1,6 +1,8 @@
 <?php
 namespace app\controllers;
 
+use app\models\ReleaseVersion;
+
 class ReleaseVersionController extends Controller
 {
     public $pageTitle = 'Версии';
@@ -49,7 +51,7 @@ class ReleaseVersionController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new ReleaseVersion;
+		$model = new ReleaseVersion;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);

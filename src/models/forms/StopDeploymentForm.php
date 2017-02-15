@@ -1,5 +1,7 @@
 <?php
-class StopDeploymentForm extends CModel
+namespace app\models\forms;
+
+class StopDeploymentForm extends \yii\base\Model
 {
     public $reason;
     public $status;

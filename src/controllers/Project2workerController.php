@@ -1,6 +1,8 @@
 <?php
 namespace app\controllers;
 
+use app\models\Project2worker;
+
 class Project2workerController extends Controller
 {
 	/**

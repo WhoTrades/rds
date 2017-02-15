@@ -1,4 +1,7 @@
 <?php
+namespace app\models;
+
+use app\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.lamp".
@@ -12,7 +15,7 @@
  * @property string $lamp_timeout
  * @property string $lamp_receivers_list
  */
-class Lamp extends CActiveRecord
+class Lamp extends ActiveRecord
 {
     const ALERT_WAIT_TIMEOUT = '10 minutes';
     const ALERT_START_HOUR = 8;
@@ -21,7 +24,7 @@ class Lamp extends CActiveRecord
     /**
      * @return string the associated database table name
      */
-    public function tableName()
+    public static function tableName()
     {
         return 'rds.lamp';
     }

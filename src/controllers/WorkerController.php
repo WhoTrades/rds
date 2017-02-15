@@ -1,6 +1,8 @@
 <?php
 namespace app\controllers;
 
+use app\models\Worker;
+
 class WorkerController extends Controller
 {
     public $pageTitle = 'Сборщики';

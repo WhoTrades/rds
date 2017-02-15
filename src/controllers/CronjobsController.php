@@ -6,6 +6,13 @@
  */
 namespace app\controllers;
 
+use app\models\Log;
+use app\models\Project;
+use app\models\ToolJob;
+use app\models\CpuUsage;
+use app\models\RdsDbConfig;
+use app\models\ToolJobStopped;
+
 class CronjobsController extends Controller
 {
     const KILL_SIGNAL = 15; //SIGTERM

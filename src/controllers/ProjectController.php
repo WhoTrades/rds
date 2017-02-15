@@ -1,6 +1,14 @@
 <?php
 namespace app\controllers;
 
+use app\models\Log;
+use app\models\Worker;
+use app\models\Project;
+use app\models\RdsDbConfig;
+use app\models\ProjectConfig;
+use app\models\Project2worker;
+use app\models\ProjectConfigHistory;
+
 class ProjectController extends Controller
 {
     public $pageTitle = 'Проекты';

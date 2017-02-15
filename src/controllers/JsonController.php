@@ -1,6 +1,14 @@
 <?php
 namespace app\controllers;
 
+use app\models\Project;
+use app\models\ToolJob;
+use app\models\RdsDbConfig;
+use app\models\ReleaseVersion;
+use app\models\ReleaseRequest;
+use app\models\MaintenanceTool;
+use app\models\MaintenanceToolRun;
+
 class JsonController extends Controller
 {
     public function actionGetReleaseRequests($project)
@@ -227,7 +235,7 @@ class JsonController extends Controller
     {
         echo json_encode([
             'ok' => true,
-            'enabled' => \RdsDbConfig::get()->is_tst_updating_enabled
+            'enabled' => RdsDbConfig::get()->is_tst_updating_enabled
         ]);
     }
 
