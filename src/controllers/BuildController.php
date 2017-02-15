@@ -106,7 +106,6 @@ class BuildController extends Controller
 	public function actionAdmin()
 	{
 		$model=new Build('search');
-		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Build']))
 			$model->attributes=$_GET['Build'];
 

@@ -39,7 +39,6 @@ class LogController extends Controller
     public function actionIndex()
     {
         $model = new Log('search');
-        $model->unsetAttributes();  // clear any default values
         if (isset($_GET['Log'])) {
             $model->attributes = $_GET['Log'];
         }

@@ -122,7 +122,6 @@ class ReleaseVersionController extends Controller
 	public function actionAdmin()
 	{
 		$model=new ReleaseVersion('search');
-		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['ReleaseVersion']))
 			$model->attributes=$_GET['ReleaseVersion'];
 

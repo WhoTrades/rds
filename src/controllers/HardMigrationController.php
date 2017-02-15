@@ -34,7 +34,6 @@ class HardMigrationController extends Controller
     public function actionIndex()
     {
         $model=new HardMigration('search');
-        $model->unsetAttributes();  // clear any default values
         if(isset($_GET['HardMigration']))
             $model->attributes=$_GET['HardMigration'];
 

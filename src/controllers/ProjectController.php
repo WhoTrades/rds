@@ -231,7 +231,6 @@ $diffStat<br />
     public function actionAdmin()
     {
         $model = new Project('search');
-        $model->unsetAttributes();  // clear any default values
         if (isset($_GET['Project'])) {
             $model->attributes = $_GET['Project'];
         }

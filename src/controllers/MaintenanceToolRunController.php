@@ -47,7 +47,6 @@ class MaintenanceToolRunController extends Controller
     public function actionIndex()
     {
         $model=new MaintenanceToolRun('search');
-        $model->unsetAttributes();  // clear any default values
         if(isset($_GET['MaintenanceToolRun']))
             $model->attributes=$_GET['MaintenanceToolRun'];
 

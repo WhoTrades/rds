@@ -135,7 +135,6 @@ class Project2workerController extends Controller
 	public function actionAdmin()
 	{
 		$model=new Project2worker('search');
-		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Project2worker']))
 			$model->attributes=$_GET['Project2worker'];
 

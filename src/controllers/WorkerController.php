@@ -126,7 +126,6 @@ class WorkerController extends Controller
 	public function actionAdmin()
 	{
 		$model=new Worker('search');
-		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Worker']))
 			$model->attributes=$_GET['Worker'];
 
