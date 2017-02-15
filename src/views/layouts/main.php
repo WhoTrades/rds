@@ -45,7 +45,7 @@ echo Nav::widget(
             ),
             array(
                 'label' => 'Миграции',
-                'url' => array('/hardMigration/index'),
+                'url' => array('/hard-migration/index'),
                 'visible' => !\Yii::$app->user->isGuest,
                 'active' => \Yii::$app->controller->id == 'hardMigration',
             ),
@@ -54,11 +54,11 @@ echo Nav::widget(
                 'label' => 'Настройка сборки',
                 'url' => array('/project/admin'),
                 'visible' => !\Yii::$app->user->isGuest,
-                'active' => in_array(\Yii::$app->controller->id, ['project', 'worker', 'releaseVersion']),
+                'active' => in_array(\Yii::$app->controller->id, ['project', 'worker', 'release-version']),
                 'items' => [
                     array('label' => 'Проекты', 'url' => array('/project/admin'), 'active' => \Yii::$app->controller->id == 'project'),
                     array('label' => 'Сборщики', 'url' => array('/worker/admin'), 'active' => \Yii::$app->controller->id == 'worker'),
-                    array('label' => 'Версии', 'url' => array('/releaseVersion/admin'), 'active' => \Yii::$app->controller->id == 'releaseVersion'),
+                    array('label' => 'Версии', 'url' => array('/release-version/admin'), 'active' => \Yii::$app->controller->id == 'releaseVersion'),
                 ],
             ),
             array(

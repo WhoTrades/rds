@@ -1,4 +1,5 @@
 <?php
+namespace app\controllers;
 
 class Project2workerController extends Controller
 {

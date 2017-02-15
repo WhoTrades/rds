@@ -4,7 +4,7 @@ namespace app\controllers;
 use app\models\RdsDbConfig;
 use app\models\AlertLog;
 
-class AlertController extends \Controller
+class AlertController extends Controller
 {
     const TIMEZONE = "Europe/Moscow";
 

@@ -1,4 +1,6 @@
 <?php
+namespace app\controllers;
+
 class MaintenanceToolController extends Controller
 {
     public function filters()

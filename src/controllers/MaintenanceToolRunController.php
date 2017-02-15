@@ -1,4 +1,6 @@
 <?php
+namespace app\controllers;
+
 class MaintenanceToolRunController extends Controller
 {
     /**

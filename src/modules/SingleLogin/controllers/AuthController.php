@@ -1,7 +1,9 @@
 <?php
 namespace app\modules\SingleLogin\controllers;
 
-class AuthController extends \Controller
+use app\controllers\Controller;
+
+class AuthController extends Controller
 {
     /**
      * @param string $code

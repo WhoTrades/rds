@@ -1,4 +1,6 @@
 <?php
+namespace app\controllers;
+
 use \GraphiteSystem\Graphite;
 
 class ProgressController extends Controller

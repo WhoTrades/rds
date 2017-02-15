@@ -1,4 +1,6 @@
 <?php
+namespace app\controllers;
+
 class JsonController extends Controller
 {
     public function actionGetReleaseRequests($project)

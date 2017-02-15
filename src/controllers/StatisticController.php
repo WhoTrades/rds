@@ -1,4 +1,6 @@
 <?php
+namespace app\controllers;
+
 class StatisticController extends Controller
 {
     const LAST_PACKAGE_REMOVE_CALL_TIME_KEY = 'RDS::actionGetProjectBuildsToDelete::last_call_time';

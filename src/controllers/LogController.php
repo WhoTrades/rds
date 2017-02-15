@@ -3,7 +3,7 @@ namespace app\controllers;
 
 use app\models\Log;
 
-class LogController extends \Controller
+class LogController extends Controller
 {
     public $pageTitle = 'Журнал';
 

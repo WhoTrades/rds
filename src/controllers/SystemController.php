@@ -1,4 +1,6 @@
 <?php
+namespace app\controllers;
+
 class SystemController extends Controller
 {
     public $pageTitle = 'Управление RDS';

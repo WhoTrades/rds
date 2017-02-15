@@ -1,4 +1,5 @@
 <?php
+namespace app\controllers;
 
 class BuildController extends Controller
 {

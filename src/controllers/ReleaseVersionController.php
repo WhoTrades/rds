@@ -1,4 +1,5 @@
 <?php
+namespace app\controllers;
 
 class ReleaseVersionController extends Controller
 {

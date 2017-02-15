@@ -6,7 +6,7 @@
  */
 namespace app\controllers;
 
-class CronjobsController extends \Controller
+class CronjobsController extends Controller
 {
     const KILL_SIGNAL = 15; //SIGTERM
 
