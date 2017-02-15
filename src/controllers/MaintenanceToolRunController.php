@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use yii\web\HttpException;
 use app\models\MaintenanceToolRun;
 
 class MaintenanceToolRunController extends Controller
@@ -66,7 +67,7 @@ class MaintenanceToolRunController extends Controller
     {
         $model = MaintenanceToolRun::findByPk($id);
         if($model===null)
-            throw new CHttpException(404,'The requested page does not exist.');
+            throw new HttpException(404,'The requested page does not exist.');
         return $model;
     }
 

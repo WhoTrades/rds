@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use yii\web\HttpException;
 use app\models\MaintenanceTool;
 
 class MaintenanceToolController extends Controller
@@ -80,13 +81,13 @@ class MaintenanceToolController extends Controller
      * If the data model is not found, an HTTP exception will be raised.
      * @param integer $id the ID of the model to be loaded
      * @return MaintenanceTool the loaded model
-     * @throws CHttpException
+     * @throws HttpException
      */
     public function loadModel($id)
     {
         $model = MaintenanceTool::findByPk($id);
         if($model===null)
-            throw new CHttpException(404,'The requested page does not exist.');
+            throw new HttpException(404,'The requested page does not exist.');
         return $model;
     }
 

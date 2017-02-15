@@ -18,7 +18,7 @@ class PgQ_EventProcessor_ZohoAsync extends RdsEventProcessorBase
     /**
      * @param \PgQ\Event $event
      *
-     * @throws CHttpException
+     * @throws HttpException
      * @throws \CompanyInfrastructure\Exception\Jira\TicketNotFound
      * @throws \ServiceBase\HttpRequest\Exception\ResponseCode
      */

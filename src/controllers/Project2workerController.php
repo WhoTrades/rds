@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use yii\web\HttpException;
 use app\models\Project2worker;
 
 class Project2workerController extends Controller
@@ -150,13 +151,13 @@ class Project2workerController extends Controller
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
 	 * @return Project2worker the loaded model
-	 * @throws CHttpException
+	 * @throws HttpException
 	 */
 	public function loadModel($id)
 	{
 		$model=Project2worker::findByPk($id);
 		if($model===null)
-			throw new CHttpException(404,'The requested page does not exist.');
+			throw new HttpException(404,'The requested page does not exist.');
 		return $model;
 	}
 

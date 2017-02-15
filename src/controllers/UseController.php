@@ -2,6 +2,7 @@
 namespace app\controllers;
 
 use app\models\Log;
+use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ReleaseRequest;
 
@@ -43,12 +44,12 @@ class UseController extends Controller
     {
         $releaseRequest = $this->loadModel($id);
         if (!$releaseRequest->canBeUsed()) {
-            throw new CHttpException(500, 'Wrong release request status');
+            throw new HttpException(500, 'Wrong release request status');
         }
 
         $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
         if (!$deployment_enabled) {
-            throw new CHttpException(500, 'Deployment disabled');
+            throw new HttpException(500, 'Deployment disabled');
         }
 
         if ($releaseRequest->canByUsedImmediately()) {
@@ -102,8 +103,8 @@ class UseController extends Controller
      * @param int $id
      * @param string $type
      *
-     * @throws CHttpException
-     * @throws Exception
+     * @throws HttpException
+     * @throws \Exception
      */
     public function actionMigrate($id, $type)
     {
@@ -212,13 +213,13 @@ class UseController extends Controller
      * @param int $id
      *
      * @return ReleaseRequest
-     * @throws CHttpException
+     * @throws HttpException
      */
     public function loadModel($id)
     {
         $model = ReleaseRequest::findByPk($id);
         if ($model == null) {
-            throw new CHttpException(404, 'The requested page does not exist.');
+            throw new HttpException(404, 'The requested page does not exist.');
         }
 
         return $model;

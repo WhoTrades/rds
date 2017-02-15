@@ -2,6 +2,7 @@
 namespace app\controllers;
 
 use app\models\Build;
+use yii\web\HttpException;
 use \GraphiteSystem\Graphite;
 
 class ProgressController extends Controller
@@ -11,7 +12,7 @@ class ProgressController extends Controller
         /** @var $build Build */
         $build = Build::findByPk($taskId);
         if (!$build) {
-            throw new CHttpException(404, 'Build not found');
+            throw new HttpException(404, 'Build not found');
         }
 
         $data = json_decode($build->build_time_log, true);

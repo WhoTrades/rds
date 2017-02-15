@@ -2,6 +2,7 @@
 namespace app\controllers;
 
 use app\models\Log;
+use yii\web\HttpException;
 
 class LogController extends Controller
 {
@@ -58,7 +59,7 @@ class LogController extends Controller
     {
         $model = Log::findByPk($id);
         if ($model === null) {
-            throw new CHttpException(404, 'The requested page does not exist.');
+            throw new HttpException(404, 'The requested page does not exist.');
         }
 
         return $model;

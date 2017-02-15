@@ -4,6 +4,7 @@ namespace app\controllers;
 use app\models\Log;
 use app\models\Worker;
 use app\models\Project;
+use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ProjectConfig;
 use app\models\Project2worker;
@@ -254,13 +255,13 @@ $diffStat<br />
      * If the data model is not found, an HTTP exception will be raised.
      * @param integer $id the ID of the model to be loaded
      * @return Project the loaded model
-     * @throws CHttpException
+     * @throws HttpException
      */
     public function loadModel($id)
     {
         $model = Project::findByPk($id);
         if ($model === null) {
-            throw new CHttpException(404, 'The requested page does not exist.');
+            throw new HttpException(404, 'The requested page does not exist.');
         }
 
         return $model;

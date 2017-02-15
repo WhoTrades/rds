@@ -1,4 +1,7 @@
 <?php
+
+use yii\web\HttpException;
+
 class WebApplication extends \yii\web\Application
 {
     /** @var \ServiceBase_IDebugLogger */
@@ -34,7 +37,7 @@ class WebApplication extends \yii\web\Application
      */
     public function handleException($exception)
     {
-        if ($exception instanceof CHttpException) {
+        if ($exception instanceof HttpException) {
             $this->debugLogger->dump()->exception('an', $exception)->notice()->save();
         } else {
             $this->debugLogger->dump()->exception('an', $exception)->critical()->save();

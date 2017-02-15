@@ -10,6 +10,7 @@ use app\models\Log;
 use app\models\Project;
 use app\models\ToolJob;
 use app\models\CpuUsage;
+use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ToolJobStopped;
 
@@ -42,7 +43,7 @@ class CronjobsController extends Controller
     {
         $Project = Project::findByAttributes(['project_name' => $project]);
         if (!$Project) {
-            throw new CHttpException(404, "Проект $project не найден");
+            throw new HttpException(404, "Проект $project не найден");
         }
 
         $projects = Project::find()->all();

@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use yii\web\HttpException;
 use app\models\ReleaseVersion;
 
 class ReleaseVersionController extends Controller
@@ -137,13 +138,13 @@ class ReleaseVersionController extends Controller
 	 * If the data model is not found, an HTTP exception will be raised.
 	 * @param integer $id the ID of the model to be loaded
 	 * @return ReleaseVersion the loaded model
-	 * @throws CHttpException
+	 * @throws HttpException
 	 */
 	public function loadModel($id)
 	{
 		$model=ReleaseVersion::findByPk($id);
 		if($model===null)
-			throw new CHttpException(404,'The requested page does not exist.');
+			throw new HttpException(404,'The requested page does not exist.');
 		return $model;
 	}
 

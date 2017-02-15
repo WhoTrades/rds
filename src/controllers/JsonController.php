@@ -3,6 +3,7 @@ namespace app\controllers;
 
 use app\models\Project;
 use app\models\ToolJob;
+use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ReleaseVersion;
 use app\models\ReleaseRequest;
@@ -16,7 +17,7 @@ class JsonController extends Controller
         /** @var $Project Project */
         $Project = Project::findByAttributes(['project_name' => $project]);
         if (!$Project) {
-            throw new CHttpException(404, 'Project not found');
+            throw new HttpException(404, 'Project not found');
         }
 
         $releaseRequests = $Project->releaseRequests;
@@ -39,7 +40,7 @@ class JsonController extends Controller
      * @param string $project название проекта (Поле в БД project.project_name)
      * @param int    $limit   максимальное количество результатов. Работает только если $project указан
      * @param string $format  формат ответа. null (json) или не null (plain text)
-     * @throws CHttpException
+     * @throws HttpException
      */
     public function actionGetInstalledPackages($project = null, $limit = null, $format = null)
     {
@@ -55,7 +56,7 @@ class JsonController extends Controller
             ]);
 
             if (!$projectObj) {
-                throw new CHttpException(404, "Project $project not found");
+                throw new HttpException(404, "Project $project not found");
             }
 
             $c->compare("rr_project_obj_id", $projectObj->obj_id);
@@ -107,7 +108,7 @@ class JsonController extends Controller
         ]);
 
         if (!$tool) {
-            throw new CHttpException(404, "Tool $toolName not found");
+            throw new HttpException(404, "Tool $toolName not found");
         }
 
         $c = new CDbCriteria();

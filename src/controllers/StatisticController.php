@@ -2,6 +2,7 @@
 namespace app\controllers;
 
 use app\models\Project;
+use yii\web\HttpException;
 use app\models\ReleaseRequest;
 
 class StatisticController extends Controller
@@ -13,7 +14,7 @@ class StatisticController extends Controller
         $project = Project::findByAttributes(array('project_name' => $projectName));
 
         if (!$project) {
-            throw new CHttpException(404, 'unknown project');
+            throw new HttpException(404, 'unknown project');
         }
 
         $c = new CDbCriteria();
