@@ -135,6 +135,16 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function defaultScope()
+    {
+        return [
+            'condition' => 't.obj_status_did = ' . \ServiceBase_IHasStatus::STATUS_ACTIVE,
+        ];
+    }
+
+    /**
      * @return array customized attribute labels (name=>label)
      */
     public function attributeLabels()
@@ -186,6 +196,17 @@ class ReleaseRequest extends ActiveRecord
         return new ReleaseRequestSearchDataProvider($this, array(
             'criteria' => $criteria,
         ));
+    }
+
+    /**
+     * @param bool $real
+     * {@inheritdoc}
+     */
+    public function delete($real = null)
+    {
+        $this->obj_status_did = \ServiceBase_IHasStatus::STATUS_DELETED;
+
+        return (bool) $real ? parent::delete() : $this->save();
     }
 
     /**

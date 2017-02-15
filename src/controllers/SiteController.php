@@ -55,11 +55,15 @@ class SiteController extends Controller
                 FROM rds.release_request
                 WHERE obj_created > NOW() - interval '3 month'
                 AND rr_user=:user
+                AND obj_status_did=:status
                 GROUP BY 1
                 ORDER BY 2 DESC
                 LIMIT 5";
 
-        $ids = Yii::app()->db->createCommand($sql)->queryColumn([':user' => Yii::app()->user->name]);
+        $ids = Yii::app()->db->createCommand($sql)->queryColumn([
+            ':user'     => Yii::app()->user->name,
+            ':status'   => \ServiceBase_IHasStatus::STATUS_DELETED,
+        ]);
 
         $mainProjects = Project::model()->findAllByPk($ids);
 
