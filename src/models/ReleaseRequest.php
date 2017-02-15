@@ -140,7 +140,8 @@ class ReleaseRequest extends ActiveRecord
     public function defaultScope()
     {
         return [
-            'condition' => 't.obj_status_did = ' . \ServiceBase_IHasStatus::STATUS_ACTIVE,
+            'alias'     => 'releaserequest',
+            'condition' => 'releaserequest.obj_status_did = ' . \ServiceBase_IHasStatus::STATUS_ACTIVE,
         ];
     }
 
@@ -181,16 +182,16 @@ class ReleaseRequest extends ActiveRecord
     {
         $criteria = new CDbCriteria();
 
-        $criteria->compare('t.obj_id', $this->obj_id);
-        $criteria->compare('t.obj_created', $this->obj_created);
-        $criteria->compare('t.obj_modified', $this->obj_modified);
-        $criteria->compare('t.obj_status_did', $this->obj_status_did);
-        $criteria->compare('t.rr_user', $this->rr_user, true);
-        $criteria->compare('t.rr_status', $this->rr_status);
-        $criteria->compare('t.rr_comment', $this->rr_comment, true);
-        $criteria->compare('t.rr_project_obj_id', $this->rr_project_obj_id);
-        $criteria->compare('t.rr_build_version', $this->rr_build_version, true);
-        $criteria->order = 't.obj_created desc';
+        $criteria->compare('releaserequest.obj_id', $this->obj_id);
+        $criteria->compare('releaserequest.obj_created', $this->obj_created);
+        $criteria->compare('releaserequest.obj_modified', $this->obj_modified);
+        $criteria->compare('releaserequest.obj_status_did', $this->obj_status_did);
+        $criteria->compare('releaserequest.rr_user', $this->rr_user, true);
+        $criteria->compare('releaserequest.rr_status', $this->rr_status);
+        $criteria->compare('releaserequest.rr_comment', $this->rr_comment, true);
+        $criteria->compare('releaserequest.rr_project_obj_id', $this->rr_project_obj_id);
+        $criteria->compare('releaserequest.rr_build_version', $this->rr_build_version, true);
+        $criteria->order = 'releaserequest.obj_created desc';
         $criteria->with = array('builds', 'builds.worker', 'builds.project', 'hardMigrations');
 
         return new ReleaseRequestSearchDataProvider($this, array(
