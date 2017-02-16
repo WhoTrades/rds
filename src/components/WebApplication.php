@@ -14,7 +14,7 @@ class WebApplication extends \yii\web\Application
      * @param array                    $config
      * @param ServiceBase_IDebugLogger $debugLogger
      */
-    public function __construct(array $config, ServiceBase_IDebugLogger $debugLogger)
+    public function __construct(array $config, \ServiceBase_IDebugLogger $debugLogger)
     {
         $this->debugLogger = $debugLogger;
 

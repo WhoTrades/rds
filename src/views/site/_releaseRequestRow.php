@@ -7,6 +7,7 @@ use app\models\ReleaseRequest;
 use app\models\Project;
 use app\models\Build;
 use yii\helpers\Html;
+use app\components\TbHtml;
 
 return array(
     'obj_id',

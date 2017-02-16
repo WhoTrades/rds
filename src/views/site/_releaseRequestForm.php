@@ -1,6 +1,10 @@
-<?php /** @var $this app\components\View */ ?>
-<?php /** @var $model app\models\ReleaseRequest */ ?>
-<?php /** @var $form yii\bootstrap\ActiveForm */?>
+<?php
+/** @var $this app\components\View */
+/** @var $model app\models\ReleaseRequest
+/** @var $form yii\bootstrap\ActiveForm */
+
+use app\components\TbHtml;
+?>
 <div class="form" style="width: 400px; margin: auto">
     <?php $form = yii\bootstrap\ActiveForm::begin(array(
         'enableAjaxValidation' => true,

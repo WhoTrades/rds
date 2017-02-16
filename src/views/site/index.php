@@ -3,6 +3,7 @@ use app\models\ReleaseReject;
 use app\models\ReleaseRequest;
 use app\models\Project;
 use yii\helpers\Html;
+use app\components\TbHtml;
 
 /** @var $this yii\web\View */
 /** @var $releaseRejectSearchModel ReleaseReject */

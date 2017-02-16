@@ -39,9 +39,8 @@ class Dispatcher extends \ServiceBase\AbstractRequestHandler
         defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 
         require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
-        require_once(__DIR__ . '/../protected/components/WebApplication.php');
         try {
-            $application = new \WebApplication(require($config), $debugLogger);
+            $application = new \app\components\WebApplication(require($config), $debugLogger);
 
             if (is_dir(__DIR__ . '/../lib/MigrationSystem')) {
                 \Yii::setAlias('@MigrationSystem', __DIR__ . '/../lib/MigrationSystem');

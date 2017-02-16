@@ -59,7 +59,7 @@ class SiteController extends Controller
 
         $mainProjects = Project::find()->where(['obj_id' => $ids])->all();
 
-        echo $this->render('index', array(
+        return $this->render('index', array(
             'releaseRequestSearchModel' => $releaseRequestSearchModel,
             'releaseRejectSearchModel' => $releaseRejectSearchModel,
             'mainProjects' => $mainProjects,

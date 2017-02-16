@@ -1,8 +1,6 @@
 <?php
 namespace app\components;
 
-require_once('WebApplication.php');
-
 class ExternalApplication extends WebApplication
 {
     public function processRequest()

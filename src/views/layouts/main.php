@@ -3,6 +3,7 @@ use app\assets\AppAsset;
 use yii\helpers\Html;
 use yii\bootstrap\NavBar;
 use yii\bootstrap\Nav;
+use app\components\TbHtml;
 
 /** @var $this yii\web\View */
 /** @var $content string */
