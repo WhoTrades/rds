@@ -128,7 +128,7 @@ class WorkerController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Worker('search');
+		$model = new Worker(['scenario' => 'search']);
 		if(isset($_GET['Worker']))
 			$model->attributes=$_GET['Worker'];
 

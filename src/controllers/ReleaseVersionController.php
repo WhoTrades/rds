@@ -124,7 +124,7 @@ class ReleaseVersionController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new ReleaseVersion('search');
+		$model = new ReleaseVersion(['scenario' => 'search']);
 		if(isset($_GET['ReleaseVersion']))
 			$model->attributes=$_GET['ReleaseVersion'];
 

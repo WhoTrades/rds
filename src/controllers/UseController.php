@@ -175,7 +175,7 @@ class UseController extends Controller
             $this->redirect('/');
         }
 
-        $model = new ReleaseRequest('use');
+        $model = new ReleaseRequest(['scenario' => 'use']);
         if (isset($_POST['ReleaseRequest'])) {
             $model->attributes = $_POST['ReleaseRequest'];
 

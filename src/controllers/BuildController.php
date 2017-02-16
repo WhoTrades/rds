@@ -109,7 +109,7 @@ class BuildController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Build('search');
+		$model = new Build(['scenario' => 'search']);
 		if(isset($_GET['Build']))
 			$model->attributes=$_GET['Build'];
 

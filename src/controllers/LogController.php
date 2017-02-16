@@ -39,7 +39,7 @@ class LogController extends Controller
      */
     public function actionIndex()
     {
-        $model = new Log('search');
+        $model = new Log(['scenario' => 'search']);
         if (isset($_GET['Log'])) {
             $model->attributes = $_GET['Log'];
         }

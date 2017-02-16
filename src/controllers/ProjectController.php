@@ -239,7 +239,7 @@ $diffStat<br />
      */
     public function actionAdmin()
     {
-        $model = new Project('search');
+        $model = new Project(['scenario' => 'search']);
         if (isset($_GET['Project'])) {
             $model->attributes = $_GET['Project'];
         }

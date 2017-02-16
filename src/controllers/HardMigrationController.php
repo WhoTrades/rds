@@ -37,7 +37,7 @@ class HardMigrationController extends Controller
 
     public function actionIndex()
     {
-        $model = new HardMigration('search');
+        $model = new HardMigration(['scenario' => 'search']);
         if(isset($_GET['HardMigration']))
             $model->attributes=$_GET['HardMigration'];
 

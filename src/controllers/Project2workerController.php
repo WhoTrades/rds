@@ -137,7 +137,7 @@ class Project2workerController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Project2worker('search');
+		$model = new Project2worker(['scenario' => 'search']);
 		if(isset($_GET['Project2worker']))
 			$model->attributes=$_GET['Project2worker'];
 

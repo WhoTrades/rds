@@ -43,7 +43,7 @@ class MaintenanceToolController extends Controller
 
     public function actionIndex()
     {
-        $model = new MaintenanceTool('search');
+        $model = new MaintenanceTool(['scenario' => 'search']);
         if(isset($_GET['MaintenanceTool']))
             $model->attributes=$_GET['MaintenanceTool'];
 
