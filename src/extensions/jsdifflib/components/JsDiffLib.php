@@ -16,7 +16,7 @@ class JsDiffLib extends CApplicationComponent
 	 */
 	public function registerAllCss()
 	{
-		\Yii::$app->clientScript->registerCssFile($this->getAssetsUrl().'/css/diffview.css');
+        \Yii::$app->view->registerCssFile($this->getAssetsUrl() . '/css/diffview.css');
 	}
 
 	/**

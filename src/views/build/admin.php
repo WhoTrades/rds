@@ -2,7 +2,7 @@
 /* @var $this BuildController */
 /* @var $model Build */
 
-\Yii::$app->clientScript->registerScript('search', "
+$this->registerJs("
 $('.search-button').click(function(){
 	$('.search-form').toggle();
 	return false;
@@ -13,7 +13,7 @@ $('.search-form form').submit(function(){
 	});
 	return false;
 });
-");
+", $this::POS_READY, 'search');
 ?>
 
 <h1>Manage Builds</h1>

@@ -4,18 +4,6 @@ namespace app\components;
 class ActiveRecord extends \yii\db\ActiveRecord
 {
     /**
-     * @param array $config
-     */
-    public function __construct($config = [])
-    {
-        if ($this->isNewRecord) {
-            $this->obj_created = date("r");
-            $this->obj_modified = date("r");
-        }
-        parent::__construct($config);
-    }
-
-    /**
      * @param bool $runValidation
      * @param null $attributes
      *

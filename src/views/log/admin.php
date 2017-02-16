@@ -1,9 +1,11 @@
-
 <?php
-/* @var $this LogController */
-/* @var $model Log */
+/**
+ * @var $model app\models\Log
+ */
 
-\Yii::$app->clientScript->registerScript('search', "
+use yii\helpers\Html;
+
+$this->registerJs("
 $('.search-button').click(function(){
     $('.search-form').toggle();
     return false;
@@ -14,7 +16,7 @@ $('.search-form form').submit(function(){
     });
     return false;
 });
-");
+", $this::POS_READY, 'search');
 ?>
 
 <h1>Logs</h1>
@@ -24,28 +26,29 @@ $('.search-form form').submit(function(){
     or <b>=</b>) at the beginning of each of your search values to specify how the comparison should be done.
 </p>
 
-<?php echo CHtml::link('Advanced Search','#',array('class'=>'search-button')); ?>
+<?= Html::a('Advanced Search','#',array('class'=>'search-button')); ?>
 <div class="search-form" style="display:none">
 <?php echo $this->render('_search',array(
     'model'=>$model,
 )); ?>
 </div><!-- search-form -->
 
-<?php $this->widget('yiistrap.widgets.TbGridView', array(
-    'id'=>'log-grid',
-    'dataProvider'=>$model->search(),
-    'htmlOptions' => ['class' => 'table-responsive'],
-    'filter'=>$model,
-    'columns'=>array(
+<?= yii\grid\GridView::widget(array(
+    'id' => 'log-grid',
+    'dataProvider' => $model->search($model->attributes),
+    'filterModel' => $model,
+    'columns' => array(
         'obj_created',
         'log_user',
         [
-            'name' => 'log_text',
-            'type' => 'html',
+            'attribute' => 'log_text',
+            'format' => 'html',
         ],
         'obj_id',
     ),
-)); ?>
+));
+
+?>
 
 <script>
     webSocketSubscribe('logUpdated', function(event){

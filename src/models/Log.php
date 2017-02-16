@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
 
 /**
@@ -58,41 +59,22 @@ class Log extends ActiveRecord
     }
 
     /**
-     * Retrieves a list of models based on the current search/filter conditions.
+     * @param array $params
      *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
+     * @return ActiveDataProvider
      */
-    public function search()
+    public function search(array $params)
     {
-        // @todo Please modify the following code to remove attributes that should not be searched.
+        $query = self::find()->filterWhere($params);
 
-        $criteria=new CDbCriteria;
-
-        $criteria->compare('obj_id',$this->obj_id,true);
-        $criteria->compare('obj_created',$this->obj_created,true);
-        $criteria->compare('obj_modified',$this->obj_modified,true);
-        $criteria->compare('obj_status_did',$this->obj_status_did);
-        $criteria->compare('log_user',$this->log_user,true);
-        $criteria->compare('log_text',$this->log_text,true);
-
-        if (empty($_GET['Log_sort'])) {
-            $criteria->order = 'obj_created desc, obj_id desc';
+        if (empty($params['Log_sort'])) {
+            $query->orderBy('obj_created desc, obj_id desc');
         }
-        $criteria->limit = 100;
 
-        return new CActiveDataProvider($this, array(
-            'criteria'=>$criteria,
-            'pagination' => [
-                'pageSize' => 100,
-            ],
-        ));
+        $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 100]]);
+        $this->load($params, 'search');
+
+        return $dataProvider;
     }
 
     /**
