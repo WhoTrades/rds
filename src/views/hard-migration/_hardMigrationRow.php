@@ -1,6 +1,7 @@
 <?php
 /** @var $model HardMigration */
 use app\components\TbHtml;
+use app\models\HardMigration;
 
 return array(
 //    [
@@ -70,7 +71,7 @@ return array(
     [
         'name' => 'migration_progress',
         'value' => function(HardMigration $migration){
-            if (!in_array($migration->migration_status, [\HardMigration::MIGRATION_STATUS_IN_PROGRESS, \HardMigration::MIGRATION_STATUS_PAUSED])) {
+            if (!in_array($migration->migration_status, [HardMigration::MIGRATION_STATUS_IN_PROGRESS, HardMigration::MIGRATION_STATUS_PAUSED])) {
                 return false;
             }
             return '<div class="progress progress-'.str_replace("/", "", $migration->migration_name).'_'.$migration->migration_environment.'" style="margin: 0; width: 250px;">

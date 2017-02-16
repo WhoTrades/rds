@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "rds.hard_migration".
