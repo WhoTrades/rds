@@ -126,7 +126,6 @@ NavBar::end();
             e.preventDefault();
         });
     });
-<<<<<<< HEAD
 
     for (var i in document.onload) {
         if (!document.onload.hasOwnProperty(i)) {
@@ -134,7 +133,7 @@ NavBar::end();
         }
         document.onload[i]();
     }
-=======
+
     webSocketSubscribe('deployment_status_changed', function(event){
         if (event.deployment_enabled) {
             var title = "Обновление серверов включено";
@@ -148,7 +147,7 @@ NavBar::end();
         $("#modal-popup .modal-body").html(body);
         $("#modal-popup").modal("show");
     });
->>>>>>> origin/master
+
 </script>
 </body>
 </html>

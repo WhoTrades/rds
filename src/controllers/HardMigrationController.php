@@ -41,7 +41,7 @@ class HardMigrationController extends Controller
         if(isset($_GET['HardMigration']))
             $model->attributes=$_GET['HardMigration'];
 
-        $this->render('index',array(
+        return $this->render('index',array(
             'model'=>$model,
         ));
     }
