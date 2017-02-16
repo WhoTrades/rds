@@ -1,8 +1,8 @@
 <?php
-/* @var $this BuildController */
+
 /* @var $model Build */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'Manage Build', 'url'=>array('admin')),
 );
 ?>

@@ -1,8 +1,7 @@
 <?php
-/* @var $this ProjectController */
 /* @var $model Project */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'Create Project', 'url'=>array('create')),
 	array('label'=>'Update Project', 'url'=>array('update', 'id'=>$model->obj_id)),
 	array('label'=>'Delete Project', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->obj_id),'confirm'=>'Are you sure you want to delete this item?')),

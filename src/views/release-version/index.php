@@ -1,8 +1,7 @@
 <?php
-/* @var $this ReleaseVersionController */
 /* @var $dataProvider CActiveDataProvider */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'Create ReleaseVersion', 'url'=>array('create')),
 	array('label'=>'Manage ReleaseVersion', 'url'=>array('admin')),
 );

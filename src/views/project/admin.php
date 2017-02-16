@@ -1,9 +1,8 @@
 <?php
-/* @var $this ProjectController */
 /* @var $model Project */
 /* @var $workers Worker[] */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'Create Project', 'url'=>array('create')),
 );
 

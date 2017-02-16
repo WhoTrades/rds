@@ -1,12 +1,15 @@
 <?php /** @var $this Controller */ ?>
 <?php $this->beginContent('views/layouts/main'); ?>
 <div id="content">
-    <?php if (!empty($this->menu)) { ?>
+    <?php if (!empty($this->params['menu'])) { ?>
         <div class="row">
             <div class="span3">
                 <div id="sidebar">
                     <?php
-                        $this->widget('yiistrap.widgets.TbNav', ['items' => $this->menu, 'htmlOptions' => ['class' => 'operations']]);
+                        echo \yii\bootstrap\Nav::widget([
+                            'items'     => $this->params['menu'],
+                            'options'   => ['class' => 'operations'],
+                        ]);
                     ?>
                 </div><!-- sidebar -->
             </div>

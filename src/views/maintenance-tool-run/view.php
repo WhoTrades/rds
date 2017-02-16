@@ -3,7 +3,7 @@
 
 $this->title = "Выполнение процесса ".$model->mtrMaintenanceTool->mt_name;
 
-$this->menu=array(
+$this->params['menu']=array(
     array('label'=>'List MaintenanceToolRun','url'=>array('index')),
     array('label'=>'Create MaintenanceToolRun','url'=>array('create')),
     array('label'=>'Update MaintenanceToolRun','url'=>array('update','id'=>$model->obj_id)),

@@ -1,5 +1,7 @@
 <?php
 /** @var $model HardMigration */
+use app\components\TbHtml;
+
 return array(
 //    [
 //        'name' => 'migration_environment',

@@ -2,7 +2,7 @@
 /* @var $this BuildController */
 /* @var $model Build */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'View Build', 'url'=>array('view', 'id'=>$model->obj_id)),
 	array('label'=>'Manage Build', 'url'=>array('admin')),
 );

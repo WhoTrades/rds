@@ -1,8 +1,7 @@
 <?php
-/* @var $this ReleaseVersionController */
 /* @var $model ReleaseVersion */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'List ReleaseVersion', 'url'=>array('index')),
 	array('label'=>'Create ReleaseVersion', 'url'=>array('create')),
 	array('label'=>'Update ReleaseVersion', 'url'=>array('update', 'id'=>$model->obj_id)),

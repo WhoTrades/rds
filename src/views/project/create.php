@@ -1,8 +1,7 @@
 <?php
-/* @var $this ProjectController */
 /* @var $model Project */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'Manage Project', 'url'=>array('admin')),
 );
 ?>

@@ -12,10 +12,10 @@
             $this->beginWidget('zii.widgets.CPortlet', array(
                 'title'=>'Operations',
             ));
-            $this->widget('yiistrap.widgets.TbNav', array(
-                'items'=>$this->menu,
-                'htmlOptions'=>array('class'=>'operations'),
-            ));
+            echo \yii\bootstrap\Nav::widget([
+                'items'     => $this->params['menu'],
+                'options'   => ['class' => 'operations'],
+            ]);
             $this->endWidget();
         ?>
         </div><!-- sidebar -->

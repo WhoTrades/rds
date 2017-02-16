@@ -1,8 +1,7 @@
 <?php
-/* @var $this Project2workerController */
 /* @var $dataProvider CActiveDataProvider */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'Create Project2worker', 'url'=>array('create')),
 	array('label'=>'Manage Project2worker', 'url'=>array('admin')),
 );

@@ -1,6 +1,6 @@
 <?php
 
-$this->menu=array(
+$this->params['menu']=array(
     array('label'=>'List MaintenanceToolRun','url'=>array('index')),
     array('label'=>'Create MaintenanceToolRun','url'=>array('create')),
 );

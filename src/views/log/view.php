@@ -1,9 +1,8 @@
-
 <?php
-/* @var $this LogController */
+
 /* @var $model Log */
 
-$this->menu=array(
+$this->params['menu']=array(
     array('label'=>'List Log', 'url'=>array('index')),
     array('label'=>'Create Log', 'url'=>array('create')),
     array('label'=>'Update Log', 'url'=>array('update', 'id'=>$model->obj_id)),

@@ -1,8 +1,7 @@
 <?php
-/* @var $this Project2workerController */
 /* @var $model Project2worker */
 
-$this->menu=array(
+$this->params['menu']=array(
 	array('label'=>'List Project2worker', 'url'=>array('index')),
 	array('label'=>'Create Project2worker', 'url'=>array('create')),
 	array('label'=>'Update Project2worker', 'url'=>array('update', 'id'=>$model->obj_id)),
