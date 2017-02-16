@@ -7,7 +7,7 @@
  * @copyright © 2015 WhoTrades, Ltd. (http://whotrades.com). All rights reserved.
  */
 
-namespace AlertLog;
+namespace app\components\AlertLog;
 
 class BadJsonException extends \CException
 {

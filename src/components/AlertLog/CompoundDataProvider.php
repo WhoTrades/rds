@@ -7,9 +7,7 @@
  * @copyright © 2015 WhoTrades, Ltd. (http://whotrades.com). All rights reserved.
  */
 
-
-namespace AlertLog;
-
+namespace app\components\AlertLog;
 
 class CompoundDataProvider implements IAlertDataProvider
 {

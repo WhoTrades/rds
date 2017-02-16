@@ -3,7 +3,8 @@
  * @author Artem Naumenko
  * Класс, который реализует хендлер логов для монолога, и пишет логи внутрь debugLogger
  */
-namespace Logs;
+
+namespace app\components\Logs;
 
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;

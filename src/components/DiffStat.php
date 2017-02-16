@@ -1,5 +1,7 @@
 <?php
-final class DiffStat extends yii\base\Object
+namespace app\components;
+
+final class DiffStat extends \yii\base\Object
 {
     public function getDiffStat($text1, $text2)
     {

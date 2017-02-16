@@ -1,4 +1,6 @@
 <?php
+namespace app\components;
+
 class Time {
 	/**
 	* Returns a nicely formatted date string for given Datetime string.

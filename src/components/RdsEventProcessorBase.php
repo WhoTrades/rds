@@ -1,5 +1,7 @@
 <?php
-abstract class RdsEventProcessorBase extends PgQ\EventProcessor\EventProcessorBase
+namespace app\components;
+
+abstract class RdsEventProcessorBase extends \PgQ\EventProcessor\EventProcessorBase
 {
     /** @return \GraphiteSystem\Graphite */
     public function getEventProcessorGraphite()

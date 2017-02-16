@@ -1,5 +1,7 @@
 <?php
-final class Whotrades extends yii\base\Object
+namespace app\components;
+
+final class Whotrades extends \yii\base\Object
 {
     /** @var \JsonRpcClient */
     protected $rpc;

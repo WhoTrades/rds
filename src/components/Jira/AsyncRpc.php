@@ -1,5 +1,5 @@
 <?php
-namespace Jira;
+namespace app\components\Jira;
 
 class AsyncRpc extends \yii\base\Object
 {

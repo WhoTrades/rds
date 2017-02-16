@@ -1,4 +1,6 @@
 <?php
+namespace app\components;
+
 class WebUser extends CWebUser
 {
     /**

@@ -1,4 +1,5 @@
 <?php
+namespace app\components;
 
 /**
  * UserIdentity represents the data needed to identity a user.

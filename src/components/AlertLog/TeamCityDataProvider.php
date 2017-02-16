@@ -8,8 +8,7 @@
  */
 
 
-namespace AlertLog;
-
+namespace app\components\AlertLog;
 
 use CompanyInfrastructure\TeamCityClient;
 

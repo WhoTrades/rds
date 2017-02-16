@@ -1,7 +1,9 @@
 <?php
+namespace app\components;
+
 use \GraphiteSystem\Graphite;
 
-class RdsGraphite extends yii\base\Object
+class RdsGraphite extends \yii\base\Object
 {
     public $host;
     public $port;

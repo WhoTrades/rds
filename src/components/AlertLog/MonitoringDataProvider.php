@@ -7,7 +7,7 @@
  * @copyright © 2016 WhoTrades, Ltd. (http://whotrades.com). All rights reserved.
  */
 
-namespace AlertLog;
+namespace app\components\AlertLog;
 
 class MonitoringDataProvider implements IAlertDataProvider
 {

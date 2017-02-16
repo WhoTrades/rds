@@ -1,7 +1,9 @@
 <?php
+namespace app\components;
+
 use RedisSystem\IRedisClient;
 
-class RdsRedis extends yii\base\Object
+class RdsRedis extends \yii\base\Object
 {
     public $host;
     public $port;

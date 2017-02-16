@@ -1,4 +1,6 @@
 <?php
+namespace app\components;
+
 class TbHtml
 {
     const ICON_COLOR_DEFAULT = '';
