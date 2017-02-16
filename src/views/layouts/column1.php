@@ -1,5 +1,4 @@
-<?php /** @var $this Controller */ ?>
-<?php $this->beginContent('views/layouts/main'); ?>
+<?php $this->beginContent('@app/views/layouts/main.php'); ?>
 <div id="content">
     <?php if (!empty($this->params['menu'])) { ?>
         <div class="row">
