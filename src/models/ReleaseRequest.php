@@ -87,6 +87,7 @@ class ReleaseRequest extends ActiveRecord
             ),
             array(['rr_project_owner_code', 'rr_release_engineer_code'], 'safe', 'on' => 'use'),
             array(['rr_release_version'], 'checkForReleaseReject'),
+            array(['rr_project_obj_id'], 'checkDeploymentEnabled'),
         );
     }
 
@@ -114,6 +115,23 @@ class ReleaseRequest extends ActiveRecord
             $this->addError($attribute, 'Запрет на релиз: ' . implode("; ", $messages));
         }
 
+    }
+
+    /**
+     * @param string $attribute
+     * @param array $params
+     */
+    public function checkDeploymentEnabled($attribute, $params)
+    {
+        $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
+        if (!$deployment_enabled) {
+            $this->addError($attribute, 'Деплой временно запрещен. Обратитесь к администратору, причина: ' . RdsDbConfig::get()->deployment_enabled_reason);
+        }
+    }
+
+    public static function find()
+    {
+        return parent::find()->andWhere(['obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE]);
     }
 
     /**
@@ -149,6 +167,17 @@ class ReleaseRequest extends ActiveRecord
         $this->load($params, 'search');
 
         return $dataProvider;
+    }
+
+    /**
+     * @param bool $real
+     * {@inheritdoc}
+     */
+    public function delete($real = null)
+    {
+        $this->obj_status_did = \ServiceBase_IHasStatus::STATUS_DELETED;
+
+        return (bool) $real ? parent::delete() : $this->save();
     }
 
     /**
