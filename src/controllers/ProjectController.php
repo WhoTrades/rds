@@ -165,7 +165,7 @@ class ProjectController extends Controller
 
                     Log::createLogMessage("Изменение в конфигурации $existingProject->project_name/$filename:<br />
 $diffStat<br />
-<a href='" . $this->createUrl("/diff/project_config", ['id' => $projectHistoryItem->obj_id]) . "'>Посмотреть подробнее</a>
+<a href='" . \yii\helpers\Url::to(["/diff/project_config", 'id' => $projectHistoryItem->obj_id]) . "'>Посмотреть подробнее</a>
 ");
                 }
 

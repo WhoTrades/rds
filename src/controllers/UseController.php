@@ -96,7 +96,7 @@ class UseController extends Controller
             Log::createLogMessage("CODES {$releaseRequest->getTitle()}");
         }
 
-        $this->redirect($this->createUrl('/use/index', ['id' => $id]));
+        $this->redirect(['/use/index', 'id' => $id]);
     }
 
     /**

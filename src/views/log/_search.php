@@ -2,6 +2,7 @@
 /* @var $this LogController */
 /* @var $model Log */
 /* @var $form CActiveForm */
+use yii\helpers\Url;
 ?>
 
 <div class="wide form">

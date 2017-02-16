@@ -3,12 +3,13 @@
 /** @var $currentBranch - текущая активная ветка */
 /** @var $allowedBranches - список всех веток, на которые можно переключиться */
 /** @var $tasks - список задач, которые осталось выполнить до переключения контура */
+use yii\helpers\Url;
 ?>
 <div style="width: 400px; margin: auto;">
     <h1>Переключение контура</h1>
 
     <?php if (empty($tasks)) {?>
-        <form method="post" action="<?=$this->createUrl("/pdev/")?>">
+        <form method="post" action="<?=Url::to(["/pdev/"])?>">
             <?=TbHtml::hiddenField('action', 'switch')?>
             <?=TbHtml::textField('branch', $currentBranch)?>
             <?=TbHtml::help('Например, master, staging, https://jira.finam.ru/browse/WTT-1000')?>

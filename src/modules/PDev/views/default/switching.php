@@ -7,7 +7,7 @@
     )?>
     <script>
         setTimeout(function(){
-            document.location = '<?=$this->createUrl('/pdev/')?>';
+            document.location = '<?=\yii\helpers\Url::to(['/pdev/'])?>';
         }, 15000);
     </script>
 </div>

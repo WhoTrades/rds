@@ -60,7 +60,7 @@ class MaintenanceToolController extends Controller
         $mtr = $tool->start(\Yii::$app->user->getIdentity()->username);
 
         if (empty($mtr->errors)) {
-            $this->redirect($this->createUrl('/maintenanceToolRun/view/', ['id' => $mtr->obj_id]));
+            $this->redirect(['/maintenance-tool-run/view/', 'id' => $mtr->obj_id]);
         } else {
             throw new Exception("Can't  create new instance of tool: ".json_encode($mtr->errors));
         }
@@ -73,7 +73,7 @@ class MaintenanceToolController extends Controller
 
         $tool->stop(\Yii::$app->user->getIdentity()->username);
 
-        $this->redirect($this->createUrl('/maintenanceTool/'));
+        $this->redirect(['/maintenance-tool/']);
     }
 
     /**
