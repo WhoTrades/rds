@@ -1,8 +1,4 @@
 <?php
-$this->breadcrumbs=array(
-    'Maintenance Tool Runs'=>array('index'),
-    'Manage',
-);
 
 $this->menu=array(
     array('label'=>'List MaintenanceToolRun','url'=>array('index')),

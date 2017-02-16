@@ -2,11 +2,6 @@
 /* @var $this ProjectController */
 /* @var $model Project */
 
-$this->breadcrumbs=array(
-	'Projects'=>array('index'),
-	$model->obj_id,
-);
-
 $this->menu=array(
 	array('label'=>'Create Project', 'url'=>array('create')),
 	array('label'=>'Update Project', 'url'=>array('update', 'id'=>$model->obj_id)),

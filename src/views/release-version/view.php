@@ -2,11 +2,6 @@
 /* @var $this ReleaseVersionController */
 /* @var $model ReleaseVersion */
 
-$this->breadcrumbs=array(
-	'Release Versions'=>array('index'),
-	$model->obj_id,
-);
-
 $this->menu=array(
 	array('label'=>'List ReleaseVersion', 'url'=>array('index')),
 	array('label'=>'Create ReleaseVersion', 'url'=>array('create')),

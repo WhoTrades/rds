@@ -3,11 +3,6 @@
 /* @var $model Project */
 /* @var $workers Worker[] */
 
-$this->breadcrumbs=array(
-	'Projects'=>array('index'),
-	'Manage',
-);
-
 $this->menu=array(
 	array('label'=>'Create Project', 'url'=>array('create')),
 );

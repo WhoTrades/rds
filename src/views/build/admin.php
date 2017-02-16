@@ -2,11 +2,6 @@
 /* @var $this BuildController */
 /* @var $model Build */
 
-$this->breadcrumbs=array(
-	'Builds'=>array('index'),
-	'Manage',
-);
-
 \Yii::$app->clientScript->registerScript('search', "
 $('.search-button').click(function(){
 	$('.search-form').toggle();

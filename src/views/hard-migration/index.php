@@ -1,7 +1,7 @@
 <?php
 /* @var $this HardMigrationController */
 /* @var $model HardMigration */
-$this->breadcrumbs=['Hard Migrations'];
+
 ?>
 <h1>Управление тяжелыми миграциями</h1>
 <p> Можно использовать дополнительные операторы сравнения (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b> or <b>=</b>) </p>

@@ -2,11 +2,6 @@
 /* @var $this Project2workerController */
 /* @var $model Project2worker */
 
-$this->breadcrumbs=array(
-	'Project2workers'=>array('index'),
-	'Create',
-);
-
 $this->menu=array(
 	array('label'=>'List Project2worker', 'url'=>array('index')),
 	array('label'=>'Manage Project2worker', 'url'=>array('admin')),

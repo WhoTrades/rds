@@ -2,11 +2,6 @@
 /* @var $this WorkerController */
 /* @var $model Worker */
 
-$this->breadcrumbs=array(
-	'Workers'=>array('index'),
-	'Manage',
-);
-
 $this->menu=array(
 	array('label'=>'List Worker', 'url'=>array('index')),
 	array('label'=>'Create Worker', 'url'=>array('create')),

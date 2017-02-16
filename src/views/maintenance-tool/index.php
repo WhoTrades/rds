@@ -2,9 +2,6 @@
 /* @var $this MaintenanceToolController */
 /* @var $model MaintenanceTool */
 
-$this->breadcrumbs=array(
-    'Maintenance Tools',
-);
 $this->title = "Обслуживание";
 $this->widget('yiistrap.widgets.TbGridView', array(
     'dataProvider'=>$model->search(),

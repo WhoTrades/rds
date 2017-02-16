@@ -2,10 +2,6 @@
 /* @var $this ReleaseVersionController */
 /* @var $dataProvider CActiveDataProvider */
 
-$this->breadcrumbs=array(
-	'Release Versions',
-);
-
 $this->menu=array(
 	array('label'=>'Create ReleaseVersion', 'url'=>array('create')),
 	array('label'=>'Manage ReleaseVersion', 'url'=>array('admin')),

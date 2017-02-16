@@ -3,12 +3,6 @@
 /* @var $model Project */
 /* @var $deployment_enabled bool */
 
-$this->breadcrumbs = array(
-    'Projects' => array('index'),
-    $model->obj_id => array('view', 'id' => $model->obj_id),
-    'Update',
-);
-
 $this->menu = array(
     array('label' => 'Create Project', 'url' => array('create')),
     array('label' => 'View Project', 'url' => array('view', 'id' => $model->obj_id)),

@@ -3,11 +3,6 @@
 /* @var $this LogController */
 /* @var $model Log */
 
-$this->breadcrumbs=array(
-    'Logs'=>array('index'),
-    'Manage',
-);
-
 \Yii::$app->clientScript->registerScript('search', "
 $('.search-button').click(function(){
     $('.search-form').toggle();

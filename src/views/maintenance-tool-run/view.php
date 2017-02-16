@@ -1,8 +1,5 @@
 <?php
 /** @var $model MaintenanceToolRun */
-$this->breadcrumbs=array(
-    'Maintenance Tool Runs'=>array('index'),
-);
 
 $this->title = "Выполнение процесса ".$model->mtrMaintenanceTool->mt_name;
 
