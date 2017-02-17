@@ -78,7 +78,7 @@ class ReleaseRequest extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'rr_user', 'rr_status', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_release_version'], 'required'),
+            array(['rr_user', 'rr_status', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_release_version'], 'required'),
             array(['obj_status_did', 'rr_project_obj_id'], 'number', 'integerOnly' => true),
             array(
                 ['obj_id', 'obj_created', 'obj_status_did', 'rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_status'],

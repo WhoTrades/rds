@@ -45,7 +45,7 @@ class MaintenanceToolRun extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'mtr_maintenance_tool_obj_id', 'mtr_runner_user', 'mtr_status'], 'required'),
+            array(['mtr_maintenance_tool_obj_id', 'mtr_runner_user', 'mtr_status'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
             array(['mtr_runner_user'], 'string', 'max' => 256),
             array(['mtr_log', 'mtr_pid'], 'safe'),

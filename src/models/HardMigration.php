@@ -59,7 +59,7 @@ class HardMigration extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'migration_type', 'migration_name', 'migration_environment'], 'required'),
+            array(['migration_type', 'migration_name', 'migration_environment'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
             array(['migration_progress'], 'number'),
             array(['migration_name'], 'checkMigrationNameIsUnique'),

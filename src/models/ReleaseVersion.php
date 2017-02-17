@@ -32,7 +32,7 @@ class ReleaseVersion extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'rv_version', 'rv_name'], 'required'),
+            array(['rv_version', 'rv_name'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly'=>true),
         );
     }

@@ -45,7 +45,7 @@ class PgqZohoIntegration extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, task', 'required'),
+            array('task', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly' => true),
             array('task', 'length', 'max' => 64),
             array('data', 'safe'),

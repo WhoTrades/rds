@@ -56,7 +56,7 @@ class AlertLog extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'alert_detect_at', 'alert_lamp', 'alert_provider', 'alert_name', 'alert_status'], 'required'),
+            array(['alert_detect_at', 'alert_lamp', 'alert_provider', 'alert_name', 'alert_status'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
             array(['alert_lamp'], 'string', 'max' => 32),
             array('alert_provider', 'string', 'max' => 64),

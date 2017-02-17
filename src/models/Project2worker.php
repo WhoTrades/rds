@@ -36,7 +36,7 @@ class Project2worker extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'worker_obj_id', 'project_obj_id'], 'required'),
+            array(['worker_obj_id', 'project_obj_id'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
         );
     }

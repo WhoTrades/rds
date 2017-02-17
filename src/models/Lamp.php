@@ -37,7 +37,7 @@ class Lamp extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('obj_created, obj_modified, lamp_name', 'required'),
+            array('lamp_name', 'required'),
             array('obj_status_did', 'numerical', 'integerOnly' => true),
             array('lamp_name', 'length', 'max' => 128),
             array('lamp_timeout, lamp_receivers_list', 'safe'),

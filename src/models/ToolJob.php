@@ -39,7 +39,7 @@ class ToolJob extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'project_obj_id', 'key', 'command', 'version'], 'required'),
+            array(['project_obj_id', 'key', 'command', 'version'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
             array(['key'],     'string', 'max' => 12),
             array(['group'],   'string', 'max' => 250),

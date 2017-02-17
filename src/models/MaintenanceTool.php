@@ -41,7 +41,7 @@ class MaintenanceTool extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'mt_name', 'mt_command'], 'required'),
+            array(['mt_name', 'mt_command'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly'=>true),
             array(['mt_name', 'mt_command'], 'string', 'max'=>256),
             // The following rule is used by search().

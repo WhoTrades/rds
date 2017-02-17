@@ -36,7 +36,7 @@ class CpuUsage extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'project_name', 'key'], 'required'),
+            array(['project_name', 'key'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
             array(['cpu_time'], 'number'),
             array(['project_name'], 'string', 'max' => 24),

@@ -51,7 +51,7 @@ class Build extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'build_worker_obj_id'], 'required'),
+            array(['build_worker_obj_id'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
             array(['build_status'], 'safe'),
             // The following rule is used by search().

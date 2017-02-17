@@ -45,7 +45,7 @@ class Project extends ActiveRecord
     public function rules()
     {
         return [
-            ['obj_created, obj_modified, project_name', 'required'],
+            ['project_name', 'required'],
             ['obj_status_did', 'number', 'integerOnly' => true],
             ['project_notification_email', 'email'], ['project_config', 'safe'],
 

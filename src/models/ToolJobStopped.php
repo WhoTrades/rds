@@ -36,7 +36,7 @@ class ToolJobStopped extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified', 'project_obj_id', 'key', 'stopped_till'], 'required'),
+            array(['project_obj_id', 'key', 'stopped_till'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
             array(['key'], 'string', 'max' => 12),
         );

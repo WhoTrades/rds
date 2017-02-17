@@ -33,7 +33,7 @@ class ProjectConfig extends ActiveRecord
     public function rules()
     {
         return [
-            ['obj_created, obj_modified, pc_project_obj_id, pc_filename', 'required'],
+            ['pc_project_obj_id, pc_filename', 'required'],
             ['obj_status_did', 'number', 'integerOnly' => true],
             ['pc_filename', 'length', 'max' => 128],
             ['pc_content', 'ext.validators.PhpSyntaxValidator'],
