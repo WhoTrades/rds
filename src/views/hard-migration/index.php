@@ -5,16 +5,20 @@
 <h1>Управление тяжелыми миграциями</h1>
 <p> Можно использовать дополнительные операторы сравнения (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b> or <b>=</b>) </p>
 
-<?php $this->widget('yiistrap.widgets.TbGridView', array(
-    'id'=>'hard-migration-grid',
-    'dataProvider'=>$model->search(),
-    'htmlOptions' => ['class' => 'table-responsive'],
-    'filter'=>$model,
-    'rowCssClassExpression' => function($index, $rr){
-        return 'hard-migration-'.str_replace("/", "", $rr->migration_name).'_'.$rr->migration_environment;
+<?= yii\grid\GridView::widget(array(
+    'id' => 'hard-migration-grid',
+    'dataProvider' => $model->search($model->attributes),
+    'options' => ['class' => 'table-responsive'],
+    'filterModel' => $model,
+    'rowOptions' => function ($model, $key, $index, $grid) {
+        return [
+            'class' => 'hard-migration-' . str_replace("/", "", $model->migration_name) . '_' . $model->migration_environment,
+        ];
     },
-    'columns'=>include('_hardMigrationRow.php'),
-)); ?>
+    'columns' => include('_hardMigrationRow.php'),
+));
+
+?>
 
 
 <script type="text/javascript">

@@ -97,7 +97,7 @@ class HardMigration extends ActiveRecord
      */
     public function getProject()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'migration_project_obj_id'])->one();
+        return $this->hasOne(Project::className(), ['obj_id' => 'migration_project_obj_id']);
     }
 
     /**
@@ -105,7 +105,7 @@ class HardMigration extends ActiveRecord
      */
     public function getReleaseRequest()
     {
-        return $this->hasOne(ReleaseRequest::className(), ['obj_id' => 'migration_release_request_obj_id'])->one();
+        return $this->hasOne(ReleaseRequest::className(), ['obj_id' => 'migration_release_request_obj_id']);
     }
 
     /**
@@ -131,48 +131,22 @@ class HardMigration extends ActiveRecord
     }
 
     /**
-     * Retrieves a list of models based on the current search/filter conditions.
+     * @param array $params
      *
-     * Typical usecase:
-     * - Initialize the model fields with values from filter form.
-     * - Execute this method to get CActiveDataProvider instance which will filter
-     * models according to data in model fields.
-     * - Pass data provider to CGridView, CListView or any similar widget.
-     *
-     * @return CActiveDataProvider the data provider that can return the models
-     * based on the search/filter conditions.
+     * @return ActiveDataProvider
      */
-    public function search()
+    public function search(array $params)
     {
-        // @todo Please modify the following code to remove attributes that should not be searched.
+        $query = self::find()->filterWhere($params)->with('releaseRequest');
 
-        $criteria=new CDbCriteria;
-
-        $criteria->with = ['releaseRequest'];
-
-        $criteria->compare('t.obj_id',$this->obj_id);
-        $criteria->compare('obj_created',$this->obj_created,true);
-        $criteria->compare('obj_modified',$this->obj_modified,true);
-        $criteria->compare('obj_status_did',$this->obj_status_did);
-        $criteria->compare('migration_release_request_obj_id',$this->migration_release_request_obj_id);
-        $criteria->compare('migration_project_obj_id',$this->migration_project_obj_id);
-        $criteria->compare('migration_type',$this->migration_type,true);
-        $criteria->compare('migration_name',$this->migration_name,true);
-        $criteria->compare('migration_ticket',$this->migration_ticket,true);
-        $criteria->compare('migration_status',$this->migration_status,true);
-        $criteria->compare('migration_retry_count',$this->migration_retry_count,true);
-        $criteria->compare('migration_progress',$this->migration_progress);
-        $criteria->compare('migration_progress_action',$this->migration_progress_action,true);
-        $criteria->compare('rr_build_version',$this->build_version, true);
-        $criteria->compare('migration_environment',$this->migration_environment, true);
-
-        if (empty($_GET['HardMigration_sort'])) {
-            $criteria->order = 't.obj_created desc';
+        if (empty($params['HardMigration_sort'])) {
+            $query->orderBy('obj_created desc');
         }
 
-        return new CActiveDataProvider($this, array(
-            'criteria'=>$criteria,
-        ));
+        $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 100]]);
+        $this->load($params, 'search');
+
+        return $dataProvider;
     }
 
     public function getNotDoneMigrationCountForTicket($ticket)
