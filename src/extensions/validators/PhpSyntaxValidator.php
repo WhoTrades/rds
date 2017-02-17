@@ -1,4 +1,9 @@
 <?php
+namespace app\extensions;
+
+use yii\validators\Validator;
+use Exception;
+
 /**
  * Валидация синтаксиса PHP-кода
  *
@@ -8,33 +13,32 @@
  * @copyright © 2015 WhoTrades, Ltd. (http://whotrades.com). All rights reserved.
  */
 
-class PhpSyntaxValidator extends CValidator
+class PhpSyntaxValidator extends Validator
 {
     /**
-     * @param CModel $object
+     * @param \yii\base\Model $model
      * @param string $attribute
-     *
-     * @throws CException
+     * @throws Exception
      */
-    protected function validateAttribute($object, $attribute)
+    public function validateAttribute($model, $attribute)
     {
         $tempName = tempnam(sys_get_temp_dir(), $attribute);
-        $result = file_put_contents($tempName, $object->$attribute);
+        $result = file_put_contents($tempName, $model->$attribute);
 
         if ($result === false) {
-            throw new CException("Не могу записать в файл $tempName");
+            throw new Exception("Не могу записать в файл $tempName");
         }
 
         $commandExecutor = new \RdsSystem\lib\CommandExecutor(\Yii::$app->debugLogger);
 
         try {
-            $command = PHP_BINDIR.DIRECTORY_SEPARATOR."php -l -ddisplay_errors=On $tempName 2>&1";
+            $command = PHP_BINDIR . DIRECTORY_SEPARATOR . "php -l -ddisplay_errors=On $tempName 2>&1";
             $commandExecutor->executeCommand($command);
         } catch (\RdsSystem\lib\CommandExecutorException $exception) {
-            $errorMessage = 'Ошибка синтаксиса валидации PHP-кода:'.PHP_EOL;
+            $errorMessage = 'Ошибка синтаксиса валидации PHP-кода:' . PHP_EOL;
             $errorMessage .= $exception->getOutput();
             $errorMessage = str_replace($tempName, "\"$attribute\"", $errorMessage);
-            $object->addError($attribute, nl2br($errorMessage));
+            $model->addError($attribute, nl2br($errorMessage));
         }
 
         unlink($tempName);

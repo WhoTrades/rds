@@ -1,5 +1,6 @@
 <?php
 /** @var $filename string */
+use app\components\TbHtml;
 
 /** @var $newText string */
 /** @var $newTitle string */
@@ -11,11 +12,18 @@
 
 $this->title = "$projectName/$filename";
 ?>
-<h1>Изменения <?=$this->title?></h1>
+<h1>Изменения <?= $this->title ?></h1>
 <div class="diff">
-    <?=yii\bootstrap\BaseHtml::icon(TbHtml::ICON_MINUS, ['style' => 'float: right ;border: solid 1px #eee; cursor: pointer', 'onclick' => 'togglePanelMode()',], 'div');?>
+    <?=yii\bootstrap\BaseHtml::icon(
+        TbHtml::ICON_MINUS,
+        [
+            'style' => 'float: right ;border: solid 1px #eee; cursor: pointer',
+            'onclick' => 'togglePanelMode()',
+        ],
+        'div'
+    ); ?>
     <div class="item">
-        <input type="checkbox" id="inline" style="float: left" onchange="diffUsingJS();" />
+        <input type="checkbox" id="inline" style="float: left" onchange="diffUsingJS();"/>
         <label for="inline">В одну колонку</label>
     </div>
 
@@ -28,23 +36,23 @@ $this->title = "$projectName/$filename";
         <button onclick="scrollNext()">Перейти к след. изменению</button>
     </div>
     <div class="item">
-        <?
+        <?php
         $diffStat = \Yii::$app->diffStat->getDiffStat(str_replace("\r", "", $currentText), str_replace("\r", "", $newText));
         $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
         $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
         ?>
-        <?=$diffStat?>
+        <?= $diffStat ?>
     </div>
     <div style="clear: both"></div>
 </div>
 
-<br />
-<div id="baseText" style="display: none"><?=htmlspecialchars($currentText)?></div>
-<div id="newText" style="display: none"><?=htmlspecialchars($newText)?></div>
+<br/>
+<div id="baseText" style="display: none"><?= htmlspecialchars($currentText) ?></div>
+<div id="newText" style="display: none"><?= htmlspecialchars($newText) ?></div>
 <div id="diffoutput"></div>
 
 <script>
-    document.onload.push(function() {
+    document.onload.push(function () {
         function togglePanelMode() {
             $('div.diff').toggleClass('navbar-fixed-top')
         }
