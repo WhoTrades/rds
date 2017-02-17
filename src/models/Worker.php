@@ -88,10 +88,10 @@ class Worker extends ActiveRecord
     /**
      * @return array
      */
-    public function forList()
+    public static function forList()
     {
         $list = array('' => " - Worker - ");
-        foreach ($this->find()->all() as $val) {
+        foreach (static::find()->all() as $val) {
             $list[$val->obj_id] = $val->worker_name;
         }
 

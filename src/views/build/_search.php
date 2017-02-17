@@ -1,72 +1,50 @@
 <?php
-/* @var $this BuildController */
-/* @var $model Build */
-/* @var $form CActiveForm */
-use yii\helpers\Url;
+/**
+ * @var $model app\models\Build
+ * @var $form yii\widgets\ActiveForm
+ */
+
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+
 ?>
 
 <div class="wide form">
 
-<?php $form=$this->beginWidget('CActiveForm', array(
-	'action'=>Url::to([$this->route]),
-	'method'=>'get',
-)); ?>
+    <?php $form = ActiveForm::begin(['method' => 'GET']) ?>
+        <div class="row">
+            <?= $form->field($model, 'obj_id'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'obj_created'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'obj_modified'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'obj_status_did'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'build_release_request_obj_id'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'build_worker_obj_id'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'build_project_obj_id'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'build_status'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'build_attach'); ?>
+        </div>
+        <div class="row">
+            <?= $form->field($model, 'build_version')->textInput(['size' => 60, 'maxlength' => 64]); ?>
+        </div>
+        <div class="row buttons">
+            <?= Html::submitButton('Search'); ?>
+        </div>
+    <?php ActiveForm::end() ?>
 
-	<div class="row">
-		<?php echo $form->label($model,'obj_id'); ?>
-		<?php echo $form->textField($model,'obj_id'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'obj_created'); ?>
-		<?php echo $form->textField($model,'obj_created'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'obj_modified'); ?>
-		<?php echo $form->textField($model,'obj_modified'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'obj_status_did'); ?>
-		<?php echo $form->textField($model,'obj_status_did'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'build_release_request_obj_id'); ?>
-		<?php echo $form->textField($model,'build_release_request_obj_id'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'build_worker_obj_id'); ?>
-		<?php echo $form->textField($model,'build_worker_obj_id'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'build_project_obj_id'); ?>
-		<?php echo $form->textField($model,'build_project_obj_id'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'build_status'); ?>
-		<?php echo $form->textField($model,'build_status'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'build_attach'); ?>
-		<?php echo $form->textArea($model,'build_attach',array('rows'=>6, 'cols'=>50)); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'build_version'); ?>
-		<?php echo $form->textField($model,'build_version',array('size'=>60,'maxlength'=>64)); ?>
-	</div>
-
-	<div class="row buttons">
-		<?php echo Html::submitButton('Search'); ?>
-	</div>
-
-<?php $this->endWidget(); ?>
-
-</div><!-- search-form -->
+</div>
