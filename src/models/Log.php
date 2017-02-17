@@ -33,7 +33,6 @@ class Log extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_created', 'obj_modified'], 'required'),
             array(['obj_status_did'], 'number', 'integerOnly' => true),
             array(['log_user'], 'string', 'max' => 128),
             array(['log_text'], 'safe'),
