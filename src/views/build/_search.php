@@ -3,12 +3,13 @@
 /* @var $model Build */
 /* @var $form CActiveForm */
 use yii\helpers\Url;
+use yii\helpers\Html;
 ?>
 
 <div class="wide form">
 
 <?php $form=$this->beginWidget('CActiveForm', array(
-	'action'=>\Yii::$app->createUrl($this->route),
+	'action'=>Url::to([$this->route]),
 	'method'=>'get',
 )); ?>
 
@@ -63,7 +64,7 @@ use yii\helpers\Url;
 	</div>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Search'); ?>
+		<?php echo Html::submitButton('Search'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

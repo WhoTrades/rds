@@ -140,17 +140,4 @@ class HardMigrationController extends Controller
             throw new HttpException(404,'The requested page does not exist.');
         return $model;
     }
-
-    /**
-     * Performs the AJAX validation.
-     * @param HardMigration $model the model to be validated
-     */
-    protected function performAjaxValidation($model)
-    {
-        if(isset($_POST['ajax']) && $_POST['ajax']==='hard-migration-form')
-        {
-            echo CActiveForm::validate($model);
-            \Yii::$app->end();
-        }
-    }
 }

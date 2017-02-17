@@ -1,7 +1,6 @@
 <?php
-/* @var $this BuildController */
 /* @var $model Build */
-
+use yii\helpers\Html;
 $this->registerJs("
 $('.search-button').click(function(){
 	$('.search-form').toggle();
@@ -23,7 +22,7 @@ You may optionally enter a comparison operator (<b>&lt;</b>, <b>&lt;=</b>, <b>&g
 or <b>=</b>) at the beginning of each of your search values to specify how the comparison should be done.
 </p>
 
-<?php echo CHtml::link('Advanced Search','#',array('class'=>'search-button')); ?>
+<?php echo Html::a('Advanced Search','#',array('class'=>'search-button')); ?>
 <div class="search-form" style="display:none">
 <?php echo $this->render('_search',array(
 	'model'=>$model,

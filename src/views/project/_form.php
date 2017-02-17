@@ -1,7 +1,7 @@
 <?php
-/* @var $this ProjectController */
 /* @var $model Project */
 /* @var $form TbActiveForm */
+use yii\helpers\Html;
 ?>
 
 <script src="/css/codemirror.js"></script>
@@ -52,14 +52,14 @@
     <br />
     Собирать на:<br />
     <?foreach ($workers as $worker) {?>
-        <?=CHtml::checkBox('workers[]', !empty($list[$worker->obj_id]), array('id' => $id = uniqid(), 'value' => $worker->obj_id))?>
+        <?=Html::checkboxList('workers', $list[$worker->obj_id], array('id' => $id = uniqid(), 'value' => $worker->obj_id))?>
         <label style="display: inline" for="<?=$id?>"><?=$worker->worker_name?></label>
         <br />
     <?}?>
 
     <br />
 	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+		<?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

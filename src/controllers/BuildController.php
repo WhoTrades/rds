@@ -66,9 +66,6 @@ class BuildController extends Controller
     {
         $model = $this->loadModel($id);
 
-        // Uncomment the following line if AJAX validation is needed
-        // $this->performAjaxValidation($model);
-
         if (isset($_POST['Build'])) {
             $model->attributes = $_POST['Build'];
             if ($model->save()) {
@@ -131,19 +128,6 @@ class BuildController extends Controller
 		if($model===null)
 			throw new HttpException(404,'The requested page does not exist.');
 		return $model;
-	}
-
-	/**
-	 * Performs the AJAX validation.
-	 * @param Build $model the model to be validated
-	 */
-	protected function performAjaxValidation($model)
-	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='build-form')
-		{
-			echo CActiveForm::validate($model);
-			\Yii::$app->end();
-		}
 	}
 
     public function cliColorsToHtml($text)

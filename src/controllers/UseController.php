@@ -186,7 +186,11 @@ class UseController extends Controller
             // проверяем правильность ввода смс
             $this->checkReleaseCode($model, $releaseRequest);
 
-            $this->performAjaxValidation($model);
+            if (isset($_POST['ajax']) && $_POST['ajax'] == 'release-request-use-form') {
+                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+                return \yii\widgets\ActiveForm::validate($model);
+            }
 
             if ($releaseRequest->rr_project_owner_code_entered && $deployment_enabled) {
                 $releaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
@@ -223,17 +227,5 @@ class UseController extends Controller
         }
 
         return $model;
-    }
-
-    protected function performAjaxValidation($model)
-    {
-        if (isset($_POST['ajax']) && $_POST['ajax'] == 'release-request-use-form') {
-            $result = [];
-            foreach ($model->getErrors() as $attribute => $errors) {
-                $result[CHtml::activeId($model, $attribute)] = $errors;
-            }
-            echo function_exists('json_encode') ? json_encode($result) : CJSON::encode($result);
-            \Yii::$app->end();
-        }
     }
 }

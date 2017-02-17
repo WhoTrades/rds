@@ -68,9 +68,6 @@ class Project2workerController extends Controller
 	{
 		$model=new Project2worker;
 
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-
 		if(isset($_POST['Project2worker']))
 		{
 			$model->attributes=$_POST['Project2worker'];
@@ -91,9 +88,6 @@ class Project2workerController extends Controller
 	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
-
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Project2worker']))
 		{
@@ -159,18 +153,5 @@ class Project2workerController extends Controller
 		if($model===null)
 			throw new HttpException(404,'The requested page does not exist.');
 		return $model;
-	}
-
-	/**
-	 * Performs the AJAX validation.
-	 * @param Project2worker $model the model to be validated
-	 */
-	protected function performAjaxValidation($model)
-	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='project2worker-form')
-		{
-			echo CActiveForm::validate($model);
-			\Yii::$app->end();
-		}
 	}
 }

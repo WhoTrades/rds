@@ -1,7 +1,7 @@
 <?php
-/* @var $this BuildController */
 /* @var $model Build */
 /* @var $form TbActiveForm */
+use yii\helpers\Html;
 ?>
 
 <div class="form" style="width: 400px; margin: auto">
@@ -10,7 +10,6 @@
 	'id'=>'build-form',
 	// Please note: When you enable ajax validation, make sure the corresponding
 	// controller action is handling ajax validation correctly.
-	// There is a call to performAjaxValidation() commented in generated controller code.
 	// See class documentation of CActiveForm for details on this.
 	'enableAjaxValidation'=>false,
 )); ?>
@@ -25,7 +24,7 @@
     )); ?>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+		<?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

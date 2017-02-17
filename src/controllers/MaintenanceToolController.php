@@ -90,17 +90,4 @@ class MaintenanceToolController extends Controller
             throw new HttpException(404,'The requested page does not exist.');
         return $model;
     }
-
-    /**
-     * Performs the AJAX validation.
-     * @param MaintenanceTool $model the model to be validated
-     */
-    protected function performAjaxValidation($model)
-    {
-        if(isset($_POST['ajax']) && $_POST['ajax']==='maintenance-tool-form')
-        {
-            echo CActiveForm::validate($model);
-            \Yii::$app->end();
-        }
-    }
 }

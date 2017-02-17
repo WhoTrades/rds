@@ -1,12 +1,11 @@
 <?php
-/* @var $this WorkerController */
 /* @var $data Worker */
 ?>
 
 <div class="view">
 
 	<b><?php echo \yii\helpers\Html::encode($data->getAttributeLabel('obj_id')); ?>:</b>
-	<?php echo CHtml::link(\yii\helpers\Html::encode($data->obj_id), array('view', 'id'=>$data->obj_id)); ?>
+	<?php echo \yii\helpers\Html::a(\yii\helpers\Html::encode($data->obj_id), array('view', 'id'=>$data->obj_id)); ?>
 	<br />
 
 	<b><?php echo \yii\helpers\Html::encode($data->getAttributeLabel('obj_created')); ?>:</b>

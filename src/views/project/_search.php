@@ -1,7 +1,8 @@
 <?php
-/* @var $this ProjectController */
 /* @var $model Project */
 /* @var $form CActiveForm */
+
+use yii\helpers\Html;
 ?>
 
 <div class="wide form">
@@ -37,7 +38,7 @@
 	</div>
 
 	<div class="row buttons">
-		<?php echo CHtml::submitButton('Search'); ?>
+		<?php echo Html::submitButton('Search'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

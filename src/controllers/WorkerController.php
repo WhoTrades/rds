@@ -59,9 +59,6 @@ class WorkerController extends Controller
 	{
 		$model=new Worker;
 
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-
 		if(isset($_POST['Worker']))
 		{
 			$model->attributes=$_POST['Worker'];
@@ -82,9 +79,6 @@ class WorkerController extends Controller
 	public function actionUpdate($id)
 	{
 		$model=$this->loadModel($id);
-
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Worker']))
 		{
@@ -150,18 +144,5 @@ class WorkerController extends Controller
 		if($model===null)
 			throw new HttpException(404,'The requested page does not exist.');
 		return $model;
-	}
-
-	/**
-	 * Performs the AJAX validation.
-	 * @param Worker $model the model to be validated
-	 */
-	protected function performAjaxValidation($model)
-	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='worker-form')
-		{
-			echo CActiveForm::validate($model);
-			\Yii::$app->end();
-		}
 	}
 }

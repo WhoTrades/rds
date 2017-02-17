@@ -6,7 +6,7 @@ use app\models\ReleaseReject;
 use app\models\Project;
 use app\models\Log;
 use app\models\Build;
-use app\models\JiraCommit;
+use app\modules\Wtflow\models\JiraCommit;
 use RdsSystem;
 
 class SiteController extends Controller

@@ -266,16 +266,4 @@ $diffStat<br />
 
         return $model;
     }
-
-    /**
-     * Performs the AJAX validation.
-     * @param Project $model the model to be validated
-     */
-    protected function performAjaxValidation($model)
-    {
-        if (isset($_POST['ajax']) && $_POST['ajax'] === 'project-form') {
-            echo CActiveForm::validate($model);
-            \Yii::$app->end();
-        }
-    }
 }
