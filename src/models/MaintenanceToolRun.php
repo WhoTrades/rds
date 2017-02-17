@@ -46,7 +46,7 @@ class MaintenanceToolRun extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['mtr_maintenance_tool_obj_id', 'mtr_runner_user', 'mtr_status'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             array(['mtr_runner_user'], 'string', 'max' => 256),
             array(['mtr_log', 'mtr_pid'], 'safe'),
         );

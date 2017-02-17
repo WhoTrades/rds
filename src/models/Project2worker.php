@@ -37,7 +37,7 @@ class Project2worker extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['worker_obj_id', 'project_obj_id'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
         );
     }
 

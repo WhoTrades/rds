@@ -46,11 +46,11 @@ class Project extends ActiveRecord
     {
         return [
             ['project_name', 'required'],
-            ['obj_status_did', 'number', 'integerOnly' => true],
-            ['project_notification_email', 'email'], ['project_config', 'safe'],
-
-            ['project_notification_email, project_notification_subject', 'length', 'max' => 64],
-            ['obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version, project_current_version', 'safe', 'on' => 'search'],
+            ['obj_status_did', 'number'],
+            ['project_notification_email', 'email'],
+            ['project_config', 'safe'],
+            [['project_notification_email', 'project_notification_subject'], 'string', 'max' => 64],
+            [['obj_id', 'obj_created', 'obj_modified', 'obj_status_did, project_name', 'project_build_version', 'project_current_version'], 'safe', 'on' => 'search'],
         ];
     }
 

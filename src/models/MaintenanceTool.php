@@ -42,11 +42,11 @@ class MaintenanceTool extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['mt_name', 'mt_command'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly'=>true),
-            array(['mt_name', 'mt_command'], 'string', 'max'=>256),
+            array(['obj_status_did'], 'number'),
+            array(['mt_name', 'mt_command'], 'string', 'max' => 256),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'mt_name', 'mt_command'], 'safe', 'on'=>'search'),
+            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'mt_name', 'mt_command'], 'safe', 'on' => 'search'),
         );
     }
 

@@ -38,7 +38,7 @@ class ProjectConfigHistory extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['pch_project_obj_id'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             array(['pch_user'], 'string', 'max' => 128),
             array(['pch_config'], 'safe'),
         );

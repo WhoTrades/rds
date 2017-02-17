@@ -38,9 +38,9 @@ class Lamp extends ActiveRecord
         // will receive user inputs.
         return array(
             array('lamp_name', 'required'),
-            array('obj_status_did', 'numerical', 'integerOnly' => true),
-            array('lamp_name', 'length', 'max' => 128),
-            array('lamp_timeout, lamp_receivers_list', 'safe'),
+            array('obj_status_did', 'integer'),
+            array('lamp_name', 'string', 'max' => 128),
+            array(['lamp_timeout', 'lamp_receivers_list'], 'safe'),
         );
     }
 

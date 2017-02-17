@@ -57,7 +57,7 @@ class AlertLog extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['alert_detect_at', 'alert_lamp', 'alert_provider', 'alert_name', 'alert_status'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             array(['alert_lamp'], 'string', 'max' => 32),
             array('alert_provider', 'string', 'max' => 64),
             array(['alert_name'], 'string', 'max' => 256),

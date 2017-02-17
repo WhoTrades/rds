@@ -79,7 +79,7 @@ class ReleaseRequest extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['rr_user', 'rr_status', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_release_version'], 'required'),
-            array(['obj_status_did', 'rr_project_obj_id'], 'number', 'integerOnly' => true),
+            array(['obj_status_did', 'rr_project_obj_id'], 'number'),
             array(
                 ['obj_id', 'obj_created', 'obj_status_did', 'rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_status'],
                 'safe',

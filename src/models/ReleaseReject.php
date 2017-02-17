@@ -36,7 +36,7 @@ class ReleaseReject extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_release_version'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_release_version'], 'safe', 'on' => 'search'),

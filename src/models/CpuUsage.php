@@ -37,7 +37,7 @@ class CpuUsage extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['project_name', 'key'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             array(['cpu_time'], 'number'),
             array(['project_name'], 'string', 'max' => 24),
             array(['key'], 'string', 'max' => 12),

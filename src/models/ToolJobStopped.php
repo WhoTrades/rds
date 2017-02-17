@@ -37,7 +37,7 @@ class ToolJobStopped extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['project_obj_id', 'key', 'stopped_till'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             array(['key'], 'string', 'max' => 12),
         );
     }

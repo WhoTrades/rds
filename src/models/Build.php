@@ -52,7 +52,7 @@ class Build extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['build_worker_obj_id'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             array(['build_status'], 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.

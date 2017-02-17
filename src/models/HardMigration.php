@@ -60,7 +60,7 @@ class HardMigration extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['migration_type', 'migration_name', 'migration_environment'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             array(['migration_progress'], 'number'),
             array(['migration_name'], 'checkMigrationNameIsUnique'),
             array(['migration_type, migration_ticket, migration_status'], 'string', 'max' => 16),

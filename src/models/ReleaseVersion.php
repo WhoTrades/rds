@@ -33,7 +33,7 @@ class ReleaseVersion extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['rv_version', 'rv_name'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly'=>true),
+            array(['obj_status_did'], 'number'),
         );
     }
 

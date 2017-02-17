@@ -36,10 +36,10 @@ class Worker extends ActiveRecord
         // will receive user inputs.
         return array(
             array(['worker_name'], 'required'),
-            array(['obj_status_did'], 'number', 'integerOnly' => true),
+            array(['obj_status_did'], 'number'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array('obj_id, obj_created, obj_modified, obj_status_did, worker_name', 'safe', 'on' => 'search'),
+            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'worker_name'], 'safe', 'on' => 'search'),
         );
     }
 
