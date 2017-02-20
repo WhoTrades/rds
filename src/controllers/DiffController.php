@@ -30,15 +30,10 @@ class DiffController extends Controller
         /** @var $rr1 ProjectConfigHistory */
         $rr1 = ProjectConfigHistory::findByPk($id);
 
-        $c = new CDbCriteria();
-        $c->compare('pch_project_obj_id', $rr1->pch_project_obj_id);
-        $c->compare('pch_filename', $rr1->pch_filename);
-        $c->compare('obj_id', "<$id");
-        $c->order = 'obj_id desc';
-        $c->limit = 1;
-
-        /** @var $rr2 ProjectConfigHistory */
-        $rr2 = ProjectConfigHistory::find($c);
+        $rr2 = ProjectConfigHistory::find()->where([
+            'pch_project_obj_id' => $rr1->pch_project_obj_id,
+            'pch_filename' => $rr1->pch_filename,
+        ])->andWhere(['<', 'obj_id', $id])->orderBy('obj_id desc')->limit(1)->all();
 
         $this->render('index', array(
             'projectName' => $rr1->project->project_name,

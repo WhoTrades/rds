@@ -67,12 +67,8 @@ class AlertController extends Controller
             $this->redirect("/alert/");
         }
 
-        $c = new CDbCriteria();
-        $c->order = 'obj_id asc';
-        $lamps = Lamp::model()->findAll($c);
-
         $this->render('index', [
-            'lamps' => $lamps,
+            'lamps' => Lamp::find()->orderBy('obj_id asc')->all(),
         ]);
     }
 

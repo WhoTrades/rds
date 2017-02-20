@@ -75,16 +75,12 @@ class Lamp extends ActiveRecord
      */
     public function getLampErrors()
     {
-        $c = new CDbCriteria();
-        $c->compare('alert_lamp', $this->lamp_name);
-        $c->compare('alert_status', AlertLog::STATUS_ERROR);
-        $c->compare('alert_ignore_timeout', '<' . date(DATE_ISO8601));
-
-        $c->order = 'alert_detect_at DESC';
-
-        $alertLog = AlertLog::model()->findAll($c);
-
-        return $alertLog;
+        return AlertLog::find()->where([
+            'alert_lamp' => $this->lamp_name,
+            'alert_status' => AlertLog::STATUS_ERROR,
+        ])->andWhere([
+            '<', 'alert_ignore_timeout', date(DATE_ISO8601)
+        ])->orderBy('alert_detect_at DESC')->all();
     }
 
     /**
@@ -103,15 +99,7 @@ class Lamp extends ActiveRecord
      */
     public function getLampIgnores()
     {
-        $c = new CDbCriteria();
-        $c->compare('alert_lamp', $this->lamp_name);
-        $c->compare('alert_ignore_timeout', '>' . date(DATE_ISO8601));
-
-        $c->order = 'alert_ignore_timeout ASC';
-
-        $alertLog = AlertLog::model()->findAll($c);
-
-        return $alertLog;
+        return AlertLog::find()->where(['alert_lamp' => $this->lamp_name])->andWhere(['>', 'alert_ignore_timeout', date(DATE_ISO8601)])->orderBy('alert_ignore_timeout ASC')->all();
     }
 
     /**

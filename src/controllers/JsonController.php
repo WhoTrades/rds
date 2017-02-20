@@ -5,6 +5,7 @@ use app\models\Project;
 use app\models\ToolJob;
 use yii\web\HttpException;
 use app\models\RdsDbConfig;
+use app\models\ToolJobStopped;
 use app\models\ReleaseVersion;
 use app\models\ReleaseRequest;
 use app\models\MaintenanceTool;
@@ -45,26 +46,22 @@ class JsonController extends Controller
     public function actionGetInstalledPackages($project = null, $limit = null, $format = null)
     {
         $limit = $limit ?: 5;
+        $result = [];
 
-        $c = new CDbCriteria();
-        $c->compare("rr_status", ReleaseRequest::getInstalledStatuses());
-        $c->order = "obj_id desc";
+        $releaseRequests = ReleaseRequest::find()->andWhere(['in', 'rr_status', ReleaseRequest::getInstalledStatuses()])->orderBy('obj_id desc');
 
         if ($project) {
-            $projectObj = Project::findByAttributes([
+            $projectObj = Project::findOne([
                 'project_name' => $project,
             ]);
 
             if (!$projectObj) {
                 throw new HttpException(404, "Project $project not found");
             }
-
-            $c->compare("rr_project_obj_id", $projectObj->obj_id);
-            $c->limit = $limit;
+            $releaseRequests->andWhere(['rr_project_obj_id' => $projectObj->obj_id])->limit($limit);
         }
+        $releaseRequests = $releaseRequests->all();
 
-        $result = [];
-        $releaseRequests = ReleaseRequest::findAll($c);
         foreach ($releaseRequests as $releaseRequest) {
             /** @var $releaseRequest ReleaseRequest */
             $result[] = $releaseRequest->getBuildTag();
@@ -111,12 +108,10 @@ class JsonController extends Controller
             throw new HttpException(404, "Tool $toolName not found");
         }
 
-        $c = new CDbCriteria();
-        $c->limit = 1;
-        $c->order = 'obj_created desc';
-        $c->compare('mtr_maintenance_tool_obj_id', $tool->obj_id);
-        $c->compare('mtr_status', MaintenanceToolRun::STATUS_DONE);
-        $mtr = MaintenanceToolRun::find($c);
+        $mtr = MaintenanceToolRun::find()->where([
+            'mtr_maintenance_tool_obj_id' => $tool->obj_id,
+            'mtr_status' => MaintenanceToolRun::STATUS_DONE,
+        ])->orderBy('obj_created desc')->one();
 
         //an: если тул ни разу не запускали - считаем что его запустили в начале времен
         if (!$mtr) {
@@ -144,9 +139,7 @@ class JsonController extends Controller
 
     public function actionGetDisabledCronjobs()
     {
-        $c = new CDbCriteria();
-        $c->addCondition("stopped_till > NOW()");
-        $list = ToolJobStopped::findAll($c);
+        $list = ToolJobStopped::find()->where(['>', 'stopped_till', 'NOW()'])->all();
         $result = [];
         foreach ($list as $val) {
             $result[] = [$val->project_name, $val->key];

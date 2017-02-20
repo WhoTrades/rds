@@ -323,11 +323,7 @@ class SiteController extends Controller
             throw new \yii\web\NotFoundHttpException("Сборка #$id не найдена");
         }
 
-        $c = new CDbCriteria();
-        $c->order = 'jira_commit_repository';
-        $c->compare('jira_commit_build_tag', $releaseRequest->getBuildTag());
-
-        $commits = JiraCommit::findAll($c);
+        $commits = JiraCommit::find()->where(['jira_commit_build_tag' => $releaseRequest->getBuildTag()])->orderBy('jira_commit_repository')->all();
 
         if ($ajax) {
             echo $this->renderPartial('commits', ['commits' => $commits]);

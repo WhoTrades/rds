@@ -3,15 +3,16 @@ use RdsSystem\Message;
 use RdsSystem\Model\Rabbit\MessagingRdsMs;
 use app\models\Build;
 use app\models\ReleaseRequest;
-use app\models\JiraCreateVersion;
+use app\modules\Wtflow\models\JiraCreateVersion;
 use app\models\Project;
-use app\models\JiraCommit;
+use app\modules\Wtflow\models\JiraCommit;
 use app\models\HardMigration;
 use app\models\ToolJob;
 use app\models\Worker;
 use app\models\Project2worker;
-use app\models\JiraUse;
-use app\models\JiraNotificationQueue;
+use app\modules\Wtflow\models\JiraUse;
+use app\modules\Wtflow\models\JiraNotificationQueue;
+use app\controllers\StatisticController;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=AsyncReader_Deploy -vv
@@ -691,24 +692,25 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $numbersOfCurrent = explode(".", $project->project_current_version);
 
             if ($numbersOfCurrent[0] - 1 > $numbersOfTest[0] || $numbersOfCurrent[0] == $numbersOfTest[0]) {
-                $c = new CDbCriteria();
-                $c->compare('rr_project_obj_id', $project->obj_id);
-                $c->compare('rr_build_version', '>' . $build['version']);
-                $c->compare('rr_build_version', '<' . $project->project_current_version);
-                $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
-                $count = ReleaseRequest::count($c);
+
+                $count = ReleaseRequest::find()
+                    ->andWhere(['rr_project_obj_id' => $project->obj_id])
+                    ->andWhere(['>', 'rr_build_version', $build['version']])
+                    ->andWhere(['<', 'rr_build_version', $project->project_current_version])
+                    ->andWhere(['in', 'rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]])
+                    ->count();
 
                 if ($count > 10) {
                     // an: Нужно наличие минимум 10 версий от текущей, что бы было куда откатываться
                     $result[] = $build;
                 }
             } elseif ($numbersOfCurrent[0] - 1 == $numbersOfTest[0]) {
-                $c = new CDbCriteria();
-                $c->compare('rr_project_obj_id', $project->obj_id);
-                $c->compare('rr_build_version', '>' . $build['version']);
-                $c->compare('rr_build_version', '<' . $numbersOfCurrent[0] . ".00.000.000");
-                $c->compare('rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]);
-                $count = ReleaseRequest::count($c);
+                $count = ReleaseRequest::find()
+                   ->andWhere(['rr_project_obj_id' => $project->obj_id])
+                   ->andWhere(['>', 'rr_build_version', $build['version']])
+                   ->andWhere(['<', 'rr_build_version', $numbersOfCurrent[0] . ".00.000.000"])
+                   ->andWhere(['in', 'rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]])
+                   ->count();
 
                 if ($count > 5) {
                     // an: Нужно наличие минимум 2 версий в текущем релизе, что бы точно могли откатиться
@@ -786,23 +788,22 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $releaseRequest->rr_migration_status = $message->status;
             $releaseRequest->rr_migration_error = $message->errorText;
 
-            if ($message->status == \ReleaseRequest::MIGRATION_STATUS_UP) {
+            if ($message->status == ReleaseRequest::MIGRATION_STATUS_UP) {
                 $releaseRequest->rr_new_migration_count = 0;
-                $c = new CDbCriteria();
-                $c->compare('rr_build_version', "<=$message->version");
-                $c->compare('rr_project_obj_id', $projectObj->obj_id);
 
-                ReleaseRequest::updateAll(array('rr_migration_status' => $message->status, 'rr_new_migration_count' => 0), $c);
+                ReleaseRequest::updateAll(['rr_migration_status' => $message->status, 'rr_new_migration_count' => 0], 'rr_build_version <= :version AND rr_project_obj_id = :id', [
+                    ':version'  => $message->version,
+                    ':id'       => $projectObj->obj_id,
+                ]);
             }
         } else {
             $releaseRequest->rr_post_migration_status = $message->status;
 
-            if ($message->status == \ReleaseRequest::MIGRATION_STATUS_UP) {
-                $c = new CDbCriteria();
-                $c->compare('rr_build_version', "<=$message->version");
-                $c->compare('rr_project_obj_id', $projectObj->obj_id);
-
-                ReleaseRequest::updateAll(array('rr_migration_status' => $message->status), $c);
+            if ($message->status == ReleaseRequest::MIGRATION_STATUS_UP) {
+                ReleaseRequest::updateAll(['rr_migration_status' => $message->status], 'rr_build_version <= :version AND rr_project_obj_id = :id', [
+                    ':version'  => $message->version,
+                    ':id'       => $projectObj->obj_id,
+                ]);
             }
         }
 

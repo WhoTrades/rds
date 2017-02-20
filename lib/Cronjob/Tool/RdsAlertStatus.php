@@ -1,5 +1,6 @@
 <?php
 use RdsSystem\Message;
+use app\models\AlertLog;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=RdsAlertStatus -vv
@@ -39,10 +40,10 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
                 }
             }
 
-            $c = new CDbCriteria();
-            $c->compare('alert_lamp', $lampName);
-            $c->compare('alert_provider', $dataProvider->getName());
-            $alertLog = AlertLog::findAll($c);
+            $alertLog = AlertLog::findAll([
+                'alert_lamp' => $lampName,
+                'alert_provider' => $dataProvider->getName(),
+            ]);
 
             foreach ($alertLog as $alert) {
                 if (isset($errors[$alert->alert_name])) {

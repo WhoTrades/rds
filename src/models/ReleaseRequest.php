@@ -185,11 +185,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function countNotFinishedBuilds()
     {
-        $c = new CDbCriteria();
-        $c->compare('build_release_request_obj_id', $this->obj_id);
-        $c->compare('build_status', '<>' . Build::STATUS_INSTALLED);
-
-        return Build::count($c);
+        return Build::find()->where(['build_release_request_obj_id' => $this->obj_id])->andWhere(['<>', 'build_status', Build::STATUS_INSTALLED])->count();
     }
 
     /** @return ReleaseRequest|null */

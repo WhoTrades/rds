@@ -1,5 +1,7 @@
 <?php
+
 use RdsSystem\Message;
+use app\modules\Wtflow\models\JiraFeature;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 
 /**
@@ -49,20 +51,14 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
     private function actionProcessDroppedBranches(Message\Merge\DroppedBranches $message, MessagingRdsMs $model)
     {
         $this->debugLogger->message("Received removed branches: branch=$message->branch, skippedRepositories: " . json_encode($message->skippedRepositories));
-        $c = new CDbCriteria();
-        $c->compare("jf_branch", $message->branch);
-        $c->compare('jf_status', JiraFeature::STATUS_REMOVING);
-
-        $update = [
-            'jf_blocker_commits' => json_encode($message->skippedRepositories, JSON_PRETTY_PRINT),
-        ];
+        $updateWhere    = ['jf_branch' => $message->branch, 'jf_status' => JiraFeature::STATUS_REMOVING];
+        $updateFields   = ['jf_blocker_commits' => json_encode($message->skippedRepositories, JSON_PRETTY_PRINT)];
 
         if (!$message->skippedRepositories) {
             $update['jf_status'] = JiraFeature::STATUS_REMOVED;
         }
 
-        JiraFeature::updateAll($update, $c);
-
+        JiraFeature::updateAll($updateFields, $updateWhere);
         $message->accepted();
         $this->debugLogger->message("Message accepted");
     }

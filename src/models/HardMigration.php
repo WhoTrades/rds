@@ -80,14 +80,16 @@ class HardMigration extends ActiveRecord
 
     public function checkMigrationNameIsUnique($attribute, $params)
     {
-        $c = new CDbCriteria();
-        $c->compare("migration_name", $this->migration_name);
-        $c->compare("migration_environment", $this->migration_environment);
+        $query = static::find()->where([
+            'migration_name' => $this->migration_name,
+            'migration_environment' => $this->migration_environment
+        ]);
+
         if ($this->obj_id) {
-            $c->compare("obj_id", '<>'.$this->obj_id);
+            $query->andWhere(['<>', 'obj_id', $this->obj_id]);
         }
-        $c->limit = 1;
-        if (self::find($c)) {
+
+        if ($query->one()) {
             $this->addError($attribute, "Migration $this->migration_name:$this->migration_environment already exists in DB");
         }
     }
@@ -151,10 +153,9 @@ class HardMigration extends ActiveRecord
 
     public function getNotDoneMigrationCountForTicket($ticket)
     {
-        $c = new CDbCriteria();
-        $c->compare('migration_ticket', $ticket);
-        $c->compare('migration_status', '<>'.self::MIGRATION_STATUS_DONE);
-        return $this->count($c);
+        return static::find()->where(['migration_ticket' => $ticket])->andWhere([
+            '<>', 'migration_status', self::MIGRATION_STATUS_DONE
+        ])->count();
     }
 
     /**

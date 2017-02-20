@@ -52,12 +52,7 @@ class CronjobsController extends Controller
             return $project->project_name."-".$project->project_current_version;
         }, $projects);
 
-        $c = new CDbCriteria();
-        $c->compare('package', $packages);
-        $c->with = 'project';
-        $c->order = '"group"';
-
-        $list = ToolJob::findAll($c);
+        $list = ToolJob::find()->where(['in', 'package', $packages])->with('project')->orderBy('group')->all();
 
         $cronJobs = [];
         $keys = [];

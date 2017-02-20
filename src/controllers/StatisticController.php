@@ -17,11 +17,7 @@ class StatisticController extends Controller
             throw new HttpException(404, 'unknown project');
         }
 
-        $c = new CDbCriteria();
-        $c->order = 'obj_id desc';
-        $c->condition = 'rr_project_obj_id='.(int)$project->obj_id." AND NOT rr_built_time IS NULL";
-        /** @var $releaseRequest ReleaseRequest*/
-        $releaseRequest = ReleaseRequest::find($c);
+        $releaseRequest = ReleaseRequest::find()->andWhere(['rr_project_obj_id' => $project->obj_id])->andWhere(['not', ['rr_built_time' => null]])->orderBy('obj_id desc')->one();
 
         if ($releaseRequest && $releaseRequest->rr_built_time) {
             echo strtotime($releaseRequest->rr_built_time) - strtotime($releaseRequest->rr_build_started ?: $releaseRequest->obj_created);
