@@ -1,6 +1,8 @@
 <?php
-/* @var $model Worker */
+/** @var $model app\models\Worker */
+
 use yii\helpers\Html;
+
 $this->params['menu']=array(
 	array('label'=>'List Worker', 'url'=>array('index')),
 	array('label'=>'Create Worker', 'url'=>array('create')),
@@ -29,22 +31,21 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 
 <?php echo Html::a('Advanced Search','#',array('class'=>'search-button')); ?>
 <div class="search-form" style="display:none">
-<?php echo $this->render('_search',array(
+<?php echo $this->render('_search', array(
 	'model'=>$model,
 )); ?>
 </div><!-- search-form -->
 
-<?php $this->widget('yiistrap.widgets.TbGridView', array(
-	'id'=>'worker-grid',
-	'dataProvider'=>$model->search(),
-	'htmlOptions' => ['class' => 'table-responsive'],
-	'filter'=>$model,
-	'columns'=>array(
-		'obj_id',
-		'obj_created',
-		'worker_name',
-		array(
-            'class'=>'yiistrap.widgets.TbButtonColumn',
-		),
-	),
-)); ?>
+<?= yii\grid\GridView::widget([
+    'id' => 'worker-grid',
+    'dataProvider' => $model->search($model->attributes),
+    //'filterModel' => $model
+    'columns' => [
+        'obj_id',
+        'obj_created',
+        'worker_name',
+        [
+            'class' => yii\grid\ActionColumn::class,
+        ],
+    ],
+]);

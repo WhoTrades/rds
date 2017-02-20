@@ -47,7 +47,7 @@ class WorkerController extends Controller
 	 */
 	public function actionView($id)
 	{
-		$this->render('view',array(
+		return $this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
 	}
@@ -67,7 +67,7 @@ class WorkerController extends Controller
 				$this->redirect(array('view','id'=>$model->obj_id));
 		}
 
-		$this->render('create',array(
+		return $this->render('create',array(
 			'model'=>$model,
 		));
 	}
@@ -88,7 +88,7 @@ class WorkerController extends Controller
 				$this->redirect(array('view','id'=>$model->obj_id));
 		}
 
-		$this->render('update',array(
+		return $this->render('update',array(
 			'model'=>$model,
 		));
 	}
@@ -113,7 +113,8 @@ class WorkerController extends Controller
 	public function actionIndex()
 	{
 		$dataProvider = new ActiveDataProvider(['query' => Worker::find()]);
-		$this->render('index',array(
+
+        return $this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
 	}
@@ -127,7 +128,7 @@ class WorkerController extends Controller
 		if(isset($_GET['Worker']))
 			$model->attributes=$_GET['Worker'];
 
-		$this->render('admin',array(
+		return $this->render('admin',array(
 			'model'=>$model,
 		));
 	}
@@ -143,7 +144,7 @@ class WorkerController extends Controller
 	{
 		$model=Worker::findByPk($id);
 		if($model===null)
-			throw new HttpException(404,'The requested page does not exist.');
+			throw new HttpException(404, 'The requested page does not exist.');
 		return $model;
 	}
 }

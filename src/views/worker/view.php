@@ -1,5 +1,5 @@
 <?php
-/* @var $model Worker */
+/** @var $model app\models\Worker */
 
 $this->params['menu']=array(
 	array('label'=>'List Worker', 'url'=>array('index')),
@@ -12,13 +12,13 @@ $this->params['menu']=array(
 
 <h1>View Worker #<?php echo $model->obj_id; ?></h1>
 
-<?php $this->widget('zii.widgets.CDetailView', array(
-	'data'=>$model,
-	'attributes'=>array(
-		'obj_id',
-		'obj_created',
-		'obj_modified',
-		'obj_status_did',
-		'worker_name',
-	),
-)); ?>
+<?= yii\widgets\DetailView::widget([
+    'model' => $model,
+    'attributes' => [
+        'obj_id',
+        'obj_created',
+        'obj_modified',
+        'obj_status_did',
+        'worker_name',
+    ],
+]);

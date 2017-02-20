@@ -9,7 +9,7 @@ $this->params['menu']=array(
 
 <h1>Workers</h1>
 
-<?php $this->widget('zii.widgets.CListView', array(
-	'dataProvider'=>$dataProvider,
-	'itemView'=>'_view',
-)); ?>
+<?= \yii\widgets\ListView::widget([
+    'dataProvider' => $dataProvider,
+    'itemView' => '_view',
+]);
