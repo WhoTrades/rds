@@ -1,7 +1,11 @@
 <?php
-/* @var $model Project */
-/* @var $workers Worker[] */
+/**
+ * @var $model app\models\Project
+ * @var $model app\models\Worker[]
+ */
+
 use yii\helpers\Html;
+
 $this->params['menu']=array(
 	array('label'=>'Create Project', 'url'=>array('create')),
 );
@@ -34,21 +38,21 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 )); ?>
 </div><!-- search-form -->
 
-<?php $this->widget('yiistrap.widgets.TbGridView', array(
-	'id'=>'project-grid',
-	'dataProvider'=>$model->search(),
-	'htmlOptions' => ['class' => 'table-responsive'],
-	'filter'=>$model,
-	'columns'=>array(
-		'project_name',
-		'project_current_version',
-		'project_notification_email',
-		array(
-            'value' => function($list) use ($workers) {
+<?= yii\grid\GridView::widget(array(
+    'id' => 'project-grid',
+    'dataProvider' => $model->search($model->attributes),
+    'options' => ['class' => 'table-responsive'],
+    'filterModel' => $model,
+    'columns' => [
+        'project_name',
+        'project_current_version',
+        'project_notification_email',
+        [
+            'value' => function ($list) use ($workers) {
                 $result = array();
                 foreach ($list->project2workers as $p2w) {
                     foreach ($workers as $worker) {
-                        if ($worker->obj_id==$p2w->worker_obj_id) {
+                        if ($worker->obj_id == $p2w->worker_obj_id) {
                             $result[] = $worker->worker_name;
                         }
                     }
@@ -56,10 +60,9 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 
                 return implode(", ", $result);
             },
-            'filter' => 'Workers',
-        ),
-		array(
-            'class'=>'yiistrap.widgets.TbButtonColumn',
-		),
-	),
-)); ?>
+        ],
+        [
+            'class' => 'yii\grid\ActionColumn',
+        ],
+    ]
+));

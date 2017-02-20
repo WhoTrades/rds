@@ -48,12 +48,14 @@ class ProjectController extends Controller
      */
     public function actionView($id)
     {
-        $configHistoryModel = ProjectConfigHistory::model();
-        $configHistoryModel->pch_project_obj_id = $id;
-        $this->render('view', array(
-            'model'              => $this->loadModel($id),
-            'configHistoryModel' => $configHistoryModel,
-        ));
+        $searchModel    = new ProjectConfigHistory();
+        $dataProvider   = $searchModel->search(\Yii::$app->request->get(), $id);
+
+        return $this->render('view', [
+            'model' => $this->loadModel($id),
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+        ]);
     }
 
     /**
@@ -84,7 +86,7 @@ class ProjectController extends Controller
             $list[$val->worker_obj_id] = $val;
         }
 
-        $this->render('create', array(
+        return $this->render('create', array(
             'model' => $model,
             'list' => $list,
             'workers' => Worker::find()->all(),
@@ -109,7 +111,7 @@ class ProjectController extends Controller
 
             if ($model->save()) {
                 Log::createLogMessage("Удалены все связки {$model->project_name}");
-                Project2worker::deleteAllByAttributes(array('project_obj_id' => $model->obj_id));
+                Project2worker::deleteAll(array('project_obj_id' => $model->obj_id));
                 foreach ($_POST['workers'] as $workerId) {
                     $projectWorker = new Project2worker();
                     $projectWorker->worker_obj_id = $workerId;
@@ -200,7 +202,7 @@ $diffStat<br />
             $list[$val->worker_obj_id] = $val;
         }
 
-        $this->render('update', array(
+        return $this->render('update', array(
             'model' => $model,
             'list' => $list,
             'workers' => Worker::find()->all(),
@@ -215,6 +217,8 @@ $diffStat<br />
      */
     public function actionDelete($id)
     {
+        Project2worker::deleteAll(['project_obj_id' => $id]);
+
         $this->loadModel($id)->delete();
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
@@ -228,10 +232,13 @@ $diffStat<br />
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider(['query' => Project::find()]);
+        $model = new Project(['scenario' => 'search']);
+        if (isset($_GET['Project'])) {
+            $model->attributes = $_GET['Project'];
+        }
 
-        $this->render('index', array(
-            'dataProvider' => $dataProvider,
+        return $this->render('index', array(
+            'model' => $model,
         ));
     }
 
@@ -245,7 +252,7 @@ $diffStat<br />
             $model->attributes = $_GET['Project'];
         }
 
-        $this->render('admin', array(
+        return $this->render('admin', array(
             'model' => $model,
             'workers' => Worker::find()->all(),
         ));

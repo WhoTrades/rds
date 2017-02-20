@@ -1,7 +1,9 @@
 <?php
-/* @var $model Project */
+/** @var $model app\models\Project */
 
-$this->params['menu']=array(
+use yii\helpers\Url;
+
+$this->params['menu'] = array(
 	array('label'=>'Create Project', 'url'=>array('create')),
 	array('label'=>'Update Project', 'url'=>array('update', 'id'=>$model->obj_id)),
 	array('label'=>'Delete Project', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->obj_id),'confirm'=>'Are you sure you want to delete this item?')),
@@ -11,30 +13,31 @@ $this->params['menu']=array(
 
 <h1>View Project #<?php echo $model->obj_id; ?></h1>
 
-<?php $this->widget('zii.widgets.CDetailView', array(
-	'data'=>$model,
-	'attributes'=>array(
-		'obj_id',
-		'obj_created',
-		'obj_modified',
-		'obj_status_did',
-		'project_name',
-	),
-)); ?>
+<?= yii\widgets\DetailView::widget([
+    'model' => $model,
+    'attributes' => [
+        'obj_id',
+        'obj_created',
+        'obj_modified',
+        'obj_status_did',
+        'project_name',
+    ],
+]);
 
-
-<?php $this->widget('yiistrap.widgets.TbGridView', array(
-    'id'=>'log-grid',
-    'dataProvider'=>$configHistoryModel->search(),
-	'htmlOptions' => ['class' => 'table-responsive'],
-    'filter'=>$configHistoryModel,
-    'columns'=>array(
+echo yii\grid\GridView::widget([
+    'id' => 'log-grid',
+    'dataProvider' => $dataProvider,
+    'filterModel' => $searchModel,
+    'options' => ['class' => 'table-responsive'],
+    'columns' => [
         'obj_created',
         'pch_user',
-        array(
-            'class'=>'yiistrap.widgets.TbButtonColumn',
+         [
+            'class' => 'yii\grid\ActionColumn',
             'template' => '{view}',
-            'viewButtonUrl' => '\Yii::$app->controller->createUrl("/diff/project_config",array("id"=>$data->primaryKey))',
-        ),
-    ),
-)); ?>
+            'urlCreator' => function ($action, $model) {
+                 return Url::to(['/diff/project_config', 'id' => $model->obj_id]);
+            },
+         ],
+    ],
+]);

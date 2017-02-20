@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
 
 /**
@@ -41,12 +42,26 @@ class ProjectConfigHistory extends ActiveRecord
             array(['obj_status_did'], 'number'),
             array(['pch_user'], 'string', 'max' => 128),
             array(['pch_config'], 'safe'),
+            array(['obj_created'], 'datetime')
         );
     }
 
     public function getProject()
     {
         return Project::findByPk($this->pch_project_obj_id);
+    }
+
+    public function search(array $params, $id = null)
+    {
+        $query = static::find()->filterWhere(['pch_project_obj_id' => $id]);
+
+        if ($this->load($params)) {
+            $query->andFilterWhere($this->attributes);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query,
+        ]);
     }
 
     /**

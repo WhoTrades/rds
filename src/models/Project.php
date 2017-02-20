@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
 
 /**
@@ -176,6 +177,21 @@ class Project extends ActiveRecord
     {
         $this->project_current_version = $version;
         $this->save(false);
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search(array $params)
+    {
+        $query = self::find()->filterWhere($params);
+
+        $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 100]]);
+        $this->load($params, 'search');
+
+        return $dataProvider;
     }
 
     /**

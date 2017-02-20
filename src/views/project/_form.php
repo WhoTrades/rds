@@ -19,6 +19,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(['id' => 'project-form']) ?>
         <p class="note">Fields with <span class="required">*</span> are required.</p>
+        <?= $form->field($model, 'project_name') ?>
         <?= $form->field($model, 'project_notification_email') ?>
         <?= $form->field($model, 'project_notification_subject') ?>
 
