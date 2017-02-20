@@ -41,7 +41,7 @@ class ReleaseVersionController extends Controller
 	 */
 	public function actionView($id)
 	{
-		$this->render('view',array(
+        return $this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
 	}
@@ -63,7 +63,7 @@ class ReleaseVersionController extends Controller
 		}
 
 
-		$this->render('create',array(
+        return $this->render('create',array(
 			'model'=>$model,
 		));
 	}
@@ -86,7 +86,7 @@ class ReleaseVersionController extends Controller
 		}
 
 
-		$this->render('update',array(
+        return $this->render('update',array(
 			'model'=>$model,
 		));
 	}
@@ -122,7 +122,7 @@ class ReleaseVersionController extends Controller
 		if(isset($_GET['ReleaseVersion']))
 			$model->attributes=$_GET['ReleaseVersion'];
 
-		$this->render('admin',array(
+		return $this->render('admin',array(
 			'model'=>$model,
 		));
 	}

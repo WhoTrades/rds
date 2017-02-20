@@ -1,6 +1,8 @@
 <?php
-/* @var $model ReleaseVersion */
+/** @var $model app\models\ReleaseVersion */
+
 use yii\helpers\Html;
+
 $this->params['menu']=array(
 	array('label'=>'List ReleaseVersion', 'url'=>array('index')),
 	array('label'=>'Create ReleaseVersion', 'url'=>array('create')),
@@ -34,17 +36,16 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 )); ?>
 </div><!-- search-form -->
 
-<?php $this->widget('yiistrap.widgets.TbGridView', array(
-	'id'=>'release-version-grid',
-	'htmlOptions' => ['class' => 'table-responsive'],
-	'dataProvider'=>$model->search(),
-	'filter'=>$model,
-	'columns'=>array(
-		'obj_created',
-		'rv_version',
-		'rv_name',
-		array(
-            'class'=>'yiistrap.widgets.TbButtonColumn',
-		),
-	),
-)); ?>
+<?= yii\grid\GridView::widget([
+    'id' => 'release-version-grid',
+    'dataProvider' => $model->search($model->attributes),
+    'filterModel' => $model,
+    'columns' => [
+        'obj_created',
+        'rv_version',
+        'rv_name',
+        [
+            'class' => yii\grid\ActionColumn::class,
+        ],
+    ],
+]);

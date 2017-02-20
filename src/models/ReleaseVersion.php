@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
 
 /**
@@ -50,6 +51,19 @@ class ReleaseVersion extends ActiveRecord
             'rv_version' => 'Rv Version',
             'rv_name' => 'Rv Name',
         );
+    }
+
+    public function search(array $params)
+    {
+        $query = static::find();
+
+        if ($this->load($params)) {
+            $query->andFilterWhere($this->attributes);
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query,
+        ]);
     }
 
     /**

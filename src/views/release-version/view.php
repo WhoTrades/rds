@@ -1,5 +1,5 @@
 <?php
-/* @var $model ReleaseVersion */
+/** @var $model app\models\ReleaseVersion */
 
 $this->params['menu']=array(
 	array('label'=>'List ReleaseVersion', 'url'=>array('index')),
@@ -12,14 +12,14 @@ $this->params['menu']=array(
 
 <h1>View ReleaseVersion #<?php echo $model->obj_id; ?></h1>
 
-<?php $this->widget('zii.widgets.CDetailView', array(
-	'data'=>$model,
-	'attributes'=>array(
-		'obj_id',
-		'obj_created',
-		'obj_modified',
-		'obj_status_did',
-		'rv_version',
-		'rv_name',
-	),
-)); ?>
+<?= yii\widgets\DetailView::widget([
+    'model' => $model,
+    'attributes' => [
+        'obj_id',
+        'obj_created',
+        'obj_modified',
+        'obj_status_did',
+        'rv_version',
+        'rv_name',
+    ],
+]);
