@@ -1,5 +1,9 @@
 <?php
+
 use RdsSystem\Message;
+use app\models\MaintenanceTool;
+use yii\data\ActiveDataProvider;
+use app\models\MaintenanceToolRun;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 
 /**
@@ -133,7 +137,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
 
         $rowTemplate = include($filename);
         $widget = \Yii::$app->getWidgetFactory()->createWidget(Yii::$app,'yiistrap.widgets.TbGridView', [
-            'dataProvider'=>new CActiveDataProvider($model, $model->search()),
+            'dataProvider'=>new ActiveDataProvider($model, $model->search()),
             'columns'=>$rowTemplate,
             'rowCssClassExpression' => function(){return 'rowItem';},
         ]);

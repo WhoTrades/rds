@@ -1,5 +1,5 @@
 <?php
-/* @var $dataProvider CActiveDataProvider */
+/** @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->params['menu']=array(
 	array('label'=>'Create ReleaseVersion', 'url'=>array('create')),

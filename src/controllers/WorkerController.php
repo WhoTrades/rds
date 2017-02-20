@@ -3,6 +3,7 @@ namespace app\controllers;
 
 use app\models\Worker;
 use yii\web\HttpException;
+use yii\data\ActiveDataProvider;
 
 class WorkerController extends Controller
 {
@@ -111,7 +112,7 @@ class WorkerController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('Worker');
+		$dataProvider = new ActiveDataProvider(['query' => Worker::find()]);
 		$this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));

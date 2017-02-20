@@ -1,5 +1,5 @@
 <?php
-/* @var $dataProvider CActiveDataProvider */
+/** @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->params['menu']=array(
 	array('label'=>'Create Project', 'url'=>array('create')),

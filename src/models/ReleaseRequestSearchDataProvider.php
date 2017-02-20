@@ -1,14 +1,15 @@
 <?php
 namespace app\models;
 
-use app\components\ActiveRecord;
+use app\models\ReleaseRequest;
+use yii\data\ActiveDataProvider;
 
 /**
  * Класс для отображения списка запросов на релиз на главной странице RDS
  * Кроме стандартных колонок ещё подтягивает дополнительные - к какому релизу откатываться, по сравнению с каким считать diff и т.д.
  */
 
-class ReleaseRequestSearchDataProvider extends CActiveDataProvider
+class ReleaseRequestSearchDataProvider extends ActiveDataProvider
 {
     private $additionalDataFetched = false;
 
@@ -50,9 +51,9 @@ class ReleaseRequestSearchDataProvider extends CActiveDataProvider
         $projectIds = array_unique($projectIds);
         $oldVersions = array_filter(array_unique($oldVersions));
 
-        $currentUsed = \ReleaseRequest::findAllByAttributes([
+        $currentUsed = ReleaseRequest::findAllByAttributes([
             'rr_project_obj_id' => $projectIds,
-            'rr_status' => \ReleaseRequest::STATUS_USED,
+            'rr_status' => ReleaseRequest::STATUS_USED,
         ]);
         foreach ($currentUsed as $releaseRequest) {
             $this->currentUsed[$releaseRequest->rr_project_obj_id] = $releaseRequest;

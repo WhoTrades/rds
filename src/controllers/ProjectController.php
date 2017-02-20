@@ -8,6 +8,7 @@ use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ProjectConfig;
 use app\models\Project2worker;
+use yii\data\ActiveDataProvider;
 use app\models\ProjectConfigHistory;
 
 class ProjectController extends Controller
@@ -227,7 +228,7 @@ $diffStat<br />
      */
     public function actionIndex()
     {
-        $dataProvider = new CActiveDataProvider('Project');
+        $dataProvider = new ActiveDataProvider(['query' => Project::find()]);
 
         $this->render('index', array(
             'dataProvider' => $dataProvider,

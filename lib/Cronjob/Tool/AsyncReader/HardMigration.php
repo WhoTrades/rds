@@ -1,5 +1,7 @@
 <?php
+
 use RdsSystem\Message;
+use app\models\HardMigration;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 
 /**
@@ -112,7 +114,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         $model->obj_id = $id;
         $rowTemplate = include($filename);
         $widget = \Yii::$app->getWidgetFactory()->createWidget(Yii::$app,'yiistrap.widgets.TbGridView', [
-            'dataProvider'=>new CActiveDataProvider($model, $model->search()),
+            'dataProvider'=> $model->search($model->attributes),
             'columns'=>$rowTemplate,
             'rowCssClassExpression' => function(){return 'rowItem';},
         ]);
