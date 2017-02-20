@@ -450,7 +450,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function getBuilds()
     {
-        return $this->hasMany(Build::className(), ['build_release_request_obj_id' => 'obj_id'])->all();
+        return $this->hasMany(Build::className(), ['build_release_request_obj_id' => 'obj_id']);
     }
 
     /**
@@ -458,7 +458,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function getHardMigrations()
     {
-        return $this->hasMany(HardMigration::className(), ['migration_release_request_obj_id' => 'obj_id'])->all();
+        return $this->hasMany(HardMigration::className(), ['migration_release_request_obj_id' => 'obj_id']);
     }
 
     /**
@@ -466,7 +466,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function getProject()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'rr_project_obj_id'])->one();
+        return $this->hasOne(Project::className(), ['obj_id' => 'rr_project_obj_id']);
     }
 
     /**
@@ -474,6 +474,6 @@ class ReleaseRequest extends ActiveRecord
      */
     public function getReleaseRequests()
     {
-        return $this->hasMany(releaseRequest::className(), ['rr_leading_id' => 'obj_id'])->all();
+        return $this->hasMany(releaseRequest::className(), ['rr_leading_id' => 'obj_id']);
     }
 }

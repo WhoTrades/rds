@@ -54,7 +54,7 @@ class ToolJob extends ActiveRecord
      */
     public function getProject()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'rr_project_obj_id'])->one();
+        return $this->hasOne(Project::className(), ['obj_id' => 'project_obj_id']);
     }
 
     /**

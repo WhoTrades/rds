@@ -107,7 +107,7 @@ class Project extends ActiveRecord
      */
     public function getReleaseRequests()
     {
-        return $this->hasMany(ReleaseRequest::class, ['rr_project_obj_id' => 'obj_id'])->all();
+        return $this->hasMany(ReleaseRequest::class, ['rr_project_obj_id' => 'obj_id']);
     }
 
     /**
@@ -115,7 +115,7 @@ class Project extends ActiveRecord
      */
     public function getReleaseRejects()
     {
-        return $this->hasMany(ReleaseRequest::class, ['rr_project_obj_id' => 'obj_id'])->all();
+        return $this->hasMany(ReleaseRequest::class, ['rr_project_obj_id' => 'obj_id']);
     }
 
     /**
@@ -123,7 +123,7 @@ class Project extends ActiveRecord
      */
     public function getProject2workers()
     {
-        return $this->hasMany(Project2worker::class, ['project_obj_id' => 'obj_id'])->all();
+        return $this->hasMany(Project2worker::class, ['project_obj_id' => 'obj_id']);
     }
 
     /**
@@ -131,7 +131,7 @@ class Project extends ActiveRecord
      */
     public function getProjectConfigs()
     {
-        return $this->hasMany(ProjectConfig::class, ['pc_project_obj_id' => 'obj_id'])->all();
+        return $this->hasMany(ProjectConfig::class, ['pc_project_obj_id' => 'obj_id']);
     }
 
     /**

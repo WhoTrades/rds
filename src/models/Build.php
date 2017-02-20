@@ -65,7 +65,7 @@ class Build extends ActiveRecord
      */
     public function getWorker()
     {
-        return $this->hasOne(Worker::className(), ['obj_id' => 'build_worker_obj_id'])->one();
+        return $this->hasOne(Worker::className(), ['obj_id' => 'build_worker_obj_id']);
     }
 
     /**
@@ -73,7 +73,7 @@ class Build extends ActiveRecord
      */
     public function getProject()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'build_project_obj_id'])->one();
+        return $this->hasOne(Project::className(), ['obj_id' => 'build_project_obj_id']);
     }
 
     public function getReleaseRequest()

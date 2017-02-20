@@ -52,7 +52,7 @@ class MaintenanceTool extends ActiveRecord
 
     public function getMaintenanceToolRuns()
     {
-        return $this->hasMany(MaintenanceToolRun::className(), ['mtr_maintenance_tool_obj_id' => 'obj_id'])->all();
+        return $this->hasMany(MaintenanceToolRun::className(), ['mtr_maintenance_tool_obj_id' => 'obj_id']);
     }
 
     /**

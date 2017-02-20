@@ -48,7 +48,7 @@ class Worker extends ActiveRecord
      */
     public function getProject2workers()
     {
-        return $this->hasMany(Project2worker::class, ['project_obj_id' => 'obj_id'])->all();
+        return $this->hasMany(Project2worker::class, ['project_obj_id' => 'obj_id']);
     }
 
     /**
