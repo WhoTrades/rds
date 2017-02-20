@@ -126,7 +126,7 @@ class HardMigrationController extends Controller
     {
         $migration = $this->loadModel($id);
 
-        $this->render('log', ['migration' => $migration]);
+        return $this->render('log', ['migration' => $migration]);
     }
 
     /**

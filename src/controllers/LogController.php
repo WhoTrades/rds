@@ -29,7 +29,7 @@ class LogController extends Controller
      */
     public function actionView($id)
     {
-        echo $this->render('view', array(
+        return $this->render('view', array(
             'model' => $this->loadModel($id),
         ));
     }
@@ -44,7 +44,7 @@ class LogController extends Controller
             $model->attributes = $_GET['Log'];
         }
 
-        echo $this->render('admin', array(
+        return $this->render('admin', array(
             'model' => $model,
         ));
     }

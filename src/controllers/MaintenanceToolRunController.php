@@ -39,7 +39,7 @@ class MaintenanceToolRunController extends Controller
      */
     public function actionView($id)
     {
-        $this->render('view',array(
+        return $this->render('view',array(
             'model'=>$this->loadModel($id),
         ));
     }
@@ -53,7 +53,7 @@ class MaintenanceToolRunController extends Controller
         if(isset($_GET['MaintenanceToolRun']))
             $model->attributes=$_GET['MaintenanceToolRun'];
 
-        $this->render('index',array(
+        return $this->render('index',array(
             'model'=>$model,
         ));
     }

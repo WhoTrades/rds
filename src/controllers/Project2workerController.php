@@ -56,7 +56,7 @@ class Project2workerController extends Controller
 	 */
 	public function actionView($id)
 	{
-		$this->render('view',array(
+        return $this->render('view',array(
 			'model'=>$this->loadModel($id),
 		));
 	}
@@ -76,7 +76,7 @@ class Project2workerController extends Controller
 				$this->redirect(array('view','id'=>$model->obj_id));
 		}
 
-		$this->render('create',array(
+        return $this->render('create',array(
 			'model'=>$model,
 		));
 	}
@@ -97,7 +97,7 @@ class Project2workerController extends Controller
 				$this->redirect(array('view','id'=>$model->obj_id));
 		}
 
-		$this->render('update',array(
+        return $this->render('update',array(
 			'model'=>$model,
 		));
 	}
@@ -122,7 +122,7 @@ class Project2workerController extends Controller
 	public function actionIndex()
 	{
 		$dataProvider=new ActiveDataProvider;(['query' => Project2worker::find()]);
-		$this->render('index',array(
+        return $this->render('index',array(
 			'dataProvider'=>$dataProvider,
 		));
 	}
@@ -136,7 +136,7 @@ class Project2workerController extends Controller
 		if(isset($_GET['Project2worker']))
 			$model->attributes=$_GET['Project2worker'];
 
-		$this->render('admin',array(
+        return $this->render('admin',array(
 			'model'=>$model,
 		));
 	}

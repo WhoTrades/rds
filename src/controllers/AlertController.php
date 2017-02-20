@@ -67,7 +67,7 @@ class AlertController extends Controller
             $this->redirect("/alert/");
         }
 
-        $this->render('index', [
+        return $this->render('index', [
             'lamps' => Lamp::find()->orderBy('obj_id asc')->all(),
         ]);
     }
@@ -79,7 +79,7 @@ class AlertController extends Controller
     {
         $result = [];
 
-        foreach (Lamp::model()->findAll() as $lamp) {
+        foreach (Lamp::find()->all() as $lamp) {
             /** @var $lamp Lamp*/
             $result[$lamp->lamp_name] = [
                 'alert' => $lamp->getLampStatus(),

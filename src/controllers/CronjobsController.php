@@ -77,7 +77,7 @@ class CronjobsController extends Controller
             $cpuUsagesOrdered[$cpuUsage->key][$cpuUsage->project_name] = $cpuUsage;
         }
 
-        $this->render('index', [
+        return $this->render('index', [
             'cronJobs' => $cronJobs,
             'Project' => $Project,
             'projects' => $projects,
@@ -280,7 +280,7 @@ class CronjobsController extends Controller
             return $a['server'] > $b['server'];
         });
 
-        $this->renderPartial('log', [
+        return $this->renderPartial('log', [
             'result' => $data,
             'plainText' => $plainText,
         ]);
@@ -312,7 +312,7 @@ class CronjobsController extends Controller
                 order by cpu_time desc";
         $data = \Yii::$app->db->createCommand($sql)->queryAll();
 
-        $this->render('cpuUsageReport', [
+        return $this->render('cpuUsageReport', [
             'data' => $data,
         ]);
     }

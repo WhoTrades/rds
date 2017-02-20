@@ -207,7 +207,7 @@ class UseController extends Controller
             $releaseRequest->save();
             $this->redirect('/');
         }
-        $this->render('index', array(
+        return $this->render('index', array(
             'model' => $model,
             'releaseRequest' => $releaseRequest,
         ));

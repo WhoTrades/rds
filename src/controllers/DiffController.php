@@ -35,7 +35,7 @@ class DiffController extends Controller
             'pch_filename' => $rr1->pch_filename,
         ])->andWhere(['<', 'obj_id', $id])->orderBy('obj_id desc')->limit(1)->all();
 
-        $this->render('index', array(
+        return $this->render('index', array(
             'projectName' => $rr1->project->project_name,
             'filename' => $rr1->pch_filename,
             'newText' => $rr1->pch_config,

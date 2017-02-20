@@ -51,7 +51,7 @@ class BuildController extends Controller
      */
     public function actionView($id)
     {
-        $this->render('view', array(
+        return $this->render('view', array(
             'model' => $this->loadModel($id),
         ));
     }
@@ -73,7 +73,7 @@ class BuildController extends Controller
             }
         }
 
-        $this->render('update', array(
+        return $this->render('update', array(
             'model' => $model,
         ));
     }
@@ -110,7 +110,7 @@ class BuildController extends Controller
 		if(isset($_GET['Build']))
 			$model->attributes=$_GET['Build'];
 
-		$this->render('admin',array(
+        return $this->render('admin',array(
 			'model'=>$model,
 		));
 	}
