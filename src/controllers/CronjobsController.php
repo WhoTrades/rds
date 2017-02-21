@@ -147,7 +147,7 @@ class CronjobsController extends Controller
 
     public function actionKill($key, $project, $signal = self::KILL_SIGNAL)
     {
-        $model = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
+        $model = (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
 
         $servers = [];
         $result = [];
@@ -165,13 +165,13 @@ class CronjobsController extends Controller
                 /** @var $p2w Project2Worker */
                 $res = $model->sendToolKillTask(
                     $p2w->worker->worker_name,
-                    new RdsSystem\Message\Tool\KillTask($key, $project, $signal),
-                    RdsSystem\Message\Tool\KillResult::type()
+                    new \RdsSystem\Message\Tool\KillTask($key, $project, $signal),
+                    \RdsSystem\Message\Tool\KillResult::type()
                 );
             }
         } while (!in_array($res->server, $servers));
 
-        $data = array_map(function (RdsSystem\Message\Tool\KillResult $val) {
+        $data = array_map(function (\RdsSystem\Message\Tool\KillResult $val) {
             return ['server' => $val->server, 'processes' => $val->result];
         }, $result);
 
@@ -192,7 +192,7 @@ class CronjobsController extends Controller
      */
     public function actionGetInfo($key, $project)
     {
-        $model = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
+        $model = (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
 
         $servers = [];
         $result = [];
@@ -210,13 +210,13 @@ class CronjobsController extends Controller
                 /** @var $p2w Project2Worker */
                 $res = $model->sendToolGetInfoTask(
                     $p2w->worker->worker_name,
-                    new RdsSystem\Message\Tool\GetInfoTask($key, $project),
-                    RdsSystem\Message\Tool\GetInfoResult::type()
+                    new \RdsSystem\Message\Tool\GetInfoTask($key, $project),
+                    \RdsSystem\Message\Tool\GetInfoResult::type()
                 );
             }
         } while (!in_array($res->server, $servers));
 
-        $data = array_map(function (RdsSystem\Message\Tool\GetInfoResult $val) {
+        $data = array_map(function (\RdsSystem\Message\Tool\GetInfoResult $val) {
             return ['server' => $val->server, 'processes' => $val->result];
         }, $result);
 
@@ -242,7 +242,7 @@ class CronjobsController extends Controller
         }
 
         $lines = min((int) $lines, 1000);
-        $model = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
+        $model = (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
         $Project = Project::findByAttributes(['project_name' => $project]);
 
         $servers = [];
@@ -259,14 +259,14 @@ class CronjobsController extends Controller
                 /** @var $p2w Project2Worker */
                 $res = $model->sendToolGetToolLogTail(
                     $p2w->worker->worker_name,
-                    new RdsSystem\Message\Tool\ToolLogTail($tag, $lines),
-                    RdsSystem\Message\Tool\ToolLogTailResult::type(),
+                    new \RdsSystem\Message\Tool\ToolLogTail($tag, $lines),
+                    \RdsSystem\Message\Tool\ToolLogTailResult::type(),
                     1
                 );
             }
         } while (!in_array($res->server, $servers));
 
-        $data = array_map(function (RdsSystem\Message\Tool\ToolLogTailResult $val) {
+        $data = array_map(function (\RdsSystem\Message\Tool\ToolLogTailResult $val) {
             return ['server' => $val->server, 'log' => $val->result];
         }, $result);
 

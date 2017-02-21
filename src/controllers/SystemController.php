@@ -7,8 +7,6 @@ use app\models\forms\StopDeploymentForm;
 
 class SystemController extends Controller
 {
-    public $pageTitle = 'Управление RDS';
-
     /**
      * @return array
      */

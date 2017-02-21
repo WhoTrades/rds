@@ -9,10 +9,11 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+$this->title = 'Управление RDS';
 ?>
 
 <div class="container-fluid">
-    <h1><?= $this->pageTitle ?></h1>
+    <h1><?= $this->title ?></h1>
     <?php $form = ActiveForm::begin() ?>
         <?= $form->errorSummary([$model]); ?>
         <?= $form->field($model, 'status')->hiddenInput() ?>

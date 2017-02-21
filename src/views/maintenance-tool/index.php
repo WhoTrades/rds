@@ -8,7 +8,7 @@ echo yii\grid\GridView::widget(array(
     'options' => ['class' => 'table-responsive'],
     'filterModel' => $model,
     'rowOptions' => function ($model) {
-        return 'maintenance-tool-' . $model->obj_id;
+        return ['class' => 'maintenance-tool-' . $model->obj_id];
     },
     'columns' => require('_maintenanceToolRow.php'),
 )); ?>
