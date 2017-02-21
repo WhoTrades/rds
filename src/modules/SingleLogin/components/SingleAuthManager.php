@@ -1,7 +1,7 @@
 <?php
 namespace app\modules\SingleLogin\components;
 
-class SingleAuthManager extends CPhpAuthManager
+class SingleAuthManager extends \yii\rbac\PhpManager
 {
     public function load()
     {
