@@ -1,4 +1,7 @@
-<?if ($plainText) {
+<?php
+use yii\bootstrap\Alert;
+
+if ($plainText) {
     header("Content-type: text/plain");
     foreach ($result as $val) {
         echo $val['log'];
@@ -6,7 +9,7 @@
 } else {
 
 if (empty($result)) {
-    echo TbHtml::alert(TbHtml::ALERT_COLOR_SUCCESS, "<strong>Нет работающих процессов сборщиков логов</strong>");
+    echo Alert::widget(['options' => ['class' => 'alert-success'], 'body' => "<b>Нет работающих процессов сборщиков логов</b>"]);
     return;
 }
 $ok = false;
@@ -15,5 +18,5 @@ foreach ($result as $val) {
     $text .= "<strong>{$val['server']}</strong><br />\n";
     $text .= "<pre style='white-space: normal'>".nl2br(htmlspecialchars($val['log']))."</pre><br />";
 }
-echo TbHtml::alert(TbHtml::ALERT_COLOR_SUCCESS, $text);
-}?>
+echo Alert::widget(['options' => ['class' => 'alert-success'], 'body' => $text]);
+}

@@ -8,6 +8,7 @@ use app\models\Project;
 use app\models\Build;
 use yii\helpers\Html;
 use app\components\TbHtml;
+use yii\bootstrap\Alert;
 
 return array(
     'obj_id',
@@ -84,7 +85,7 @@ return array(
                 }
 
                 if ($text = $val->determineHumanReadableError()) {
-                    $result[] = TbHtml::alert(TbHTML::ALERT_COLOR_WARNING, $text, ['closeText' => false]);
+                    $result[] = Alert::widget(['options' => ['class' => 'alert-warning'], 'body' => $text]);
                 }
             }
 

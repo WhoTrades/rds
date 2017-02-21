@@ -2,6 +2,8 @@
 /* @var $model Project */
 /* @var $deployment_enabled bool */
 
+use yii\bootstrap\Alert;
+
 $this->params['menu'] = array(
     array('label' => 'Create Project', 'url' => array('create')),
     array('label' => 'View Project', 'url' => array('view', 'id' => $model->obj_id)),
@@ -15,5 +17,5 @@ $this->params['menu'] = array(
 if ($deployment_enabled) {
     echo $this->render('_form', array('model' => $model, 'list' => $list, 'workers' => $workers));
 } else {
-    echo TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "По техническим причинам деплой на PROD приостановлен");
+    echo Alert::widget(['options' => ['class' => 'alert-danger'], 'body' => 'По техническим причинам деплой на PROD приостановлен']);
 }

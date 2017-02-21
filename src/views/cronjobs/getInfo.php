@@ -1,6 +1,9 @@
 <?php
+use yii\bootstrap\Html;
+use yii\bootstrap\Alert;
+
 if (empty($result)) {
-    echo TbHtml::alert(TbHtml::ALERT_COLOR_INFO, "<strong>Нет работающих процессов</strong>");
+    echo Alert::widget(['options' => ['class' => 'alert-info'], 'body' => "<b>Нет работающих процессов</b>"]);
 
     return;
 }
@@ -15,11 +18,10 @@ foreach ($result as $val) {
         }
     } else {
         $text .= "<i>Процессы не найдены</i> " .
-            TbHtml::tooltip(
-                yii\bootstrap\BaseHtml::icon(TbHtml::ICON_INFO_SIGN),
-                '#',
-                'То что процессов нет при работающем кроне - это нормально. Это случается, например, если тул запускается раз в минуту и отрабатывает за 5 секунд'
-            ) . "<br />";
+            Html::a(Html::icon('info-sign'), '#', [
+                'data' => ['toggle' => 'tooltip', 'placement' => 'top'],
+                'title' => 'То что процессов нет при работающем кроне - это нормально. Это случается, например, если тул запускается раз в минуту и отрабатывает за 5 секунд',
+            ]) . "<br />";
     }
 }
-echo TbHtml::alert(TbHtml::ALERT_COLOR_INFO, $text);
+echo Alert::widget(['options' => ['class' => 'alert-info'], 'body' => $text]);

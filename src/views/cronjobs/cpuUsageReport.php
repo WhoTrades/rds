@@ -1,3 +1,7 @@
+<?php
+use yii\bootstrap\Html;
+?>
+
 <div class="table-responsive">
     <table class="items table table-hover table-bordered">
         <thead>
@@ -17,13 +21,11 @@
                     <td><?=$val['group']?></td>
                     <td>
                         <?=$val['substring']?>
-                        <?=TbHtml::tooltip(
-                            yii\bootstrap\BaseHtml::icon(TbHtml::ICON_INFO_SIGN),
-                            "", $val['command'], [
-                                'onclick' => 'js:$("span.command", $(this).parent().parent()).html("'.$val['command'].'"); return false;',
-                            ]
-                        )
-                        ?>
+                        <?= Html::a(Html::icon('info-sign'), '', [
+                            'data' => ['toggle' => 'tooltip', 'placement' => 'top'],
+                            'title' => $val['command'],
+                            'onclick' => '$("span.command", $(this).parent().parent()).html("' . $val['command'] . '"); return false;',
+                        ])?>
                         <br /><span class="command"></span>
                     </td>
                     <td>

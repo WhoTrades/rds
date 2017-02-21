@@ -1,14 +1,19 @@
 <?php
-/** @var $this CronJobsController - название текущего проекта */
+/** @var $this yii\web\View - название текущего проекта */
 /** @var $Project Project - название текущего проекта */
 /** @var $projects Project[] - Список всех проектов с кронами */
 /** @var $cronJobs ToolJob[] - Список кронов */
 /** @var $cpuUsageLastTruncate date - Дата последнего сброса статистики по использованию CPU */
+
+use yii\bootstrap\Html;
+
 $this->title = "Фоновые процессы";
+
+$this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
 ?>
 <h1>
     <?=$this->title?>
-    <small><a href="<?=yii\helpers\Url::to("cpuUsageReport")?>">CPU usage report</a></small>
+    <small><a href="<?=yii\helpers\Url::to("cpu-usage-report")?>">CPU usage report</a></small>
 </h1>
 <div style="clear: both"></div>
 
@@ -19,23 +24,23 @@ $this->title = "Фоновые процессы";
         </li>
     <?php }?>
 
-    <li><?=TbHtml::textField('search', '', [
+    <li><?=Html::textInput('search', '', [
         'placeholder' => 'Быстрый фильтр',
-        'class' => '__tools-filter',
+        'class' => '__tools-filter form-control',
     ])?></li>
     <li style="float: right">
-        <?=TbHtml::button(
+        <?=Html::button(
             "Обнулить показатели CPU<br /><small>Последнее обнуление: <span>" .
                 ($cpuUsageLastTruncate ? date('d.m.Y H:i', strtotime($cpuUsageLastTruncate)) : "никогда") .
                 "</span></small>",
             [
-                'color' => TbHtml::BUTTON_COLOR_DANGER,
+                'class' => 'btn btn-danger',
                 'onclick' => 'js:if (confirm("Вы уверены что хотите обнулить все показатели по использованию CPU")) {
                     var html = this.innerHTML;
-                    this.innerHTML = ' . json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH)) . ';
+                    this.innerHTML = ' . json_encode(yii\bootstrap\BaseHtml::icon('refresh')) . ';
                     this.disabled = true;
                     var obj = this;
-                    $.ajax({url: "' . yii\helpers\Url::to('truncateCpuUsage') . '"}).done(function(){
+                    $.ajax({url: "' . yii\helpers\Url::to('truncate-cpu-usage') . '"}).done(function(){
                         obj.innerHTML = html;
                         obj.disabled = false;
                         location += "";
@@ -64,19 +69,18 @@ $this->title = "Фоновые процессы";
                     <?php if ($toolJob->group !== $group) {?>
                         <tr class="group-splitter active-tr" id="group-<?=$groupNormalized = preg_replace('~\W+~', '-', $toolJob->group)?>">
                             <td colspan="10">
-                                <?=TbHtml::tooltip(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_LINK, [
+                                <?= Html::a(Html::icon('link'), "#group-$groupNormalized", [
                                     'class' => 'active-link',
-                                    'style' => 'cursor: pointer',
-                                    'border' => 'solid 1px #eee',
-                                    'padding' => '3px',
-                                ]), "#group-$groupNormalized", 'Постоянная ссылка на процесс')?>
-
-                                <b><a href="#<?=$id = preg_replace('~\W+~sui', '-', $toolJob->group)?>" id="<?=$id ?>"><?=$toolJob->group?></a></b>
+                                    'data' => ['toggle' => 'tooltip', 'placement' => 'top'],
+                                    'title' => 'Постоянная ссылка на процесс',
+                                ])?>
+                                <?php $id = preg_replace('~\W+~sui', '-', $toolJob->group); ?>
+                                <b><?= Html::a($toolJob->group, "#$id", ['id' => $id]) ?></b>
                             </td>
                         </tr>
                         <?php $group = $toolJob->group;?>
                     <?php }?>
-                    <?=$this->renderToolJobRow($toolJob, $cpuUsages);?>
+                    <?=$this->context->renderToolJobRow($toolJob, $cpuUsages);?>
                 <?php }?>
             </tbody>
         </table>
@@ -97,7 +101,7 @@ $this->title = "Фоновые процессы";
             var td = $('td:first', $(this).parents('tr:first'));
             var that = this;
             var html = this.innerHTML;
-            that.innerHTML = <?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH))?>;
+            that.innerHTML = <?=json_encode(yii\bootstrap\BaseHtml::icon('refresh'))?>;
 
             $.ajax({
                 url: this.href
@@ -165,8 +169,8 @@ $this->title = "Фоновые процессы";
             $('time', objs).html(event.last_run_time);
             $('span.duration', objs).html(event.last_run_duration + ' сек.');
             $('span.error-mark', objs).html(event.last_exit_code
-                ? '<?=TbHtml::labelTb('Да', ['color' => TbHtml::ALERT_COLOR_DANGER])?>'
-                : 'Нет'
+                    ? '<?=Html::tag('span', 'Да', ['class' => 'label label-danger'])?>'
+                    : 'Нет'
             );
             setTimeout(function(){
                 objs.css({'color': 'inherit'});

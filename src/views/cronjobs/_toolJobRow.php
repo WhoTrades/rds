@@ -1,15 +1,17 @@
 <?php
 /** @var $toolJob ToolJob */
 /** @var $Project Project */
+
+use yii\bootstrap\Html;
+
 ?>
 <tr id="<?=$toolJob->getLoggerTag()?>" class="active-tr project-<?=$toolJob->project->project_name?>">
     <td style="font-family: Menlo, Monaco, Consolas, monospace">
-        <?=TbHtml::tooltip(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_LINK, [
+        <?= Html::a(Html::icon('link'), '#' . $toolJob->getLoggerTag(), [
             'class' => 'active-link',
-            'style' => 'cursor: pointer',
-            'border' => 'solid 1px #eee',
-            'padding' => '3px',
-        ]), "#" . $toolJob->getLoggerTag(), 'Постоянная ссылка на процесс')?>
+            'data' => ['toggle' => 'tooltip', 'placement' => 'top'],
+            'title' => 'Постоянная ссылка на процесс',
+        ])?>
         <span class="command">
             <?=preg_replace(
                 '~(--(?:tool|queue-name|event-processor)=)(\S*)~',
@@ -37,71 +39,44 @@
             <?php } else {?>
                 Активен
             <?php }?>
-            <?=TbHtml::tooltip(
-                yii\bootstrap\BaseHtml::icon(TbHtml::ICON_INFO_SIGN),
-                yii\helpers\Url::to("/cronjobs/getInfo", [
-                    'key' => $toolJob->key,
-                    'project' => $Project->project_name,
-                ]),
-                "Запросить информацию о работающих процессах",
-                [
-                    'class' => '__get-process-info',
-                    'style' => 'color: orange',
-                ]
-            )?>
+            <?= Html::a(Html::icon('info-sign'), ['/cronjobs/get-info', 'key' => $toolJob->key, 'project' => $Project->project_name], [
+                'class' => '__get-process-info',
+                'style' => 'color: orange',
+                'data' => ['toggle' => 'tooltip', 'placement' => 'top'],
+                'title' => 'Запросить информацию о работающих процессах',
+            ])?>
         </div>
         <?php if ($stopper) {?>
             <a href="<?=yii\helpers\Url::to("/cronjobs/start", [
                 'key' => $toolJob->key,
                 'projectId' => $Project->obj_id,
             ])?>" class="ajax-url">
-                <?=yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PLAY, ['style' => 'font-size: 2em; color: green'])?>
+                <?=yii\bootstrap\BaseHtml::icon('play', ['style' => 'font-size: 2em; color: green'])?>
             </a><br />
         <?php } else {?>
             <div style="white-space: nowrap">
                 <?php foreach (['0.7em' => '5 minutes', '1em' => '15 minutes', '1.3em' => '1 hour', '1.7em' => '3 hours', '2.0em' => '1 day'] as $size => $interval) {?>
-                    <?=TbHtml::tooltip(
-                        yii\bootstrap\BaseHtml::icon(TbHtml::ICON_STOP),
-                        yii\helpers\Url::to("/cronjobs/stop", [
-                            'key' => $toolJob->key,
-                            'interval' => $interval,
-                            'projectId' => $Project->obj_id,
-                        ]),
-                        "Не запускать " . $interval,
-                        [
-                            'style' => 'font-size: ' . $size,
-                            'class' => 'ajax-url',
-                        ]
-                    )?>
+                    <?= Html::a(Html::icon('stop'), ['/cronjobs/stop', 'key' => $toolJob->key, 'interval' => $interval, 'projectId' => $Project->obj_id], [
+                        'class' => 'ajax-url',
+                        'style' => 'cursor: pointer; font-size: ' . $size,
+                        'data' => ['toggle' => 'tooltip', 'placement' => 'top'],
+                        'title' => 'Не запускать ' . $interval,
+                    ])?>
                 <?php }?>
             </div>
         <?php }?>
-        <?=TbHtml::tooltip(
-            yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REMOVE_CIRCLE),
-            yii\helpers\Url::to("/cronjobs/kill", [
-                'key' => $toolJob->key,
-                'project' => $Project->project_name,
-            ]),
-            "Мягко завершить работающие процессы (SIGTERM)",
-            [
-                'style' => 'font-size: 2em',
-                'class' => '__kill-process',
-            ]
-        )?>
-        &nbsp;
-        <?=TbHtml::tooltip(
-            yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REMOVE),
-            yii\helpers\Url::to("/cronjobs/kill", [
-                'key' => $toolJob->key,
-                'signal' => 9,
-                'project' => $Project->project_name,
-            ]),
-            "Жестко убить работающие процессы (sudo kill -9)",
-            [
-                'class' => '__kill-process __hard-kill',
-                'style' => 'font-size: 2em; color: red',
-            ]
-        )?>
+        <?= Html::a(Html::icon('remove-circle'), ['/cronjobs/kill', 'key' => $toolJob->key, 'project' => $Project->project_name], [
+            'class' => '__kill-process',
+            'style' => 'font-size: 2em;cursor :pointer;',
+            'data' => ['toggle' => 'tooltip', 'placement' => 'top'],
+            'title' => 'Мягко завершить работающие процессы (SIGTERM)',
+        ])?>
+        <?= Html::a(Html::icon('remove'), ['/cronjobs/kill', 'signal' => 9, 'key' => $toolJob->key, 'project' => $Project->project_name], [
+            'class' => '__kill-process __hard-kill',
+            'style' => 'font-size: 2em; color: red; cursor: pointer;',
+            'data' => ['toggle' => 'tooltip', 'placement' => 'top'],
+            'title' => 'Жестко убить работающие процессы (sudo kill -9)',
+        ])?>
     </td>
     <td style="white-space: nowrap;" class="cpu-usage __project-<?=$toolJob->project->project_name?> __key-<?=$toolJob->key?>">
         <?php if (isset($cpuUsages[$toolJob->key][$toolJob->project->project_name])) {?>
@@ -117,9 +92,8 @@
             </a>
             <br />
             Ошибка: <span class="error-mark"><?=$cpuUsage->last_exit_code
-                    ? TbHtml::labelTb('Да', [
-                        'color' => TbHtml::ALERT_COLOR_DANGER,
-                        'class' => "__get-log-tail",
+                    ? Html::tag('span', 'Да', [
+                        'class' => '__get-log-tail label label-danger',
                         'tag' => $tag,
                         'style' => 'cursor: pointer',
                     ])
