@@ -18,26 +18,20 @@ class CronjobsController extends Controller
 {
     const KILL_SIGNAL = 15; //SIGTERM
 
-    public function filters()
+    /**
+     * @return array
+     */
+    public function behaviors()
     {
-        return array(
-            'accessControl', // perform access control for CRUD operations
-        );
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    ['allow' => true, 'roles' => ['@']],
+                ],
+            ],
+        ];
     }
-
-    public function accessRules()
-    {
-        return array(
-            array('allow',
-                'users'=>array('@'),
-            ),
-            array('deny',  // deny all users
-                'users'=>array('*'),
-            ),
-        );
-    }
-
-
 
     public function actionIndex($project = 'comon')
     {

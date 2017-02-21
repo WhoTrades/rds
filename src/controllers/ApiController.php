@@ -1,5 +1,7 @@
 <?php
-include(__DIR__.'/JsonController.php');
+
+namespace app\controllers;
+
 class ApiController extends JsonController
 {
 

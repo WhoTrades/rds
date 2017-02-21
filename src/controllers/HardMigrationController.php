@@ -8,31 +8,20 @@ use app\models\HardMigration;
 class HardMigrationController extends Controller
 {
     public $pageTitle = 'Тяжелые миграции';
-    /**
-     * @return array action filters
-     */
-    public function filters()
-    {
-        return array(
-            'accessControl'
-        );
-    }
 
     /**
-     * Specifies the access control rules.
-     * This method is used by the 'accessControl' filter.
-     * @return array access control rules
+     * @return array
      */
-    public function accessRules()
+    public function behaviors()
     {
-        return array(
-            array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'users'=>array('@'),
-            ),
-            array('deny',  // deny all users
-                'users'=>array('*'),
-            ),
-        );
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    ['allow' => true, 'roles' => ['@']],
+                ],
+            ],
+        ];
     }
 
     public function actionIndex()

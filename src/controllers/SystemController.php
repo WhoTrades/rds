@@ -12,26 +12,16 @@ class SystemController extends Controller
     /**
      * @return array
      */
-    public function filters()
+    public function behaviors()
     {
-        return array(
-            'accessControl', // perform access control for CRUD operations
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function accessRules()
-    {
-        return array(
-            array('allow',
-                'users' => array('@'),
-            ),
-            array('deny',
-                'users' => array('*'),
-            ),
-        );
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    ['allow' => true, 'roles' => ['@']],
+                ],
+            ],
+        ];
     }
 
     /**
