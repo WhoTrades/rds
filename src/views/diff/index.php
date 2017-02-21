@@ -1,6 +1,5 @@
 <?php
 /** @var $filename string */
-use app\components\TbHtml;
 
 /** @var $newText string */
 /** @var $newTitle string */
@@ -15,12 +14,11 @@ $this->title = "$projectName/$filename";
 <h1>Изменения <?= $this->title ?></h1>
 <div class="diff">
     <?=yii\bootstrap\BaseHtml::icon(
-        TbHtml::ICON_MINUS,
+        'minus',
         [
             'style' => 'float: right ;border: solid 1px #eee; cursor: pointer',
             'onclick' => 'togglePanelMode()',
-        ],
-        'div'
+        ]
     ); ?>
     <div class="item">
         <input type="checkbox" id="inline" style="float: left" onchange="diffUsingJS();"/>

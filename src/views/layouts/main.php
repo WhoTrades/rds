@@ -3,7 +3,6 @@ use app\assets\AppAsset;
 use yii\helpers\Html;
 use yii\bootstrap\NavBar;
 use yii\bootstrap\Nav;
-use app\components\TbHtml;
 use yii\bootstrap\Alert;
 
 /** @var $this yii\web\View */
@@ -96,7 +95,7 @@ echo Nav::widget(
             ),
             array(
                 'label' => \Yii::$app->user->getIsGuest() ? "" : "Выйти " . \Yii::$app->user->getIdentity()->username,
-                'icon' => TbHtml::ICON_LOG_OUT,
+                'icon' => 'log-out',
                 'url' => array('/site/logout'),
                 'visible' => !\Yii::$app->user->isGuest,
             ),
@@ -120,7 +119,7 @@ NavBar::end();
         $('body').on('click', '.ajax-url', function (e) {
             var that = this;
             var html = this.innerHTML;
-            that.innerHTML = <?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH))?>;
+            that.innerHTML = <?=json_encode(yii\bootstrap\BaseHtml::icon('refresh'))?>;
             $.ajax({url: this.href}).done(function () {
                 that.innerHTML = html;
             });

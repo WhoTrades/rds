@@ -3,7 +3,6 @@
 /** @var $model app\models\ReleaseRequest
 /** @var $form yii\bootstrap\ActiveForm */
 
-use app\components\TbHtml;
 ?>
 <div class="form" style="width: 400px; margin: auto">
     <?php $form = yii\bootstrap\ActiveForm::begin(array(
@@ -12,12 +11,12 @@ use app\components\TbHtml;
         'options' => array(
             'validateOnSubmit' => true,
             'validateOnChange' => false,
-            'beforeValidate' => 'js:function(form, data, hasError){
+            'beforeValidate' => 'function(form, data, hasError){
                 $("button", $(form)).attr("disabled", true);
 
                 return true;
             }',
-            'afterValidate' => 'js:function(form, data, hasError){
+            'afterValidate' => 'function(form, data, hasError){
                 if (!hasError) {
                     $("button", $(form)).attr("disabled", true);
                     $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(){
@@ -67,7 +66,7 @@ use app\components\TbHtml;
             this.ajax.abort();
         }
 
-        $('#diff-preview').html(<?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH))?>);
+        $('#diff-preview').html(<?=json_encode(yii\bootstrap\BaseHtml::icon('refresh'))?>);
 
         this.ajax = $.ajax({
             url: "/api/getProjectCurrentVersion",
@@ -83,7 +82,7 @@ use app\components\TbHtml;
                     'href': 'http://git.finam.ru/projects/WT/repos/sparta/pull-requests?create&targetBranch=refs%2Ftags%2F' + tag + '&sourceBranch=refs%2Fheads%2Fmaster'
                 });
             } else {
-                $('#diff-preview').html(<?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_STOP))?>).attr('a', '#');
+                $('#diff-preview').html(<?=json_encode(yii\bootstrap\BaseHtml::icon('stop'))?>).attr('a', '#');
             }
         });
     };

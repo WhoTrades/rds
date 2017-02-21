@@ -43,7 +43,7 @@ return [
             'start' => [
                 'visible' => '$data->canBeStarted()',
                 'url' => '\Yii::$app->controller->createAbsoluteUrl("/maintenanceTool/start",array("id"=>$data->primaryKey))',
-                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_PLAY, ['style' => 'color: #32cd32']),
+                'label' => yii\bootstrap\BaseHtml::icon('play', ['style' => 'color: #32cd32']),
                 'options' => [
                     'title' => 'Запустить команду',
                 ],
@@ -51,7 +51,7 @@ return [
             'stop' => [
                 'visible' => '$data->canBeKilled()',
                 'url' => '\Yii::$app->controller->createAbsoluteUrl("/maintenanceTool/stop",array("id"=>$data->primaryKey))',
-                'label' => yii\bootstrap\BaseHtml::icon(TbHtml::ICON_STOP, ['style' => 'color: red']),
+                'label' => yii\bootstrap\BaseHtml::icon('stop', ['style' => 'color: red']),
                 'options' => [
                     'title' => 'Остановить команду',
                 ],

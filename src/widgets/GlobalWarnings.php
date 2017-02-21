@@ -1,8 +1,6 @@
 <?php
 namespace app\widgets;
 
-use app\components\TbHtml;
-
 class GlobalWarnings extends \yii\base\Widget
 {
     public function init()
@@ -17,8 +15,8 @@ class GlobalWarnings extends \yii\base\Widget
         if (!$config->is_tst_updating_enabled) {
             $warnings[] = new GlobalWarningItem(
                 "Обновление tst контура остановлено",
-                TbHtml::ICON_WARNING_SIGN,
-                TbHtml::ALERT_COLOR_WARNING
+                'warning-sign',
+                'warning'
             );
         }
 

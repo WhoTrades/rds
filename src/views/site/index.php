@@ -3,7 +3,6 @@ use app\models\ReleaseReject;
 use app\models\ReleaseRequest;
 use app\models\Project;
 use yii\helpers\Html;
-use app\components\TbHtml;
 
 /** @var $this yii\web\View */
 /** @var $releaseRejectSearchModel ReleaseReject */
@@ -194,7 +193,7 @@ echo yii\grid\GridView::widget(array(
             data.ajax = 1;
             $("#modal-popup").modal("show");
             $("#modal-popup .modal-header h4").html(title);
-            $("#modal-popup .modal-body").html("<center><span style='font-size: 3em'>" + <?=json_encode(yii\bootstrap\BaseHtml::icon(TbHtml::ICON_REFRESH))?> + "<span></center>");
+            $("#modal-popup .modal-body").html("<center><span style='font-size: 3em'>" + <?=json_encode(yii\bootstrap\BaseHtml::icon('refresh'))?> + "<span></center>");
             $.ajax({
                 url: url,
                 data: data

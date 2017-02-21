@@ -6,8 +6,7 @@
 use app\models\ReleaseRequest;
 use app\models\Project;
 use app\models\Build;
-use yii\helpers\Html;
-use app\components\TbHtml;
+use yii\bootstrap\Html;
 use yii\bootstrap\Alert;
 
 return array(
@@ -32,15 +31,15 @@ return array(
     array(
         'value' => function (ReleaseRequest $releaseRequest) {
             $map = array(
-                ReleaseRequest::STATUS_NEW          => array(TbHtml::ICON_TIME, 'Ожидает сборки', 'black'),
-                ReleaseRequest::STATUS_FAILED       => array(TbHtml::ICON_REMOVE, 'Не собралось', 'red'),
-                ReleaseRequest::STATUS_INSTALLED    => array(TbHtml::ICON_OK, 'Установлено', 'black'),
-                ReleaseRequest::STATUS_USING        => array(TbHtml::ICON_REFRESH, 'Активируем', 'orange'),
-                ReleaseRequest::STATUS_CODES        => array(TbHtml::ICON_TIME, 'Ждем ввода кодов', 'orange'),
-                ReleaseRequest::STATUS_USED         => array(TbHtml::ICON_OK, 'Активная версия', '#32cd32'),
-                ReleaseRequest::STATUS_OLD          => array(TbHtml::ICON_TIME, 'Старая версия', 'grey'),
-                ReleaseRequest::STATUS_CANCELLING   => array(TbHtml::ICON_REFRESH, 'Отменяем...', 'orange'),
-                ReleaseRequest::STATUS_CANCELLED    => array(TbHtml::ICON_OK, 'Отменено', 'red'),
+                ReleaseRequest::STATUS_NEW          => array('time', 'Ожидает сборки', 'black'),
+                ReleaseRequest::STATUS_FAILED       => array('remove', 'Не собралось', 'red'),
+                ReleaseRequest::STATUS_INSTALLED    => array('ok', 'Установлено', 'black'),
+                ReleaseRequest::STATUS_USING        => array('refresh', 'Активируем', 'orange'),
+                ReleaseRequest::STATUS_CODES        => array('time', 'Ждем ввода кодов', 'orange'),
+                ReleaseRequest::STATUS_USED         => array('ok', 'Активная версия', '#32cd32'),
+                ReleaseRequest::STATUS_OLD          => array('time', 'Старая версия', 'grey'),
+                ReleaseRequest::STATUS_CANCELLING   => array('refresh', 'Отменяем...', 'orange'),
+                ReleaseRequest::STATUS_CANCELLED    => array('ok', 'Отменено', 'red'),
             );
             list($icon, $text, $color) = $map[$releaseRequest->rr_status];
             $result = ["<span title='{$text}' style='color: " . $color . "'>" . yii\bootstrap\BaseHtml::icon($icon) . " {$releaseRequest->rr_status}</span><hr />"];
@@ -48,19 +47,15 @@ return array(
             foreach ($releaseRequest->builds as $val) {
                 /** @var $val Build */
                 $map = array(
-                    Build::STATUS_FAILED => array(TbHtml::ICON_EXCLAMATION_SIGN, 'Не собралось', 'red'),
-                    Build::STATUS_BUILDING => array(TbHtml::ICON_REFRESH, 'Собирается', 'orange'),
-                    Build::STATUS_NEW => array(TbHtml::ICON_TIME, 'Ожидает сборки', 'black'),
-                    Build::STATUS_BUILT => array(TbHtml::ICON_UPLOAD, 'Раскладывается по серверам', 'orange'),
-                    Build::STATUS_INSTALLED => array(TbHtml::ICON_OK, 'Скопировано на сервер', 'black'),
-                    Build::STATUS_USED => array(TbHtml::ICON_OK, 'Установлено', '#32cd32'),
-                    Build::STATUS_CANCELLED => array(TbHtml::ICON_BAN_CIRCLE, 'Отменено', 'red'),
-                    Build::STATUS_PREPROD_USING => array(TbHtml::ICON_REFRESH, 'Устанавливаем на preprod', 'orange'),
-                    Build::STATUS_PREPROD_MIGRATIONS => array(
-                        TbHtml::ICON_REFRESH,
-                        'Устанавливаем на preprod',
-                        'orange',
-                    ),
+                    Build::STATUS_FAILED => array('exclamation-sign', 'Не собралось', 'red'),
+                    Build::STATUS_BUILDING => array('refresh', 'Собирается', 'orange'),
+                    Build::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
+                    Build::STATUS_BUILT => array('upload', 'Раскладывается по серверам', 'orange'),
+                    Build::STATUS_INSTALLED => array('ok', 'Скопировано на сервер', 'black'),
+                    Build::STATUS_USED => array('ok', 'Установлено', '#32cd32'),
+                    Build::STATUS_CANCELLED => array('ban-circle', 'Отменено', 'red'),
+                    Build::STATUS_PREPROD_USING => array('refresh', 'Устанавливаем на preprod', 'orange'),
+                    Build::STATUS_PREPROD_MIGRATIONS => array('refresh', 'Устанавливаем на preprod', 'orange'),
                 );
                 list($icon, $text, $color) = $map[$val->build_status];
 
@@ -158,7 +153,7 @@ return array(
                             'header' => 'Errors of migration applying',
                             'content' => "<pre>$releaseRequest->rr_migration_error</pre>",
                             'footer' => array(
-                                TbHtml::button('Close', array('data-dismiss' => 'modal')),
+                                Html::button('Close', array('data-dismiss' => 'modal')),
                             ),
                         ));
                         $widget->init();
