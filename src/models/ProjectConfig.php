@@ -42,13 +42,11 @@ class ProjectConfig extends ActiveRecord
     }
 
     /**
-     * @return array relational rules.
+     * @return ProjectConfig
      */
-    public function relations()
+    public function getProject()
     {
-        return [
-            'project' => array(self::BELONGS_TO, 'Project', 'pc_project_obj_id'),
-        ];
+        return $this->hasOne(Project::className(), ['obj_id' => 'pc_project_obj_id']);
     }
 
     /**

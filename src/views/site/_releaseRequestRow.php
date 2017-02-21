@@ -20,7 +20,7 @@ return array(
             $result = strip_tags($releaseRequest->rr_comment) . "<br />";
 
             if ($releaseRequest->isInstalledStatus()) {
-                $result .= "<a href='" . yii\helpers\Url::to('/Wtflow/jira/gotoJiraTicketsByReleaseRequest', ['id' => $releaseRequest->obj_id]) .
+                $result .= "<a href='" . yii\helpers\Url::to(['/wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id]) .
                     "' target='_blank'>Тикеты</a><br />";
             }
             $result .= "<a href='/site/commits/$releaseRequest->obj_id' onclick=\"popup('test', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>";
@@ -61,7 +61,7 @@ return array(
                 list($icon, $text, $color) = $map[$val->build_status];
 
                 $result[] =  implode("", [
-                    "<a href='" . yii\helpers\Url::to('build/view', array('id' => $val->obj_id)),
+                    "<a href='" . yii\helpers\Url::to(['build/view', 'id' => $val->obj_id]),
                     "' title='{$text}' style='color: $color'>",
                     yii\bootstrap\BaseHtml::icon($icon),
                     " {$val->build_status} {$val->project->project_name} {$val->build_version}</a>",
@@ -191,10 +191,10 @@ return array(
             } elseif ($releaseRequest->rr_status == ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
                 if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest($releaseRequest->rr_project_obj_id, $releaseRequest->rr_old_version)) {
                     if ($oldReleaseRequest->canBeUsed()) {
-                        return "<a href='" . yii\helpers\Url::to('/use/create', array('id' => $oldReleaseRequest->obj_id)) .
+                        return "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $oldReleaseRequest->obj_id]) .
                             "' --data-id='$oldReleaseRequest->obj_id' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
                     } elseif ($oldReleaseRequest->rr_status == ReleaseRequest::STATUS_CODES) {
-                        return "<a href='" . yii\helpers\Url::to('/use/index', array('id' => $oldReleaseRequest->obj_id)) .
+                        return "<a href='" . yii\helpers\Url::to(['/use/index', 'id' => $oldReleaseRequest->obj_id]) .
                             "' onclick='showForm($oldReleaseRequest->obj_id); return false;'>Sms код для отката до $releaseRequest->rr_old_version</a>";
                     }
                 }

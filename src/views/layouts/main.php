@@ -48,7 +48,7 @@ echo Nav::widget(
                 'label' => 'Миграции',
                 'url' => array('/hard-migration/index'),
                 'visible' => !\Yii::$app->user->isGuest,
-                'active' => \Yii::$app->controller->id == 'hardMigration',
+                'active' => \Yii::$app->controller->id == 'hard-migration',
             ),
 
             array(
@@ -59,7 +59,7 @@ echo Nav::widget(
                 'items' => [
                     array('label' => 'Проекты', 'url' => array('/project/admin'), 'active' => \Yii::$app->controller->id == 'project'),
                     array('label' => 'Сборщики', 'url' => array('/worker/admin'), 'active' => \Yii::$app->controller->id == 'worker'),
-                    array('label' => 'Версии', 'url' => array('/release-version/admin'), 'active' => \Yii::$app->controller->id == 'releaseVersion'),
+                    array('label' => 'Версии', 'url' => array('/release-version/admin'), 'active' => \Yii::$app->controller->id == 'release-version'),
                 ],
             ),
             array(
@@ -71,19 +71,19 @@ echo Nav::widget(
                     ['label' => 'JIRA', 'url' => array('/Wtflow/jira/index'), 'active' => \Yii::$app->controller->id == 'jira'],
                     ['label' => 'Разработчики', 'url' => array('/Wtflow/developer/index'), 'active' => \Yii::$app->controller->id == 'developer'],
                     ['label' => 'Git', 'url' => array('/Wtflow/git/index'), 'active' => \Yii::$app->controller->id == 'git' && $__action == 'index'],
-                    ['label' => 'wtflow', 'url' => array('/Wtflow/git/wtflowStat'), 'active' => \Yii::$app->controller->id == 'git' && $__action == 'wtflowStat'],
+                    ['label' => 'wtflow', 'url' => array('/Wtflow/git/wt-flow-stat'), 'active' => \Yii::$app->controller->id == 'git' && $__action == 'wt-flow-stat'],
                 ],
             ),
             array(
                 'label' => 'Обслуживание',
-                'url' => array('/maintenanceTool/index'),
+                'url' => array('/maintenance-tool/index'),
                 'visible' => !\Yii::$app->user->isGuest,
                 'active' => in_array(\Yii::$app->controller->id, ['maintenanceTool', 'alert', 'cronjobs', 'gitBuild']),
                 'items' => [
                     //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => \Yii::$app->controller->id == 'maintenanceTool'],
                     ['label' => 'Сигнализация', 'url' => array('/alert/index'), 'active' => \Yii::$app->controller->id == 'alert'],
                     ['label' => 'Фоновые задачи', 'url' => array('/cronjobs/index'), 'active' => \Yii::$app->controller->id == 'cronjobs'],
-                    ['label' => 'Пересборка веток', 'url' => array('/Wtflow/gitBuild'), 'active' => \Yii::$app->controller->id == 'gitBuild'],
+                    ['label' => 'Пересборка веток', 'url' => array('/Wtflow/git-build'), 'active' => \Yii::$app->controller->id == 'git-build'],
                     ['label' => 'Ограничение функциональности', 'url' => array('/system/index'), 'active' => \Yii::$app->controller->id == 'system'],
                 ],
             ),
