@@ -34,20 +34,20 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 )); ?>
 </div><!-- search-form -->
 
-<?php $this->widget('yiistrap.widgets.TbGridView', array(
-	'id'=>'project2worker-grid',
-	'dataProvider'=>$model->search(),
-	'htmlOptions' => ['class' => 'table-responsive'],
-	'filter'=>$model,
-	'columns'=>array(
+<?= yii\grid\GridView::widget([
+	'id' => 'project2worker-grid',
+	'dataProvider' => $model->search($model->attributes),
+	'filterModel' => $model,
+	'options' => ['class' => 'table-responsive'],
+	'columns' => [
 		'obj_id',
 		'obj_created',
 		'obj_modified',
 		'obj_status_did',
 		'worker.worker_name',
 		'project.project_name',
-		array(
-            'class'=>'yiistrap.widgets.TbButtonColumn',
-		),
-	),
-)); ?>
+		[
+			'class' => 'yii\grid\ActionColumn',
+		],
+	],
+]);

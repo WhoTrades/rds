@@ -1,6 +1,7 @@
 <?php
-/* @var $model Build */
+/** @var $model app\models\Build */
 use yii\helpers\Html;
+
 $this->registerJs("
 $('.search-button').click(function(){
 	$('.search-form').toggle();
@@ -29,21 +30,21 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 )); ?>
 </div><!-- search-form -->
 
-<?php $this->widget('yiistrap.widgets.TbGridView', array(
-	'id'=>'build-grid',
-	'dataProvider'=>$model->search(),
-	'filter'=>$model,
-	'htmlOptions' => ['class' => 'table-responsive'],
-	'columns'=>array(
-		'obj_id',
-		'obj_created',
-		'project.project_name',
-		'worker.worker_name',
-		'build_status',
-		'build_attach',
-		'build_version',
-		array(
-            'class'=>'yiistrap.widgets.TbButtonColumn',
-		),
-	),
-)); ?>
+<?= yii\grid\GridView::widget(array(
+    'id' => 'build-grid',
+    'dataProvider' => $model->search($model->attributes),
+    'filterModel' => $model,
+    'options' => ['class' => 'table-responsive'],
+    'columns' => [
+        'obj_id',
+        'obj_created',
+        'project.project_name',
+        'worker.worker_name',
+        'build_status',
+        'build_attach',
+        'build_version',
+        [
+            'class' => 'yii\grid\ActionColumn',
+        ],
+    ],
+));

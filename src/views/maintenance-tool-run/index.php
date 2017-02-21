@@ -14,21 +14,21 @@ $this->params['menu']=array(
     or <b>=</b>) at the beginning of each of your search values to specify how the comparison should be done.
 </p>
 
-<?php $this->widget('yiistrap.widgets.TbGridView',array(
-    'id'=>'maintenance-tool-run-grid',
-    'dataProvider'=>$model->search(),
-    'htmlOptions' => ['class' => 'table-responsive'],
-    'filter'=>$model,
-    'columns'=>array(
+<?= yii\grid\GridView::widget([
+    'id' => 'maintenance-tool-run-grid',
+    'dataProvider' => $model->search($model->attributes),
+    'filterModel' => $model,
+    'options' => ['class' => 'table-responsive'],
+    'columns' => [
         'obj_id',
         'obj_created',
         'mtrMaintenanceTool.mt_name',
         'mtr_runner_user',
         'mtr_pid',
         'mtr_status',
-        array(
-            'class'=>'yiistrap.widgets.TbButtonColumn',
-            'template' => '{view}'
-        ),
-    ),
-)); ?> 
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'template' => '{view}',
+        ],
+    ],
+]);

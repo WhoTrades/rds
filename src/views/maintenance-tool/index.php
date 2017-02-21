@@ -1,16 +1,16 @@
 <?php
-/* @var $this MaintenanceToolController */
-/* @var $model MaintenanceTool */
+/** @var $model app\models\MaintenanceTool */
 
 $this->title = "Обслуживание";
-$this->widget('yiistrap.widgets.TbGridView', array(
-    'dataProvider'=>$model->search(),
-    'htmlOptions' => ['class' => 'table-responsive'],
-    'rowCssClassExpression' => function($index, MaintenanceTool $tool){
-        return 'maintenance-tool-'.$tool->obj_id;
+
+echo yii\grid\GridView::widget(array(
+    'dataProvider' => $model->search($model->attributes),
+    'options' => ['class' => 'table-responsive'],
+    'filterModel' => $model,
+    'rowOptions' => function ($model) {
+        return 'maintenance-tool-' . $model->obj_id;
     },
-    'filter'=>$model,
-    'columns'=>require('_maintenanceToolRow.php'),
+    'columns' => require('_maintenanceToolRow.php'),
 )); ?>
 
 
