@@ -8,6 +8,7 @@ use app\models\Project;
 use app\models\Build;
 use yii\bootstrap\Html;
 use yii\bootstrap\Alert;
+use yii\bootstrap\Modal;
 
 return array(
     'obj_id',
@@ -148,21 +149,21 @@ return array(
                         return "updating migrations";
                     } elseif ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_FAILED) {
                         $result .= "updating migrations failed<br />";
-                        $widget = \Yii::$app->getWidgetFactory()->createWidget(\Yii::$app, 'yiistrap.widgets.TbModal', array(
+                        Modal::begin([
                             'id' => 'release-request-migration-error-' . $releaseRequest->obj_id,
                             'header' => 'Errors of migration applying',
-                            'content' => "<pre>$releaseRequest->rr_migration_error</pre>",
-                            'footer' => array(
-                                Html::button('Close', array('data-dismiss' => 'modal')),
-                            ),
-                        ));
-                        $widget->init();
-                        $widget->run();
+                            'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
+                        ]);
+                        echo "<pre>$releaseRequest->rr_migration_error</pre>";
+                        Modal::end();
 
-                        $result .= '<a href="" style="info" data-toggle="modal" data-target="#release-request-migration-error-' .
-                            $releaseRequest->obj_id . '" onclick="return false;">view error</a> | ';
-                        $result .= "<a href='" . yii\helpers\Url::to('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre')) .
-                            "' class='ajax-url'>Retry</a><br />";
+                        $result .= Html::a('view error', '', [
+                            'style' => 'info',
+                            'data' => ['toggle' => 'modal', 'target' => '#release-request-migration-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
+                        ]);
+                        $result .= ' | ';
+                        $result .= Html::a('Retry', ['/use/migrate', 'id' => $releaseRequest->obj_id, 'type' => 'pre'], ['class' => 'ajax-url']);
+                        $result .= "<br />";
 
                         return $result;
                     } else {
