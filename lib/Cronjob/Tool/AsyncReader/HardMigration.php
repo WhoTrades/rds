@@ -1,8 +1,11 @@
 <?php
 
+use yii\helpers\Url;
 use RdsSystem\Message;
 use app\models\HardMigration;
+use app\components\Jira\AsyncRpc;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
+use app\modules\Wtflow\models\JiraMoveTicket;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=AsyncReader_HardMigration -vv
@@ -55,7 +58,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         if ($model->getEnv() == 'main' && $migration->migration_status != $message->status) {
             if (\Config::getInstance()->serviceRds['jira']['repostMigrationStatus']) {
                 /** @var $jira JiraApi */
-                $jira = new Jira\AsyncRpc($this->debugLogger);
+                $jira = new AsyncRpc($this->debugLogger);
 
                 switch ($message->status) {
                     case HardMigration::MIGRATION_STATUS_NEW:
@@ -132,7 +135,9 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
 
     public function createUrl($route, $params)
     {
-        Yii::$app->urlManager->setBaseUrl('');
-        return \Yii::$app->createAbsoluteUrl($route, $params);
+        \Yii::$app->urlManager->setBaseUrl('');
+        array_unshift($params, $route);
+
+        return Url::to($params, true);
     }
 }

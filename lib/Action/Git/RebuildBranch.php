@@ -1,7 +1,12 @@
 <?php
 namespace Action\Git;
 
+use app\models\Log;
 use RdsSystem\Message;
+use app\modules\Wtflow\models\GitBuild;
+use app\modules\Wtflow\models\JiraFeature;
+use app\modules\Wtflow\components\JiraApi;
+use app\modules\Wtflow\models\GitBuildBranch;
 
 class RebuildBranch
 {
@@ -22,9 +27,9 @@ class RebuildBranch
         }
 
         if ($checkForDuplicateTasks) {
-            $notReadyBranchesCount = \GitBuild::countByAttributes([
+            $notReadyBranchesCount = GitBuild::countByAttributes([
                 'additional_data' => $branch,
-                'status' => \GitBuild::STATUS_NEW,
+                'status' => GitBuild::STATUS_NEW,
             ]);
 
             if ($notReadyBranchesCount > 0) {
@@ -56,7 +61,7 @@ class RebuildBranch
             ],
         ];
 
-        $jira = new \JiraApi(\Yii::$app->debugLogger);
+        $jira = new JiraApi(\Yii::$app->debugLogger);
 
         $jql = "status IN (\"".implode('", "', $map[$branch])."\") AND project IN (".implode(", ", \Yii::$app->params['jiraProjects']).") ORDER BY updated ASC";
         \Yii::$app->debugLogger->message("Getting tickets by jql=$jql");
@@ -66,7 +71,7 @@ class RebuildBranch
         $branches = [];
         foreach ($tickets['issues'] as $ticket) {
             \Yii::$app->debugLogger->debug("Testing {$ticket['key']}");
-            if (!\JiraFeature::countByAttributes(['jf_ticket' => $ticket['key']])) {
+            if (!JiraFeature::countByAttributes(['jf_ticket' => $ticket['key']])) {
                 \Yii::$app->debugLogger->debug("Skip {$ticket['key']} as it is not known");
                 //continue;
             }
@@ -86,9 +91,9 @@ class RebuildBranch
         }
 
 
-        $build = new \GitBuild();
+        $build = new GitBuild();
         $build->branch = "tmp/build_".uniqid();
-        $build->status = \GitBuild::STATUS_NEW;
+        $build->status = GitBuild::STATUS_NEW;
         $build->user = $user;
         $build->additional_data = $branch;
         $build->save();
@@ -102,14 +107,14 @@ class RebuildBranch
 
         foreach ($branches as $val) {
 
-            if (!\GitBuildBranch::countByAttributes([
+            if (!GitBuildBranch::countByAttributes([
                 'git_build_id' => $build->obj_id,
                 'branch' => $val,
             ])) {
-                $b = new \GitBuildBranch();
+                $b = new GitBuildBranch();
                 $b->git_build_id = $build->obj_id;
                 $b->branch = $val;
-                $b->status = \GitBuildBranch::STATUS_NEW;
+                $b->status = GitBuildBranch::STATUS_NEW;
                 $b->errors = '[]';
                 $b->save();
             }
@@ -122,7 +127,7 @@ class RebuildBranch
             );
         }
 
-        \Log::createLogMessage("Заказана пересборка #$build->obj_id ветки $branch");
+        Log::createLogMessage("Заказана пересборка #$build->obj_id ветки $branch");
         \Yii::$app->webSockets->send('gitBuildRefreshAll', []);
 
         \Yii::$app->debugLogger->message("Tasks sent successfully");

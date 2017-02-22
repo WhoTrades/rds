@@ -12,9 +12,7 @@ class YiiBridge
         defined('YII_DEBUG') or define('YII_DEBUG', true);
         defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 
-        require_once(__DIR__ . '/../protected/components/ExternalApplication.php');
-        $application = new \ExternalApplication(require($config));
-        $application->debugLogger = $debugLogger;
+        $application = new \app\components\ExternalApplication(require($config), $debugLogger);
 
         $application->run();
     }

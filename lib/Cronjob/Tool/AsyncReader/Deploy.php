@@ -1,4 +1,5 @@
 <?php
+use yii\helpers\Url;
 use RdsSystem\Message;
 use RdsSystem\Model\Rabbit\MessagingRdsMs;
 use app\models\Build;
@@ -144,7 +145,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
                     foreach ($builds as $val) {
                         $text .= "<a href='" .
-                            Yii::$app->createAbsoluteUrl('build/view', array('id' => $val->obj_id)) .
+                            Url::to(['build/view', 'id' => $val->obj_id], true) .
                             "'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
                     }
 
@@ -173,7 +174,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             case Build::STATUS_FAILED:
                 $title = "Failed to install $project->project_name";
                 $text = "Проект $project->project_name не удалось собрать. <a href='" .
-                    Yii::$app->createAbsoluteUrl('build/view', array('id' => $build->obj_id)) .
+                    Url::to(['build/view', 'id' => $build->obj_id], true) .
                     "'>Подробнее</a>";
 
                 Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
@@ -184,7 +185,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
                 $releaseRequest = $build->releaseRequest;
-                $releaseRequest->rr_status = \ReleaseRequest::STATUS_FAILED;
+                $releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
                 $releaseRequest->save();
                 break;
             case Build::STATUS_BUILDING:
@@ -196,7 +197,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             case Build::STATUS_CANCELLED:
                 $title = "Cancelled installation of $project->project_name";
                 $text = "Сборка $project->project_name отменена. <a href='" .
-                    \Yii::$app->createAbsoluteUrl('build/view', array('id' => $build->obj_id)) .
+                    Url::to(['build/view', 'id' => $build->obj_id], true) .
                     "'>Подробнее</a>";
 
                 $releaseRequest = $build->releaseRequest;
@@ -868,8 +869,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public function createUrl($route, $params)
     {
-        Yii::$app->urlManager->setBaseUrl('');
+        \Yii::$app->urlManager->setBaseUrl('');
+        array_unshift($params, $route);
 
-        return \Yii::$app->createAbsoluteUrl($route, $params);
+        return Url::to($params, true);
     }
 }

@@ -17,7 +17,7 @@ class RdsRedis extends \yii\base\Object
      */
     public function init()
     {
-        $redisSystem = new RedisSystem\Factory([
+        $redisSystem = new \RedisSystem\Factory([
             'host' => $this->host,
             'port' => $this->port,
             'timeout' => $this->timeout,
