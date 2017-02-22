@@ -41,7 +41,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
             $this->debugLogger->message("Received get process info message");
 
             try {
-                $command = "ps -Ao pid,bsdstart,command|grep 'sys__key=$task->key'|grep -P '\s--sys__package=$task->project-[0-9-]+\s' | grep -v 'set -o pipefail'";
+                $command = "ps -Ao pid,bsdstart,command|grep 'sys__key=$task->key'|grep -P '\s--sys__package=$task->project-[0-9.]+\s' | grep -v 'set -o pipefail'";
                 $text = $commandExecutor->executeCommand($command);
             } catch (\RdsSystem\lib\CommandExecutorException $e) {
                 if ($e->getCode() == 1) {
