@@ -34,19 +34,14 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $releaseRequestSearchModel = new ReleaseRequest();
-        $releaseRequestSearchModel->obj_created = null;
-        $releaseRequestSearchModel->obj_modified = null;
         if (isset($_GET['ReleaseRequest'])) {
             $releaseRequestSearchModel->attributes = $_GET['ReleaseRequest'];
         }
 
         $releaseRejectSearchModel = new ReleaseReject();
-        $releaseRejectSearchModel->obj_created = null;
-        $releaseRejectSearchModel->obj_modified = null;
         if (isset($_GET['ReleaseReject'])) {
             $releaseRejectSearchModel->attributes = $_GET['ReleaseReject'];
         }
-
         $sql = "SELECT rr_project_obj_id, COUNT(*)
                 FROM rds.release_request
                 WHERE obj_created > NOW() - interval '3 month'
@@ -58,10 +53,10 @@ class SiteController extends Controller
 
         $ids = \Yii::$app->db->createCommand($sql, [
             ':user' => \Yii::$app->user->getIdentity()->username,
-            ':status'   => \ServiceBase_IHasStatus::STATUS_ACTIVE,
+            ':status' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
         ])->queryColumn();
 
-        $mainProjects = Project::find()->where(['obj_id' => $ids])->all();
+        $mainProjects = Project::find()->where(['in', 'obj_id', $ids])->all();
 
         return $this->render('index', array(
             'releaseRequestSearchModel' => $releaseRequestSearchModel,

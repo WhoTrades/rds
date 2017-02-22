@@ -1,9 +1,9 @@
 <?php
 namespace app\models;
 
+use yii\data\Sort;
 use app\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
-use RdsSystem;
 
 /**
  * This is the model class for table "rds.release_request".
@@ -162,8 +162,11 @@ class ReleaseRequest extends ActiveRecord
      */
     public function search(array $params)
     {
-        $query = self::find()->where(array_filter($params));
-        $dataProvider = new ActiveDataProvider(['query' => $query]);
+        $query = self::find()->andWhere(array_filter($params));
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => new Sort(['defaultOrder' => ['obj_id' => SORT_DESC]]),
+        ]);
         $this->load($params, 'search');
 
         return $dataProvider;
@@ -338,7 +341,7 @@ class ReleaseRequest extends ActiveRecord
             orderBy('rr_build_version desc')->one();
 
             // an: Отправляем задачу в Rabbit на сборку
-            (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($build->worker->worker_name, new \RdsSystem\Message\BuildTask(
+            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($build->worker->worker_name, new \RdsSystem\Message\BuildTask(
                 $build->obj_id,
                 $build->project->project_name,
                 $build->releaseRequest->rr_build_version,
@@ -363,7 +366,7 @@ class ReleaseRequest extends ActiveRecord
 
         foreach ($this->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
-            (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
+            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
                 $p2w->worker->worker_name,
                 new \RdsSystem\Message\UseTask(
                     $this->project->project_name,

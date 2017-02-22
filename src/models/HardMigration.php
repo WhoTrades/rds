@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use yii\data\Sort;
 use app\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
 
@@ -145,7 +146,11 @@ class HardMigration extends ActiveRecord
             $query->orderBy('obj_created desc');
         }
 
-        $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 100]]);
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => ['pageSize' => 10],
+            'sort' => new Sort(['defaultOrder' => ['migration_status' => SORT_ASC]]),
+        ]);
         $this->load($params, 'search');
 
         return $dataProvider;
