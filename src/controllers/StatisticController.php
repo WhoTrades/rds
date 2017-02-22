@@ -28,6 +28,6 @@ class StatisticController extends Controller
 
     public function actionGetProjectBuildsToDeleteLastCallTime()
     {
-        echo time() - CoreLight::getInstance()->getServiceBaseCacheKvdpp()->get(self::LAST_PACKAGE_REMOVE_CALL_TIME_KEY);
+        echo time() - \CoreLight::getInstance()->getServiceBaseCacheKvdpp()->get(self::LAST_PACKAGE_REMOVE_CALL_TIME_KEY);
     }
 }
