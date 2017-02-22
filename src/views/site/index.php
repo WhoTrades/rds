@@ -22,7 +22,7 @@ yii\bootstrap\Modal::begin(array(
 ))->end(); ?>
 
 <h1>Запреты релиза</h1>
-<a href="<?=yii\helpers\Url::to('/site/createReleaseReject')?>">Создать</a>
+<a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>">Создать</a>
 <?php
 echo yii\grid\GridView::widget(array(
     'id' => 'release-reject-grid',
