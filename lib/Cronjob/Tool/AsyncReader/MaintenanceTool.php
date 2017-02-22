@@ -1,6 +1,7 @@
 <?php
 
 use RdsSystem\Message;
+use app\models\RdsDbConfig;
 use app\models\MaintenanceTool;
 use yii\data\ActiveDataProvider;
 use app\models\MaintenanceToolRun;
@@ -64,7 +65,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
             return;
         }
 
-        MaintenanceToolRun::updateByPk($message->id, ['mtr_status' => $message->status, 'mtr_pid' => $message->pid]);
+        MaintenanceToolRun::updateAll(['mtr_status' => $message->status, 'mtr_pid' => $message->pid], ['obj_id' => $message->id]);
 
         self::sendMaintenanceToolUpdated($message->id);
 
@@ -83,10 +84,10 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
 
         $sql = "UPDATE ".MaintenanceToolRun::tableName()." SET mtr_log=COALESCE(mtr_log, '')||:log WHERE obj_id=:id";
 
-        MaintenanceToolRun::getDbConnection()->createCommand($sql)->execute([
+        \Yii::$app->db->createCommand($sql, [
             'id' => $message->id,
             'log' => $message->text,
-        ]);
+        ])->execute();
 
         $this->debugLogger->message("Log chunk of MTR=$message->id saved, length=".strlen($message->text).", log=".$message->text);
 
@@ -107,7 +108,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
 
     public function actionChangePreProdStatus($ok, MessagingRdsMs $model)
     {
-        $config = \RdsDbConfig::get();
+        $config = RdsDbConfig::get();
         $config->preprod_online = $ok;
         $config->save();
     }
@@ -155,6 +156,8 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
     public function createUrl($route, $params)
     {
         Yii::$app->urlManager->setBaseUrl('');
-        return \Yii::$app->createAbsoluteUrl($route, $params);
+        array_unshift($params, $route);
+
+        return \Yii::$app->urlManager->createAbsoluteUrl($params, true);
     }
 }

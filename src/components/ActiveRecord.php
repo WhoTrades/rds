@@ -21,7 +21,7 @@ class ActiveRecord extends \yii\db\ActiveRecord
         try {
             $result = parent::save($runValidation, $attributes);
         } catch (\Exception $e) {
-            $transaction->rollback();
+            $transaction->rollBack();
             throw $e;
         }
 

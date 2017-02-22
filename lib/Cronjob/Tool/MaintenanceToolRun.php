@@ -1,5 +1,6 @@
 <?php
-use RdsSystem\Message;
+
+use app\models\MaintenanceTool;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=MaintenanceToolRun -vv --tool-name=InstrumentsUpdateTickers

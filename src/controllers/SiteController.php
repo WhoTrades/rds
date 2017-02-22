@@ -143,7 +143,7 @@ class SiteController extends Controller
             }
         } catch (\Exception $e) {
             if ($transaction->isActive) {
-                $transaction->rollback();
+                $transaction->rollBack();
             }
             throw $e;
         }
@@ -260,7 +260,7 @@ class SiteController extends Controller
                 $transaction->commit();
                 \Yii::$app->webSockets->send('updateAllReleaseRejects', []);
             } catch (\Exception $e) {
-                $transaction->rollback();
+                $transaction->rollBack();
             }
         }
 

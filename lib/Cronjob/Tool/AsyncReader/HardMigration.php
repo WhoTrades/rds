@@ -93,7 +93,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
             }
         }
 
-        HardMigration::updateByPk($migration->obj_id, ['migration_status' => $message->status]);
+        HardMigration::updateAll(['migration_status' => $message->status], ['obj_id' => $migration->obj_id]);
 
         $this->sendHardMigrationUpdated($migration->obj_id);
         $message->accepted();

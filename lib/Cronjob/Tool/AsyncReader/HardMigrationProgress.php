@@ -1,5 +1,7 @@
 <?php
+
 use RdsSystem\Message;
+use app\models\HardMigration;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 
 /**
@@ -42,13 +44,13 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
         SET migration_progress=:progress, migration_progress_action=:action, migration_pid=:pid
         WHERE migration_name=:name and migration_environment=:env";
 
-        \HardMigration::getDbConnection()->createCommand($sql)->execute([
+        \Yii::$app->db->createCommand($sql, [
             'progress' => $message->progress,
             'action' => $message->action,
             'pid' => $message->pid,
             'name' => $message->migration,
             'env' => $model->getEnv(),
-        ]);
+        ])->execute();
 
         $this->sendMigrationProgressbarChanged(str_replace("/", "", "{$message->migration}_{$model->getEnv()}"), $message->progress, $message->action);
 

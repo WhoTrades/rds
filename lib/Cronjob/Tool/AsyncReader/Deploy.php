@@ -357,7 +357,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public function actionSetCronConfig(Message\ReleaseRequestCronConfig $message, MessagingRdsMs $model)
     {
-        $transaction = Build::getDbConnection()->beginTransaction();
+        $transaction = \Yii::$app->db->beginTransaction();
         try {
             /** @var $build Build */
             $build = Build::findByPk($message->taskId);
@@ -400,10 +400,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
             $message->accepted();
         } catch (\Exception $e) {
-            $transaction->rollback();
+            $transaction->rollBack();
             throw $e;
         }
-
     }
 
     /**
@@ -784,7 +783,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
-        $transaction = ReleaseRequest::getDbConnection()->beginTransaction();
+        $transaction = \Yii::$app->db->beginTransaction();
         if ($message->type == 'pre') {
             $releaseRequest->rr_migration_status = $message->status;
             $releaseRequest->rr_migration_error = $message->errorText;

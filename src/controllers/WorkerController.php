@@ -21,12 +21,14 @@ class WorkerController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['index', 'admin'],
-                        'roles' => ['*'],
+                        'roles' => ['@'],
+                        //'roles' => ['*'],
                     ],
                     [
                         'allow' => true,
                         'actions' => ['create', 'update'],
-                        'roles' => ['admin'],
+                        'roles' => ['@'],
+                        //'roles' => ['admin'],
                     ],
                 ],
             ],

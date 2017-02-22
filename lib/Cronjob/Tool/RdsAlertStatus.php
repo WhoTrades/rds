@@ -1,6 +1,10 @@
 <?php
-use RdsSystem\Message;
+
+use app\models\Lamp;
 use app\models\AlertLog;
+use app\components\AlertLog\CompoundDataProvider;
+use app\components\AlertLog\TeamCityDataProvider;
+use app\components\AlertLog\MonitoringDataProvider;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=RdsAlertStatus -vv
@@ -90,7 +94,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         $text = "$alertLog->alert_text<br />\n";
 
         $prev = date_default_timezone_get();
-        date_default_timezone_set(AlertController::TIMEZONE);
+        date_default_timezone_set(\app\controllers\AlertController::TIMEZONE);
         $text .= "Лампа включена<br />Взять ошибку в работу - http://rds.whotrades.net/alert/ (лампа погаснет на 10 минут)\n";
         date_default_timezone_set($prev);
 
@@ -150,8 +154,8 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         $config = \Config::getInstance()->serviceRds['alerts']['dataProvider'];
 
         return [
-            AlertLog::WTS_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
-            AlertLog::CRM_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring ', $config['monitoring']['url']),
+            AlertLog::WTS_LAMP_NAME => new MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
+            AlertLog::CRM_LAMP_NAME => new MonitoringDataProvider($this->debugLogger, 'Monitoring ', $config['monitoring']['url']),
             AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(['WhoTrades_AcceptanceTests_WtSmokeTestProd'], 'TeamCity: Smoke Tests'),
         ];
     }
@@ -171,9 +175,9 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         $dataProviders = [];
 
         foreach ($projects as $project) {
-            $dataProviders[] = new \AlertLog\TeamCityDataProvider($this->debugLogger, $teamCityClient, $project);
+            $dataProviders[] = new TeamCityDataProvider($this->debugLogger, $teamCityClient, $project);
         }
 
-        return new \AlertLog\CompoundDataProvider($this->debugLogger, $name, $dataProviders);
+        return new CompoundDataProvider($this->debugLogger, $name, $dataProviders);
     }
 }

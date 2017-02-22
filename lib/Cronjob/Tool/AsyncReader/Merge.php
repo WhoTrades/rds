@@ -1,8 +1,12 @@
 <?php
 
 use RdsSystem\Message;
+use app\modules\Wtflow\models\GitBuild;
+use app\modules\Wtflow\Jira\Transition;
+use app\modules\Wtflow\components\JiraApi;
 use app\modules\Wtflow\models\JiraFeature;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
+use app\modules\Wtflow\models\GitBuildBranch;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=AsyncReader_Merge -vv
@@ -73,9 +77,9 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
     public function actionProcessMergeFeatureResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
     {
         $transitionMap = [
-            "develop" => \Jira\Transition::MERGED_TO_DEVELOP,
-            "master" => \Jira\Transition::MERGED_TO_MASTER,
-            "staging" => \Jira\Transition::MERGED_TO_STAGING,
+            "develop" => Transition::MERGED_TO_DEVELOP,
+            "master" => Transition::MERGED_TO_MASTER,
+            "staging" => Transition::MERGED_TO_STAGING,
         ];
 
         /** @var $feature JiraFeature */
@@ -104,9 +108,9 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 $transition = $transitionMap[$message->targetBranch];
                 // ar: Сохраняем время мержа задачи в мастер
                 if ($message->targetBranch === 'master') {
-                    JiraFeature::model()->updateAll([
+                    JiraFeature::updateAll([
                         'jf_merged_to_master_time' => date('Y-m-d H:i:s'),
-                    ], "jf_ticket=:ticket", ['ticket' => $feature->jf_ticket]);
+                    ], ['jf_ticket' => $feature->jf_ticket]);
                 }
                 $jira->transitionTicket($ticketInfo, $transition, "Задача была успешно слита в ветку $message->targetBranch", true);
             } else {
@@ -225,7 +229,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
         $filename = \Yii::getPathOfAlias('application.modules.Wtflow.views.gitBuild._gitBuildRow').'.php';
         $rowTemplate = include($filename);
-        $model = \GitBuild::model();
+        $model = new GitBuild();
         $model->obj_id = $gitBuild->obj_id;
         /** @var $widget \CWidget*/
         $widget = \Yii::$app->getWidgetFactory()->createWidget(\Yii::$app,'yiistrap.widgets.TbGridView', [
