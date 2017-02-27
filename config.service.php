@@ -21,3 +21,11 @@ $this->serviceRds['alerts']['dataProvider'] = [
         'url' => 'http://monitoring.dev.whotrades.net/?json=1',
     ],
 ];
+
+$this->graphiteSystem = array(
+    'host'     => 'graphite.local',
+    'port'     => 8125,
+    'protocol' => 'udp',
+    'env'      => 'prod',
+    'prefix'   => 'rds',
+);
