@@ -36,7 +36,8 @@ class BuildController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['admin', 'delete'],
-                        'roles' => ['admin'],
+                        'roles' => ['@'],
+                        //'roles' => ['admin'],
                     ],
                 ],
             ],
