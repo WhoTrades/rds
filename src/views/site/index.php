@@ -24,6 +24,7 @@ yii\bootstrap\Modal::begin(array(
 <h1>Запреты релиза</h1>
 <a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>">Создать</a>
 <?php
+\yii\widgets\Pjax::begin(['id' => 'release-reject-grid-pjax-container', 'clientOptions' => ['fragment' => '#release-reject-grid']]);
 echo yii\grid\GridView::widget(array(
     'id' => 'release-reject-grid',
     'dataProvider' => $releaseRejectSearchModel->search($releaseRejectSearchModel->attributes),
@@ -54,7 +55,9 @@ echo yii\grid\GridView::widget(array(
             ],
         ),
     ),
-)); ?>
+));
+\yii\widgets\Pjax::end();
+?>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -106,7 +109,7 @@ echo yii\grid\GridView::widget(array(
 
 <div style="clear: both"></div>
 <?php
-\yii\widgets\Pjax::begin();
+\yii\widgets\Pjax::begin(['id' => 'release-request-grid-pjax-container', 'clientOptions' => ['fragment' => '#release-request-grid']]);
 echo yii\grid\GridView::widget(array(
     'id' => 'release-request-grid',
     'options' => ['class' => 'table-responsive'],
@@ -121,6 +124,7 @@ echo yii\grid\GridView::widget(array(
 ?>
 
 <script type="text/javascript">
+
     //an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
     // А такое случается часто, когда мы заказываем сборку
     document.onload.push(function(){
