@@ -25,14 +25,23 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $model = (new RdsSystem\Factory(Yii::app()->debugLogger))->getMessagingRdsMsModel();
+        $jira = new JiraApi($this->debugLogger);
+        $tickets = $jira->getTicketsByStatus(CompanyInfrastructure\Jira\Status::STATUS_CODE_REVIEW, ['WTT']);
 
-        $res = $model->sendToolGetToolLogTail(
-            'debian',
-            new RdsSystem\Message\Tool\ToolLogTail('test', 100),
-            RdsSystem\Message\Tool\ToolLogTailResult::type(),
-            1
-        );
-        var_dump($res);
+        $stashApi = new \CompanyInfrastructure\StashApi($this->debugLogger);
+
+        foreach ($tickets['issues'] as $ticketInfo) {
+            $ticket = $ticketInfo['key'];
+
+            $pullRequests = $stashApi->getPullRequestsByBranch("WT", "sparta", "refs/heads/feature/$ticket");
+
+            foreach ($pullRequests['values'] as $pullRequest) {
+                var_export($pullRequest);
+
+                //$jira->transitionTicket($ticketInfo, JIra\Transition::FAILED_CODE_REVIEW);
+                //$jira->transitionTicket($ticketInfo, JIra\Transition::APPROVE_CODE_REVIEW);
+                return;
+            }
+        }
     }
 }

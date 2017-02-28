@@ -88,6 +88,7 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_Jira_FixVersionsRelease::getToolCommand([], $verbosity = 1), '46 10 * * * *', 'rds_jira_fix_versions_release'),
             new CronCommand(Cronjob_Tool_Jira_MergeTasks::getToolCommand(['--max-duration=60'], $verbosity = 1), '*/6 * * * * *', 'rds_jira_merge_tasks'),
             new CronCommand(Cronjob_Tool_Jira_CloseFeatures::getToolCommand([], $verbosity = 1), '32 10 * * * *', 'rds_jira_close_features'),
+            new CronCommand(Cronjob_Tool_Jira_CodeReview::getToolCommand([], $verbosity = 3), '25 * * * * *', 'rds_jira_code_review'),
             new CronCommand(Cronjob_Tool_Jira_HardMigrationNotifier::getToolCommand([], $verbosity = 1), '21 10 4 * * *', 'rds_jira_hard_migration_notifier'),
 
             new Comment("TeamCity integration"),
