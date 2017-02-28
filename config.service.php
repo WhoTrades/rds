@@ -21,3 +21,18 @@ $this->serviceRds['alerts']['dataProvider'] = [
         'url' => 'http://monitoring.dev.whotrades.net/?json=1',
     ],
 ];
+
+$this->serviceRds['jira']['codeReview'] = [
+    'WTT' => [
+        '*' => 40,
+    ],
+    'WTS' => [
+        '*' => 40,
+    ],
+    'WTA' => [
+        '*' => 50,
+    ],
+    'WTI' => [
+        '*' => 40,
+    ],
+];
