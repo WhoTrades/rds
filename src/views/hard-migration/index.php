@@ -5,7 +5,9 @@
 <h1>Управление тяжелыми миграциями</h1>
 <p> Можно использовать дополнительные операторы сравнения (<b>&lt;</b>, <b>&lt;=</b>, <b>&gt;</b>, <b>&gt;=</b>, <b>&lt;&gt;</b> or <b>=</b>) </p>
 
-<?= yii\grid\GridView::widget(array(
+<?php
+\yii\widgets\Pjax::begin(['id' => 'hard-migration-grid-pjax-container']);
+echo yii\grid\GridView::widget(array(
     'id' => 'hard-migration-grid',
     'dataProvider' => $model->search($model->attributes),
     'options' => ['class' => 'table-responsive'],
@@ -17,7 +19,7 @@
     },
     'columns' => include('_hardMigrationRow.php'),
 ));
-
+\yii\widgets\Pjax::end();
 ?>
 
 
@@ -26,7 +28,7 @@
     // А такое случается часто, когда мы заказываем сборку
     document.onload.push(function(){
         setTimeout(function(){
-            $.fn.yiiGridView.update("hard-migration-grid");
+            $.pjax.reload('#hard-migration-grid-pjax-container');
         }, 1);
         webSocketSubscribe('hardMigrationChanged', function(event){
             console.log('Hard migration '+event.rr_id+' updated');

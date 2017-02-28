@@ -125,13 +125,14 @@ echo yii\grid\GridView::widget(array(
 
 <script type="text/javascript">
 
-    //an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
+    // an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
     // А такое случается часто, когда мы заказываем сборку
+    // ar: 2 pjax одновременно не выполняются, один из них всегда возвращает "canceled", добавил таймаут - сожалею
     document.onload.push(function(){
+        $.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
         setTimeout(function(){
-            $.fn.yiiGridView.update("release-reject-grid");
-            $.fn.yiiGridView.update("release-request-grid");
-        }, 0);
+            $.pjax.reload('#release-reject-grid-pjax-container', {fragment: '#release-reject-grid'});
+        }, 500);
     });
 </script>
 
@@ -157,11 +158,11 @@ echo yii\grid\GridView::widget(array(
         });
         webSocketSubscribe('updateAllReleaseRequests', function(event){
             console.log("websocket event received", event);
-            $.fn.yiiGridView.update("release-request-grid");
+            $.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
             console.log('got update all release requests event');
         });
         webSocketSubscribe('updateAllReleaseRejects', function(event){
-            $.fn.yiiGridView.update("release-reject-grid");
+            $.pjax.reload('#release-reject-grid-pjax-container', {fragment: '#release-reject-grid'});
             console.log('got update all release rejects event');
         });
         $('body').on('click', '.use-button', function(e){
