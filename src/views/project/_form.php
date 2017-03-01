@@ -58,7 +58,8 @@
     <?}?>
 
     <br />
-	<div class="row buttons">
+    <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над измененной строкой - причину и авторство")?>
+    <div class="row buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>
 
