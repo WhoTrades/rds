@@ -20,7 +20,7 @@ echo yii\grid\GridView::widget(array(
             console.log('Maintenance tool '+event.id+' updated');
             var html = event.html;
             console.log(html);
-            var trHtmlCode = $(html).find('tr.rowItem').first().html()
+            var trHtmlCode = $(html).find('tr.rowItem').first().html();
             $('.maintenance-tool-'+event.id).html(trHtmlCode);
         });
         webSocketSubscribe('maintenanceToolProgressbarChanged', function(event){

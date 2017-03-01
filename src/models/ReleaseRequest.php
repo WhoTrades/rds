@@ -114,7 +114,6 @@ class ReleaseRequest extends ActiveRecord
             }
             $this->addError($attribute, 'Запрет на релиз: ' . implode("; ", $messages));
         }
-
     }
 
     /**

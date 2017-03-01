@@ -2,7 +2,7 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
-use RdsSystem;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "rds.maintenance_tool".
@@ -53,6 +53,22 @@ class MaintenanceTool extends ActiveRecord
     public function getMaintenanceToolRuns()
     {
         return $this->hasMany(MaintenanceToolRun::className(), ['mtr_maintenance_tool_obj_id' => 'obj_id']);
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search(array $params)
+    {
+        $query = self::find()->andWhere(array_filter($params));
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+        $this->load($params, 'search');
+
+        return $dataProvider;
     }
 
     /**
@@ -122,7 +138,7 @@ class MaintenanceTool extends ActiveRecord
         ];
 
         if ($mtr->save()) {
-            $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
+            $messageModel = (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
             foreach (Worker::find()->all() as $worker) {
                 /** @var $worker Worker */
                 $messageModel->sendMaintenanceToolStart(
@@ -154,7 +170,7 @@ class MaintenanceTool extends ActiveRecord
 
         Log::createLogMessage("Остановлен тул {$this->getTitle()}", $user);
 
-        $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
+        $messageModel = (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
         foreach (Worker::find()->all() as $worker) {
             /** @var $worker Worker */
             $messageModel->sendUnixSignalToGroup(

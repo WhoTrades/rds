@@ -110,16 +110,10 @@ echo yii\grid\GridView::widget(array(
 <div style="clear: both"></div>
 <?php
 \yii\widgets\Pjax::begin(['id' => 'release-request-grid-pjax-container', 'clientOptions' => ['fragment' => '#release-request-grid']]);
-echo yii\grid\GridView::widget(array(
-    'id' => 'release-request-grid',
-    'options' => ['class' => 'table-responsive'],
-    'dataProvider' => $releaseRequestSearchModel->search($releaseRequestSearchModel->attributes),
-    'filterModel' => $releaseRequestSearchModel,
-    'rowOptions' => function ($rr, $key, $index) {
-        return ['class' => 'release-request-' . $rr->obj_id . " release-request-" . $rr->rr_status];
-    },
-    'columns' => include('_releaseRequestRow.php'),
-));
+echo $this->render('_releaseRequestGrid', [
+    'dataProvider'  => $releaseRequestSearchModel->search($releaseRequestSearchModel->attributes),
+    'filterModel'   => $releaseRequestSearchModel,
+]);
 \yii\widgets\Pjax::end();
 ?>
 
@@ -140,16 +134,20 @@ echo yii\grid\GridView::widget(array(
     document.onload.push(function(){
         webSocketSubscribe('releaseRequestChanged', function(event){
             console.log("websocket event received", event);
-            var html = event.html;
-            console.log($(html).find('tr.rowItem').first().attr('class'));
-            var trHtmlCode = $(html).find('tr.rowItem').first().html()
-            $('.release-request-'+event.rr_id).html(trHtmlCode);
-            $('.release-request-'+event.rr_id).attr('class', $(html).find('tr.rowItem').first().attr('class'));
-            console.log('Release request '+event.rr_id+' updated');
+
+            var trId = '.release-request-' + event.rr_id,
+                html = $(event.html).find(trId).html();
+
+            $(trId).html(html);
+
+            console.log('Release request '+ event.rr_id + ' updated');
         });
         webSocketSubscribe('progressbarChanged', function(event){
-            $('.progress-'+event.build_id+' .progress-bar').css({width: event.percent+'%'});
-            $('.progress-'+event.build_id+' .progress-bar').html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
+            var progressBar =  $('.progress-' + event.build_id + ' .progress-bar');
+
+            progressBar.css({width: event.percent+'%'});
+            progressBar.html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
+
             console.log(event);
         });
         webSocketSubscribe('refresh', function(event){

@@ -823,40 +823,17 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         /** @var $debugLogger \ServiceBase_IDebugLogger */
         $debugLogger = \Yii::$app->debugLogger;
 
-        $releaseRequest = ReleaseRequest::findByPk($id);
-        if (!$releaseRequest) {
+        if (!$releaseRequest = ReleaseRequest::findByPk($id)) {
             return;
         }
 
         $debugLogger->message("Sending to comet new data of releaseRequest $id");
-        Yii::$app->assetManager->setBasePath(Yii::getPathOfAlias('application') . "/../main/www/assets/");
-        Yii::$app->assetManager->setBaseUrl("/assets/");
-        Yii::$app->urlManager->setBaseUrl('');
-        $filename = \Yii::getPathOfAlias('application.views.site._releaseRequestRow') . '.php';
-        $rowTemplate = include($filename);
 
-        list($controller, $action) = \Yii::$app->createController('/');
-        $controller->setAction($controller->createAction($action));
-        Yii::$app->setController($controller);
-        $model = ReleaseRequest::model();
-        $model->obj_id = $id;
-        $widget = \Yii::$app->getWidgetFactory()->createWidget(
-            Yii::$app,
-            'yiistrap.widgets.TbGridView',
-            [
-                'dataProvider' => $model->search(),
-                'columns' => $rowTemplate,
-                'rowCssClassExpression' => function () use ($releaseRequest) {
-                    return 'rowItem release-request-' . $releaseRequest->obj_id . ' release-request-' . $releaseRequest->rr_status;
-                },
-            ]
-        );
-        $widget->init();
-        ob_start();
-        $widget->run();
-        $html = ob_get_clean();
+        $html = \Yii::$app->view->renderFile('@app/views/site/_releaseRequestGrid.php', [
+            'dataProvider' => $releaseRequest->search(['obj_id' => $id]),
+        ]);
 
-        Yii::$app->webSockets->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
+        \Yii::$app->webSockets->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
         $debugLogger->message("Sended");
     }
 
