@@ -217,34 +217,15 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
      * Функция отправляет по комету изменения GitBuild, что бы интерфейс мог отрисовать то что изменилось
      * @param GitBuild $gitBuild
      */
-    private static function updateGitBuildAtInterface(\GitBuild $gitBuild)
+    private static function updateGitBuildAtInterface(GitBuild $gitBuild)
     {
-        \Yii::$app->assetManager->setBasePath(\Yii::getPathOfAlias('application')."/../main/www/assets/");
-        \Yii::$app->assetManager->setBaseUrl("/assets/");
-        \Yii::$app->urlManager->setBaseUrl('');
-        /** @var $controller \CController */
-        list($controller, $action) = \Yii::$app->createController('/');
-        $controller->setAction($controller->createAction($action));
-        \Yii::$app->setController($controller);
+        $model = app\modules\Wtflow\models\GitBuild::findByPk($gitBuild->obj_id);
 
-        $filename = \Yii::getPathOfAlias('application.modules.Wtflow.views.gitBuild._gitBuildRow').'.php';
-        $rowTemplate = include($filename);
-        $model = new GitBuild();
-        $model->obj_id = $gitBuild->obj_id;
-        /** @var $widget \CWidget*/
-        $widget = \Yii::$app->getWidgetFactory()->createWidget(\Yii::$app,'yiistrap.widgets.TbGridView', [
-            'dataProvider'=>$model->search(),
-            'columns'=>$rowTemplate,
-            'rowCssClassExpression' => function() use ($gitBuild){
-                return 'rowItem git-build-'.$gitBuild->obj_id." git-build-".$gitBuild->status;
-            },
+        $html = \Yii::$app->view->renderFile('@app/modules/Wtflow/views/git-build/_gitBuildGrid.php', [
+            'dataProvider' => $model->search(['obj_id' => $model->obj_id]),
         ]);
-        $widget->init();
-        ob_start();
-        $widget->run();
-        $html = ob_get_clean();
 
-        \Yii::$app->webSockets->send('gitBuildChanged', [
+        Yii::$app->webSockets->send('gitBuildChanged', [
             'html' => $html,
             'git_build_id' => $gitBuild->obj_id,
         ]);

@@ -3,7 +3,6 @@
 use RdsSystem\Message;
 use app\models\RdsDbConfig;
 use app\models\MaintenanceTool;
-use yii\data\ActiveDataProvider;
 use app\models\MaintenanceToolRun;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 
@@ -117,39 +116,22 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
     {
         /** @var $debugLogger \ServiceBase_IDebugLogger */
         $debugLogger = \Yii::$app->debugLogger;
+        $debugLogger->message("Sending to comet new data of maintenance tool run #$id");
 
         /** @var $mtr MaintenanceToolRun */
-        $mtr = MaintenanceToolRun::findByPk($id);
-        if (!$mtr) {
+        if (!$mtr = MaintenanceToolRun::findByPk($id)) {
             return;
         }
 
-        $debugLogger->message("Sending to comet new data of maintenance tool run #$id");
-        Yii::$app->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
-        Yii::$app->assetManager->setBaseUrl("/assets/");
-        Yii::$app->urlManager->setBaseUrl('/');
-        $filename = \Yii::getPathOfAlias('application.views.maintenanceTool._maintenanceToolRow').'.php';
+        $model = MaintenanceTool::findByPk($mtr->mtr_maintenance_tool_obj_id);
 
-        list($controller, $action) = \Yii::$app->createController('/');
-        $controller->setAction($controller->createAction($action));
-        Yii::$app->setController($controller);
-        $model = MaintenanceTool::model();
-        $model->obj_id = $mtr->mtr_maintenance_tool_obj_id;
-
-        $rowTemplate = include($filename);
-        $widget = \Yii::$app->getWidgetFactory()->createWidget(Yii::$app,'yiistrap.widgets.TbGridView', [
-            'dataProvider'=>new ActiveDataProvider($model, $model->search()),
-            'columns'=>$rowTemplate,
-            'rowCssClassExpression' => function(){return 'rowItem';},
+        $html = \Yii::$app->view->renderFile('@app/views/maintenance-tool/_maintenanceToolGrid.php', [
+            'dataProvider' => $model->search(['obj_id' => $model->obj_id]),
         ]);
-        $widget->init();
-        ob_start();
-        $widget->run();
-        $html = ob_get_clean();
-        $debugLogger->message("html code generated, html=".$html);
 
-        /** @var $migration HardMigration */
-        Yii::$app->webSockets->send('maintenanceToolChanged', ['id' => $mtr->mtr_maintenance_tool_obj_id, 'html' => $html]);
+        $debugLogger->message("html code generated, html=" . $html);
+
+        Yii::$app->webSockets->send('maintenanceToolChanged', ['id' => $model->obj_id, 'html' => $html]);
         $debugLogger->message("Sended");
     }
 

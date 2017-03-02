@@ -105,7 +105,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         $debugLogger = \Yii::$app->debugLogger;
         $debugLogger->message("Sending to comet new data of hard migration #$id");
 
-        $model = app\models\HardMigration::findByPk($id);
+        $model = HardMigration::findByPk($id);
 
         $html = \Yii::$app->view->renderFile('@app/views/hard-migration/_hardMigrationGrid.php', [
             'dataProvider' => $model->search(['obj_id' => $id]),
