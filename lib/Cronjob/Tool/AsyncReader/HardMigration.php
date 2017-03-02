@@ -103,34 +103,18 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
     {
         /** @var $debugLogger \ServiceBase_IDebugLogger */
         $debugLogger = \Yii::$app->debugLogger;
-
         $debugLogger->message("Sending to comet new data of hard migration #$id");
-        Yii::$app->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
-        Yii::$app->assetManager->setBaseUrl("/assets/");
-        Yii::$app->urlManager->setBaseUrl('/');
-        $filename = \Yii::getPathOfAlias('application.views.hardMigration._hardMigrationRow').'.php';
 
-        list($controller, $action) = \Yii::$app->createController('/');
-        $controller->setAction($controller->createAction($action));
-        Yii::$app->setController($controller);
-        $model = HardMigration::model();
-        $model->obj_id = $id;
-        $rowTemplate = include($filename);
-        $widget = \Yii::$app->getWidgetFactory()->createWidget(Yii::$app,'yiistrap.widgets.TbGridView', [
-            'dataProvider'=> $model->search($model->attributes),
-            'columns'=>$rowTemplate,
-            'rowCssClassExpression' => function(){return 'rowItem';},
+        $model = app\models\HardMigration::findByPk($id);
+
+        $html = \Yii::$app->view->renderFile('@app/views/hard-migration/_hardMigrationGrid.php', [
+            'dataProvider' => $model->search(['obj_id' => $id]),
+            'model' => $model,
         ]);
-        $widget->init();
-        ob_start();
-        $widget->run();
-        $html = ob_get_clean();
+
         $debugLogger->message("html code generated");
 
-        /** @var $migration HardMigration */
-        $migration = HardMigration::findByPk($id);
-        Yii::$app->webSockets->send('hardMigrationChanged', ['rr_id' => str_replace("/", "", "{$migration->migration_name}_$migration->migration_environment"), 'html' => $html]);
-        $debugLogger->message("Sended");
+        Yii::$app->webSockets->send('hardMigrationChanged', ['rr_id' => str_replace("/", "", "{$model->migration_name}_$model->migration_environment"), 'html' => $html]);
     }
 
     public function createUrl($route, $params)

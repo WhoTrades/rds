@@ -1,5 +1,8 @@
 <?php
-/* @var $model HardMigration */
+/**
+ * @var $this yii\web\View
+ * @var $model app\models\HardMigration
+ */
 
 ?>
 <h1>Управление тяжелыми миграциями</h1>
@@ -7,18 +10,7 @@
 
 <?php
 \yii\widgets\Pjax::begin(['id' => 'hard-migration-grid-pjax-container']);
-echo yii\grid\GridView::widget(array(
-    'id' => 'hard-migration-grid',
-    'dataProvider' => $model->search($model->attributes),
-    'options' => ['class' => 'table-responsive'],
-    'filterModel' => $model,
-    'rowOptions' => function ($model, $key, $index, $grid) {
-        return [
-            'class' => 'hard-migration-' . str_replace("/", "", $model->migration_name) . '_' . $model->migration_environment,
-        ];
-    },
-    'columns' => include('_hardMigrationRow.php'),
-));
+echo $this->render('_hardMigrationGrid', ['dataProvider' => $model->search($model->attributes), 'filterModel' => $model, 'model' => $model]);
 \yii\widgets\Pjax::end();
 ?>
 
@@ -31,10 +23,12 @@ echo yii\grid\GridView::widget(array(
             $.pjax.reload('#hard-migration-grid-pjax-container');
         }, 1);
         webSocketSubscribe('hardMigrationChanged', function(event){
-            console.log('Hard migration '+event.rr_id+' updated');
-            var html = event.html;
-            var trHtmlCode = $(html).find('tr.rowItem').first().html()
-            $('.hard-migration-'+event.rr_id).html(trHtmlCode);
+            console.log('Hard migration ' + event.rr_id + ' updated');
+
+            var trId = '.hard-migration-' + event.rr_id,
+                html = $(event.html).find(trId).html();
+
+            $(trId).html(html);
         });
         webSocketSubscribe('migrationProgressbarChanged', function(event){
             $('.progress-'+event.migration+' .progress-bar').css({width: event.percent+'%'});

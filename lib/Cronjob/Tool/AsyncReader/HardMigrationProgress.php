@@ -40,7 +40,7 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
     {
         $message->accepted();
         $t = microtime(true);
-        $sql = "UPDATE ".HardMigration::tableName()."
+        $sql = "UPDATE " . HardMigration::tableName() . "
         SET migration_progress=:progress, migration_progress_action=:action, migration_pid=:pid
         WHERE migration_name=:name and migration_environment=:env";
 
@@ -55,13 +55,12 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
         $this->sendMigrationProgressbarChanged(str_replace("/", "", "{$message->migration}_{$model->getEnv()}"), $message->progress, $message->action);
 
         $this->debugLogger->message("Progress of migration $message->migration updated ($message->progress%)");
-        $this->debugLogger->message("Executing progress got ".sprintf("%.2f", 1000 * (microtime(true) - $t))." ms");
-
+        $this->debugLogger->message("Executing progress got " . sprintf("%.2f", 1000 * (microtime(true) - $t)) . " ms");
     }
 
     private function sendMigrationProgressbarChanged($id, $percent, $key)
     {
         $this->debugLogger->message("Sending migraion progressbar to comet");
-        Yii::$app->webSockets->send('migrationProgressbarChanged', ['migration' => $id, 'percent' => (float)$percent, 'key' => $key]);
+        Yii::$app->webSockets->send('migrationProgressbarChanged', ['migration' => $id, 'percent' => (float) $percent, 'key' => $key]);
     }
 }

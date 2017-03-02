@@ -2,7 +2,7 @@
 /**
  * @var $this yii\web\View
  * @var $dataProvider yii\data\BaseDataProvider
- * @var $filterModel yii\base\ModelEvent | null
+ * @var $filterModel yii\base\Model | null
  */
 
 use yii\grid\GridView;
