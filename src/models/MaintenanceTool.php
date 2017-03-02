@@ -92,17 +92,17 @@ class MaintenanceTool extends ActiveRecord
             return $this->lastRunLocal;
         }
 
-        return $this->lastRunLocal = static::find()->where([
+        return $this->lastRunLocal = MaintenanceToolRun::find()->where([
             'mtr_maintenance_tool_obj_id' => $this->obj_id,
-        ])->orderBy(['obj_id desc'])->one();
+        ])->orderBy('obj_id desc')->one();
     }
 
     public function canBeStarted()
     {
-        return 0 == MaintenanceToolRun::countByAttributes([
+        return 0 == MaintenanceToolRun::find()->where([
             'mtr_maintenance_tool_obj_id' => $this->obj_id,
             'mtr_status' => [MaintenanceToolRun::STATUS_IN_PROGRESS, MaintenanceToolRun::STATUS_NEW],
-        ]);
+        ])->count();
     }
 
     public function canBeKilled()

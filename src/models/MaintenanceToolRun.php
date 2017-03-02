@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "rds.maintenance_tool_run".
@@ -54,7 +55,7 @@ class MaintenanceToolRun extends ActiveRecord
 
     public function getMtrMaintenanceTool()
     {
-        return MaintenanceTool::find()->where(['mtr_maintenance_tool_obj_id' => $this->obj_id])->one();
+        return MaintenanceTool::findOne($this->mtr_maintenance_tool_obj_id);
     }
 
     /**
@@ -72,6 +73,22 @@ class MaintenanceToolRun extends ActiveRecord
             'mtr_pid' => 'PID',
             'mtr_log' => 'Log',
         );
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search(array $params)
+    {
+        $query = self::find()->andWhere(array_filter($params));
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+        $this->load($params, 'search');
+
+        return $dataProvider;
     }
 
     /**
