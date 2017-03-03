@@ -117,39 +117,37 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
 
             $daysAgo = 0;
             $linesCount = 0;
-            try {
-                do {
-                    // dg: Формируем имя файла
-                    $filename = "/var/log/storelog/cronjobs/$task->tag.log";
-                    if ($daysAgo > 0) {
-                        $filename .= '.' . $daysAgo;
-                    }
+            do {
+                // dg: Формируем имя файла
+                $filename = "/var/log/storelog/cronjobs/$task->tag.log";
+                if ($daysAgo > 0) {
+                    $filename .= '.' . $daysAgo;
+                }
 
-                    // dg: Проверяем наличие файла
-                    if (!file_exists($filename)) {
-                        if ($daysAgo === 0) {
-                            $this->debugLogger->message("File $filename not found");
-                            $text = "No logs";
-                            $isSuccess = false;
-                        }
-                        break;
+                // dg: Проверяем наличие файла
+                if (!file_exists($filename)) {
+                    if ($daysAgo === 0) {
+                        $this->debugLogger->message("File $filename not found");
+                        $text = "No logs";
+                        $isSuccess = false;
                     }
+                    break;
+                }
 
+                try {
                     $command = "tail -n " . ((int) $task->linesCount - $linesCount) . " " . escapeshellarg($filename);
-
-                    $textPart = $commandExecutor->executeCommand($command) . PHP_EOL;
-                    $text = $textPart . $text;
-                    $linesCount += substr_count($textPart, PHP_EOL);
-                    $daysAgo++;
-                } while ($linesCount < $task->linesCount);
-            } catch (\RdsSystem\lib\CommandExecutorException $e) {
-                $this->debugLogger->error("Error occurred during command execution: " . $e->getMessage());
-                if ($daysAgo === 0) {
-                    // dg: Отправляем сообщение об ошибке только если не получилось запросить логи за текущий день
+                } catch (\RdsSystem\lib\CommandExecutorException $e) {
+                    $this->debugLogger->error("Error occurred during command execution: " . $e->getMessage());
                     $text = $e->getMessage();
                     $isSuccess = false;
+                    break;
                 }
-            }
+
+                $textPart = $commandExecutor->executeCommand($command) . PHP_EOL;
+                $text = $textPart . $text;
+                $linesCount += substr_count($textPart, PHP_EOL);
+                $daysAgo++;
+            } while ($linesCount < $task->linesCount);
 
             $model->sendToolGetToolLogTailResult(
                 new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), $isSuccess, $server, $text)
