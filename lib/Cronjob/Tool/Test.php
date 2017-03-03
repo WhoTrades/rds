@@ -25,21 +25,5 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $id = 728;
-        /** @var $debugLogger \ServiceBase_IDebugLogger */
-        $debugLogger = \Yii::$app->debugLogger;
-
-        if (!$releaseRequest = app\models\ReleaseRequest::findByPk($id)) {
-            return;
-        }
-
-        $debugLogger->message("Sending to comet new data of releaseRequest $id");
-
-        $html = \Yii::$app->view->renderFile('@app/views/site/_releaseRequestGrid.php', [
-                'dataProvider' => $releaseRequest->search(['obj_id' => $id]),
-        ]);
-
-        \Yii::$app->webSockets->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
-        $debugLogger->message("Sended");
     }
 }
