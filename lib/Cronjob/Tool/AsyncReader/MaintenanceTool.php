@@ -122,7 +122,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $debugLogger->message("Sending to comet new data of maintenance tool run #$id");
         Yii::app()->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
         Yii::app()->assetManager->setBaseUrl("/assets/");
-        Yii::app()->urlManager->setBaseUrl('/');
+        Yii::app()->urlManager->setBaseUrl('');
         $filename = Yii::getPathOfAlias('application.views.maintenanceTool._maintenanceToolRow').'.php';
 
         list($controller, $action) = Yii::app()->createController('/');

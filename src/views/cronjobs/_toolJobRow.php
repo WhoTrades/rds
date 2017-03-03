@@ -121,6 +121,7 @@
                         'color' => TbHtml::ALERT_COLOR_DANGER,
                         'class' => "__get-log-tail",
                         'tag' => $tag,
+                        'rel' => 30,
                         'style' => 'cursor: pointer',
                     ])
                     : "Нет"

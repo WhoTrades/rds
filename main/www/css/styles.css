@@ -51,10 +51,6 @@
 
 }
 
-.table-responsive .table td {
-    vertical-align: middle;
-}
-
 .glyphicon-refresh {
     animation: fa-spin 2s infinite linear;
 }
