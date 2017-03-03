@@ -112,37 +112,47 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
         $model->readToolGetToolLogTail($workerName, false, function (RdsSystem\Message\Tool\ToolLogTail $task) use ($server, $model, $commandExecutor, $workerName) {
             $this->debugLogger->message("Received message of tail ");
 
-            $filename = "/var/log/storelog/cronjobs/$task->tag.log";
+            $text = '';
+            $isSuccess = true;
 
-            if (!file_exists($filename)) {
-                $this->debugLogger->message("File $filename not found");
-                $model->sendToolGetToolLogTailResult(
-                    new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), false, $server, "No logs")
-                );
-
-                $this->debugLogger->message("Message accepted");
-                $task->accepted();
-
-                return;
-            }
-
-            $command = "tail -n " . (int) $task->linesCount . " " . escapeshellarg($filename);
+            $daysAgo = 0;
+            $linesCount = 0;
             try {
-                $text = $commandExecutor->executeCommand($command);
+                do {
+                    // dg: Формируем имя файла
+                    $filename = "/var/log/storelog/cronjobs/$task->tag.log";
+                    if ($daysAgo > 0) {
+                        $filename .= '.' . $daysAgo;
+                    }
+
+                    // dg: Проверяем наличие файла
+                    if (!file_exists($filename)) {
+                        if ($daysAgo === 0) {
+                            $this->debugLogger->message("File $filename not found");
+                            $text = "No logs";
+                            $isSuccess = false;
+                        }
+                        break;
+                    }
+
+                    $command = "tail -n " . ((int) $task->linesCount - $linesCount) . " " . escapeshellarg($filename);
+
+                    $textPart = $commandExecutor->executeCommand($command) . PHP_EOL;
+                    $text = $textPart . $text;
+                    $linesCount += substr_count($textPart, PHP_EOL);
+                    $daysAgo++;
+                } while ($linesCount < $task->linesCount);
             } catch (\RdsSystem\lib\CommandExecutorException $e) {
-                $this->debugLogger->error("Error occured during command execution: " . $e->getMessage());
-                $model->sendToolGetToolLogTailResult(
-                    new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), false, $server, $e->getMessage())
-                );
-
-                $this->debugLogger->message("Message accepted");
-                $task->accepted();
-
-                return;
+                $this->debugLogger->error("Error occurred during command execution: " . $e->getMessage());
+                if ($daysAgo === 0) {
+                    // dg: Отправляем сообщение об ошибке только если не получилось запросить логи за текущий день
+                    $text = $e->getMessage();
+                    $isSuccess = false;
+                }
             }
 
             $model->sendToolGetToolLogTailResult(
-                new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), true, $server, $text)
+                new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), $isSuccess, $server, $text)
             );
 
             $this->debugLogger->message("Message accepted");
