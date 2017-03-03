@@ -63,13 +63,13 @@ echo yii\grid\GridView::widget(array(
     <div class="col-md-4">
         <h2 style="padding: 0; margin:0; float: left; margin-right: 20px;">Запрос релиза</h2>
         <?php
-        $modal = yii\bootstrap\Modal::begin(array(
+        yii\bootstrap\Modal::begin(array(
             'id' => 'release-request-form-modal',
             'header' => 'Запрос релиза',
             'toggleButton' => ['label' => 'Собрать проект', 'class' => 'btn'],
         ));
         echo $this->render('createReleaseRequest', ['model' => $releaseRequest['model']], true);
-        $modal->end();?>
+        yii\bootstrap\Modal::end();?>
     </div>
     <div class="col-md-8" style="float: right">
         <div class="row">
@@ -91,7 +91,6 @@ echo yii\grid\GridView::widget(array(
                     echo $this->render('createReleaseRequest', ['model' => $releaseRequest['model']], true);
                     $modal->end();
                     ?>
-                    &nbsp;
                 </div>
             <?php }?>
         </div>
