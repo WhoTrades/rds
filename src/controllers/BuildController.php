@@ -6,8 +6,6 @@ use yii\web\HttpException;
 
 class BuildController extends Controller
 {
-    public $layout = '//layouts/column2';
-
     /**
      * @return array
      */
@@ -30,6 +28,10 @@ class BuildController extends Controller
                     ],
                     [
                         'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                    /*[
+                        'allow' => true,
                         'actions' => ['create', 'update'],
                         'roles' => ['@'],
                     ],
@@ -37,8 +39,8 @@ class BuildController extends Controller
                         'allow' => true,
                         'actions' => ['admin', 'delete'],
                         'roles' => ['@'],
-                        //'roles' => ['admin'],
-                    ],
+                        'roles' => ['admin'],
+                    ],*/
                 ],
             ],
         ];

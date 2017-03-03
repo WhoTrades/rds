@@ -7,7 +7,7 @@ class SingleAuthManager extends \yii\rbac\PhpManager
     {
         parent::load();
 
-        foreach (\Yii::$app->session['userRights'] as $role) {
+        foreach ((array) \Yii::$app->session['userRights'] as $role) {
             $this->assign($role, \Yii::$app->user->id);
         }
     }

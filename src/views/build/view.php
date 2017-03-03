@@ -1,5 +1,5 @@
 <?php
-/** @var $model Build */
+/** @var $model app\models\Build */
 ?>
 
     <h1>Сборка #<?php echo $model->obj_id; ?> (<?= $model->project->project_name ?>
@@ -16,9 +16,12 @@ echo yii\widgets\DetailView::widget([
         'build_version',
         [
             'attribute' => 'build_time_log',
-            'format' => 'html',
+            'format' => 'raw',
             'value' => function ($model) {
                 $data   = json_decode($model->build_time_log, true);
+                if (empty($data)) {
+                    return '';
+                }
                 $max    = $prev = 0;
 
                 foreach ($data as $val) {
@@ -60,7 +63,7 @@ echo yii\widgets\DetailView::widget([
             'attribute' => 'build_attach',
             'format' => 'html',
             'value' => function ($model) {
-                return $this->cliColorsToHtml($model->build_attach);
+                return $this->context->cliColorsToHtml($model->build_attach);
             },
         ],
     ],
