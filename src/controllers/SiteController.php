@@ -196,7 +196,7 @@ class SiteController extends Controller
             $this->redirect(array('index'));
         }
 
-        echo $this->render('createReleaseReject', array(
+        return $this->render('createReleaseReject', array(
             'model' => $model,
         ));
     }
@@ -215,7 +215,7 @@ class SiteController extends Controller
 
         $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
 
-        $transaction = $model->getDb()->beginTransaction();
+        $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/
         foreach ($model->builds as $build) {
             if (in_array($build->build_status, Build::getInstallingStatuses())) {

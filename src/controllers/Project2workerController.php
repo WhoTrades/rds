@@ -114,9 +114,9 @@ class Project2workerController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new ActiveDataProvider;(['query' => Project2worker::find()]);
-        return $this->render('index',array(
-			'dataProvider'=>$dataProvider,
+		$dataProvider = new ActiveDataProvider(['query' => Project2worker::find()]);
+        return $this->render('index', array(
+			'dataProvider' => $dataProvider,
 		));
 	}
 
