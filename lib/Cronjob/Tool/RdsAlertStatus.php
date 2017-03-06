@@ -146,13 +146,35 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      */
     private function getDataProviderList()
     {
-        $config = \Config::getInstance()->serviceRds['alerts']['dataProvider'];
+        $monitoringDataProvider = $this->getMonitoringDataProvider('Monitoring');
+
+        $crmMonitoringDataProvider = new \AlertLog\CompoundDataProvider($this->debugLogger, 'Monitoring ', [$monitoringDataProvider]);
 
         return [
-            AlertLog::WTS_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring', $config['monitoring']['url']),
-            AlertLog::CRM_LAMP_NAME => new \AlertLog\MonitoringDataProvider($this->debugLogger, 'Monitoring ', $config['monitoring']['url']),
+            AlertLog::WTS_LAMP_NAME => $monitoringDataProvider,
+            AlertLog::CRM_LAMP_NAME => $crmMonitoringDataProvider,
+            AlertLog::MONITORING_DEV_LAMP_NAME => $this->getMonitoringDataProvider('MonitoringDEV'),
+            AlertLog::MONITORING_TST_LAMP_NAME => $this->getMonitoringDataProvider('MonitoringTST'),
             AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(['WhoTrades_AcceptanceTests_WtSmokeTestProd'], 'TeamCity: Smoke Tests'),
         ];
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return \AlertLog\IAlertDataProvider
+     */
+    private function getMonitoringDataProvider($name)
+    {
+        $config = \Config::getInstance()->serviceRds['alerts']['dataProvider'][$name];
+
+        if (!$config['enable']) {
+            $this->debugLogger->message("data provider [$name] disabled");
+            // dg: Если указанный провайдер выключен, то возвращаем пустой провайдер (существующие проблемы будут отмечены как решенные)
+            return new \AlertLog\CompoundDataProvider($this->debugLogger, $name, []);
+        }
+
+        return new \AlertLog\MonitoringDataProvider($this->debugLogger, $name, $config['url']);
     }
 
     /**
@@ -163,8 +185,10 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      *
      * @return \AlertLog\CompoundDataProvider
      */
-    private function getTeamCityDataProvider(array $projects, $name = 'TeamCity')
+    private function getTeamCityDataProvider(array $projects, $name = null)
     {
+        $name = $name ?? 'TeamCity';
+
         $teamCityClient = new \CompanyInfrastructure\WtTeamCityClient($this->debugLogger);
 
         $dataProviders = [];
