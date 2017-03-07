@@ -25,5 +25,6 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
+
     }
 }

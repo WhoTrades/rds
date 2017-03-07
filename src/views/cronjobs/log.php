@@ -4,7 +4,7 @@ use yii\bootstrap\Alert;
 if ($plainText) {
     header("Content-type: text/plain");
     foreach ($result as $val) {
-        echo $val['log'];
+        echo $val['log'] . PHP_EOL;
     }
 } else {
 

@@ -95,6 +95,7 @@ use yii\bootstrap\Html;
                     ? Html::tag('span', 'Да', [
                         'class' => '__get-log-tail label label-danger',
                         'tag' => $tag,
+                        'rel' => 30,
                         'style' => 'cursor: pointer',
                     ])
                     : "Нет"
