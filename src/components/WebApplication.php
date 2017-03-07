@@ -68,4 +68,18 @@ class WebApplication extends \yii\web\Application
 
         return parent::setRuntimePath($path);
     }
+
+    /**
+     * Хак для поддержки старой базы ссылок
+     * @param string $route
+     * @return \yii\base\Controller
+     */
+    public function createControllerByID($route)
+    {
+        $newStyleRoute = preg_replace_callback('~([a-z0-9])([A-Z])~', function ($matches) {
+            return $matches[1] . "-" . strtolower($matches[2]);
+        }, $route);
+
+        return parent::createControllerByID($newStyleRoute);
+    }
 }
