@@ -1,6 +1,8 @@
 <?php
 namespace app\components;
 
+use Yii;
+
 class NotifierEmail extends \yii\base\Object
 {
     public $releaseRequestedEmail;

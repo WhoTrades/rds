@@ -78,6 +78,7 @@ class ReleaseRequest extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
+            array('rr_status', 'default', 'value' => self::STATUS_NEW),
             array(['rr_user', 'rr_status', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_release_version'], 'required'),
             array(['obj_status_did', 'rr_project_obj_id'], 'number'),
             array(
@@ -114,7 +115,6 @@ class ReleaseRequest extends ActiveRecord
             }
             $this->addError($attribute, 'Запрет на релиз: ' . implode("; ", $messages));
         }
-
     }
 
     /**

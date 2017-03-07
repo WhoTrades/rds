@@ -338,6 +338,6 @@ class CronjobsController extends Controller
             'toolJob' => $toolJob,
             'Project' => $toolJob->project,
             'cpuUsages' => $cpuUsages,
-        ], true);
+        ]);
     }
 }

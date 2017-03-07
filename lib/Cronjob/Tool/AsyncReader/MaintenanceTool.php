@@ -1,8 +1,8 @@
 <?php
 
 use RdsSystem\Message;
+use app\models\RdsDbConfig;
 use app\models\MaintenanceTool;
-use yii\data\ActiveDataProvider;
 use app\models\MaintenanceToolRun;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 
@@ -64,7 +64,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
             return;
         }
 
-        MaintenanceToolRun::updateByPk($message->id, ['mtr_status' => $message->status, 'mtr_pid' => $message->pid]);
+        MaintenanceToolRun::updateAll(['mtr_status' => $message->status, 'mtr_pid' => $message->pid], ['obj_id' => $message->id]);
 
         self::sendMaintenanceToolUpdated($message->id);
 
@@ -83,10 +83,10 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
 
         $sql = "UPDATE ".MaintenanceToolRun::tableName()." SET mtr_log=COALESCE(mtr_log, '')||:log WHERE obj_id=:id";
 
-        MaintenanceToolRun::getDbConnection()->createCommand($sql)->execute([
+        \Yii::$app->db->createCommand($sql, [
             'id' => $message->id,
             'log' => $message->text,
-        ]);
+        ])->execute();
 
         $this->debugLogger->message("Log chunk of MTR=$message->id saved, length=".strlen($message->text).", log=".$message->text);
 
@@ -107,7 +107,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
 
     public function actionChangePreProdStatus($ok, MessagingRdsMs $model)
     {
-        $config = \RdsDbConfig::get();
+        $config = RdsDbConfig::get();
         $config->preprod_online = $ok;
         $config->save();
     }
@@ -116,45 +116,30 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
     {
         /** @var $debugLogger \ServiceBase_IDebugLogger */
         $debugLogger = \Yii::$app->debugLogger;
+        $debugLogger->message("Sending to comet new data of maintenance tool run #$id");
 
         /** @var $mtr MaintenanceToolRun */
-        $mtr = MaintenanceToolRun::findByPk($id);
-        if (!$mtr) {
+        if (!$mtr = MaintenanceToolRun::findByPk($id)) {
             return;
         }
 
-        $debugLogger->message("Sending to comet new data of maintenance tool run #$id");
-        Yii::$app->assetManager->setBasePath(Yii::getPathOfAlias('application')."/../main/www/assets/");
-        Yii::$app->assetManager->setBaseUrl("/assets/");
-        Yii::$app->urlManager->setBaseUrl('/');
-        $filename = \Yii::getPathOfAlias('application.views.maintenanceTool._maintenanceToolRow').'.php';
+        $model = MaintenanceTool::findByPk($mtr->mtr_maintenance_tool_obj_id);
 
-        list($controller, $action) = \Yii::$app->createController('/');
-        $controller->setAction($controller->createAction($action));
-        Yii::$app->setController($controller);
-        $model = MaintenanceTool::model();
-        $model->obj_id = $mtr->mtr_maintenance_tool_obj_id;
-
-        $rowTemplate = include($filename);
-        $widget = \Yii::$app->getWidgetFactory()->createWidget(Yii::$app,'yiistrap.widgets.TbGridView', [
-            'dataProvider'=>new ActiveDataProvider($model, $model->search()),
-            'columns'=>$rowTemplate,
-            'rowCssClassExpression' => function(){return 'rowItem';},
+        $html = \Yii::$app->view->renderFile('@app/views/maintenance-tool/_maintenanceToolGrid.php', [
+            'dataProvider' => $model->search(['obj_id' => $model->obj_id]),
         ]);
-        $widget->init();
-        ob_start();
-        $widget->run();
-        $html = ob_get_clean();
-        $debugLogger->message("html code generated, html=".$html);
 
-        /** @var $migration HardMigration */
-        Yii::$app->webSockets->send('maintenanceToolChanged', ['id' => $mtr->mtr_maintenance_tool_obj_id, 'html' => $html]);
+        $debugLogger->message("html code generated, html=" . $html);
+
+        Yii::$app->webSockets->send('maintenanceToolChanged', ['id' => $model->obj_id, 'html' => $html]);
         $debugLogger->message("Sended");
     }
 
     public function createUrl($route, $params)
     {
         Yii::$app->urlManager->setBaseUrl('');
-        return \Yii::$app->createAbsoluteUrl($route, $params);
+        array_unshift($params, $route);
+
+        return \Yii::$app->urlManager->createAbsoluteUrl($params, true);
     }
 }

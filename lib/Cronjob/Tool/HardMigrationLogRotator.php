@@ -19,7 +19,7 @@ class Cronjob_Tool_HardMigrationLogRotator extends \Cronjob\Tool\ToolBase
 
         $sql = "UPDATE rds.hard_migration SET migration_log=SUBSTRING(migration_log FROM LENGTH(migration_log)-100000+1) WHERE LENGTH(migration_log) > 100000";
 
-        HardMigration::getDbConnection()->createCommand($sql)->execute();
+        \Yii::$app->db->createCommand($sql)->execute();
         $this->debugLogger->message("Finished log rotation");
     }
 }

@@ -166,7 +166,7 @@ $diffStat<br />
                         $configs[$projectConfig->pc_filename] = $projectConfig->pc_content;
                     }
 
-                    (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
+                    (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
                         new \RdsSystem\Message\ProjectConfig(
                             $model->project_name,
                             $configs
@@ -178,10 +178,10 @@ $diffStat<br />
                     $transaction->commit();
                     $this->redirect(array('view', 'id' => $model->obj_id));
                 } else {
-                    $transaction->rollback();
+                    $transaction->rollBack();
                 }
             } else {
-                $transaction->rollback();
+                $transaction->rollBack();
             }
         }
 

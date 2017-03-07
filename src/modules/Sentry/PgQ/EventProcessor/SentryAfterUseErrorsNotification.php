@@ -8,7 +8,7 @@
    process_queue
  */
 
-class PgQ_EventProcessor_SentryAfterUseErrorsNotification extends RdsEventProcessorBase
+class PgQ_EventProcessor_SentryAfterUseErrorsNotification extends app\components\RdsEventProcessorBase
 {
     const SENTRY_WAIT_RETRY_TIMEOUT = 60;
     const INTERVAL_FROM_USE = 600;

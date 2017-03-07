@@ -20,14 +20,20 @@ class WorkerController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                    /*[
+                        'allow' => true,
                         'actions' => ['index', 'admin'],
-                        'roles' => ['*'],
+                        'roles' => ['@'],
+                        //'roles' => ['*'],
                     ],
                     [
                         'allow' => true,
                         'actions' => ['create', 'update'],
+                        'roles' => ['@'],
                         'roles' => ['admin'],
-                    ],
+                    ],*/
                 ],
             ],
         ];

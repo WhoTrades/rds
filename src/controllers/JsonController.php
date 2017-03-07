@@ -10,6 +10,9 @@ use app\models\ReleaseVersion;
 use app\models\ReleaseRequest;
 use app\models\MaintenanceTool;
 use app\models\MaintenanceToolRun;
+use app\modules\Wtflow\models\Developer;
+use app\modules\Wtflow\models\WtFlowStat;
+use app\modules\Wtflow\components\JiraApi;
 
 class JsonController extends Controller
 {
@@ -178,10 +181,11 @@ class JsonController extends Controller
                 ':cpu' => 1000 * ($val['CPUUser'] + $val['CPUSystem']),
                 ':last_run' => date("r", round($val['lastRunTimestamp'])),
                 ':exit_code' => $val['errors'],
-                ':duration' => (int)$val['time'] / $val['count'],
+                ':duration' => (int) $val['time'] / $val['count'],
             ];
 
-            $row = \Yii::$app->db->createCommand("SELECT * FROM cronjobs.add_cronjobs_cpu_usage(:project, :key, :cpu, :last_run, :exit_code, :duration)")->queryRow(true, $bind);
+            $row = \Yii::$app->db->createCommand("SELECT * FROM cronjobs.add_cronjobs_cpu_usage(:project, :key, :cpu, :last_run, :exit_code, :duration)", $bind)
+                    ->queryOne(\PDO::FETCH_ASSOC);
 
             $toolJob = ToolJob::findByAttributes([
                 'key' => $key,
@@ -254,7 +258,7 @@ class JsonController extends Controller
         $result = array();
         $projectsAllowed = \Yii::$app->params['teamCityProjectAllowed'];
         $parameterName = \Yii::$app->params['teamCityBuildComponentParameter'];
-        $teamCity = new CompanyInfrastructure\WtTeamCityClient(\Yii::$app->debugLogger);
+        $teamCity = new \CompanyInfrastructure\WtTeamCityClient(\Yii::$app->debugLogger);
         $components = $ticket['fields']['components'];
 
         foreach ($projectsAllowed as $project) {
@@ -317,7 +321,7 @@ class JsonController extends Controller
         }
 
         $action = new \Action\Git\RebuildBranch();
-        $action->run('staging', 'JIRA-hook', (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel(), false);
+        $action->run('staging', 'JIRA-hook', (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel(), false);
 
         echo 'OK';
     }

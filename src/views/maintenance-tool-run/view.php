@@ -1,6 +1,8 @@
 <?php
 /** @var $model MaintenanceToolRun */
 
+use app\models\MaintenanceToolRun;
+
 $this->title = "Выполнение процесса ".$model->mtrMaintenanceTool->mt_name;
 
 $this->params['menu']=array(
@@ -14,9 +16,10 @@ $this->params['menu']=array(
 
     <h1>View MaintenanceToolRun #<?php echo $model->obj_id; ?></h1>
 
-<?php $this->widget('yiistrap.widgets.TbDetailView',array(
-    'data'=>$model,
-    'attributes'=>array(
+<?php
+echo yii\widgets\DetailView::widget([
+    'model' => $model,
+    'attributes' => [
         'obj_id',
         'obj_created',
         'obj_modified',
@@ -26,33 +29,36 @@ $this->params['menu']=array(
         'mtr_pid',
         'mtr_status',
         [
-            'name' => 'progress',
-            'value' => function(MaintenanceToolRun $toolRun){
-                if (!$toolRun->isInProgress()) {
-                    if ($toolRun->mtr_status == MaintenanceToolRun::STATUS_DONE) {
+            'attribute' => 'progress',
+            'value' => function ($model) {
+                if (!$model->isInProgress()) {
+                    if ($model->mtr_status == MaintenanceToolRun::STATUS_DONE) {
                         return '100%';
                     }
-                    return;
+
+                    return null;
                 }
 
-                list($percent, $key) = $toolRun->getProgressPercentAndKey();
-                return '<div class="progress progress-'.$toolRun->obj_id.'" style="margin: 0; width: 250px;">
-                            <div class="progress-bar" style="width: '.(int)$percent.'%;white-space:nowrap; color:#FFA500; padding-left: 5px">
-                                <b>'.sprintf("%.2f", $percent).'%</b>: '.$key.'
+                list($percent, $key) = $model->getProgressPercentAndKey();
+
+                return '<div class="progress progress-' . $model->obj_id . '" style="margin: 0; width: 250px;">
+                            <div class="progress-bar" style="width: ' . (int) $percent . '%;white-space:nowrap; color:#FFA500; padding-left: 5px">
+                                <b>' . sprintf("%.2f", $percent) . '%</b>: ' . $key . '
                             </div>
                         </div>';
             },
-            'type' => 'html',
+            'format' => 'html',
         ],
         [
-            'name' => 'mtr_log',
-            'value' => function(MaintenanceToolRun $mtr){
-                return "<pre class='pre'>$mtr->mtr_log</pre>";
+            'attribute' => 'mtr_log',
+            'value' => function ($model) {
+                return "<pre class='pre'>$model->mtr_log</pre>";
             },
-            'type' => 'html',
-        ]
-    ),
-)); ?>
+            'format' => 'html',
+        ],
+    ],
+]);
+?>
 
 <script type="text/javascript">
     document.onload.push(function(){

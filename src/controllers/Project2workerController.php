@@ -7,12 +7,6 @@ use yii\data\ActiveDataProvider;
 
 class Project2workerController extends Controller
 {
-	/**
-	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
-	 * using two-column layout. See 'protected/views/layouts/column2.php'.
-	 */
-	public $layout='//layouts/column2';
-
     /**
      * @return array
      */
@@ -41,7 +35,8 @@ class Project2workerController extends Controller
                     [
                         'allow' => true,
                         'actions' => ['admin', 'delete'],
-                        'roles' => ['admin'],
+                        'roles' => ['@'],
+                        //'roles' => ['admin'],
                     ],
                 ],
             ],
@@ -119,9 +114,9 @@ class Project2workerController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new ActiveDataProvider;(['query' => Project2worker::find()]);
-        return $this->render('index',array(
-			'dataProvider'=>$dataProvider,
+		$dataProvider = new ActiveDataProvider(['query' => Project2worker::find()]);
+        return $this->render('index', array(
+			'dataProvider' => $dataProvider,
 		));
 	}
 

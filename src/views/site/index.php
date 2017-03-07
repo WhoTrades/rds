@@ -22,8 +22,9 @@ yii\bootstrap\Modal::begin(array(
 ))->end(); ?>
 
 <h1>Запреты релиза</h1>
-<a href="<?=yii\helpers\Url::to('/site/createReleaseReject')?>">Создать</a>
+<a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>">Создать</a>
 <?php
+\yii\widgets\Pjax::begin(['id' => 'release-reject-grid-pjax-container', 'clientOptions' => ['fragment' => '#release-reject-grid']]);
 echo yii\grid\GridView::widget(array(
     'id' => 'release-reject-grid',
     'dataProvider' => $releaseRejectSearchModel->search($releaseRejectSearchModel->attributes),
@@ -54,19 +55,21 @@ echo yii\grid\GridView::widget(array(
             ],
         ),
     ),
-)); ?>
+));
+\yii\widgets\Pjax::end();
+?>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <h2 style="padding: 0; margin:0; float: left; margin-right: 20px;">Запрос релиза</h2>
         <?php
-        $modal = yii\bootstrap\Modal::begin(array(
+        yii\bootstrap\Modal::begin(array(
             'id' => 'release-request-form-modal',
             'header' => 'Запрос релиза',
             'toggleButton' => ['label' => 'Собрать проект', 'class' => 'btn'],
         ));
         echo $this->render('createReleaseRequest', ['model' => $releaseRequest['model']], true);
-        $modal->end();?>
+        yii\bootstrap\Modal::end();?>
     </div>
     <div class="col-md-8" style="float: right">
         <div class="row">
@@ -88,7 +91,6 @@ echo yii\grid\GridView::widget(array(
                     echo $this->render('createReleaseRequest', ['model' => $releaseRequest['model']], true);
                     $modal->end();
                     ?>
-                    &nbsp;
                 </div>
             <?php }?>
         </div>
@@ -106,28 +108,24 @@ echo yii\grid\GridView::widget(array(
 
 <div style="clear: both"></div>
 <?php
-\yii\widgets\Pjax::begin();
-echo yii\grid\GridView::widget(array(
-    'id' => 'release-request-grid',
-    'options' => ['class' => 'table-responsive'],
-    'dataProvider' => $releaseRequestSearchModel->search($releaseRequestSearchModel->attributes),
-    'filterModel' => $releaseRequestSearchModel,
-    'rowOptions' => function ($rr, $key, $index) {
-        return ['class' => 'release-request-' . $rr->obj_id . " release-request-" . $rr->rr_status];
-    },
-    'columns' => include('_releaseRequestRow.php'),
-));
+\yii\widgets\Pjax::begin(['id' => 'release-request-grid-pjax-container', 'clientOptions' => ['fragment' => '#release-request-grid']]);
+echo $this->render('_releaseRequestGrid', [
+    'dataProvider'  => $releaseRequestSearchModel->search($releaseRequestSearchModel->attributes),
+    'filterModel'   => $releaseRequestSearchModel,
+]);
 \yii\widgets\Pjax::end();
 ?>
 
 <script type="text/javascript">
-    //an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
+
+    // an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
     // А такое случается часто, когда мы заказываем сборку
+    // ar: 2 pjax одновременно не выполняются, один из них всегда возвращает "canceled", добавил таймаут - сожалею
     document.onload.push(function(){
+        $.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
         setTimeout(function(){
-            $.fn.yiiGridView.update("release-reject-grid");
-            $.fn.yiiGridView.update("release-request-grid");
-        }, 0);
+            $.pjax.reload('#release-reject-grid-pjax-container', {fragment: '#release-reject-grid'});
+        }, 500);
     });
 </script>
 
@@ -135,16 +133,20 @@ echo yii\grid\GridView::widget(array(
     document.onload.push(function(){
         webSocketSubscribe('releaseRequestChanged', function(event){
             console.log("websocket event received", event);
-            var html = event.html;
-            console.log($(html).find('tr.rowItem').first().attr('class'));
-            var trHtmlCode = $(html).find('tr.rowItem').first().html()
-            $('.release-request-'+event.rr_id).html(trHtmlCode);
-            $('.release-request-'+event.rr_id).attr('class', $(html).find('tr.rowItem').first().attr('class'));
-            console.log('Release request '+event.rr_id+' updated');
+
+            var trId = '.release-request-' + event.rr_id,
+                html = $(event.html).find(trId).html();
+
+            $(trId).html(html);
+
+            console.log('Release request '+ event.rr_id + ' updated');
         });
         webSocketSubscribe('progressbarChanged', function(event){
-            $('.progress-'+event.build_id+' .progress-bar').css({width: event.percent+'%'});
-            $('.progress-'+event.build_id+' .progress-bar').html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
+            var progressBar =  $('.progress-' + event.build_id + ' .progress-bar');
+
+            progressBar.css({width: event.percent+'%'});
+            progressBar.html('<b>'+event.percent.toFixed(2).toString()+'%:</b> '+event.key);
+
             console.log(event);
         });
         webSocketSubscribe('refresh', function(event){
@@ -153,11 +155,11 @@ echo yii\grid\GridView::widget(array(
         });
         webSocketSubscribe('updateAllReleaseRequests', function(event){
             console.log("websocket event received", event);
-            $.fn.yiiGridView.update("release-request-grid");
+            $.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
             console.log('got update all release requests event');
         });
         webSocketSubscribe('updateAllReleaseRejects', function(event){
-            $.fn.yiiGridView.update("release-reject-grid");
+            $.pjax.reload('#release-reject-grid-pjax-container', {fragment: '#release-reject-grid'});
             console.log('got update all release rejects event');
         });
         $('body').on('click', '.use-button', function(e){

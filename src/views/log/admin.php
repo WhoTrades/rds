@@ -33,7 +33,9 @@ $('.search-form form').submit(function(){
 )); ?>
 </div><!-- search-form -->
 
-<?= yii\grid\GridView::widget(array(
+<?php
+\yii\widgets\Pjax::begin(['id' => 'log-grid-pjax-container']);
+echo yii\grid\GridView::widget(array(
     'id' => 'log-grid',
     'dataProvider' => $model->search($model->attributes),
     'filterModel' => $model,
@@ -47,12 +49,12 @@ $('.search-form form').submit(function(){
         'obj_id',
     ),
 ));
-
+\yii\widgets\Pjax::end();
 ?>
 
 <script>
     webSocketSubscribe('logUpdated', function(event){
         console.log("websocket event received", event);
-        $.fn.yiiGridView.update("log-grid");
+        $.pjax.reload('#log-grid-pjax-container');
     });
 </script>

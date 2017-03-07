@@ -3,8 +3,9 @@
  * @example dev/services/rds/misc/tools/runner.php --tool=DevParseCronConfig -vv
  */
 
-use RdsSystem\Message;
-use RdsSystem\lib\CommandExecutor;
+use app\models\Project;
+use app\models\ToolJob;
+use app\models\ReleaseRequest;
 
 class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
 {
@@ -55,9 +56,9 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
 
         $rr->rr_cron_config = file_get_contents($filename);
 
-        $transaction = ToolJob::getDbConnection()->beginTransaction();
+        $transaction = \Yii::$app->db->beginTransaction();
         try {
-            ToolJob::deleteAllByAttributes([
+            ToolJob::deleteAll([
                 'project_obj_id' => $Project->obj_id,
             ]);
 
@@ -65,7 +66,7 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
 
             $transaction->commit();
         } catch (\Exception $e) {
-            $transaction->rollback();
+            $transaction->rollBack();
             throw $e;
         }
     }

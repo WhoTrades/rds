@@ -3,25 +3,19 @@
 
 $this->title = "Обслуживание";
 
-echo yii\grid\GridView::widget(array(
-    'dataProvider' => $model->search($model->attributes),
-    'options' => ['class' => 'table-responsive'],
-    'filterModel' => $model,
-    'rowOptions' => function ($model) {
-        return ['class' => 'maintenance-tool-' . $model->obj_id];
-    },
-    'columns' => require('_maintenanceToolRow.php'),
-)); ?>
+echo $this->render('_maintenanceToolGrid', ['dataProvider' => $model->search($model->attributes), 'filterModel' => $model]);
+?>
 
 
 <script>
     document.onload.push(function(){
         webSocketSubscribe('maintenanceToolChanged', function(event){
             console.log('Maintenance tool '+event.id+' updated');
-            var html = event.html;
-            console.log(html);
-            var trHtmlCode = $(html).find('tr.rowItem').first().html()
-            $('.maintenance-tool-'+event.id).html(trHtmlCode);
+
+            var trId = '.maintenance-tool-' + event.id,
+                html = $(event.html).find(trId).html();
+
+            $(trId).html(html);
         });
         webSocketSubscribe('maintenanceToolProgressbarChanged', function(event){
             $('.progress-'+event.id+' .progress-bar').css({width: event.percent+'%'});

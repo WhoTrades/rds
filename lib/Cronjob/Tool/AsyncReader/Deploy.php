@@ -1,4 +1,5 @@
 <?php
+use yii\helpers\Url;
 use RdsSystem\Message;
 use RdsSystem\Model\Rabbit\MessagingRdsMs;
 use app\models\Build;
@@ -144,7 +145,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
                     foreach ($builds as $val) {
                         $text .= "<a href='" .
-                            Yii::$app->createAbsoluteUrl('build/view', array('id' => $val->obj_id)) .
+                            Url::to(['build/view', 'id' => $val->obj_id], true) .
                             "'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
                     }
 
@@ -173,7 +174,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             case Build::STATUS_FAILED:
                 $title = "Failed to install $project->project_name";
                 $text = "Проект $project->project_name не удалось собрать. <a href='" .
-                    Yii::$app->createAbsoluteUrl('build/view', array('id' => $build->obj_id)) .
+                    Url::to(['build/view', 'id' => $build->obj_id], true) .
                     "'>Подробнее</a>";
 
                 Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
@@ -184,7 +185,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
                 $releaseRequest = $build->releaseRequest;
-                $releaseRequest->rr_status = \ReleaseRequest::STATUS_FAILED;
+                $releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
                 $releaseRequest->save();
                 break;
             case Build::STATUS_BUILDING:
@@ -196,7 +197,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             case Build::STATUS_CANCELLED:
                 $title = "Cancelled installation of $project->project_name";
                 $text = "Сборка $project->project_name отменена. <a href='" .
-                    \Yii::$app->createAbsoluteUrl('build/view', array('id' => $build->obj_id)) .
+                    Url::to(['build/view', 'id' => $build->obj_id], true) .
                     "'>Подробнее</a>";
 
                 $releaseRequest = $build->releaseRequest;
@@ -356,7 +357,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public function actionSetCronConfig(Message\ReleaseRequestCronConfig $message, MessagingRdsMs $model)
     {
-        $transaction = Build::getDbConnection()->beginTransaction();
+        $transaction = \Yii::$app->db->beginTransaction();
         try {
             /** @var $build Build */
             $build = Build::findByPk($message->taskId);
@@ -399,10 +400,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
             $message->accepted();
         } catch (\Exception $e) {
-            $transaction->rollback();
+            $transaction->rollBack();
             throw $e;
         }
-
     }
 
     /**
@@ -783,7 +783,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
-        $transaction = ReleaseRequest::getDbConnection()->beginTransaction();
+        $transaction = \Yii::$app->db->beginTransaction();
         if ($message->type == 'pre') {
             $releaseRequest->rr_migration_status = $message->status;
             $releaseRequest->rr_migration_error = $message->errorText;
@@ -823,40 +823,17 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         /** @var $debugLogger \ServiceBase_IDebugLogger */
         $debugLogger = \Yii::$app->debugLogger;
 
-        $releaseRequest = ReleaseRequest::findByPk($id);
-        if (!$releaseRequest) {
+        if (!$releaseRequest = ReleaseRequest::findByPk($id)) {
             return;
         }
 
         $debugLogger->message("Sending to comet new data of releaseRequest $id");
-        Yii::$app->assetManager->setBasePath(Yii::getPathOfAlias('application') . "/../main/www/assets/");
-        Yii::$app->assetManager->setBaseUrl("/assets/");
-        Yii::$app->urlManager->setBaseUrl('');
-        $filename = \Yii::getPathOfAlias('application.views.site._releaseRequestRow') . '.php';
-        $rowTemplate = include($filename);
 
-        list($controller, $action) = \Yii::$app->createController('/');
-        $controller->setAction($controller->createAction($action));
-        Yii::$app->setController($controller);
-        $model = ReleaseRequest::model();
-        $model->obj_id = $id;
-        $widget = \Yii::$app->getWidgetFactory()->createWidget(
-            Yii::$app,
-            'yiistrap.widgets.TbGridView',
-            [
-                'dataProvider' => $model->search(),
-                'columns' => $rowTemplate,
-                'rowCssClassExpression' => function () use ($releaseRequest) {
-                    return 'rowItem release-request-' . $releaseRequest->obj_id . ' release-request-' . $releaseRequest->rr_status;
-                },
-            ]
-        );
-        $widget->init();
-        ob_start();
-        $widget->run();
-        $html = ob_get_clean();
+        $html = \Yii::$app->view->renderFile('@app/views/site/_releaseRequestGrid.php', [
+            'dataProvider' => $releaseRequest->search(['obj_id' => $id]),
+        ]);
 
-        Yii::$app->webSockets->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
+        \Yii::$app->webSockets->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
         $debugLogger->message("Sended");
     }
 
@@ -868,8 +845,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      */
     public function createUrl($route, $params)
     {
-        Yii::$app->urlManager->setBaseUrl('');
+        \Yii::$app->urlManager->setBaseUrl('');
+        array_unshift($params, $route);
 
-        return \Yii::$app->createAbsoluteUrl($route, $params);
+        return Url::to($params, true);
     }
 }

@@ -10,7 +10,7 @@ class GlobalWarnings extends \yii\base\Widget
         }
 
         $warnings = [];
-        $config = app\models\RdsDbConfig::get();
+        $config = \app\models\RdsDbConfig::get();
 
         if (!$config->is_tst_updating_enabled) {
             $warnings[] = new GlobalWarningItem(

@@ -90,7 +90,7 @@ class Log extends ActiveRecord
         $log->log_text = $text;
         $log->log_user = $user;
         if (!$log->save()) {
-            throw new Exception("Can't create log request: " . json_encode($log->errors));
+            throw new \Exception("Can't create log request: " . json_encode($log->errors));
         }
 
         \Yii::$app->webSockets->send('logUpdated', []);

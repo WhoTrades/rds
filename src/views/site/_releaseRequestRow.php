@@ -140,7 +140,7 @@ return array(
                 }
 
                 if ($releaseRequest->hardMigrations) {
-                    $result .= "<a href='" . yii\helpers\Url::to('hardMigration/index', ['HardMigration[migration_release_request_obj_id]' => $releaseRequest->obj_id]) .
+                    $result .= "<a href='" . yii\helpers\Url::to(['hard-migration/index', 'HardMigration[migration_release_request_obj_id]' => $releaseRequest->obj_id]) .
                         "'>Покажать тяжелые миграции (" . count($releaseRequest->hardMigrations) . ")</a><br />";
                 }
 
@@ -168,7 +168,7 @@ return array(
                         return $result;
                     } else {
                         $result .=
-                            "<a href='" . yii\helpers\Url::to('/use/migrate', array('id' => $releaseRequest->obj_id, 'type' => 'pre')) .
+                            "<a href='" . yii\helpers\Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id, 'type' => 'pre']) .
                                 "' class='ajax-url'>Запустить pre-миграции</a><br />" .
                                 "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">Показать pre миграции</a>
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
@@ -182,11 +182,11 @@ return array(
                         return $result;
                     }
                 } else {
-                    return "<a href='" . yii\helpers\Url::to('/use/create', array('id' => $releaseRequest->obj_id)) .
+                    return "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
                         "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
                 }
             } elseif ($releaseRequest->rr_status == ReleaseRequest::STATUS_CODES) {
-                return "<a href='" . yii\helpers\Url::to('/use/index', array('id' => $releaseRequest->obj_id)) .
+                return "<a href='" . yii\helpers\Url::to(['/use/index', 'id' => $releaseRequest->obj_id]) .
                     "' onclick='showForm($releaseRequest->obj_id); return false;'>Ввести sms код</a>";
             } elseif ($releaseRequest->rr_status == ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
                 if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest($releaseRequest->rr_project_obj_id, $releaseRequest->rr_old_version)) {

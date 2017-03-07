@@ -2,33 +2,30 @@
 /** @var $this app\components\View */
 /** @var $model app\models\ReleaseRequest
 /** @var $form yii\bootstrap\ActiveForm */
+use yii\bootstrap\Html;
 
+$this->registerJs('
+    $("#release-request-form").on("beforeSubmit", function(e) {
+        var form = $("#release-request-form"),
+            btn  = form.find("button[type=\"submit\"]"),
+            modal= $("#release-request-form-modal");
+
+            btn.attr("disabled", true);
+
+            $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(){
+                modal.modal("hide");
+                btn.attr("disabled", false);
+            });
+
+        return false;
+    });
+');
 ?>
 <div class="form" style="width: 400px; margin: auto">
-    <?php $form = yii\bootstrap\ActiveForm::begin(array(
-        'enableAjaxValidation' => true,
-        'id' => 'release-request-form',
-        'options' => array(
-            'validateOnSubmit' => true,
-            'validateOnChange' => false,
-            'beforeValidate' => 'function(form, data, hasError){
-                $("button", $(form)).attr("disabled", true);
-
-                return true;
-            }',
-            'afterValidate' => 'function(form, data, hasError){
-                if (!hasError) {
-                    $("button", $(form)).attr("disabled", true);
-                    $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(){
-                        $("#release-request-form-modal").modal("hide");
-                        $("button", $(form)).attr("disabled", false);
-                    });
-                } else {
-                    $("button", $(form)).attr("disabled", false);
-                }
-            }',
-        ),
-    ));
+    <?php
+        $form = yii\bootstrap\ActiveForm::begin(array(
+            'id' => 'release-request-form',
+        ));
     ?>
 
     <?php echo $form->errorSummary($model); ?>
@@ -48,13 +45,11 @@
         <?php echo $form->field($model, 'rr_release_version')->dropDownList(\app\models\ReleaseVersion::forList()); ?>
     </div>
 
-    <div class="row buttons">
-        <button class="btn">
-            <?=$model->isNewRecord ? 'Create' : 'Save'?>
-        </button>
-    </div>
+    <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Save', ['class' => 'btn'])?>
 
-    <?php $form->end(); ?>
+    <?php
+        yii\bootstrap\ActiveForm::end();
+    ?>
 
 </div><!-- form -->
 

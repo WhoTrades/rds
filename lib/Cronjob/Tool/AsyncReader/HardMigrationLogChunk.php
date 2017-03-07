@@ -1,5 +1,7 @@
 <?php
+
 use RdsSystem\Message;
+use app\models\HardMigration;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 
 /**
@@ -45,11 +47,11 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
         $t = microtime(true);
         $sql = "UPDATE ".HardMigration::tableName()." SET migration_log=COALESCE(migration_log, '')||:log WHERE migration_name=:name and migration_environment=:env";
 
-        HardMigration::getDbConnection()->createCommand($sql)->execute([
+        \Yii::$app->db->createCommand($sql, [
             'log' => $message->text,
             'name' => $message->migration,
             'env' => $model->getEnv(),
-        ]);
+        ])->execute();
 
         $id = str_replace("/", "", $message->migration)."_".$model->getEnv();
         $this->debugLogger->message("id=$id");

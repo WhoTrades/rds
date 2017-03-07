@@ -2,7 +2,7 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
-use RdsSystem;
+use yii\data\ActiveDataProvider;
 
 /**
  * This is the model class for table "rds.maintenance_tool".
@@ -56,6 +56,22 @@ class MaintenanceTool extends ActiveRecord
     }
 
     /**
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search(array $params)
+    {
+        $query = self::find()->andWhere(array_filter($params));
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+        $this->load($params, 'search');
+
+        return $dataProvider;
+    }
+
+    /**
      * @return array customized attribute labels (name=>label)
      */
     public function attributeLabels()
@@ -76,17 +92,17 @@ class MaintenanceTool extends ActiveRecord
             return $this->lastRunLocal;
         }
 
-        return $this->lastRunLocal = static::find()->where([
+        return $this->lastRunLocal = MaintenanceToolRun::find()->where([
             'mtr_maintenance_tool_obj_id' => $this->obj_id,
-        ])->orderBy(['obj_id desc'])->one();
+        ])->orderBy('obj_id desc')->one();
     }
 
     public function canBeStarted()
     {
-        return 0 == MaintenanceToolRun::countByAttributes([
+        return 0 == MaintenanceToolRun::find()->where([
             'mtr_maintenance_tool_obj_id' => $this->obj_id,
             'mtr_status' => [MaintenanceToolRun::STATUS_IN_PROGRESS, MaintenanceToolRun::STATUS_NEW],
-        ]);
+        ])->count();
     }
 
     public function canBeKilled()
@@ -122,7 +138,7 @@ class MaintenanceTool extends ActiveRecord
         ];
 
         if ($mtr->save()) {
-            $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
+            $messageModel = (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
             foreach (Worker::find()->all() as $worker) {
                 /** @var $worker Worker */
                 $messageModel->sendMaintenanceToolStart(
@@ -154,7 +170,7 @@ class MaintenanceTool extends ActiveRecord
 
         Log::createLogMessage("Остановлен тул {$this->getTitle()}", $user);
 
-        $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
+        $messageModel = (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel($this->mt_environment);
         foreach (Worker::find()->all() as $worker) {
             /** @var $worker Worker */
             $messageModel->sendUnixSignalToGroup(

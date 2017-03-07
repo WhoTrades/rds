@@ -29,7 +29,7 @@ class WebApplication extends \yii\web\Application
     public function end($status = 0, $exit = true)
     {
         if ($exit) {
-            CoreLight::getInstance()->getFatalWatcher()->stop();
+            \CoreLight::getInstance()->getFatalWatcher()->stop();
         }
     }
 

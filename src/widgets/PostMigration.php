@@ -1,7 +1,7 @@
 <?php
 namespace app\widgets;
 
-use namespace app\models\ReleaseRequest;
+use app\models\ReleaseRequest;
 
 class PostMigration extends \yii\base\Widget
 {
