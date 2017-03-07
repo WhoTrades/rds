@@ -21,7 +21,7 @@ class AlertController extends Controller
     {
         if (!empty($_POST['disable'])) {
             foreach ($_POST['disable'] as $id => $timeout) {
-                $lamp = Lamp::model()->findByPk($id);
+                $lamp = Lamp::findByPk($id);
                 if (!$lamp) {
                     continue;
                 }
@@ -45,7 +45,7 @@ class AlertController extends Controller
 
         if (!empty($_POST['add_receiver'])) {
             foreach ($_POST['add_receiver'] as $id => $phone) {
-                $lamp = Lamp::model()->findByPk($id);
+                $lamp = Lamp::findByPk($id);
                 if (!$lamp) {
                     continue;
                 }
@@ -57,7 +57,7 @@ class AlertController extends Controller
 
         if (!empty($_POST['remove_receiver'])) {
             foreach ($_POST['remove_receiver'] as $id => $phone) {
-                $lamp = Lamp::model()->findByPk($id);
+                $lamp = Lamp::findByPk($id);
                 if (!$lamp) {
                     continue;
                 }
@@ -94,7 +94,7 @@ class AlertController extends Controller
      */
     public function actionGetLampStatusJson($lampName)
     {
-        $lamp = Lamp::model()->findByLampName($lampName);
+        $lamp = Lamp::findByLampName($lampName);
         $result = ['alert' => $lamp->getLampStatus()];
 
         echo json_encode($result, JSON_PRETTY_PRINT);

@@ -84,7 +84,7 @@ class RebuildBranch
         if (!$branches) {
             \Yii::$app->debugLogger->message("No branches, se just create $branch from master branch");
             $model->sendMergeCreateBranch(
-                \Yii::$app->modules['Wtflow']['workerName'],
+                \Yii::$app->modules['Wtflow']->workerName,
                 new Message\Merge\CreateBranch($branch, "master", true)
             );
             return;
@@ -92,16 +92,17 @@ class RebuildBranch
 
 
         $build = new GitBuild();
-        $build->branch = "tmp/build_".uniqid();
+        $build->branch = "tmp/build_" . uniqid();
         $build->status = GitBuild::STATUS_NEW;
         $build->user = $user;
         $build->additional_data = $branch;
+
         $build->save();
 
         \Yii::$app->debugLogger->message("Target branch: $build->branch, sending create branch task");
 
         $model->sendMergeTask(
-            \Yii::$app->modules['Wtflow']['workerName'],
+            \Yii::$app->modules['Wtflow']->workerName,
             new Message\Merge\Task(-1, "master", $build->branch, Message\Merge\Task::MERGE_TYPE_FEATURE)
         );
 
@@ -122,7 +123,7 @@ class RebuildBranch
 
             \Yii::$app->debugLogger->message("Branch: $val, sending merge branch task");
             $model->sendMergeTask(
-                \Yii::$app->modules['Wtflow']['workerName'],
+                \Yii::$app->modules['Wtflow']->workerName,
                 new Message\Merge\Task($build->obj_id, $val, $build->branch, Message\Merge\Task::MERGE_TYPE_BUILD)
             );
         }

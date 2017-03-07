@@ -101,7 +101,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         $receiver = \Config::getInstance()->serviceRds['alerts']['lampOnEmail'];
         $this->sendEmail($subject, $text, $receiver);
 
-        $lamp = Lamp::model()->findByLampName($alertLog->alert_lamp);
+        $lamp = Lamp::findByLampName($alertLog->alert_lamp);
 
         foreach ($lamp->getReceivers() as $phone) {
             $sms = "[ERROR] $alertLog->alert_name";
@@ -121,7 +121,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         $receiver = \Config::getInstance()->serviceRds['alerts']['lampOffEmail'];
         $this->sendEmail($subject, $text, $receiver);
 
-        $lamp = Lamp::model()->findByLampName($alertLog->alert_lamp);
+        $lamp = Lamp::findByLampName($alertLog->alert_lamp);
 
         foreach ($lamp->getReceivers() as $phone) {
             $sms = "[OK] $alertLog->alert_name";

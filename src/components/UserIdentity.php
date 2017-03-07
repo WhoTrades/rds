@@ -21,7 +21,7 @@ class UserIdentity extends CUserIdentity
         $users=array(
             'demo'=>'demo',
             'admin'=>'admin',
-            'yiier'=>\Yii::$app->modules['gii']['password'],
+            'yiier'=>\Yii::$app->modules['gii']->password,
         );
         if(!isset($users[$this->username]))
             $this->errorCode=self::ERROR_USERNAME_INVALID;

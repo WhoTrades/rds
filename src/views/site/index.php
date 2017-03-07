@@ -79,14 +79,15 @@ echo yii\grid\GridView::widget(array(
                     $modal = yii\bootstrap\Modal::begin(array(
                         'id' => 'release-request-form-modal',
                         'header' => 'Запрос релиза',
-                        'toggleButton' => ['label' => 'Собрать ' . $project->project_name, 'class' => 'btn'],
-                        'options' => [
-                            'onclick' => "$('#ReleaseRequest_rr_project_obj_id').val({$project->obj_id});
-                                setTimeout(function(){
-                                    $('#release-request-form-modal .modal-body input:first').focus();
-                                    $('#ReleaseRequest_rr_project_obj_id').change();
-                                }, 500);",
+                        'toggleButton' => [
+                            'label' => 'Собрать ' . $project->project_name, 'class' => 'btn',
+                            'onclick' => "$('#releaserequest-rr_project_obj_id').val({$project->obj_id});
+                            setTimeout(function(){
+                                $('#release-request-form-modal .modal-body input:first').focus();
+                                $('#ReleaseRequest_rr_project_obj_id').change();
+                            }, 500);",
                         ],
+
                     ));
                     echo $this->render('createReleaseRequest', ['model' => $releaseRequest['model']], true);
                     $modal->end();

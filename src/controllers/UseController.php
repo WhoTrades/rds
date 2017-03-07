@@ -2,6 +2,8 @@
 namespace app\controllers;
 
 use app\models\Log;
+use app\models\Project2worker;
+use Cronjob_Tool_AsyncReader_Deploy;
 use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ReleaseRequest;
@@ -101,17 +103,17 @@ class UseController extends Controller
         }
 
         if ($type == 'pre') {
-            $releaseRequest->rr_migration_status = \ReleaseRequest::MIGRATION_STATUS_UPDATING;
+            $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_UPDATING;
             $logMessage = "Запущены pre миграции {$releaseRequest->getTitle()}";
         } else {
-            $releaseRequest->rr_post_migration_status = \ReleaseRequest::MIGRATION_STATUS_UPDATING;
+            $releaseRequest->rr_post_migration_status = ReleaseRequest::MIGRATION_STATUS_UPDATING;
             $logMessage = "Запущены post миграции {$releaseRequest->getTitle()}";
         }
 
         foreach ($releaseRequest->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
             $worker = $p2w->worker;
-            (new RdsSystem\Factory(\Yii::$app->debugLogger))->
+            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->
                 getMessagingRdsMsModel()->
                 sendMigrationTask(
                     $worker->worker_name,
@@ -137,7 +139,7 @@ class UseController extends Controller
      * @param $model
      * @param $releaseRequest
      */
-    private function checkReleaseCode(ReleaseRequest $model, $releaseRequest)
+    private function checkReleaseCode(ReleaseRequest $model, ReleaseRequest $releaseRequest)
     {
         if ($model->rr_project_owner_code == $releaseRequest->rr_project_owner_code) {
             Log::createLogMessage("Введен правильный Project Owner код {$releaseRequest->getTitle()}");
@@ -194,6 +196,7 @@ class UseController extends Controller
             $releaseRequest->save();
             $this->redirect('/');
         }
+
         return $this->render('index', array(
             'model' => $model,
             'releaseRequest' => $releaseRequest,

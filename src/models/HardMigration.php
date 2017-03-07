@@ -156,10 +156,15 @@ class HardMigration extends ActiveRecord
         return $dataProvider;
     }
 
-    public function getNotDoneMigrationCountForTicket($ticket)
+    /**
+     * Возвращает количество не оконченных тяжелых миграция для тикета в Жире
+     * @param string $ticket
+     * @return int
+     */
+    public static function getNotDoneMigrationCountForTicket($ticket)
     {
         return static::find()->where(['migration_ticket' => $ticket])->andWhere([
-            '<>', 'migration_status', self::MIGRATION_STATUS_DONE
+            '<>', 'migration_status', self::MIGRATION_STATUS_DONE,
         ])->count();
     }
 

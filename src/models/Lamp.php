@@ -69,7 +69,7 @@ class Lamp extends ActiveRecord
             'alert_lamp' => $this->lamp_name,
             'alert_status' => AlertLog::STATUS_ERROR,
         ])->andWhere([
-            '<', 'alert_ignore_timeout', date(DATE_ISO8601)
+            '<', 'alert_ignore_timeout', date(DATE_ISO8601),
         ])->orderBy('alert_detect_at DESC')->all();
     }
 
@@ -77,9 +77,9 @@ class Lamp extends ActiveRecord
      * @param string $lampName
      * @return Lamp
      */
-    public function findByLampName($lampName)
+    public static function findByLampName($lampName)
     {
-        return static::model()->findByAttributes(['lamp_name' => $lampName]);
+        return static::findByAttributes(['lamp_name' => $lampName]);
     }
 
     /**
@@ -147,16 +147,5 @@ class Lamp extends ActiveRecord
         $errors = $this->getLampErrors();
 
         return !empty($errors);
-    }
-
-    /**
-     * Returns the static model of the specified AR class.
-     * Please note that you should have this exact method in all your CActiveRecord descendants!
-     * @param string $className active record class name.
-     * @return Lamp the static model class
-     */
-    public static function model($className = __CLASS__)
-    {
-        return parent::model($className);
     }
 }

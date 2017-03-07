@@ -8,6 +8,7 @@ namespace app\controllers;
 
 use app\models\Log;
 use app\models\Project;
+use app\models\Project2worker;
 use app\models\ToolJob;
 use app\models\CpuUsage;
 use yii\web\HttpException;
@@ -181,14 +182,12 @@ class CronjobsController extends Controller
 
         Log::createLogMessage("Убиты процессы с сигналом -$signal: " . json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
 
-        $this->renderPartial('kill', ['result' => $data]);
+        return $this->renderPartial('kill', ['result' => $data]);
     }
 
     /**
      * @param string $key
      * @param string $project
-     *
-     * @throws CException
      */
     public function actionGetInfo($key, $project)
     {
@@ -224,7 +223,7 @@ class CronjobsController extends Controller
             return $a['server'] > $b['server'];
         });
 
-        $this->renderPartial('getInfo', ['result' => $data]);
+        return $this->renderPartial('getInfo', ['result' => $data]);
     }
 
     /**

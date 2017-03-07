@@ -47,7 +47,8 @@ use yii\bootstrap\Html;
             ])?>
         </div>
         <?php if ($stopper) {?>
-            <a href="<?=yii\helpers\Url::to("/cronjobs/start", [
+            <a href="<?=yii\helpers\Url::to([
+                "/cronjobs/start",
                 'key' => $toolJob->key,
                 'projectId' => $Project->obj_id,
             ])?>" class="ajax-url">
