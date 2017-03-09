@@ -19,15 +19,19 @@ class YiiPgq extends PgQ\Cronjob\RequestHandler\Pgq
         parent::__construct($debugLogger);
     }
 
-    /** @return RestorePointInterface */
+    /**
+     * @param string $id
+     * @return RestorePointInterface
+     */
     public function getRestorePoint($id)
     {
         /** @var $db CDbConnection */
         $db = Yii::app()->db;
 
-        return new Composite([
-            new File($this->getPersistentDirectory()),
-            new Postgres($db->connectionString, $db->username, $db->password),
-        ]);
+        $point = new Postgres($db->connectionString, $db->username, $db->password);
+
+        $point->setRestorePointId($id);
+
+        return $point;
     }
 }
