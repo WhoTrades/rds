@@ -175,6 +175,7 @@ class Build extends ActiveRecord
             '~E: Unable to lock the administration directory \(/var/lib/dpkg/\), is another process using it\?~' => "На сервере администратор что-то устанавливает. Пересоберите позже",
             '~ssh: connect to host ([\w-]+.whotrades.net) port 22: Connection timed out~' => "Сервер $1 не отвечает. Обратитесь к администратору<br />$0",
             '~([\w-]+.whotrades.net):.*No space left on device~' => "Закончилось место на <b>$1</b>. Обратитесь к администратору",
+            '~ target=sentry, target=raven, event_id=(\w+)~' => "Sentry <a href='https://sentry.whotrades.com/sentry/{$this->project->project_name}/?query=$1'><b>$1</b></a>.",
         ];
 
         foreach ($regexes as $regex => $text) {
