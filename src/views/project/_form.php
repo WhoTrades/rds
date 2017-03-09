@@ -66,7 +66,7 @@
             измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
     <?php } ?>
     <div class="row buttons" style="margin-bottom: 50px;">
-		<?php echo TbHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+        <?php echo TbHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>
