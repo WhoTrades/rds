@@ -14,7 +14,7 @@
     <?php if (count($model->projectConfigs)) { ?>
         <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над
             измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
-    <? } ?>
+    <?php } ?>
 <?php $form = $this->beginWidget('yiistrap.widgets.TbActiveForm', array(
     'id' => 'project-form',
     'enableAjaxValidation' => false,
@@ -64,7 +64,7 @@
     <?php if (count($model->projectConfigs)) { ?>
         <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над
             измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
-    <? } ?>
+    <?php } ?>
     <div class="row buttons" style="margin-bottom: 50px;">
 		<?php echo TbHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>
