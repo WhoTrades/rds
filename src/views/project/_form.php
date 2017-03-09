@@ -11,7 +11,10 @@
 <link rel="stylesheet" href="/css/codemirror.css">
 
 <div class="form" style="width: 1200px; margin: auto">
-
+    <?php if (count($model->projectConfigs)) { ?>
+        <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над
+            измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
+    <? } ?>
 <?php $form = $this->beginWidget('yiistrap.widgets.TbActiveForm', array(
     'id' => 'project-form',
     'enableAjaxValidation' => false,
@@ -58,9 +61,12 @@
     <?}?>
 
     <br />
-    <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над измененной строкой - причину и авторство")?>
-    <div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+    <?php if (count($model->projectConfigs)) { ?>
+        <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над
+            измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
+    <? } ?>
+    <div class="row buttons" style="margin-bottom: 50px;">
+		<?php echo TbHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

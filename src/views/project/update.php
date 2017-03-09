@@ -18,8 +18,6 @@ $this->menu = array(
 
 <h1>Update Project <?php echo $model->obj_id; ?></h1>
 
-<?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над измененной строкой - причину и авторство")?>
-
 <?php
 if ($deployment_enabled) {
     echo $this->renderPartial('_form', array('model' => $model, 'list' => $list, 'workers' => $workers));
