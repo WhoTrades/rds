@@ -42,3 +42,11 @@ $this->serviceRds['jira']['codeReview'] = [
         '*' => 40,
     ],
 ];
+
+$this->graphiteSystem = array(
+    'host'     => 'graphite.local',
+    'port'     => 8125,
+    'protocol' => 'udp',
+    'env'      => 'prod',
+    'prefix'   => 'rds',
+);
