@@ -227,8 +227,12 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         $controller->setAction($controller->createAction($action));
         \Yii::app()->setController($controller);
 
+        $jira = new JiraApi(Yii::app()->debugLogger);
+        // dg: Эта переменная используется в шаблоне _gitBuildRow.php
+        $jiraBaseUrl = $jira->getJiraUrl();
+
         $filename = \Yii::getPathOfAlias('application.modules.Wtflow.views.gitBuild._gitBuildRow').'.php';
-        $rowTemplate = include($filename);
+        $rowTemplate = require($filename);
         $model = \GitBuild::model();
         $model->obj_id = $gitBuild->obj_id;
         /** @var $widget \CWidget*/
