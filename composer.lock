@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "78275dc241af4330d291797c3798f4bf",
-    "content-hash": "755a8f4e072299ed4f17131fa9113324",
+    "hash": "918a0a3021d8b514a20791ddb587d4b0",
+    "content-hash": "810453b1adb9137654f5048e176f83de",
     "packages": [
         {
             "name": "crisu83/yiistrap",
@@ -319,16 +319,16 @@
         },
         {
             "name": "monolog/monolog",
-            "version": "1.22.0",
+            "version": "1.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "bad29cb8d18ab0315e6c477751418a82c850d558"
+                "reference": "1e044bc4b34e91743943479f1be7a1d5eb93add0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/Seldaek/monolog/bad29cb8d18ab0315e6c477751418a82c850d558",
-                "reference": "bad29cb8d18ab0315e6c477751418a82c850d558",
+                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/Seldaek/monolog/1e044bc4b34e91743943479f1be7a1d5eb93add0",
+                "reference": "1e044bc4b34e91743943479f1be7a1d5eb93add0",
                 "shasum": ""
             },
             "require": {
@@ -392,7 +392,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-11-26 00:15:39"
+            "time": "2017-03-13 07:08:03"
         },
         {
             "name": "php-amqplib/php-amqplib",
@@ -643,21 +643,20 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "1.1.0",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "33fbf98955cdfe34e99fe43ef8bdd874253675dd"
+                "reference": "5bee26136ab3fc166334cd972892bf71bd361558"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/33fbf98955cdfe34e99fe43ef8bdd874253675dd",
-                "reference": "33fbf98955cdfe34e99fe43ef8bdd874253675dd",
+                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/getsentry/sentry-php/5bee26136ab3fc166334cd972892bf71bd361558",
+                "reference": "5bee26136ab3fc166334cd972892bf71bd361558",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
-                "monolog/monolog": "*",
                 "php": ">=5.2.4"
             },
             "conflict": {
@@ -665,7 +664,11 @@
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^1.8.0",
-                "phpunit/phpunit": "^4.6.6"
+                "monolog/monolog": "*",
+                "phpunit/phpunit": "^4.8 || ^5.0"
+            },
+            "suggest": {
+                "monolog/monolog": "Automatically capture Monolog events as breadcrumbs"
             },
             "bin": [
                 "bin/sentry"
@@ -673,7 +676,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "1.6.x-dev"
                 }
             },
             "autoload": {
@@ -681,7 +684,6 @@
                     "Raven_": "lib/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -697,20 +699,20 @@
                 "log",
                 "logging"
             ],
-            "time": "2016-07-30 18:28:24"
+            "time": "2017-02-03 07:32:53"
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "2.8.0",
+            "version": "2.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "86dd55a522238211f9f3631e3361703578941d9a"
+                "reference": "d7cf0d894e8aa4c73712ee4a331cc1eaa37cdc7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/squizlabs/PHP_CodeSniffer/86dd55a522238211f9f3631e3361703578941d9a",
-                "reference": "86dd55a522238211f9f3631e3361703578941d9a",
+                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/squizlabs/PHP_CodeSniffer/d7cf0d894e8aa4c73712ee4a331cc1eaa37cdc7d",
+                "reference": "d7cf0d894e8aa4c73712ee4a331cc1eaa37cdc7d",
                 "shasum": ""
             },
             "require": {
@@ -774,7 +776,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2017-02-02 03:30:00"
+            "time": "2017-03-01 22:17:45"
         },
         {
             "name": "twbs/bootstrap",
@@ -829,16 +831,16 @@
         },
         {
             "name": "whotrades/phpcs-stash",
-            "version": "0.0.17",
+            "version": "0.0.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/phpcs-stash.git",
-                "reference": "15658af837e99d8e7e9e4fdee66bde1b62d4602b"
+                "reference": "ff02ecb57842dbb716c18f7837b7ccf3551cac9e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/WhoTrades/phpcs-stash/15658af837e99d8e7e9e4fdee66bde1b62d4602b",
-                "reference": "15658af837e99d8e7e9e4fdee66bde1b62d4602b",
+                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/WhoTrades/phpcs-stash/ff02ecb57842dbb716c18f7837b7ccf3551cac9e",
+                "reference": "ff02ecb57842dbb716c18f7837b7ccf3551cac9e",
                 "shasum": ""
             },
             "require": {
@@ -854,7 +856,7 @@
                 }
             },
             "description": "Integration between phpcs and atlassian stash",
-            "time": "2017-02-15 16:00:26"
+            "time": "2017-03-14 15:01:07"
         },
         {
             "name": "yiisoft/yii",
