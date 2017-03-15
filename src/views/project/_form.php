@@ -18,6 +18,10 @@ use yii\widgets\ActiveForm;
 <div class="form" style="width: 1200px; margin: auto">
 
     <?php $form = ActiveForm::begin(['id' => 'project-form']) ?>
+        <?php if (count($model->projectConfigs)) { ?>
+            <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над
+                измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
+        <?php } ?>
         <p class="note">Fields with <span class="required">*</span> are required.</p>
         <?= $form->field($model, 'project_name') ?>
         <?= $form->field($model, 'project_notification_email') ?>
@@ -52,6 +56,10 @@ use yii\widgets\ActiveForm;
             <label style="display: inline" for="<?=$id?>"><?=$worker->worker_name?></label>
             <br />
         <?php }?>
+        <?php if (count($model->projectConfigs)) { ?>
+            <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над
+                измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
+        <?php } ?>
         <br />
         <div class="row buttons">
             <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>

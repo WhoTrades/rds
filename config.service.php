@@ -14,11 +14,17 @@ $this->serviceRds['alerts']['lampFromEmail'] = 'rds-lamp@whotrades.org';
 $this->serviceRds['alerts']['lampOnEmail'] = 'oops+lamp-on@whotrades.org';
 $this->serviceRds['alerts']['lampOffEmail'] = 'oops+lamp-off@whotrades.org';
 $this->serviceRds['alerts']['dataProvider'] = [
-    'monitoring' => [
+    'Monitoring' => [
+        'enable' => true,
         'url' => 'https://monitoring.whotrades.net/?json=1',
     ],
-    'monitoringDEV' => [
+    'MonitoringDEV' => [
+        'enable' => true,
         'url' => 'http://monitoring.dev.whotrades.net/?json=1',
+    ],
+    'MonitoringTST' => [
+        'enable' => true,
+        'url' => 'http://monitoring.tst.whotrades.net/?json=1',
     ],
 ];
 
@@ -36,3 +42,11 @@ $this->serviceRds['jira']['codeReview'] = [
         '*' => 40,
     ],
 ];
+
+$this->graphiteSystem = array(
+    'host'     => 'graphite.local',
+    'port'     => 8125,
+    'protocol' => 'udp',
+    'env'      => 'prod',
+    'prefix'   => 'rds',
+);

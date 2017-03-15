@@ -133,7 +133,7 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_Maintenance_MasterTool::getToolCommand(['--max-duration=60'], $verbosity = 1), '* * * * * *', 'rds_master_tool'),
 
             new Comment("Лампа"),
-            new CronCommand(Cronjob_Tool_RdsAlertStatus::getToolCommand([], $verbosity = 1), '10 */2 * * * *', 'rds_alert_status'),
+            new CronCommand(Cronjob_Tool_RdsAlertStatus::getToolCommand([], $verbosity = 1), '*/20 * * * * *', 'rds_alert_status'),
 
             new Comment("Ротация логом тяжелых миграций"),
             new CronCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity = 1), '*/28 * * * * *', 'rds_hard_migration_log_rotator'),
