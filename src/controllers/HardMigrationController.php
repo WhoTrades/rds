@@ -2,8 +2,12 @@
 namespace app\controllers;
 
 use app\models\Log;
+use app\models\Project2worker;
+use HardMigrationBase;
 use yii\web\HttpException;
 use app\models\HardMigration;
+use RdsSystem;
+use Exception;
 
 class HardMigrationController extends Controller
 {
@@ -24,17 +28,26 @@ class HardMigrationController extends Controller
         ];
     }
 
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         $model = new HardMigration(['scenario' => 'search']);
-        if(isset($_GET['HardMigration']))
-            $model->attributes=$_GET['HardMigration'];
+        if (isset($_GET['HardMigration'])) {
+            $model->attributes = $_GET['HardMigration'];
+        }
 
-        return $this->render('index',array(
-            'model'=>$model,
+
+        return $this->render('index', array(
+            'model' => $model,
         ));
     }
 
+    /**
+     * @param int $id
+     * @throws Exception
+     */
     public function actionStart($id)
     {
         $migration = $this->loadModel($id);
@@ -63,6 +76,9 @@ class HardMigrationController extends Controller
         $this->redirect('/hardMigration/index');
     }
 
+    /**
+     * @param int $id
+     */
     public function actionRestart($id)
     {
         $migration = $this->loadModel($id);
@@ -70,6 +86,9 @@ class HardMigrationController extends Controller
         $this->actionStart($id);
     }
 
+    /**
+     * @param int $id
+     */
     public function actionPause($id)
     {
         $migration = $this->loadModel($id);
@@ -77,6 +96,9 @@ class HardMigrationController extends Controller
         $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_PAUSE, HardMigration::MIGRATION_STATUS_PAUSED);
     }
 
+    /**
+     * @param int $id
+     */
     public function actionResume($id)
     {
         $migration = $this->loadModel($id);
@@ -84,6 +106,9 @@ class HardMigrationController extends Controller
         $this->sendUnixSignalAndRedirect($id, HardMigrationBase::SIGNAL_RESUME, HardMigration::MIGRATION_STATUS_IN_PROGRESS);
     }
 
+    /**
+     * @param int $id
+     */
     public function actionStop($id)
     {
         $migration = $this->loadModel($id);
@@ -111,6 +136,10 @@ class HardMigrationController extends Controller
         $this->redirect('/hardMigration/index');
     }
 
+    /**
+     * @param int $id
+     * @return string
+     */
     public function actionLog($id)
     {
         $migration = $this->loadModel($id);
@@ -119,14 +148,17 @@ class HardMigrationController extends Controller
     }
 
     /**
-     * @param $id
+     * @param int $id
      * @return HardMigration
+     * @throws HttpException
      */
     public function loadModel($id)
     {
         $model = HardMigration::findByPk($id);
-        if($model===null)
-            throw new HttpException(404,'The requested page does not exist.');
+        if ($model === null) {
+            throw new HttpException(404, 'The requested page does not exist.');
+        }
+
         return $model;
     }
 }

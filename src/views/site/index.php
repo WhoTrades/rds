@@ -2,7 +2,9 @@
 use app\models\ReleaseReject;
 use app\models\ReleaseRequest;
 use app\models\Project;
+use kartik\grid\GridView;
 use yii\helpers\Html;
+use yii\widgets\Pjax;
 
 /** @var $this yii\web\View */
 /** @var $releaseRejectSearchModel ReleaseReject */
@@ -24,12 +26,11 @@ yii\bootstrap\Modal::begin(array(
 <h1>Запреты релиза</h1>
 <a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>">Создать</a>
 <?php
-\yii\widgets\Pjax::begin(['id' => 'release-reject-grid-pjax-container', 'clientOptions' => ['fragment' => '#release-reject-grid']]);
-echo yii\grid\GridView::widget(array(
-    'id' => 'release-reject-grid',
+\yii\widgets\Pjax::begin(['timeout' => 10000]);
+echo GridView::widget(array(
     'dataProvider' => $releaseRejectSearchModel->search($releaseRejectSearchModel->attributes),
     'filterModel' => $releaseRejectSearchModel,
-    'options' => ['class' => 'table-responsive'],
+    'export' => false,
     'columns' => array(
         'obj_id',
         'obj_created',
@@ -56,7 +57,7 @@ echo yii\grid\GridView::widget(array(
         ),
     ),
 ));
-\yii\widgets\Pjax::end();
+Pjax::end();
 ?>
 <hr />
 <div class="row">
@@ -109,7 +110,8 @@ echo yii\grid\GridView::widget(array(
 
 <div style="clear: both"></div>
 <?php
-\yii\widgets\Pjax::begin(['id' => 'release-request-grid-pjax-container', 'clientOptions' => ['fragment' => '#release-request-grid']]);
+
+\yii\widgets\Pjax::begin(['timeout' => 10000, 'id' => 'release-request-grid-container']);
 echo $this->render('_releaseRequestGrid', [
     'dataProvider'  => $releaseRequestSearchModel->search($releaseRequestSearchModel->attributes),
     'filterModel'   => $releaseRequestSearchModel,
@@ -123,10 +125,7 @@ echo $this->render('_releaseRequestGrid', [
     // А такое случается часто, когда мы заказываем сборку
     // ar: 2 pjax одновременно не выполняются, один из них всегда возвращает "canceled", добавил таймаут - сожалею
     document.onload.push(function(){
-        $.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
-        setTimeout(function(){
-            $.pjax.reload('#release-reject-grid-pjax-container', {fragment: '#release-reject-grid'});
-        }, 500);
+        $.pjax.reload('#release-request-grid-container', {timeout: 10000});
     });
 </script>
 

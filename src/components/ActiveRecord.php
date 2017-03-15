@@ -70,6 +70,11 @@ class ActiveRecord extends \yii\db\ActiveRecord
         return static::find()->where($condition)->all();
     }
 
+    public static function updateByPk($id, $attributes)
+    {
+        return self::updateAll($attributes, ['obj_id' => $id]);
+    }
+
     /**
      * Added for campatibility with yii 1.1
      * @return \yii\db\Connection
@@ -78,4 +83,6 @@ class ActiveRecord extends \yii\db\ActiveRecord
     {
         return static::getDb();
     }
+
+
 }

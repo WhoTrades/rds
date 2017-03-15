@@ -5,17 +5,17 @@
  * @var $filterModel yii\base\Model | null
  */
 
-use yii\grid\GridView;
+use \kartik\grid\GridView;
 
 echo GridView::widget([
-    'id'            => 'release-request-grid',
-    'options'       => ['class' => 'table-responsive'],
-    'dataProvider'  => $dataProvider,
-    'filterModel'   => $filterModel ?? null,
-    'rowOptions'    => function ($model) {
-        return [
-            'class' => 'release-request-' . $model->obj_id . ' release-request-' . $model->rr_status,
-        ];
+    'id'           => 'release-request-grid',
+    'dataProvider' => $dataProvider,
+    'filterModel'  => $filterModel,
+    'columns'      => include('_releaseRequestRow.php'),
+    'responsive'   => true,
+    'hover'        => true,
+    'export'       => false,
+    'rowOptions' => function ($rr, $key, $index) {
+        return ['class' => 'release-request-' . $rr->obj_id . " release-request-" . $rr->rr_status];
     },
-    'columns' => include('_releaseRequestRow.php'),
 ]);

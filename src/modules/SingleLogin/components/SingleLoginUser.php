@@ -19,6 +19,11 @@ class SingleLoginUser implements IdentityInterface
         $this->username = $email;
     }
 
+    public function getPhone()
+    {
+        return $this->data['phone'] ?? null;
+    }
+
     /**
      * @return int
      */

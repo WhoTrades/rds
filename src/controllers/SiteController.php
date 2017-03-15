@@ -8,6 +8,7 @@ use app\models\Log;
 use app\models\Build;
 use app\modules\Wtflow\models\JiraCommit;
 use RdsSystem;
+use Yii;
 
 class SiteController extends Controller
 {
@@ -91,7 +92,7 @@ class SiteController extends Controller
                     // взаимосвязанныъ проектов - нужно подумать как это объединить в целостную систему
 
                     $projectName = $model->project->project_name;
-                    if (in_array($projectName, ['comon', 'whotrades'])
+                    if (in_array($projectName, ['comon'])
                         && ($dictionaryProject = Project::findByAttributes(['project_name' => 'dictionary']))
                         && ($whotradesProject = Project::findByAttributes(['project_name' => 'whotrades']))
                     ) {
@@ -236,6 +237,8 @@ class SiteController extends Controller
 
         Log::createLogMessage("Удален {$model->getTitle()}");
         $model->delete();
+
+        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $transaction->commit();
 
