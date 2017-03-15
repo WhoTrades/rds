@@ -1,5 +1,8 @@
 <?php
-use RedisSystem\IRedisClient;
+use \Cronjob\RestorePoint\RestorePointInterface;
+use \Cronjob\RestorePoint\File;
+use \Cronjob\RestorePoint\Postgres;
+use \Cronjob\RestorePoint\Composite;
 
 class YiiPgq extends PgQ\Cronjob\RequestHandler\Pgq
 {
@@ -16,9 +19,19 @@ class YiiPgq extends PgQ\Cronjob\RequestHandler\Pgq
         parent::__construct($debugLogger);
     }
 
-    /** @return IRedisClient */
-    public function getRedisClient()
+    /**
+     * @param string $id
+     * @return RestorePointInterface
+     */
+    public function getRestorePoint($id)
     {
-        return Yii::app()->redis->getRedisClient();
+        /** @var $db CDbConnection */
+        $db = Yii::app()->db;
+
+        $point = new Postgres($db->connectionString, $db->username, $db->password);
+
+        $point->setRestorePointId($id);
+
+        return $point;
     }
 }
