@@ -45,7 +45,7 @@ class Cronjob_Tool_BitBucket2Graphite extends Cronjob\Tool\ToolBase
         $count = $stash->getPullRequestOpenCount($project, $repo);
 
         /* @var $graphite \GraphiteSystem\Graphite */
-        $graphite = \Yii::app()->graphite->getGraphite();
+        $graphite = \Yii::$app->graphite->getGraphite();
         $graphite->gauge(\GraphiteSystem\Metrics::dynamicName(\GraphiteSystem\Metrics::GIT_PULL_REQUEST___GAUGE, [$project, $repo]), $count);
 
         return 0;

@@ -81,7 +81,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
             return;
         }
 
-        $sql = "UPDATE ".MaintenanceToolRun::tableName()." SET mtr_log=COALESCE(mtr_log, '')||:log WHERE obj_id=:id";
+        $sql = "UPDATE " . MaintenanceToolRun::tableName() . " SET mtr_log=COALESCE(mtr_log, '')||:log WHERE obj_id=:id";
 
         \Yii::$app->db->createCommand($sql, [
             'id' => $message->id,

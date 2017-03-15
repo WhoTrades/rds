@@ -140,9 +140,11 @@ class WorkerController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Worker::findByPk($id);
-		if($model===null)
-			throw new HttpException(404, 'The requested page does not exist.');
+		$model = Worker::findByPk($id);
+		if ($model === null) {
+            throw new HttpException(404, 'The requested page does not exist.');
+        }
+
 		return $model;
 	}
 }

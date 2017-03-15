@@ -94,42 +94,45 @@ class BuildController extends Controller
         }
     }
 
-	/**
-	 * Lists all models.
-	 */
-	public function actionIndex()
-	{
+    /**
+     * Lists all models.
+     */
+    public function actionIndex()
+    {
         return $this->actionAdmin();
-	}
+    }
 
-	/**
-	 * Manages all models.
-	 */
-	public function actionAdmin()
-	{
-		$model = new Build(['scenario' => 'search']);
-		if(isset($_GET['Build']))
-			$model->attributes=$_GET['Build'];
+    /**
+     * Manages all models.
+     */
+    public function actionAdmin()
+    {
+        $model = new Build(['scenario' => 'search']);
+        if (isset($_GET['Build'])) {
+            $model->attributes = $_GET['Build'];
+        }
 
-        return $this->render('admin',array(
-			'model'=>$model,
-		));
-	}
+        return $this->render('admin', array(
+            'model' => $model,
+        ));
+    }
 
-	/**
-	 * Returns the data model based on the primary key given in the GET variable.
-	 * If the data model is not found, an HTTP exception will be raised.
-	 * @param integer $id the ID of the model to be loaded
-	 * @return Build the loaded model
-	 * @throws HttpException
-	 */
-	public function loadModel($id)
-	{
-		$model=Build::findByPk($id);
-		if($model===null)
-			throw new HttpException(404,'The requested page does not exist.');
-		return $model;
-	}
+    /**
+     * Returns the data model based on the primary key given in the GET variable.
+     * If the data model is not found, an HTTP exception will be raised.
+     * @param integer $id the ID of the model to be loaded
+     * @return Build the loaded model
+     * @throws HttpException
+     */
+    public function loadModel($id)
+    {
+        $model = Build::findByPk($id);
+        if ($model === null) {
+            throw new HttpException(404, 'The requested page does not exist.');
+        }
+
+        return $model;
+    }
 
     public function cliColorsToHtml($text)
     {
@@ -162,10 +165,11 @@ class BuildController extends Controller
         $backgroundColors['lightgray'] = '47';
         $temp = $foregroundColors;
         foreach ($temp as $key => $val) {
-            $foregroundColors[$key." "] = "0$val";
+            $foregroundColors[$key . " "] = "0$val";
         }
-        $text = preg_replace_callback("~\e\[([\d;]+)m~",
-            function ($mathes) use ($foregroundColors, $backgroundColors)  {
+        $text = preg_replace_callback(
+            "~\e\[([\d;]+)m~",
+            function ($mathes) use ($foregroundColors, $backgroundColors) {
                 $defaultBackgroundColor = "transparent";
                 $defaultTextColor = "inherit";
                 if (false !== $color = array_search($mathes[1], $foregroundColors)) {
@@ -180,24 +184,27 @@ class BuildController extends Controller
 
                 $textColor = $defaultTextColor;
                 foreach ($foregroundColors as $code => $color) {
-                    $list = explode(";",$color);
+                    $list = explode(";", $color);
                     if ($list[0] == $foreground) {
                         $textColor = $code;
                         break;
                     }
                 }
 
-                $backgroundColor = array_search($background, $backgroundColors) ;
+                $backgroundColor = array_search($background, $backgroundColors);
                 $backgroundColor = $backgroundColor === false ? $defaultBackgroundColor : $backgroundColor;
 
                 if ($backgroundColor == $defaultBackgroundColor && $textColor == $defaultTextColor) {
                     return "</font><font style='color: $defaultTextColor; background-color: $defaultBackgroundColor'>";
                 }
+
                 return "</font><font style='color: $textColor; background-color: $backgroundColor'>";
-            }, $text);
+            },
+            $text
+        );
 
         $text = str_replace("\e[m", "</font>", $text);
 
-        return "<div style='background: black; color: #AAAAAA'>".nl2br($text)."</div>";
+        return "<div style='background: black; color: #AAAAAA'>" . nl2br($text) . "</div>";
     }
 }

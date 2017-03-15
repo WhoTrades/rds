@@ -26,7 +26,7 @@ class YiiPgq extends PgQ\Cronjob\RequestHandler\Pgq
     public function getRestorePoint($id)
     {
         /** @var $db CDbConnection */
-        $db = Yii::app()->db;
+        $db = Yii::$app->db;
 
         $point = new Postgres($db->connectionString, $db->username, $db->password);
 

@@ -143,9 +143,11 @@ class Project2workerController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Project2worker::findByPk($id);
-		if($model===null)
-			throw new HttpException(404,'The requested page does not exist.');
+		$model = Project2worker::findByPk($id);
+		if ($model===null) {
+            throw new HttpException(404, 'The requested page does not exist.');
+        }
+
 		return $model;
 	}
 }

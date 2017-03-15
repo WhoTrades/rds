@@ -63,7 +63,7 @@ class RebuildBranch
 
         $jira = new JiraApi(\Yii::$app->debugLogger);
 
-        $jql = "status IN (\"".implode('", "', $map[$branch])."\") AND project IN (".implode(", ", \Yii::$app->params['jiraProjects']).") ORDER BY updated ASC";
+        $jql = "status IN (\"" . implode('", "', $map[$branch]) . "\") AND project IN (" . implode(", ", \Yii::$app->params['jiraProjects']) . ") ORDER BY updated ASC";
         \Yii::$app->debugLogger->message("Getting tickets by jql=$jql");
 
         $tickets = $jira->getTicketsByJql($jql);
@@ -79,7 +79,7 @@ class RebuildBranch
             $branches[] = "feature/{$ticket['key']}";
         }
 
-        \Yii::$app->debugLogger->message("Branches: ".implode(", ", $branches));
+        \Yii::$app->debugLogger->message("Branches: " . implode(", ", $branches));
 
         if (!$branches) {
             \Yii::$app->debugLogger->message("No branches, se just create $branch from master branch");

@@ -45,7 +45,7 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
     public function actionProcessHardMigrationLogChunk(Message\HardMigrationLogChunk $message, MessagingRdsMs $model)
     {
         $t = microtime(true);
-        $sql = "UPDATE ".HardMigration::tableName()." SET migration_log=COALESCE(migration_log, '')||:log WHERE migration_name=:name and migration_environment=:env";
+        $sql = "UPDATE " . HardMigration::tableName() . " SET migration_log=COALESCE(migration_log, '')||:log WHERE migration_name=:name and migration_environment=:env";
 
         \Yii::$app->db->createCommand($sql, [
             'log' => $message->text,
@@ -53,16 +53,16 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
             'env' => $model->getEnv(),
         ])->execute();
 
-        $id = str_replace("/", "", $message->migration)."_".$model->getEnv();
+        $id = str_replace("/", "", $message->migration) . "_" . $model->getEnv();
         $this->debugLogger->message("id=$id");
 
-        //an: Максимальный размер пакета, который умещается в comet - 8KB. Потому и нам нужно разбивать
+        // an: Максимальный размер пакета, который умещается в comet - 8KB. Потому и нам нужно разбивать
         foreach (str_split($message->text, self::MAX_TEXT_SIZE) as $chunk) {
             Yii::$app->webSockets->send("migrationLogChunk_$id", ['text' => $chunk]);
         }
 
         $message->accepted();
 
-        $this->debugLogger->message("Executing log chunk got ".sprintf("%.2f", 1000 * (microtime(true) - $t))." ms");
+        $this->debugLogger->message("Executing log chunk got " . sprintf("%.2f", 1000 * (microtime(true) - $t)) . " ms");
     }
 }
