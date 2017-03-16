@@ -4,6 +4,26 @@
  * Настройки cron jobs проекта rds
  */
 
+use app\modules\Wtflow\Cronjob\Tool\Git\RebuildBranch;
+use app\modules\Wtflow\Cronjob\Tool\GitDropFeatureBranch;
+use app\modules\Wtflow\Cronjob\Tool\Jira\CloseFeatures;
+use app\modules\Wtflow\Cronjob\Tool\Jira\CodeReview;
+use app\modules\Wtflow\Cronjob\Tool\Jira\FixVersionsRelease;
+use app\modules\Wtflow\Cronjob\Tool\Jira\HardMigrationNotifier;
+use app\modules\Wtflow\Cronjob\Tool\Jira\MergeTasks;
+use app\modules\Wtflow\Cronjob\Tool\TeamCityCheckQueuedTasks;
+use app\modules\Wtflow\PgQ\EventProcessor\JiraAsyncRpc;
+use app\modules\Wtflow\PgQ\EventProcessor\JiraMoveTicket;
+use app\modules\Wtflow\PgQ\EventProcessor\PhpCsStashIntegration;
+use app\modules\Wtflow\PgQ\EventProcessor\ProcessCreatePullRequest;
+use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraCommit;
+use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraCreateVersion;
+use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraNotificationQueue;
+use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraTicketStatus;
+use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraUse;
+use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraUseExternalNotifier;
+use app\modules\Wtflow\PgQ\EventProcessor\RdsTeamCityBuildComplete;
+use app\modules\Wtflow\PgQ\EventProcessor\RdsTeamCityRunTest;
 use \Cronjob\ConfigGenerator;
 use \Cronjob\ConfigGenerator\Comment;
 use \Cronjob\ConfigGenerator\MultiCronCommand;
@@ -32,32 +52,32 @@ class ServiceRdsProdTL1
         return [
             new Comment("JIRA integration"),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsJiraCreateVersion::getPgqConsumer('rds_jira_create_version', 'rds_jira_create_version_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                RdsJiraCreateVersion::getPgqConsumer('rds_jira_create_version', 'rds_jira_create_version_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_create_version'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_PhpCsStashIntegration::getPgqConsumer('rds_stash_phpcs_integration', 'rds_stash_phpcs_integration_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                PhpCsStashIntegration::getPgqConsumer('rds_stash_phpcs_integration', 'rds_stash_phpcs_integration_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_stash_phpcs_integration'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsJiraCommit::getPgqConsumer('rds_jira_commit', 'rds_jira_commit_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                RdsJiraCommit::getPgqConsumer('rds_jira_commit', 'rds_jira_commit_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_commit'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsJiraTicketStatus::getPgqConsumer('rds_jira_commit', 'rds_jira_ticket_status_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                RdsJiraTicketStatus::getPgqConsumer('rds_jira_commit', 'rds_jira_ticket_status_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_commit-ticket_status'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsJiraUse::getPgqConsumer('rds_jira_use', 'rds_jira_use_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                RdsJiraUse::getPgqConsumer('rds_jira_use', 'rds_jira_use_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_use'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsJiraUseExternalNotifier::getPgqConsumer('rds_jira_use', 'rds_jira_use_external_notifier_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                RdsJiraUseExternalNotifier::getPgqConsumer('rds_jira_use', 'rds_jira_use_external_notifier_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_use_external_notifier_consumer'
             ),
@@ -75,38 +95,38 @@ class ServiceRdsProdTL1
                 'rds_jira_use_sentry_after_use_errors_notification_consumer'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_JiraMoveTicket::getPgqConsumer('rds_jira_move_ticket', 'rds_jira_move_ticket_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                JiraMoveTicket::getPgqConsumer('rds_jira_move_ticket', 'rds_jira_move_ticket_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_move_ticket'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_JiraAsyncRpc::getPgqConsumer('rds_jira_async_rpc', 'rds_jira_async_rpc_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                JiraAsyncRpc::getPgqConsumer('rds_jira_async_rpc', 'rds_jira_async_rpc_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_async_rpc'
             ),
 
-            new CronCommand(Cronjob_Tool_Jira_FixVersionsRelease::getToolCommand([], $verbosity = 1), '46 10 * * * *', 'rds_jira_fix_versions_release'),
-            new CronCommand(Cronjob_Tool_Jira_MergeTasks::getToolCommand(['--max-duration=60'], $verbosity = 1), '*/6 * * * * *', 'rds_jira_merge_tasks'),
-            new CronCommand(Cronjob_Tool_Jira_CloseFeatures::getToolCommand([], $verbosity = 1), '32 10 * * * *', 'rds_jira_close_features'),
-            new CronCommand(Cronjob_Tool_Jira_CodeReview::getToolCommand([], $verbosity = 3), '25 * * * * *', 'rds_jira_code_review'),
-            new CronCommand(Cronjob_Tool_Jira_HardMigrationNotifier::getToolCommand([], $verbosity = 1), '21 10 4 * * *', 'rds_jira_hard_migration_notifier'),
+            new CronCommand(FixVersionsRelease::getToolCommand([], $verbosity = 1), '46 10 * * * *', 'rds_jira_fix_versions_release'),
+            new CronCommand(MergeTasks::getToolCommand(['--max-duration=60'], $verbosity = 1), '*/6 * * * * *', 'rds_jira_merge_tasks'),
+            new CronCommand(CloseFeatures::getToolCommand([], $verbosity = 1), '32 10 * * * *', 'rds_jira_close_features'),
+            new CronCommand(CodeReview::getToolCommand([], $verbosity = 3), '25 * * * * *', 'rds_jira_code_review'),
+            new CronCommand(HardMigrationNotifier::getToolCommand([], $verbosity = 1), '21 10 4 * * *', 'rds_jira_hard_migration_notifier'),
 
             new Comment("TeamCity integration"),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsTeamCityRunTest::getPgqConsumer('rds_teamcity_run_test', 'rds_teamcity_run_test_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                RdsTeamCityRunTest::getPgqConsumer('rds_teamcity_run_test', 'rds_teamcity_run_test_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_teamcity_run_test'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsTeamCityBuildComplete::getPgqConsumer('rds_teamcity_build_complete', 'rds_teamcity_build_complete_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                RdsTeamCityBuildComplete::getPgqConsumer('rds_teamcity_build_complete', 'rds_teamcity_build_complete_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_teamcity_build_complete'
             ),
-            new CronCommand(Cronjob_Tool_TeamCityCheckQueuedTasks::getToolCommand([], $verbosity = 1), '28 * * * * *', 'rds_team_city_check_queued_tasks'),
+            new CronCommand(TeamCityCheckQueuedTasks::getToolCommand([], $verbosity = 1), '28 * * * * *', 'rds_team_city_check_queued_tasks'),
 
             new Comment("Stash integration"),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_ProcessCreatePullRequest::getPgqConsumer('rds_create_pull_request', 'rds_create_pull_request_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                ProcessCreatePullRequest::getPgqConsumer('rds_create_pull_request', 'rds_create_pull_request_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_create_pull_request'
             ),
@@ -139,18 +159,18 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity = 1), '*/28 * * * * *', 'rds_hard_migration_log_rotator'),
 
             new Comment("Удаление старых веток из git"),
-            new CronCommand(Cronjob_Tool_GitDropFeatureBranch::getToolCommand([], $verbosity = 3), '37 10 20 * * *', 'rds_git_drop_feature_branch'),
+            new CronCommand(GitDropFeatureBranch::getToolCommand([], $verbosity = 3), '37 10 20 * * *', 'rds_git_drop_feature_branch'),
 
             new Comment("Уведомления о релизах"),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_RdsJiraNotificationQueue::getPgqConsumer('rds_jira_notification_queue', 'rds_jira_notification_queue_consumer', 'simple', 'DSN_DB4', 1, [], 3),
+                RdsJiraNotificationQueue::getPgqConsumer('rds_jira_notification_queue', 'rds_jira_notification_queue_consumer', 'simple', 'DSN_DB4', 1, [], 3),
                 '* * * * * *',
                 'rds_jira_notification_queue'
             ),
 
             new Comment("Пересборка веток"),
-            new CronCommand(Cronjob_Tool_Git_RebuildBranch::getToolCommand(['--branch=develop'], $verbosity = 3), '39 10 20 * * *', 'rds_rebuild_develop'),
-            new CronCommand(Cronjob_Tool_Git_RebuildBranch::getToolCommand(['--branch=staging'], $verbosity = 3), '39 30 20 * * *', 'rds_rebuild_staging'),
+            new CronCommand(RebuildBranch::getToolCommand(['--branch=develop'], $verbosity = 3), '39 10 20 * * *', 'rds_rebuild_develop'),
+            new CronCommand(RebuildBranch::getToolCommand(['--branch=staging'], $verbosity = 3), '39 30 20 * * *', 'rds_rebuild_staging'),
         ];
     }
 
