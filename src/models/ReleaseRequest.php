@@ -4,6 +4,7 @@ namespace app\models;
 use yii\data\Sort;
 use app\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.release_request".
@@ -129,9 +130,14 @@ class ReleaseRequest extends ActiveRecord
         }
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public static function find()
     {
-        return parent::find()->andWhere(['obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE]);
+        return parent::find()->andWhere([
+            'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
+        ]);
     }
 
     /**

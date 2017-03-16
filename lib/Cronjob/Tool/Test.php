@@ -3,6 +3,7 @@
  * @example dev/services/rds/misc/tools/runner.php --tool=Test -vv
  */
 
+use app\models\ReleaseRequest;
 use RdsSystem\Message;
 
 class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
