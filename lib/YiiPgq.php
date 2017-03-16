@@ -1,8 +1,7 @@
 <?php
 use \Cronjob\RestorePoint\RestorePointInterface;
-use \Cronjob\RestorePoint\File;
 use \Cronjob\RestorePoint\Postgres;
-use \Cronjob\RestorePoint\Composite;
+use yii\db\Connection;
 
 class YiiPgq extends PgQ\Cronjob\RequestHandler\Pgq
 {
@@ -25,10 +24,10 @@ class YiiPgq extends PgQ\Cronjob\RequestHandler\Pgq
      */
     public function getRestorePoint($id)
     {
-        /** @var $db CDbConnection */
+        /** @var $db Connection */
         $db = Yii::$app->db;
 
-        $point = new Postgres($db->connectionString, $db->username, $db->password);
+        $point = new Postgres($db->dsn, $db->username, $db->password);
 
         $point->setRestorePointId($id);
 
