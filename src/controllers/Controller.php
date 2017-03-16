@@ -34,7 +34,7 @@ class Controller extends ControllerBase
             $methodName = 'action' . str_replace(' ', '', ucwords(implode(' ', explode('-', $id))));
             if (method_exists($this, $methodName)) {
                 $method = new \ReflectionMethod($this, $methodName);
-                if ($method->isPublic() && $method->getName() === $methodName) {
+                if ($method->isPublic() && strtolower($method->getName()) == strtolower($methodName)) {
                     return new InlineAction($id, $this, $methodName);
                 }
             }
