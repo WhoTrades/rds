@@ -5,6 +5,7 @@
 
 use app\models\ReleaseRequest;
 use RdsSystem\Message;
+use yii\helpers\Url;
 
 class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
 {
@@ -26,15 +27,6 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $id = 290;
-        if (!$releaseRequest = ReleaseRequest::findByPk($id)) {
-            return;
-        }
-
-        $html = \Yii::$app->view->renderFile('@app/views/site/_releaseRequestGrid.php', [
-            'dataProvider' => $releaseRequest->search(['obj_id' => $id]),
-        ]);
-
-        echo $html;
+        $this->debugLogger->message(Url::to(['build/view', 'id' => 12], true));
     }
 }
