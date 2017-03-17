@@ -78,7 +78,7 @@ class Build extends ActiveRecord
 
     public function getReleaseRequest()
     {
-        return ReleaseRequest::find()->where(['obj_id' => $this->build_release_request_obj_id])->one();
+        return $this->hasOne(ReleaseRequest::className(), ['obj_id' => 'build_release_request_obj_id']);
     }
 
     /**

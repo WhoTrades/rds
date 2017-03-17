@@ -48,7 +48,7 @@ class ProjectConfigHistory extends ActiveRecord
 
     public function getProject()
     {
-        return Project::findByPk($this->pch_project_obj_id);
+        return $this->hasOne(Project::className(), ['obj_id' => 'pch_project_obj_id']);
     }
 
     public function search(array $params, $id = null)

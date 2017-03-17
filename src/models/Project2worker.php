@@ -43,12 +43,12 @@ class Project2worker extends ActiveRecord
 
     public function getWorker()
     {
-        return Worker::findByPk($this->worker_obj_id);
+        return $this->hasOne(Worker::className(), ['obj_id' => 'worker_obj_id']);
     }
 
     public function getProject()
     {
-        return Worker::findByPk($this->project_obj_id);
+        return $this->hasOne(Project::className(), ['obj_id' => 'project_obj_id']);
     }
 
     /**
