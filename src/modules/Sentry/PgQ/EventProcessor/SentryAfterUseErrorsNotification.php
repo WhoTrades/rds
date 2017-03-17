@@ -7,8 +7,14 @@
    --queue-name=rds_jira_use --consumer-name=sentry_after_use_errors_notification_consumer --partition=1 --dsn-name=DSN_DB4 --strategy=simple+retry -vvv \
    process_queue
  */
+namespace app\modules\Sentry\PgQ\EventProcessor;
 
-class PgQ_EventProcessor_SentryAfterUseErrorsNotification extends app\components\RdsEventProcessorBase
+use app\components\RdsEventProcessorBase;
+use ApplicationException;
+use PgQ;
+use ServiceBase\HttpRequest\Exception\ResponseCode;
+
+class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
 {
     const SENTRY_WAIT_RETRY_TIMEOUT = 60;
     const INTERVAL_FROM_USE = 600;
@@ -54,7 +60,7 @@ class PgQ_EventProcessor_SentryAfterUseErrorsNotification extends app\components
         $api = new \CompanyInfrastructure\SentryApi($this->debugLogger, $url);
         try {
             $errors = iterator_to_array($api->getNewFatalErrorsIterator('sentry', $project, $buildVersion));
-        } catch (ServiceBase\HttpRequest\Exception\ResponseCode $e) {
+        } catch (ResponseCode $e) {
             if ($e->getHttpCode() == 404 && $e->getResponse() == '{"detail": ""}') {
                 $this->debugLogger->warning("Project $project not integrated with sentry");
 

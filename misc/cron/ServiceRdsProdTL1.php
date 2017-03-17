@@ -4,6 +4,7 @@
  * Настройки cron jobs проекта rds
  */
 
+use app\modules\Sentry\PgQ\EventProcessor\SentryAfterUseErrorsNotification;
 use app\modules\Wtflow\Cronjob\Tool\Git\RebuildBranch;
 use app\modules\Wtflow\Cronjob\Tool\GitDropFeatureBranch;
 use app\modules\Wtflow\Cronjob\Tool\Jira\CloseFeatures;
@@ -24,11 +25,10 @@ use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraUse;
 use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraUseExternalNotifier;
 use app\modules\Wtflow\PgQ\EventProcessor\RdsTeamCityBuildComplete;
 use app\modules\Wtflow\PgQ\EventProcessor\RdsTeamCityRunTest;
-use \Cronjob\ConfigGenerator;
-use \Cronjob\ConfigGenerator\Comment;
-use \Cronjob\ConfigGenerator\MultiCronCommand;
-use \Cronjob\ConfigGenerator\CronCommand;
-use \Cronjob\ConfigGenerator\MultiCommandToCron;
+use Cronjob\ConfigGenerator\Comment;
+use Cronjob\ConfigGenerator\MultiCronCommand;
+use Cronjob\ConfigGenerator\CronCommand;
+use Cronjob\ConfigGenerator\MultiCommandToCron;
 
 /** @example sphp dev/services/rds/misc/tools/runner.php --tool=CodeGenerate_CronjobGenerator -vv --project=service-rds --env=prod --server=1 */
 class ServiceRdsProdTL1
@@ -82,7 +82,7 @@ class ServiceRdsProdTL1
                 'rds_jira_use_external_notifier_consumer'
             ),
             new MultiCommandToCron(
-                \PgQ_EventProcessor_SentryAfterUseErrorsNotification::getPgqConsumer(
+                SentryAfterUseErrorsNotification::getPgqConsumer(
                     'rds_jira_use',
                     'sentry_after_use_errors_notification_consumer',
                     'simple',

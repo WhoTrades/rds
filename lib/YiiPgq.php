@@ -33,4 +33,15 @@ class YiiPgq extends PgQ\Cronjob\RequestHandler\Pgq
 
         return $point;
     }
+
+    /**
+     * Возвращает имя класса обработчика событий по названию обработчика из консольной команды
+     * @param string $eventProcessorName
+     *
+     * @return string
+     */
+    protected function getEventProcessorClassName($eventProcessorName)
+    {
+        return $eventProcessorName;
+    }
 }
