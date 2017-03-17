@@ -9,6 +9,8 @@
 
 namespace app\components\AlertLog;
 
+use app\models\AlertLog;
+
 class MonitoringDataProvider implements IAlertDataProvider
 {
     const TIMEOUT = 60;
@@ -86,9 +88,9 @@ class MonitoringDataProvider implements IAlertDataProvider
             foreach ($data as $group => $list) {
                 foreach ($list as $name => $val) {
                     if (empty($val['checkResult'])) {
-                        $status = \AlertLog::STATUS_OK;
+                        $status = AlertLog::STATUS_OK;
                     } else {
-                        $status = \AlertLog::STATUS_ERROR;
+                        $status = AlertLog::STATUS_ERROR;
                     }
                     $text = "url: {$val['link']}";
 
