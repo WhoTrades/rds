@@ -3,6 +3,7 @@ namespace app\controllers;
 
 use app\models\Project;
 use app\models\ToolJob;
+use yii\base\Module;
 use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ToolJobStopped;
@@ -16,6 +17,18 @@ use app\modules\Wtflow\components\JiraApi;
 
 class JsonController extends Controller
 {
+    /**
+     * JsonController constructor.
+     * @param string $id
+     * @param Module $module
+     * @param array $config
+     */
+    public function __construct($id, Module $module, array $config = [])
+    {
+        $this->enableCsrfValidation = false;
+        parent::__construct($id, $module, $config);
+    }
+
     public function actionGetReleaseRequests($project)
     {
         /** @var $Project Project */
