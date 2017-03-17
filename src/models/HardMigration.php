@@ -64,14 +64,14 @@ class HardMigration extends ActiveRecord
             array(['obj_status_did'], 'number'),
             array(['migration_progress'], 'number'),
             array(['migration_name'], 'checkMigrationNameIsUnique'),
-            array(['migration_type, migration_ticket, migration_status'], 'string', 'max' => 16),
-            array(['migration_name, migration_progress_action'], 'string', 'max' => 255),
-            array(['migration_release_request_obj_id, migration_project_obj_id, migration_retry_count'], 'safe'),
+            array(['migration_type', 'migration_ticket', 'migration_status'], 'string', 'max' => 16),
+            array(['migration_name', 'migration_progress_action'], 'string', 'max' => 255),
+            array(['migration_release_request_obj_id', 'migration_project_obj_id', 'migration_retry_count'], 'safe'),
             array(
                 [
-                    'obj_id, obj_created, obj_modified, obj_status_did, migration_release_request_obj_id, migration_project_obj_id,
-                    migration_type, migration_name, migration_ticket, migration_status, migration_retry_count, migration_progress,
-                    migration_progress_action, project_obj_id, build_version, migration_environment',
+                    'obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'migration_release_request_obj_id', 'migration_project_obj_id',
+                    'migration_type', 'migration_name', 'migration_ticket', 'migration_status', 'migration_retry_count', 'migration_progress',
+                    'migration_progress_action', 'project_obj_id', 'build_version', 'migration_environment',
                 ],
                 'safe',
                 'on' => 'search',
@@ -96,7 +96,7 @@ class HardMigration extends ActiveRecord
     }
 
     /**
-     * @return Project
+     * @return \yii\db\ActiveQuery
      */
     public function getProject()
     {
@@ -104,7 +104,7 @@ class HardMigration extends ActiveRecord
     }
 
     /**
-     * @return ReleaseRequest
+     * @return \yii\db\ActiveQuery
      */
     public function getReleaseRequest()
     {
