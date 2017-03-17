@@ -32,8 +32,8 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readHardMigrationLogChunk(false, function(Message\HardMigrationLogChunk $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received next log chunk: ".json_encode($message));
+        $model->readHardMigrationLogChunk(false, function (Message\HardMigrationLogChunk $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received next log chunk: " . json_encode($message));
             $this->actionProcessHardMigrationLogChunk($message, $model);
         });
 
@@ -41,7 +41,10 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
         $this->waitForMessages($model, $cronJob);
     }
 
-
+    /**
+     * @param Message\HardMigrationLogChunk $message
+     * @param MessagingRdsMs $model
+     */
     public function actionProcessHardMigrationLogChunk(Message\HardMigrationLogChunk $message, MessagingRdsMs $model)
     {
         $t = microtime(true);

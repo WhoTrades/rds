@@ -8,11 +8,17 @@ class Cronjob_Tool_HardMigrationLogRotator extends \Cronjob\Tool\ToolBase
 {
     const MIGRATION_LOG_MAX_SIZE = 100000;  //an: после этого значения мы будем просто обрезать лог
 
+    /**
+     * @return array
+     */
     public static function getCommandLineSpec()
     {
         return [];
     }
 
+    /**
+     * @param \Cronjob\ICronjob $cronJob
+     */
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $this->debugLogger->message("Starting log rotation");

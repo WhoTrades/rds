@@ -1,5 +1,6 @@
 <?php
 
+use app\modules\Wtflow\components\JiraApi;
 use yii\helpers\Url;
 use RdsSystem\Message;
 use app\models\HardMigration;
@@ -50,6 +51,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         if (!$migration) {
             $this->debugLogger->error("Can't find migration $message->migration, environment={$model->getEnv()}");
             $message->accepted();
+
             return;
         }
 
@@ -65,10 +67,18 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
                         //an: Это означает что миграцию пытались запустить, но миграция оказалась ещё не готова к запуску. Просто ничего не делаем
                         break;
                     case HardMigration::MIGRATION_STATUS_IN_PROGRESS:
-                        $jira->addCommentOrAppendMyComment($migration->migration_ticket, date("d.m.Y H:i").": "."Запущена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                        $jira->addCommentOrAppendMyComment(
+                            $migration->migration_ticket,
+                            date("d.m.Y H:i") . ": " . "Запущена миграция $message->migration. Лог миграции: " .
+                                $this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])
+                        );
                         break;
                     case HardMigration::MIGRATION_STATUS_DONE:
-                        $jira->addCommentOrAppendMyComment($migration->migration_ticket, date("d.m.Y H:i").": "."Выполнена миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                        $jira->addCommentOrAppendMyComment(
+                            $migration->migration_ticket,
+                            date("d.m.Y H:i") . ": " . "Выполнена миграция $message->migration. Лог миграции: " .
+                                $this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])
+                        );
 
                         $jiraMove = new JiraMoveTicket();
                         $jiraMove->attributes = [
@@ -79,15 +89,23 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
                         $this->debugLogger->message("Adding ticket {$migration->migration_ticket} for moving up");
 
                         if (!$jiraMove->save()) {
-                            $this->debugLogger->error("Can't save JiraMoveTicket, errors: ".json_encode($jiraMove->errors));
+                            $this->debugLogger->error("Can't save JiraMoveTicket, errors: " . json_encode($jiraMove->errors));
                         }
 
                         break;
                     case HardMigration::MIGRATION_STATUS_FAILED:
-                        $jira->addCommentOrAppendMyComment($migration->migration_ticket, date("d.m.Y H:i").": "."Завершилась с ошибкой миграция $message->migration. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                        $jira->addCommentOrAppendMyComment(
+                            $migration->migration_ticket,
+                            date("d.m.Y H:i") . ": " . "Завершилась с ошибкой миграция $message->migration. Лог миграции: " .
+                                $this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])
+                        );
                         break;
                     default:
-                        $jira->addCommentOrAppendMyComment($migration->migration_ticket, date("d.m.Y H:i").": "."Статус миграции $message->migration изменился на $message->status. Лог миграции: ".$this->createUrl('/hardMigration/log', ['id' => $migration->obj_id]));
+                        $jira->addCommentOrAppendMyComment(
+                            $migration->migration_ticket,
+                            date("d.m.Y H:i") . ": " . "Статус миграции $message->migration изменился на $message->status. Лог миграции: " .
+                                $this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])
+                        );
                         break;
                 }
             }

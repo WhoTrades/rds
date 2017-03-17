@@ -692,7 +692,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $numbersOfCurrent = explode(".", $project->project_current_version);
 
             if ($numbersOfCurrent[0] - 1 > $numbersOfTest[0] || $numbersOfCurrent[0] == $numbersOfTest[0]) {
-
                 $count = ReleaseRequest::find()
                     ->andWhere(['rr_project_obj_id' => $project->obj_id])
                     ->andWhere(['>', 'rr_build_version', $build['version']])

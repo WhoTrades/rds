@@ -18,16 +18,15 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
         return array() + parent::getCommandLineSpec();
     }
 
-
     /**
-     * Performs actual work
+     * @param \Cronjob\ICronjob $cronJob
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readHardMigrationProgress(false, function(Message\HardMigrationProgress $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received harm migration progress changed: ".json_encode($message));
+        $model->readHardMigrationProgress(false, function (Message\HardMigrationProgress $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received harm migration progress changed: " . json_encode($message));
             $this->actionHardMigrationProgressChanged($message, $model);
         });
 
@@ -35,7 +34,10 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
         $this->waitForMessages($model, $cronJob);
     }
 
-
+    /**
+     * @param Message\HardMigrationProgress $message
+     * @param MessagingRdsMs $model
+     */
     public function actionHardMigrationProgressChanged(Message\HardMigrationProgress $message, MessagingRdsMs $model)
     {
         $message->accepted();

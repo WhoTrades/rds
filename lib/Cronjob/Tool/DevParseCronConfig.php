@@ -11,6 +11,9 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
 {
     const PACKAGES_TIMEOUT = 30;
 
+    /**
+     * @return array
+     */
     public static function getCommandLineSpec()
     {
         return [
@@ -27,6 +30,11 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
         ] + parent::getCommandLineSpec();
     }
 
+    /**
+     * @param \Cronjob\ICronjob $cronJob
+     * @return int
+     * @throws Exception
+     */
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $filename = $cronJob->getOption('filename');
@@ -34,12 +42,14 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
 
         if (!file_exists($filename) || !is_readable($filename)) {
             $this->debugLogger->error("File $filename not exists or not readable");
+
             return 1;
         }
 
         $Project = Project::findByAttributes(['project_name' => $project]);
         if (!$Project) {
             $this->debugLogger->error("Project $project not exists at DB");
+
             return 2;
         }
 
@@ -51,6 +61,7 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
 
         if (!$rr) {
             $this->debugLogger->error("No any release request for project=$project");
+
             return 3;
         }
 
@@ -69,5 +80,7 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
             $transaction->rollBack();
             throw $e;
         }
+
+        return 0;
     }
 }

@@ -20,32 +20,31 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         return array() + parent::getCommandLineSpec();
     }
 
-
     /**
-     * Performs actual work
+     * @param \Cronjob\ICronjob $cronJob
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readMaintenanceToolChangeStatus(false, function(Message\MaintenanceTool\ChangeStatus $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received changing status of maintenance tool: ".json_encode($message));
+        $model->readMaintenanceToolChangeStatus(false, function (Message\MaintenanceTool\ChangeStatus $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received changing status of maintenance tool: " . json_encode($message));
             $this->actionUpdateMaintenanceToolStatus($message, $model);
         });
 
-        $model->readMaintenanceToolLogChunk(false, function(Message\MaintenanceTool\LogChunk $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received next log chunk of maintenance tool: ".json_encode($message));
+        $model->readMaintenanceToolLogChunk(false, function (Message\MaintenanceTool\LogChunk $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Received next log chunk of maintenance tool: " . json_encode($message));
             $this->actionSaveMaintenanceToolLogChunk($message, $model);
         });
 
-        $model->readPreProdDown(false, function(Message\PreProd\Down $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Preprod is down: ".json_encode($message));
+        $model->readPreProdDown(false, function (Message\PreProd\Down $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Preprod is down: " . json_encode($message));
             $this->actionChangePreProdStatus(0, $model);
             $message->accepted();
         });
 
-        $model->readPreProdUp(false, function(Message\PreProd\Up $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Preprod is up: ".json_encode($message));
+        $model->readPreProdUp(false, function (Message\PreProd\Up $message) use ($model) {
+            $this->debugLogger->message("env={$model->getEnv()}, Preprod is up: " . json_encode($message));
             $this->actionChangePreProdStatus(1, $model);
             $message->accepted();
         });
@@ -54,6 +53,10 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $this->waitForMessages($model, $cronJob);
     }
 
+    /**
+     * @param Message\MaintenanceTool\ChangeStatus $message
+     * @param MessagingRdsMs $model
+     */
     public function actionUpdateMaintenanceToolStatus(Message\MaintenanceTool\ChangeStatus $message, RdsSystem\Model\Rabbit\MessagingRdsMs $model)
     {
         $message->accepted();
@@ -61,6 +64,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $mtr = MaintenanceToolRun::findByPk($message->id);
         if (!$mtr) {
             $this->debugLogger->error("MTR id=$message->id not found");
+
             return;
         }
 
@@ -71,6 +75,10 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $this->debugLogger->message("Status of MTR=$message->id updated to $message->status");
     }
 
+    /**
+     * @param Message\MaintenanceTool\LogChunk $message
+     * @param MessagingRdsMs $model
+     */
     public function actionSaveMaintenanceToolLogChunk(Message\MaintenanceTool\LogChunk $message, RdsSystem\Model\Rabbit\MessagingRdsMs $model)
     {
         $message->accepted();
@@ -78,6 +86,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $mtr = MaintenanceToolRun::findByPk($message->id);
         if (!$mtr) {
             $this->debugLogger->error("MTR id=$message->id not found");
+
             return;
         }
 
@@ -88,7 +97,7 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
             'log' => $message->text,
         ])->execute();
 
-        $this->debugLogger->message("Log chunk of MTR=$message->id saved, length=".strlen($message->text).", log=".$message->text);
+        $this->debugLogger->message("Log chunk of MTR=$message->id saved, length=" . strlen($message->text) . ", log=" . $message->text);
 
 
         $this->debugLogger->message("commet id=maintenance_tool_log_$message->id");
@@ -102,9 +111,12 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
             Yii::$app->webSockets->send("maintenanceToolProgressbarChanged", ['id' => $message->id, 'percent' => $percent, 'key' => $key]);
             $this->debugLogger->message("Percentage of tool updated to percent=$percent");
         }
-
     }
 
+    /**
+     * @param bool $ok
+     * @param MessagingRdsMs $model
+     */
     public function actionChangePreProdStatus($ok, MessagingRdsMs $model)
     {
         $config = RdsDbConfig::get();
@@ -112,6 +124,9 @@ class Cronjob_Tool_AsyncReader_MaintenanceTool extends RdsSystem\Cron\RabbitDaem
         $config->save();
     }
 
+    /**
+     * @param int $id
+     */
     public static function sendMaintenanceToolUpdated($id)
     {
         /** @var $debugLogger \ServiceBase_IDebugLogger */

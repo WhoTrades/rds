@@ -1,5 +1,7 @@
 <?php
 
+use app\components\AlertLog\AlertData;
+use app\components\AlertLog\IAlertDataProvider;
 use app\models\Lamp;
 use app\models\AlertLog;
 use app\components\AlertLog\CompoundDataProvider;
@@ -34,7 +36,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         }
 
         foreach ($this->getDataProviderList() as $lampName => $dataProvider) {
-            /** @var \AlertLog\AlertData[] $errors */
+            /** @var AlertData[] $errors */
             $errors = [];
             foreach ($dataProvider->getData() as $alertData) {
                 if ($alertData->isError()) {
@@ -147,13 +149,13 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
 
     /**
-     * @return \AlertLog\IAlertDataProvider[]
+     * @return IAlertDataProvider[]
      */
     private function getDataProviderList()
     {
         $monitoringDataProvider = $this->getMonitoringDataProvider('Monitoring');
 
-        $crmMonitoringDataProvider = new \AlertLog\CompoundDataProvider($this->debugLogger, 'Monitoring ', [$monitoringDataProvider]);
+        $crmMonitoringDataProvider = new CompoundDataProvider($this->debugLogger, 'Monitoring ', [$monitoringDataProvider]);
 
         return [
             AlertLog::WTS_LAMP_NAME => $monitoringDataProvider,
@@ -167,7 +169,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
     /**
      * @param string $name
      *
-     * @return \AlertLog\IAlertDataProvider
+     * @return IAlertDataProvider
      */
     private function getMonitoringDataProvider($name)
     {
@@ -176,10 +178,10 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         if (!$config['enable']) {
             $this->debugLogger->message("data provider [$name] disabled");
             // dg: Если указанный провайдер выключен, то возвращаем пустой провайдер (существующие проблемы будут отмечены как решенные)
-            return new \AlertLog\CompoundDataProvider($this->debugLogger, $name, []);
+            return new CompoundDataProvider($this->debugLogger, $name, []);
         }
 
-        return new \AlertLog\MonitoringDataProvider($this->debugLogger, $name, $config['url']);
+        return new MonitoringDataProvider($this->debugLogger, $name, $config['url']);
     }
 
     /**
@@ -188,7 +190,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
      * @param array $projects Идентификаторы проектов
      * @param string $name Название провайдера данных
      *
-     * @return \AlertLog\CompoundDataProvider
+     * @return CompoundDataProvider
      */
     private function getTeamCityDataProvider(array $projects, $name = null)
     {

@@ -22,9 +22,8 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         return array() + parent::getCommandLineSpec();
     }
 
-
     /**
-     * Performs actual work
+     * @param \Cronjob\ICronjob $cronJob
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
@@ -157,6 +156,10 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param Message\Merge\TaskResult $message
+     * @param MessagingRdsMs $model
+     */
     public function actionProcessMergeBuildResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
     {
         /** @var $gitBuild GitBuild */
@@ -164,6 +167,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         if (!$gitBuild) {
             $this->debugLogger->message("Can't find build $message->featureId, skip message");
             $message->accepted();
+
             return;
         }
 
@@ -183,22 +187,30 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             'status' => GitBuildBranch::STATUS_NEW,
         ])) {
             $this->debugLogger->message("Build #$gitBuild->obj_id finished");
-            //an: Если смержили (с ошибками или успешно) все ветки, но билд считаем завершенным
+            // an: Если смержили (с ошибками или успешно) все ветки, но билд считаем завершенным
 
             $errorsCount = GitBuildBranch::countByAttributes([
                 'git_build_id' => $gitBuild->obj_id,
                 'status' => GitBuildBranch::STATUS_ERROR,
             ]);
 
-            //an: Если собирали ради пересборки develop/staging и все успешно смержилось - тогда пушим пересоздаем ветки
+            // an: Если собирали ради пересборки develop/staging и все успешно смержилось - тогда пушим пересоздаем ветки
             if (in_array($gitBuild->additional_data, ["develop", "staging"]) && $errorsCount == 0) {
                 $model->sendMergeCreateBranch(
                     \Yii::$app->modules['Wtflow']->workerName,
                     new Message\Merge\CreateBranch($gitBuild->additional_data, $gitBuild->branch, true)
                 );
-                mail("dev-test-rebuilt-success@whotrades.org", "[RDS] $gitBuild->additional_data успешно пересобрана", "Все вмержилось, новый код можно смотреть на тестовом контуре");
+                mail(
+                    "dev-test-rebuilt-success@whotrades.org",
+                    "[RDS] $gitBuild->additional_data успешно пересобрана",
+                    "Все вмержилось, новый код можно смотреть на тестовом контуре"
+                );
             } else {
-                mail("dev-test-rebuilt-failed@whotrades.org", "[RDS] Собрка ветки $gitBuild->additional_data завершилась неудачей", "Часть задач не вмержились");
+                mail(
+                    "dev-test-rebuilt-failed@whotrades.org",
+                    "[RDS] Собрка ветки $gitBuild->additional_data завершилась неудачей",
+                    "Часть задач не вмержились"
+                );
             }
 
             $gitBuild->status = GitBuild::STATUS_FINISHED;
