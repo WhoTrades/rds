@@ -6,6 +6,7 @@
  */
 
 use \kartik\grid\GridView;
+//use yii\grid\GridView;
 
 echo GridView::widget([
     'id'           => 'release-request-grid',

@@ -14,6 +14,7 @@ if (!empty($matches[1])) {
 
 require_once __DIR__ . '/../../init-libraries.php';
 
+define('YII_DEBUG', true);
 require(__DIR__ . '/../../vendor/yiisoft/yii2/Yii.php');
 
 $Core = Cronjob\RequestHandler\Core::getInstance(__DIR__ . "/../../")->init(array());

@@ -26,6 +26,15 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
+        $id = 290;
+        if (!$releaseRequest = ReleaseRequest::findByPk($id)) {
+            return;
+        }
 
+        $html = \Yii::$app->view->renderFile('@app/views/site/_releaseRequestGrid.php', [
+            'dataProvider' => $releaseRequest->search(['obj_id' => $id]),
+        ]);
+
+        echo $html;
     }
 }
