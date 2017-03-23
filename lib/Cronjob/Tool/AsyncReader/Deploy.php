@@ -651,17 +651,20 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         foreach ($builds as $build) {
             if (!preg_match('~\d{2,3}\.\d\d\.\d+\.\d+~', $build['version']) && !preg_match('~2014\.\d{2,3}\.\d\d\.\d+\.\d+~', $build['version'])) {
                 // an: неизвестный формат версии, лучше не будем удалять :) фиг его знает что это
+                $this->debugLogger->error("Unknown version format: {$build['version']} (build={$build['project']}-{$build['version']})");
                 continue;
             }
             /** @var $project Project */
             $project = Project::model()->findByAttributes(['project_name' => $build['project']]);
             if (!$project) {
                 // an: непонятно что и зачем это нам прислали, лучше не будем удалять
+                $this->debugLogger->error("Unknown project: {$build['project']} (build={$build['project']}-{$build['version']})");
                 continue;
             }
 
             if ($build['version'] == $project->project_current_version) {
                 // an: Ну никак нельзя удалять ту версию, что сейчас зарелижена
+                $this->debugLogger->message("Active project and version (build={$build['project']}-{$build['version']})");
                 continue;
             }
 
@@ -670,8 +673,10 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 'rr_build_version' => $build['version'],
             ]);
 
-            if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime('-1 week'))) {
+            $interval = '-1 week';
+            if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime($interval))) {
                 // an: Не удаляем те билды, что были на проде меньше недели назад
+                $this->debugLogger->message("Last time at prod less then `$interval` (build={$build['project']}-{$build['version']})");
                 continue;
             }
 
@@ -680,28 +685,24 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             $numbersOfCurrent = explode(".", $project->project_current_version);
 
             if ($numbersOfCurrent[0] - 1 > $numbersOfTest[0] || $numbersOfCurrent[0] == $numbersOfTest[0]) {
-                $c = new CDbCriteria();
-                $c->compare('rr_project_obj_id', $project->obj_id);
-                $c->compare('rr_build_version', '>' . $build['version']);
-                $c->compare('rr_build_version', '<' . $project->project_current_version);
-                $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
-                $count = \ReleaseRequest::model()->count($c);
+                $count = $this->countInstalledBuildsBetweenVersions($project->obj_id, $build['version'], $project->project_current_version);
 
                 if ($count > 10) {
                     // an: Нужно наличие минимум 10 версий от текущей, что бы было куда откатываться
                     $result[] = $build;
+                    $this->debugLogger->message("(!) Removing build of current build (build={$build['project']}-{$build['version']})");
+                } else {
+                    $this->debugLogger->message("Projects of current version at prod=$count, less then 10 (build={$build['project']}-{$build['version']})");
                 }
             } elseif ($numbersOfCurrent[0] - 1 == $numbersOfTest[0]) {
-                $c = new CDbCriteria();
-                $c->compare('rr_project_obj_id', $project->obj_id);
-                $c->compare('rr_build_version', '>' . $build['version']);
-                $c->compare('rr_build_version', '<' . $numbersOfCurrent[0] . ".00.000.000");
-                $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
-                $count = \ReleaseRequest::model()->count($c);
+                $count = $this->countInstalledBuildsBetweenVersions($project->obj_id, $build['version'], $numbersOfCurrent[0] . ".00.000.000");
 
                 if ($count > 5) {
                     // an: Нужно наличие минимум 2 версий в текущем релизе, что бы точно могли откатиться
                     $result[] = $build;
+                    $this->debugLogger->message("(!) Removing build of previous build (build={$build['project']}-{$build['version']})");
+                } else {
+                    $this->debugLogger->message("Projects of previous version at prod=$count, less then 5 (build={$build['project']}-{$build['version']})");
                 }
             }
         }
@@ -712,6 +713,18 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $model->sendGetProjectBuildsToDeleteRequestReply(new Message\ProjectBuildsToDeleteReply($result));
 
         $message->accepted();
+    }
+
+    private function countInstalledBuildsBetweenVersions(int $projectId, string $startVersion, string $endVersion)
+    {
+        $c = new CDbCriteria();
+        $c->compare('rr_project_obj_id', $projectId);
+        $c->addCondition("string_to_array(rr_build_version, '.')::int[] > string_to_array('" . addslashes($startVersion) . "', '.')::int[]");
+        $c->addCondition("string_to_array(rr_build_version, '.')::int[] < string_to_array('" . addslashes($endVersion) . "', '.')::int[]");
+        $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
+        $count = \ReleaseRequest::model()->count($c);
+
+        return $count;
     }
 
     /**
