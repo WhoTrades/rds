@@ -210,7 +210,7 @@ echo $this->render('_releaseRequestGrid', [
 
 
 <style>
-    .release-request-used {
+    body table.table tbody tr.release-request-used {
         background: #EEFFEE;
     }
 </style>

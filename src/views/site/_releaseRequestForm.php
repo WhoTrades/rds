@@ -21,7 +21,7 @@ $this->registerJs('
     });
 ');
 ?>
-<div class="form" style="width: 400px; margin: auto">
+<div class="form" style="margin: auto">
     <?php
         $form = yii\bootstrap\ActiveForm::begin(array(
             'id' => 'release-request-form',
