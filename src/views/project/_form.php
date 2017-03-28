@@ -1,11 +1,13 @@
 <?php
 /**
- * @var $model app\models\Project
+ * @var $model Project
  * @var $form yii\widgets\ActiveForm
  */
 
-use yii\helpers\Html;
+use yii\bootstrap\Alert;
+use yii\bootstrap\Html;
 use yii\widgets\ActiveForm;
+use app\models\Project;
 
 ?>
 
@@ -19,8 +21,13 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(['id' => 'project-form']) ?>
         <?php if (count($model->projectConfigs)) { ?>
-            <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над
-                измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
+            <?=Alert::widget([
+                'options' => [
+                    'class' => 'alert-danger',
+                ],
+                'body' => "Внимание! Редактируя настройки, обязательно укажите в комментариях над " .
+                "измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01",
+            ])?>
         <?php } ?>
         <p class="note">Fields with <span class="required">*</span> are required.</p>
         <?= $form->field($model, 'project_name') ?>
@@ -29,7 +36,17 @@ use yii\widgets\ActiveForm;
 
         <?php foreach ($model->projectConfigs as $projectConfig) { ?>
             <h3><?=$projectConfig->pc_filename?></h3>
-            <?= Html::error($model, $projectConfig->pc_filename, ['class' => 'alert alert-danger']) ?>\
+            <?=$model->getFirstError($projectConfig->pc_filename)
+                ? Html::error(
+                    $model,
+                    $projectConfig->pc_filename,
+                    [
+                        'class' => 'alert alert-danger',
+                        'encode' => false,
+                    ]
+                )
+                : ''
+            ?>
             <?= Html::textarea(
                 'project_config[' . $projectConfig->pc_filename . ']',
                 isset($_POST['project_config'][$projectConfig->pc_filename]) ? $_POST['project_config'][$projectConfig->pc_filename] : $projectConfig->pc_content,
@@ -57,8 +74,13 @@ use yii\widgets\ActiveForm;
             <br />
         <?php }?>
         <?php if (count($model->projectConfigs)) { ?>
-            <?=TbHtml::alert(TbHtml::ALERT_COLOR_DANGER, "Внимание! Редактируя настройки, обязательно укажите в комментариях над
-                измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01")?>
+            <?=Alert::widget([
+                'options' => [
+                    'class' => 'alert-danger',
+                ],
+                'body' => "Внимание! Редактируя настройки, обязательно укажите в комментариях над " .
+                    "измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01",
+            ])?>
         <?php } ?>
         <br />
         <div class="row buttons">

@@ -93,7 +93,6 @@ class ProjectController extends Controller
 
         if (isset($_POST['Project']) && $deployment_enabled) {
             $model->attributes = $_POST['Project'];
-            $model->project_config = str_replace("\r", "", $model->project_config);
             $transaction = $model->getDbConnection()->beginTransaction();
             $existingProject = Project::findByPk($model->obj_id);
 
@@ -137,7 +136,7 @@ class ProjectController extends Controller
 
                     $projectConfig->pc_content = $content;
                     if (!$projectConfig->validate(['pc_content'])) {
-                        $model->addError($filename, $projectConfig->getError('pc_content'));
+                        $model->addError($filename, $projectConfig->getFirstError('pc_content'));
                         continue;
                     }
 

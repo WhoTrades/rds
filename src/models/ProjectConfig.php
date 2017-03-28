@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
+use app\extensions\validators\PhpSyntaxValidator;
 
 /**
  * @author Artem Naumenko
@@ -36,7 +37,7 @@ class ProjectConfig extends ActiveRecord
             [['pc_project_obj_id', 'pc_filename'], 'required'],
             ['obj_status_did', 'number'],
             ['pc_filename', 'string', 'max' => 128],
-            ['pc_content', 'app\extensions\PhpSyntaxValidator'],
+            ['pc_content', PhpSyntaxValidator::class],
             [['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'pc_project_obj_id', 'pc_filename', 'pc_content'], 'safe', 'on' => 'search'],
         ];
     }

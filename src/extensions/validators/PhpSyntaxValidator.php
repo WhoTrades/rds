@@ -1,5 +1,5 @@
 <?php
-namespace app\extensions;
+namespace app\extensions\validators;
 
 use yii\validators\Validator;
 use Exception;
