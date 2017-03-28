@@ -26,7 +26,10 @@ yii\bootstrap\Modal::begin(array(
 <h1>Запреты релиза</h1>
 <a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>">Создать</a>
 <?php
-\yii\widgets\Pjax::begin(['timeout' => 10000]);
+\yii\widgets\Pjax::begin([
+    'timeout' => 10000,
+    'id' => 'release-reject-grid-container',
+]);
 echo GridView::widget(array(
     'dataProvider' => $releaseRejectSearchModel->search($releaseRejectSearchModel->attributes),
     'filterModel' => $releaseRejectSearchModel,
@@ -155,11 +158,13 @@ echo $this->render('_releaseRequestGrid', [
         });
         webSocketSubscribe('updateAllReleaseRequests', function(event){
             console.log("websocket event received", event);
-            $.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
+            $.pjax.reload('#release-request-grid-container', {timeout: 10000});
+            //$.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
             console.log('got update all release requests event');
         });
         webSocketSubscribe('updateAllReleaseRejects', function(event){
-            $.pjax.reload('#release-reject-grid-pjax-container', {fragment: '#release-reject-grid'});
+            $.pjax.reload('#release-reject-grid-container', {timeout: 10000});
+            //$.pjax.reload('#release-reject-grid-pjax-container', {fragment: '#release-reject-grid'});
             console.log('got update all release rejects event');
         });
         $('body').on('click', '.use-button', function(e){
