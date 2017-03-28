@@ -83,6 +83,7 @@ class Log extends ActiveRecord
      */
     public static function createLogMessage(string $text, string $user = null)
     {
+
         if ($user == null) {
             $user = \Yii::$app->user->getIdentity()->username;
         }
