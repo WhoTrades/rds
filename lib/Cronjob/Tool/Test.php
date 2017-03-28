@@ -5,6 +5,7 @@
 
 use app\models\Build;
 use app\models\ReleaseRequest;
+use app\modules\Wtflow\models\JiraFeature;
 use RdsSystem\Message;
 use yii\helpers\Url;
 
