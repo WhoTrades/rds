@@ -719,7 +719,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             }
         }
 
-        Yii::import('application.controllers.StatisticController');
         CoreLight::getInstance()->getServiceBaseCacheKvdpp()->set(StatisticController::LAST_PACKAGE_REMOVE_CALL_TIME_KEY, time());
 
         $model->sendGetProjectBuildsToDeleteRequestReply(new Message\ProjectBuildsToDeleteReply($result));
