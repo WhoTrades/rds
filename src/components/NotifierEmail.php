@@ -25,7 +25,6 @@ class NotifierEmail extends \yii\base\Object
      * @param string $text
      *
      * @return bool
-     * @throws CException
      */
     public function sendReleaseRejectCustomNotification($title, $text)
     {
@@ -75,7 +74,6 @@ here;
      * @param string $text
      *
      * @return bool
-     * @throws CException
      */
     public function sendRdsConflictNotification($developerEmail, $developerGroupEmail, $ticket, $targetBranch, $text)
     {
@@ -94,7 +92,6 @@ here;
      * @param string $comment
      *
      * @return bool
-     * @throws CException
      */
     public function sendRdsReleaseRejectNotification($user, $projectName, $comment)
     {
@@ -112,7 +109,6 @@ here;
      * @param string $comment
      *
      * @return bool
-     * @throws CException
      */
     public function sendRdsReleaseRequestNotification($userName, $projectName, $comment)
     {
@@ -129,7 +125,6 @@ here;
      * @param string $newVersion
      *
      * @return bool
-     * @throws CException
      */
     public function sendReleaseReleased($projectName, $newVersion)
     {
@@ -146,17 +141,9 @@ here;
      * @param string $tagTo
      * @param array $errors
      * @return bool
-     * @throws CException
-     * @throws phpmailerException
      */
     public function sentNewSentryErrors($receiver, $tagTo, $errors)
     {
-        $mail = new YiiMailer();
-        $mail->setLayout('mail');
-        $mail->setFrom('report@whotrades.org', 'releases');
-        $mail->setTo($receiver);
-        $mail->setSubject("[RDS] Новые ошибки после релиза $tagTo");
-
         $text = "<h1>Новые ошибки в релизе $tagTo:</h1>\n";
         $summaryUsers = 0;
         foreach ($errors as $error) {
@@ -167,15 +154,16 @@ here;
             $text .= "<span style='color: gray'>{$error['metadata']['value']}</span><br /><br />\n\n";
         }
 
+        $mail = $this->getMailer($text);
+        $mail->setFrom(['report@whotrades.org' => 'releases']);
+        $mail->setTo($receiver);
+        $mail->setSubject("[RDS] Новые ошибки после релиза $tagTo");
+
         // an: Если ошибок много - добавляем в копию tml@whotrades.org
         if ($summaryUsers > 10) {
             $mail->setSubject("Ошибки в $tagTo, затронуто пользователей: $summaryUsers");
             $mail->setCc('tml@whotrades.org');
-            $text = "+tml@whotrades.org<br /><br />\n$text";
         }
-
-        $mailer = $this->getMailer($text);
-        $mailer->setFrom();
 
         return $mail->send();
     }
