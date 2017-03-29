@@ -174,7 +174,8 @@ here;
             $text = "+tml@whotrades.org<br /><br />\n$text";
         }
 
-        $mail->setBody($text);
+        $mailer = $this->getMailer($text);
+        $mailer->setFrom();
 
         return $mail->send();
     }
