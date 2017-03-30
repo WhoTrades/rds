@@ -1,4 +1,7 @@
-<?php /** @var $this PostMigration*/ ?>
+<?php /** @var $this app\components\View */
+use app\models\ReleaseRequest;
+use yii\helpers\Url;
+?>
 <?php /** @var $releaseRequests ReleaseRequest[]*/ ?>
 <?php if ($releaseRequests) {?>
     <div style="float: right; ">
@@ -8,12 +11,12 @@
                 <?php continue; ?>
             <?php }?>
             <h5 style="float: left; margin: 0 20px 0 0"><?=$rr->project->project_name?> :: <?=$rr->rr_build_version?> (<?=count(json_decode($rr->rr_new_post_migrations))?>)</h5>
-            <?php if ($rr->rr_post_migration_status == \ReleaseRequest::MIGRATION_STATUS_UPDATING) {?>
+            <?php if ($rr->rr_post_migration_status == ReleaseRequest::MIGRATION_STATUS_UPDATING) {?>
                 Updating migrations
-            <?php } elseif ($rr->rr_post_migration_status == \ReleaseRequest::MIGRATION_STATUS_FAILED) {?>
+            <?php } elseif ($rr->rr_post_migration_status == ReleaseRequest::MIGRATION_STATUS_FAILED) {?>
                 Migrations failed
-            <?php } elseif ($rr->rr_post_migration_status == \ReleaseRequest::MIGRATION_STATUS_NONE) {?>
-                <a href="/use/migrate/?id=<?=$rr->obj_id?>&type=post">Накатить</a>
+            <?php } elseif ($rr->rr_post_migration_status == ReleaseRequest::MIGRATION_STATUS_NONE) {?>
+                <a href="<?=Url::to(["/use/migrate/", "id" => $rr->obj_id, "type" => "post"])?>">Накатить</a>
                 <div style="clear: both"></div>
                 <?php foreach (json_decode($rr->rr_new_post_migrations) as $migration) {?>
                     <a href='<?=$rr->project->getMigrationUrl($migration, 'post')?>'>

@@ -685,7 +685,11 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 'rr_build_version' => $build['version'],
             ]);
 
-            $interval = '-1 week';
+            $interval = "-" . Yii::$app->params['garbageCollector']['minTimeAtProd'];
+            if (empty($interval)) {
+                $this->debugLogger->error("Empty interval at RDS garbage collector. Stop removing packets");
+                break;
+            }
             if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime($interval))) {
                 // an: Не удаляем те билды, что были на проде меньше недели назад
                 $this->debugLogger->message("Last time at prod less then `$interval` (build={$build['project']}-{$build['version']})");
@@ -726,6 +730,12 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $message->accepted();
     }
 
+    /**
+     * @param int $projectId
+     * @param string $startVersion
+     * @param string $endVersion
+     * @return int|string
+     */
     public static function countInstalledBuildsBetweenVersions(int $projectId, string $startVersion, string $endVersion)
     {
         $count = ReleaseRequest::find()
@@ -734,13 +744,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             ->andWhere("string_to_array(rr_build_version, '.')::int[] < string_to_array('" . addslashes($endVersion) . "', '.')::int[]")
             ->andWhere(['in', 'rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]])
             ->count();
-
-//        $c = new CDbCriteria();
-//        $c->compare('rr_project_obj_id', $projectId);
-//        $c->addCondition("string_to_array(rr_build_version, '.')::int[] > string_to_array('" . addslashes($startVersion) . "', '.')::int[]");
-//        $c->addCondition("string_to_array(rr_build_version, '.')::int[] < string_to_array('" . addslashes($endVersion) . "', '.')::int[]");
-//        $c->compare('rr_status', [\ReleaseRequest::STATUS_INSTALLED, \ReleaseRequest::STATUS_OLD]);
-//        $count = \ReleaseRequest::model()->count($c);
 
         return $count;
     }

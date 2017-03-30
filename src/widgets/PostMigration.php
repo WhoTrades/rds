@@ -2,20 +2,27 @@
 namespace app\widgets;
 
 use app\models\ReleaseRequest;
+use Yii;
 
 class PostMigration extends \yii\base\Widget
 {
-    public function init()
+    /**
+     * @return string
+     */
+    public function run()
     {
         if (\Yii::$app->user->isGuest) {
-            return;
+            return "";
         }
+
+        $interval = Yii::$app->params['garbageCollector']['minTimeAtProd'];
+
         $sql = "select * from (
                     select (
                         select obj_id from rds.release_request where
                         rr_status IN ('old', 'installed')
                         and rr_project_obj_id=project.obj_id
-                        and rr_build_version <= ((string_to_array(project_current_version,'.'))[1])::varchar
+                        and rr_last_time_on_prod <= NOW() - interval '$interval'
                         and obj_status_did = :status
                         order by rr_build_version desc
                         limit 1
@@ -24,18 +31,13 @@ class PostMigration extends \yii\base\Widget
 
         $ids = \Yii::$app->db->createCommand($sql)->bindValue(':status', \ServiceBase_IHasStatus::STATUS_ACTIVE)->queryColumn();
 
-        $releaseRequests = ReleaseRequest::find()->with('project')->andWhere(['in', 'releaserequest.obj_id', $ids])
-            ->andWhere(['<>', 'releaserequest.rr_post_migration_status', ReleaseRequest::MIGRATION_STATUS_UP])
+        $releaseRequests = ReleaseRequest::find()->with('project')->andWhere(['in', 'release_request.obj_id', $ids])
+            ->andWhere(['<>', 'release_request.rr_post_migration_status', ReleaseRequest::MIGRATION_STATUS_UP])
             ->andWhere('rr_new_post_migrations != \'\' and rr_new_post_migrations != \'[]\' and not rr_new_post_migrations is null')
             ->all();
 
-        $this->render('application.views.widgets.PostMigration', [
+        return $this->render('@app/views/widgets/PostMigration', [
             'releaseRequests' => $releaseRequests,
         ]);
-    }
-
-    public function run()
-    {
-
     }
 }

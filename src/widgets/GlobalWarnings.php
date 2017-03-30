@@ -1,12 +1,17 @@
 <?php
 namespace app\widgets;
 
+use GlobalWarningItem;
+
 class GlobalWarnings extends \yii\base\Widget
 {
-    public function init()
+    /**
+     * @return string
+     */
+    public function run()
     {
         if (\Yii::$app->user->isGuest) {
-            return;
+            return "";
         }
 
         $warnings = [];
@@ -20,21 +25,8 @@ class GlobalWarnings extends \yii\base\Widget
             );
         }
 
-        $this->render('application.views.widgets.GlobalWarnings', [
+        return $this->render('@app/views/widgets/GlobalWarnings', [
             'warnings' => $warnings,
         ]);
-    }
-}
-
-class GlobalWarningItem {
-    public $message;
-    public $icon;
-    public $color;
-
-    public function __construct($message, $icon, $color)
-    {
-        $this->message  = $message;
-        $this->icon     = $icon;
-        $this->color    = $color;
     }
 }

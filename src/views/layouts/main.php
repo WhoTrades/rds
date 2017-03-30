@@ -34,6 +34,7 @@ Yii::$app->webSockets->registerScripts($this);
 <body>
 <?php
 $this->beginBody();
+$controllerId = \Yii::$app->controller->id;
 NavBar::begin(['brandLabel' => 'RDS']);
 echo Nav::widget(
     array(
@@ -42,56 +43,56 @@ echo Nav::widget(
             array(
                 'label' => 'Главная',
                 'url' => array('/site/index'),
-                'active' => \Yii::$app->controller->id == 'site',
+                'active' => $controllerId == 'site',
             ),
             array(
                 'label' => 'Миграции',
                 'url' => array('/hard-migration/index'),
                 'visible' => !\Yii::$app->user->isGuest,
-                'active' => \Yii::$app->controller->id == 'hard-migration',
+                'active' => $controllerId == 'hard-migration',
             ),
 
             array(
                 'label' => 'Настройка сборки',
                 'url' => array('/project/admin'),
                 'visible' => !\Yii::$app->user->isGuest,
-                'active' => in_array(\Yii::$app->controller->id, ['project', 'worker', 'release-version']),
+                'active' => in_array($controllerId, ['project', 'worker', 'release-version']),
                 'items' => [
-                    array('label' => 'Проекты', 'url' => array('/project/admin'), 'active' => \Yii::$app->controller->id == 'project'),
-                    array('label' => 'Сборщики', 'url' => array('/worker/admin'), 'active' => \Yii::$app->controller->id == 'worker'),
-                    array('label' => 'Версии', 'url' => array('/release-version/admin'), 'active' => \Yii::$app->controller->id == 'release-version'),
+                    array('label' => 'Проекты', 'url' => array('/project/admin'), 'active' => $controllerId == 'project'),
+                    array('label' => 'Сборщики', 'url' => array('/worker/admin'), 'active' => $controllerId == 'worker'),
+                    array('label' => 'Версии', 'url' => array('/release-version/admin'), 'active' => $controllerId == 'release-version'),
                 ],
             ),
             array(
                 'label' => 'Интеграция',
                 'url' => array('/Wtflow/jira/index'),
                 'visible' => !\Yii::$app->user->isGuest,
-                'active' => in_array(\Yii::$app->controller->id, ['jira', 'developer', 'git']),
+                'active' => in_array($controllerId, ['jira', 'developer', 'git']),
                 'items' => [
-                    ['label' => 'JIRA', 'url' => array('/Wtflow/jira/index'), 'active' => \Yii::$app->controller->id == 'jira'],
-                    ['label' => 'Разработчики', 'url' => array('/Wtflow/developer/index'), 'active' => \Yii::$app->controller->id == 'developer'],
-                    ['label' => 'Git', 'url' => array('/Wtflow/git/index'), 'active' => \Yii::$app->controller->id == 'git' && $__action == 'index'],
-                    ['label' => 'wtflow', 'url' => array('/Wtflow/git/wt-flow-stat'), 'active' => \Yii::$app->controller->id == 'git' && $__action == 'wt-flow-stat'],
+                    ['label' => 'JIRA', 'url' => array('/Wtflow/jira/index'), 'active' => $controllerId == 'jira'],
+                    ['label' => 'Разработчики', 'url' => array('/Wtflow/developer/index'), 'active' => $controllerId == 'developer'],
+                    ['label' => 'Git', 'url' => array('/Wtflow/git/index'), 'active' => $controllerId == 'git' && $__action == 'index'],
+                    ['label' => 'wtflow', 'url' => ['/Wtflow/git/wt-flow-stat', 'sort' => '-obj_created'], 'active' => $controllerId == 'git' && $__action == 'wt-flow-stat'],
                 ],
             ),
             array(
                 'label' => 'Обслуживание',
                 'url' => array('/maintenance-tool/index'),
                 'visible' => !\Yii::$app->user->isGuest,
-                'active' => in_array(\Yii::$app->controller->id, ['maintenanceTool', 'alert', 'cronjobs', 'gitBuild']),
+                'active' => in_array($controllerId, ['maintenanceTool', 'alert', 'cronjobs', 'gitBuild']),
                 'items' => [
-                    //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => \Yii::$app->controller->id == 'maintenanceTool'],
-                    ['label' => 'Сигнализация', 'url' => array('/alert/index'), 'active' => \Yii::$app->controller->id == 'alert'],
-                    ['label' => 'Фоновые задачи', 'url' => array('/cronjobs/index'), 'active' => \Yii::$app->controller->id == 'cronjobs'],
-                    ['label' => 'Пересборка веток', 'url' => array('/Wtflow/git-build'), 'active' => \Yii::$app->controller->id == 'git-build'],
-                    ['label' => 'Ограничение функциональности', 'url' => array('/system/index'), 'active' => \Yii::$app->controller->id == 'system'],
+                    //['label'=>'Управление ключевыми тулами', 'url'=>array('/maintenanceTool/index'), 'active' => $controllerId == 'maintenanceTool'],
+                    ['label' => 'Сигнализация', 'url' => array('/alert/index'), 'active' => $controllerId == 'alert'],
+                    ['label' => 'Фоновые задачи', 'url' => array('/cronjobs/index'), 'active' => $controllerId == 'cronjobs'],
+                    ['label' => 'Пересборка веток', 'url' => array('/Wtflow/git-build'), 'active' => $controllerId == 'git-build'],
+                    ['label' => 'Ограничение функциональности', 'url' => array('/system/index'), 'active' => $controllerId == 'system'],
                 ],
             ),
             array(
                 'label' => 'Журнал',
                 'url' => array('/log/index'),
                 'visible' => !\Yii::$app->user->isGuest,
-                'active' => \Yii::$app->controller->id == 'log',
+                'active' => $controllerId == 'log',
             ),
             array(
                 'label' => \Yii::$app->user->getIsGuest() ? "" : "Выйти " . \Yii::$app->user->getIdentity()->username,
@@ -105,8 +106,8 @@ echo Nav::widget(
 NavBar::end();
 ?>
 
-<?//=app\widgets\GlobalWarnings::widget([])?>
-<?//=app\widgets\PostMigration::widget([])?>
+<?=app\widgets\GlobalWarnings::widget([])?>
+<?=app\widgets\PostMigration::widget([])?>
 
 
 <div id="page" class="container-fluid">
@@ -151,4 +152,5 @@ NavBar::end();
 </script>
 </body>
 </html>
-<?php $this->endPage() ?>
+<?php
+$this->endPage();
