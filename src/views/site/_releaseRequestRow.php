@@ -20,7 +20,7 @@ return array(
             $result = strip_tags($releaseRequest->rr_comment) . "<br />";
 
             if ($releaseRequest->isInstalledStatus()) {
-                $result .= "<a href='" . yii\helpers\Url::to(['/wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id]) .
+                $result .= "<a href='" . yii\helpers\Url::to(['/Wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id]) .
                     "' target='_blank'>Тикеты</a><br />";
             }
             $result .= "<a href='/site/commits/$releaseRequest->obj_id' onclick=\"popup('test', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>";
@@ -173,7 +173,7 @@ return array(
                                 "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">Показать pre миграции</a>
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                         foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                            $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, 'pre') . ">";
+                            $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, 'pre', $releaseRequest->rr_build_version) . ">";
                             $result .= "$migration";
                             $result .= "</a><br />";
                         }

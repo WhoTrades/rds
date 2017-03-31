@@ -111,7 +111,7 @@ return [
     [
         'attribute' => 'migration_name',
         'value' => function (HardMigration $migration) {
-            $migrationUrl = $migration->project->getMigrationUrl($migration->migration_name, 'hard');
+            $migrationUrl = $migration->project->getMigrationUrl($migration->migration_name, 'hard', $migration->releaseRequest->rr_build_version);
 
             return "<a href='{$migrationUrl}' title='Посмотреть исходный код миграции'>{$migration->migration_name}</a><br />";
         },

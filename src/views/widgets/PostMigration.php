@@ -19,7 +19,7 @@ use yii\helpers\Url;
                 <a href="<?=Url::to(["/use/migrate/", "id" => $rr->obj_id, "type" => "post"])?>">Накатить</a>
                 <div style="clear: both"></div>
                 <?php foreach (json_decode($rr->rr_new_post_migrations) as $migration) {?>
-                    <a href='<?=$rr->project->getMigrationUrl($migration, 'post')?>'>
+                    <a href='<?=$rr->project->getMigrationUrl($migration, 'post', $rr->rr_build_version)?>'>
                         <?=$migration?>
                     </a><br />
                 <?php }?>

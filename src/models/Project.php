@@ -199,16 +199,17 @@ class Project extends ActiveRecord
      *
      * @param string $migration
      * @param string $type - pre|post|hard
+     * @param string $buildVersion
      *
      * @return string
      */
-    public function getMigrationUrl($migration, $type)
+    public function getMigrationUrl($migration, $type, $buildVersion)
     {
         $config = \Yii::$app->params['projectMigrationUrlMask'];
         if (isset($config[$this->project_name])) {
-            return $config[$this->project_name]($migration, $this->project_name, $type);
+            return $config[$this->project_name]($migration, $this->project_name, $type, $buildVersion);
         } else {
-            return $config['*']($migration, $this->project_name, $type);
+            return $config['*']($migration, $this->project_name, $type, $buildVersion);
         }
     }
 }
