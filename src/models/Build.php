@@ -1,7 +1,9 @@
 <?php
+
 namespace app\models;
 
 use app\components\ActiveRecord;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.build".
@@ -61,7 +63,7 @@ class Build extends ActiveRecord
     }
 
     /**
-     * @return Worker
+     * @return ActiveQuery
      */
     public function getWorker()
     {
@@ -69,13 +71,16 @@ class Build extends ActiveRecord
     }
 
     /**
-     * @return Project
+     * @return ActiveQuery
      */
     public function getProject()
     {
         return $this->hasOne(Project::className(), ['obj_id' => 'build_project_obj_id']);
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public function getReleaseRequest()
     {
         return $this->hasOne(ReleaseRequest::className(), ['obj_id' => 'build_release_request_obj_id']);
@@ -97,13 +102,17 @@ class Build extends ActiveRecord
         );
     }
 
-    public function getProgressbarInfo()
+    /**
+     * На основании предыдущей успешной сборки высчитывает текущий процент сборки
+     * @return array - [percent, lastTaskKey]
+     */
+    public function getProgressBarInfo()
     {
         $prev = self::find()->where([
             'build_status' => [Build::STATUS_INSTALLED, Build::STATUS_USED],
             'build_project_obj_id' => $this->build_project_obj_id,
             'build_worker_obj_id' => $this->build_worker_obj_id,
-        ])->orderBy('obj_id desc')->one();
+        ])->orderBy('obj_id desc')->limit(1)->one();
 
         $dataCurrent = array_reverse(array_keys(json_decode($this->build_time_log, true)));
 
@@ -122,23 +131,31 @@ class Build extends ActiveRecord
             }
         }
 
-        $percent = 100*$currentTime/$lastPrev;
+        $percent = 100 * $currentTime / $lastPrev;
 
         return [$percent, $currentKey];
     }
 
+    /**
+     * Список всех статусов, при которых проект считается успешно собранным
+     * @return array
+     */
     public static function getInstallingStatuses()
     {
         return [self::STATUS_BUILDING, self::STATUS_BUILT, self::STATUS_PREPROD_USING, self::STATUS_PREPROD_MIGRATIONS];
     }
 
+    /**
+     * @return mixed|null
+     */
     public function determineHumanReadableError()
     {
         $regexes = [
             '~Execution of target "merge-(?:(?:js)|(?:css))" failed for the following reason: Task exited with code 10~' => "Ошибка в MergeJS/CSS, обращайтесь к фронтдендщикам",
             '~HTTP request sent, awaiting response... (5\d{2} [\w -]*)~' => "DEV не отдает словарь: $1. Попробуйте пересобрать",
             '~ssh: connect to host ([\w-]+.whotrades.net) port 22: No route to host~' => "$0. Обратитесь к администратору",
-            '~E: Unable to lock the administration directory \(/var/lib/dpkg/\), is another process using it\?~' => "На сервере администратор что-то устанавливает. Пересоберите позже",
+            '~E: Unable to lock the administration directory \(/var/lib/dpkg/\), is another process using it\?~'
+            => "На сервере администратор что-то устанавливает. Пересоберите позже",
             '~ssh: connect to host ([\w-]+.whotrades.net) port 22: Connection timed out~' => "Сервер $1 не отвечает. Обратитесь к администратору<br />$0",
             '~([\w-]+.whotrades.net):.*No space left on device~' => "Закончилось место на <b>$1</b>. Обратитесь к администратору",
             '~ target=sentry, target=raven, event_id=(\w+)~' => "Sentry <a href='https://sentry.whotrades.com/sentry/{$this->project->project_name}/?query=$1'><b>$1</b></a>.",
@@ -147,7 +164,8 @@ class Build extends ActiveRecord
         foreach ($regexes as $regex => $text) {
             if (preg_match($regex, $this->build_attach, $ans)) {
                 $i = 0;
-                return str_replace(array_map(function() use (&$i){
+
+                return str_replace(array_map(function () use (&$i) {
                     return '$' . ($i++);
                 }, $ans), $ans, $text);
             }
