@@ -53,6 +53,10 @@ class ReleaseVersion extends ActiveRecord
         );
     }
 
+    /**
+     * @param array $params
+     * @return ActiveDataProvider
+     */
     public function search(array $params)
     {
         $query = static::find();
@@ -69,7 +73,8 @@ class ReleaseVersion extends ActiveRecord
     /**
      * @return array
      */
-    public static function forList(){
+    public static function forList()
+    {
         $list = array();
         foreach (static::find()->all() as $val) {
             $list[$val->rv_version] = $val->rv_name . " - " . $val->rv_version;

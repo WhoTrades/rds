@@ -11,4 +11,5 @@ namespace app\components\AlertLog;
 
 class BadJsonException extends \yii\base\Exception
 {
+
 }

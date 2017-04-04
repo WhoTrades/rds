@@ -23,6 +23,9 @@ final class SingleLoginAuth extends \yii\base\Object
     public $clientId = null;
     public $timeout = 10;
 
+    /**
+     * @return string
+     */
     public function getAuthUrl()
     {
         $hash = md5(uniqid() . microtime() . "dfgldfgkidfg98789h4i" . rand(1, PHP_INT_MAX));
@@ -37,6 +40,10 @@ final class SingleLoginAuth extends \yii\base\Object
         return $url;
     }
 
+    /**
+     * @param string $code
+     * @return SingleLoginUser|null
+     */
     public function authorize($code)
     {
         $token = sha1($code . '+' . $this->secretKey);

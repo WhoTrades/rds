@@ -3,6 +3,7 @@ namespace app\models;
 
 use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.project_config_history".
@@ -42,15 +43,23 @@ class ProjectConfigHistory extends ActiveRecord
             array(['obj_status_did'], 'number'),
             array(['pch_user'], 'string', 'max' => 128),
             array(['pch_config'], 'safe'),
-            array(['obj_created'], 'datetime')
+            array(['obj_created'], 'datetime'),
         );
     }
 
+    /**
+     * @return ActiveQuery
+     */
     public function getProject()
     {
         return $this->hasOne(Project::className(), ['obj_id' => 'pch_project_obj_id']);
     }
 
+    /**
+     * @param array $params
+     * @param int $id
+     * @return ActiveDataProvider
+     */
     public function search(array $params, $id = null)
     {
         $query = static::find()->filterWhere(['pch_project_obj_id' => $id]);

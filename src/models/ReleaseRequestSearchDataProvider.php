@@ -25,9 +25,9 @@ class ReleaseRequestSearchDataProvider extends ActiveDataProvider
      *
      * @return array
      */
-    public function getData($refresh = false)
+    public function getData($refresh = null)
     {
-        $data = parent::getData($refresh);
+        $data = parent::getData($refresh ?? false);
         if ($refresh || !$this->additionalDataFetched) {
             $this->fetchAdditionalData($data);
             $this->additionalDataFetched = true;

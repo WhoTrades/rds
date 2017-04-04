@@ -3,18 +3,17 @@
 
 use app\models\MaintenanceToolRun;
 
-$this->title = "Выполнение процесса ".$model->mtrMaintenanceTool->mt_name;
+$this->title = "Выполнение процесса " . $model->mtrMaintenanceTool->mt_name;
 
-$this->params['menu']=array(
-    array('label'=>'List MaintenanceToolRun','url'=>array('index')),
-    array('label'=>'Create MaintenanceToolRun','url'=>array('create')),
-    array('label'=>'Update MaintenanceToolRun','url'=>array('update','id'=>$model->obj_id)),
-    array('label'=>'Delete MaintenanceToolRun','url'=>'#','linkOptions'=>array('submit'=>array('delete','id'=>$model->obj_id),'confirm'=>'Are you sure you want to delete this item?')),
-    array('label'=>'Manage MaintenanceToolRun','url'=>array('admin')),
+$this->params['menu'] = array(
+    array('label' => 'List MaintenanceToolRun', 'url' => array('index')),
+    array('label' => 'Create MaintenanceToolRun', 'url' => array('create')),
+    array('label' => 'Update MaintenanceToolRun', 'url' => array('update', 'id' => $model->obj_id)),
+    array('label' => 'Manage MaintenanceToolRun', 'url' => array('admin')),
 );
 ?>
 
-    <h1>View MaintenanceToolRun #<?php echo $model->obj_id; ?></h1>
+<h1>View MaintenanceToolRun #<?php echo $model->obj_id; ?></h1>
 
 <?php
 echo yii\widgets\DetailView::widget([
@@ -61,20 +60,20 @@ echo yii\widgets\DetailView::widget([
 ?>
 
 <script type="text/javascript">
-    document.onload.push(function(){
-        webSocketSubscribe('maintenanceToolProgressbarChanged', function(event){
+    document.onload.push(function () {
+        webSocketSubscribe('maintenanceToolProgressbarChanged', function (event) {
             console.log(event);
-            $('.progress-'+event.id+' .bar').css({width: event.percent+'%'});
-            var html = '<b>'+(event.percent.toFixed(2).toString())+'%:</b> '+(event.key);
-            $('.progress-'+event.id+' .bar').html(html);
-            $('.progress-action-'+event.id).html(event.key);
+            $('.progress-' + event.id + ' .bar').css({width: event.percent + '%'});
+            var html = '<b>' + (event.percent.toFixed(2).toString()) + '%:</b> ' + (event.key);
+            $('.progress-' + event.id + ' .bar').html(html);
+            $('.progress-action-' + event.id).html(event.key);
         });
 
-        webSocketSubscribe('maintenance_tool_log_<?=$model->obj_id?>', function(event){
+        webSocketSubscribe('maintenance_tool_log_<?=$model->obj_id?>', function (event) {
             $('.pre').append('<span>' + event.text + '</span>');
             var span = $('.pre span:last');
             span.css({fontWeight: 'bold'});
-            setTimeout(function(){
+            setTimeout(function () {
                 span.css({fontWeight: 'normal'});
             }, 250);
             $('body').scrollTop($('body').height())

@@ -10,5 +10,4 @@ class WebSocketsAsset extends AssetBundle
     public $jsOptions = ['position' => \yii\web\View::POS_BEGIN];
 
     public $js = ['autobahn.min.js'];
-
 }

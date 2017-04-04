@@ -4,10 +4,14 @@
 use yii\helpers\Url;
 
 $this->params['menu'] = array(
-	array('label'=>'Create Project', 'url'=>array('create')),
-	array('label'=>'Update Project', 'url'=>array('update', 'id'=>$model->obj_id)),
-	array('label'=>'Delete Project', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->obj_id),'confirm'=>'Are you sure you want to delete this item?')),
-	array('label'=>'Manage Project', 'url'=>array('admin')),
+    array('label' => 'Create Project', 'url' => array('create')),
+    array('label' => 'Update Project', 'url' => array('update', 'id' => $model->obj_id)),
+    array(
+        'label' => 'Delete Project',
+        'url' => '#',
+        'linkOptions' => array('submit' => array('delete', 'id' => $model->obj_id), 'confirm' => 'Are you sure you want to delete this item?'),
+    ),
+    array('label' => 'Manage Project', 'url' => array('admin')),
 );
 ?>
 
@@ -32,12 +36,12 @@ echo yii\grid\GridView::widget([
     'columns' => [
         'obj_created',
         'pch_user',
-         [
+        [
             'class' => 'yii\grid\ActionColumn',
             'template' => '{view}',
             'urlCreator' => function ($action, $model) {
-                 return Url::to(['/diff/project_config', 'id' => $model->obj_id]);
+                return Url::to(['/diff/project_config', 'id' => $model->obj_id]);
             },
-         ],
+        ],
     ],
 ]);

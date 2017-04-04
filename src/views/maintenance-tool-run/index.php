@@ -1,8 +1,8 @@
 <?php
 
-$this->params['menu']=array(
-    array('label'=>'List MaintenanceToolRun','url'=>array('index')),
-    array('label'=>'Create MaintenanceToolRun','url'=>array('create')),
+$this->params['menu'] = array(
+    array('label' => 'List MaintenanceToolRun', 'url' => array('index')),
+    array('label' => 'Create MaintenanceToolRun', 'url' => array('create')),
 );
 
 ?>
@@ -14,7 +14,8 @@ $this->params['menu']=array(
     or <b>=</b>) at the beginning of each of your search values to specify how the comparison should be done.
 </p>
 
-<?= yii\grid\GridView::widget([
+<?php
+echo yii\grid\GridView::widget([
     'id' => 'maintenance-tool-run-grid',
     'dataProvider' => $model->search($model->attributes),
     'filterModel' => $model,

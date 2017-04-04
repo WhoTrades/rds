@@ -1,7 +1,8 @@
 <?php
-/* @var $model Project */
-/* @var $deployment_enabled bool */
+/** @var $model Project */
+/** @var $deployment_enabled bool */
 
+use app\models\Project;
 use yii\bootstrap\Alert;
 
 $this->params['menu'] = array(

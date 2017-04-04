@@ -16,6 +16,7 @@ class AlertController extends Controller
 
     /**
      * @throws \Exception
+     * @return string
      */
     public function actionIndex()
     {

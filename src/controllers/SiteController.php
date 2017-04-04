@@ -31,6 +31,7 @@ class SiteController extends Controller
     }
 
     /**
+     * @return string
      */
     public function actionIndex()
     {
@@ -155,6 +156,7 @@ class SiteController extends Controller
     /**
      * Страница создания запрета на релиз
      * @throws \Exception
+     * @return string
      */
     public function actionCreateReleaseReject()
     {

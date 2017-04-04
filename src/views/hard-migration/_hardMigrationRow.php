@@ -1,5 +1,6 @@
 <?php
 /** @var $model app\models\HardMigration */
+use app\modules\Wtflow\components\JiraApi;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use yii\bootstrap\BaseHtml;
@@ -120,7 +121,9 @@ return [
     [
         'attribute' => 'migration_ticket',
         'value' => function (HardMigration $migration) {
-            return "<a href='https://jira.finam.ru/browse/$migration->migration_ticket' target='_blank' title='Перейти в JIRA'>$migration->migration_ticket</a>";
+            $jiraBaseUrl = \Yii::$app->params['jira']['baseRdsJiraUrl'];
+
+            return "<a href='$jiraBaseUrl/browse/$migration->migration_ticket' target='_blank' title='Перейти в JIRA'>$migration->migration_ticket</a>";
         },
         'format' => 'html',
     ],

@@ -3,6 +3,9 @@ namespace app\modules\SingleLogin\components;
 
 class SingleAuthManager extends \yii\rbac\PhpManager
 {
+    /**
+     * {@inheritdoc}
+     */
     public function load()
     {
         parent::load();

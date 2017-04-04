@@ -1,5 +1,5 @@
 <?php
-/* @var $this app\components\View */
+/** @var $this app\components\View */
 ?>
 <h1><?php echo $this->uniqueId . '/' . $this->action->id; ?></h1>
 

@@ -45,7 +45,7 @@ echo yii\widgets\DetailView::widget([
                     $content .=     '<td>' . $prevName . '</td>';
                     $content .=     '<td>';
                     $content .=         '<div class="progress" style="margin: 0">';
-                    $content .=             '<div class="progress-bar" style="color: black; width:' . $with . '">' . sprintf("%.2f", $time - $prev) . '</div>';
+                    $content .=             '<div class="progress-bar" style="color: black; width:' . $with . '%">' . sprintf("%.2f", $time - $prev) . '</div>';
                     $content .=         '</div>';
                     $content .=     '</td>';
                     $content .=     '<td>' . sprintf("%.2f", $time) . '</td>';

@@ -1,12 +1,16 @@
 <?php
 /** @var $model app\models\ReleaseVersion */
 
-$this->params['menu']=array(
-	array('label'=>'List ReleaseVersion', 'url'=>array('index')),
-	array('label'=>'Create ReleaseVersion', 'url'=>array('create')),
-	array('label'=>'Update ReleaseVersion', 'url'=>array('update', 'id'=>$model->obj_id)),
-	array('label'=>'Delete ReleaseVersion', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->obj_id),'confirm'=>'Are you sure you want to delete this item?')),
-	array('label'=>'Manage ReleaseVersion', 'url'=>array('admin')),
+$this->params['menu'] = array(
+    array('label' => 'List ReleaseVersion', 'url' => array('index')),
+    array('label' => 'Create ReleaseVersion', 'url' => array('create')),
+    array('label' => 'Update ReleaseVersion', 'url' => array('update', 'id' => $model->obj_id)),
+    array(
+        'label' => 'Delete ReleaseVersion',
+        'url' => '#',
+        'linkOptions' => array('submit' => array('delete', 'id' => $model->obj_id), 'confirm' => 'Are you sure you want to delete this item?'),
+    ),
+    array('label' => 'Manage ReleaseVersion', 'url' => array('admin')),
 );
 ?>
 

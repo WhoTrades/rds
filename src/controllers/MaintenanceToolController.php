@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use Exception;
 use yii\web\HttpException;
 use app\models\MaintenanceTool;
 
@@ -22,27 +23,34 @@ class MaintenanceToolController extends Controller
     }
 
     /**
-     * Displays a particular model.
-     * @param integer $id the ID of the model to be displayed
+     * @param int $id
+     * @return string
      */
     public function actionView($id)
     {
-        return $this->render('view',array(
-            'model'=>$this->loadModel($id),
+        return $this->render('view', array(
+            'model' => $this->loadModel($id),
         ));
     }
 
+    /**
+     * @return string
+     */
     public function actionIndex()
     {
         $model = new MaintenanceTool(['scenario' => 'search']);
-        if(isset($_GET['MaintenanceTool']))
-            $model->attributes=$_GET['MaintenanceTool'];
+        if (isset($_GET['MaintenanceTool'])) {
+            $model->attributes = $_GET['MaintenanceTool'];
+        }
 
-        return $this->render('index',array(
-            'model'=>$model,
+        return $this->render('index', array(
+            'model' => $model,
         ));
     }
 
+    /**
+     * @param int $id
+     */
     public function actionStart($id)
     {
         /** @var $tool MaintenanceTool */
@@ -53,10 +61,13 @@ class MaintenanceToolController extends Controller
         if (empty($mtr->errors)) {
             $this->redirect(['/maintenance-tool-run/view/', 'id' => $mtr->obj_id]);
         } else {
-            throw new Exception("Can't  create new instance of tool: ".json_encode($mtr->errors));
+            throw new Exception("Can't  create new instance of tool: " . json_encode($mtr->errors));
         }
     }
 
+    /**
+     * @param int $id
+     */
     public function actionStop($id)
     {
         /** @var $tool MaintenanceTool */
@@ -77,8 +88,10 @@ class MaintenanceToolController extends Controller
     public function loadModel($id)
     {
         $model = MaintenanceTool::findByPk($id);
-        if($model===null)
-            throw new HttpException(404,'The requested page does not exist.');
+        if ($model === null) {
+            throw new HttpException(404, 'The requested page does not exist.');
+        }
+
         return $model;
     }
 }

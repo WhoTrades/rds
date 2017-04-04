@@ -28,6 +28,7 @@ class UseController extends Controller
     /**
      * @param int $id
      * Lists all models.
+     * @return string
      */
     public function actionCreate($id)
     {
@@ -85,7 +86,7 @@ class UseController extends Controller
             Log::createLogMessage("CODES {$releaseRequest->getTitle()}");
         }
 
-        $this->redirect(['/use/index', 'id' => $id]);
+        return $this->redirect(['/use/index', 'id' => $id]);
     }
 
     /**
@@ -156,6 +157,7 @@ class UseController extends Controller
     /**
      * @param int $id
      * Lists all models.
+     * @return string
     */
     public function actionIndex($id)
     {

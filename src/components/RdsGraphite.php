@@ -15,6 +15,9 @@ class RdsGraphite extends \yii\base\Object
     /** @var Graphite */
     private $graphite;
 
+    /**
+     * {@inheritdoc}
+     */
     public function init() {
         $this->graphite = new Graphite([
             'host'      => $this->host,

@@ -43,10 +43,9 @@ use yii\widgets\ActiveForm;
     ]) ?>
     <?= Html::errorSummary([$model]) ?>
 
-    <?if (!$releaseRequest->rr_project_owner_code_entered) {?>
-        <?= $form->field($model,'rr_project_owner_code'); ?>
-    <?}?>
+    <?php if (!$releaseRequest->rr_project_owner_code_entered) {?>
+        <?=$form->field($model, 'rr_project_owner_code'); ?>
+    <?php }?>
     <?php echo Html::submitButton('USE'); ?>
     <?php ActiveForm::end() ?>
-
 </div>

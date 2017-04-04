@@ -81,7 +81,8 @@ use app\models\AlertLog;
                             $alertName = Html::a($alertName, $alert->getLink(), ['target' => '_blank']);
                         }
 
-                        echo Html::tag('em',
+                        echo Html::tag(
+                            'em',
                             Html::submitButton(Html::icon($val['icon']), [
                                 'name' => "ignore[$alert->obj_id]",
                                 'value' => $val['ignoreTime'],
@@ -89,7 +90,6 @@ use app\models\AlertLog;
                                 'class' => $alert->alert_status == AlertLog::STATUS_OK ? 'btn btn-success' : 'btn btn-danger',
                             ]) . ' ' . $alertName
                         );
-
                     }
                     if (empty($val['list'])) {
                         echo '<span class="label label-warning">Нет</span>';
