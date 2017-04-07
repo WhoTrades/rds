@@ -22,7 +22,7 @@ echo yii\grid\GridView::widget([
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'obj_id',
-        'obj_created',
+        'obj_created:datetime',
         'mtrMaintenanceTool.mt_name',
         'mtr_runner_user',
         'mtr_pid',

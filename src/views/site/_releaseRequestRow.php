@@ -12,7 +12,7 @@ use yii\bootstrap\Modal;
 
 return array(
     'obj_id',
-    'obj_created',
+    'obj_created:datetime',
     'rr_user',
     [
         'attribute' => 'rr_comment',
@@ -43,7 +43,7 @@ return array(
                 ReleaseRequest::STATUS_CANCELLED    => array('ok', 'Отменено', 'red'),
             );
             list($icon, $text, $color) = $map[$releaseRequest->rr_status];
-            $result = ["<span title='{$text}' style='color: " . $color . "'>" . yii\bootstrap\BaseHtml::icon($icon) . " {$releaseRequest->rr_status}</span><hr />"];
+            $result = ["<span title='{$text}' style='color: " . $color . "'>" . yii\bootstrap\BaseHtml::icon($icon) . " {$releaseRequest->rr_status}</span><br />"];
 
             foreach ($releaseRequest->builds as $val) {
                 /** @var $val Build */

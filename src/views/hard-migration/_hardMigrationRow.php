@@ -139,6 +139,6 @@ return [
         'attribute' => 'releaseRequest.rr_build_version',
         'filter' => Html::activeTextInput($model, 'build_version'),
     ],
-    'obj_created',
+    'obj_created:datetime',
     'migration_release_request_obj_id',
 ];

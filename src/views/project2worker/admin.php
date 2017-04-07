@@ -44,7 +44,7 @@ echo yii\grid\GridView::widget([
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'obj_id',
-        'obj_created',
+        'obj_created:datetime',
         'obj_modified',
         'obj_status_did',
         'worker.worker_name',

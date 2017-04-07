@@ -197,7 +197,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             // an: Если собирали ради пересборки develop/staging и все успешно смержилось - тогда пушим пересоздаем ветки
             if (in_array($gitBuild->additional_data, ["develop", "staging"]) && $errorsCount == 0) {
                 $model->sendMergeCreateBranch(
-                    \Yii::$app->modules['Wtflow']['workerName'],
+                    \Yii::$app->modules['Wtflow']->workerName,
                     new Message\Merge\CreateBranch($gitBuild->additional_data, $gitBuild->branch, true)
                 );
                 mail(

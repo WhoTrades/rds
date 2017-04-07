@@ -42,7 +42,7 @@ $('.search-form form').submit(function(){
     //'filterModel' => $model
     'columns' => [
         'obj_id',
-        'obj_created',
+        'obj_created:datetime',
         'worker_name',
         [
             'class' => yii\grid\ActionColumn::class,

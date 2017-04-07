@@ -41,7 +41,7 @@ $('.search-form form').submit(function(){
     'dataProvider' => $model->search($model->attributes),
     'filterModel' => $model,
     'columns' => [
-        'obj_created',
+        'obj_created:datetime',
         'rv_version',
         'rv_name',
         [

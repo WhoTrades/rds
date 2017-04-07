@@ -21,7 +21,7 @@ $this->params['menu'] = array(
     'model' => $model,
     'attributes' => [
         'obj_id',
-        'obj_created',
+        'obj_created:datetime',
         'obj_modified',
         'obj_status_did',
         'project_name',
@@ -34,7 +34,7 @@ echo yii\grid\GridView::widget([
     'filterModel' => $searchModel,
     'options' => ['class' => 'table-responsive'],
     'columns' => [
-        'obj_created',
+        'obj_created:datetime',
         'pch_user',
         [
             'class' => 'yii\grid\ActionColumn',

@@ -41,7 +41,7 @@ echo yii\grid\GridView::widget(array(
     'dataProvider' => $model->search($model->attributes),
     'filterModel' => $model,
     'columns' => array(
-        'obj_created',
+        'obj_created:datetime',
         'log_user',
         [
             'attribute' => 'log_text',

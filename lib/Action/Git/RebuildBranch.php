@@ -10,6 +10,26 @@ use app\modules\Wtflow\models\GitBuildBranch;
 
 class RebuildBranch
 {
+    private $map = [
+        'develop' => [
+            \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_DEVELOP,
+            \CompanyInfrastructure\Jira\Status::STATUS_WAITING_FOR_TEST,
+            \CompanyInfrastructure\Jira\Status::STATUS_TESTING,
+
+            \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_STAGING,
+            \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_CHECK,
+            \CompanyInfrastructure\Jira\Status::STATUS_CHECKING,
+            \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_STAGING,
+            \CompanyInfrastructure\Jira\Status::STATUS_PACKED_FOR_RELEASE,
+        ],
+        'staging' => [
+            \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_STAGING,
+            \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_CHECK,
+            \CompanyInfrastructure\Jira\Status::STATUS_CHECKING,
+
+            \CompanyInfrastructure\Jira\Status::STATUS_PACKED_FOR_RELEASE,
+        ],
+    ];
     /**
      * @param string $branch - ветка, которую нужно пересобрать, develop|staging
      * @param string $user - имя пользовеля, инициатора пересборки
@@ -40,69 +60,24 @@ class RebuildBranch
             }
         }
 
-        $map = [
-            'develop' => [
-                \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_DEVELOP,
-                \CompanyInfrastructure\Jira\Status::STATUS_WAITING_FOR_TEST,
-                \CompanyInfrastructure\Jira\Status::STATUS_TESTING,
-
-                \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_STAGING,
-                \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_CHECK,
-                \CompanyInfrastructure\Jira\Status::STATUS_CHECKING,
-                \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_STAGING,
-                \CompanyInfrastructure\Jira\Status::STATUS_PACKED_FOR_RELEASE,
-            ],
-            'staging' => [
-                \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_STAGING,
-                \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_CHECK,
-                \CompanyInfrastructure\Jira\Status::STATUS_CHECKING,
-
-                \CompanyInfrastructure\Jira\Status::STATUS_PACKED_FOR_RELEASE,
-            ],
-        ];
-
-        $jira = new JiraApi(\Yii::$app->debugLogger);
-
-        $jql = "status IN (\"" . implode('", "', $map[$branch]) . "\") AND project IN (" . implode(", ", \Yii::$app->params['jiraProjects']) . ") ORDER BY updated ASC";
-        \Yii::$app->debugLogger->message("Getting tickets by jql=$jql");
-
-        $tickets = $jira->getTicketsByJql($jql);
-
-        $branches = [];
-        foreach ($tickets['issues'] as $ticket) {
-            \Yii::$app->debugLogger->debug("Testing {$ticket['key']}");
-            if (!JiraFeature::countByAttributes(['jf_ticket' => $ticket['key']])) {
-                \Yii::$app->debugLogger->debug("Skip {$ticket['key']} as it is not known");
-                //continue;
-            }
-
-            $branches[] = "feature/{$ticket['key']}";
-        }
-
-        \Yii::$app->debugLogger->message("Branches: " . implode(", ", $branches));
+        $branches = $this->getBranchesForBuild($branch);
 
         if (!$branches) {
             \Yii::$app->debugLogger->message("No branches, se just create $branch from master branch");
             $model->sendMergeCreateBranch(
-                \Yii::$app->modules['Wtflow']['workerName'],
+                \Yii::$app->modules['Wtflow']->workerName,
                 new Message\Merge\CreateBranch($branch, "master", true)
             );
+
             return;
         }
 
-
-        $build = new GitBuild();
-        $build->branch = "tmp/build_" . uniqid();
-        $build->status = GitBuild::STATUS_NEW;
-        $build->user = $user;
-        $build->additional_data = $branch;
-
-        $build->save();
+        $build = $this->createGitBuild($user, $branch);
 
         \Yii::$app->debugLogger->message("Target branch: $build->branch, sending create branch task");
 
         $model->sendMergeTask(
-            \Yii::$app->modules['Wtflow']['workerName'],
+            \Yii::$app->modules['Wtflow']->workerName,
             new Message\Merge\Task(-1, "master", $build->branch, Message\Merge\Task::MERGE_TYPE_FEATURE)
         );
 
@@ -122,7 +97,7 @@ class RebuildBranch
 
             \Yii::$app->debugLogger->message("Branch: $val, sending merge branch task");
             $model->sendMergeTask(
-                \Yii::$app->modules['Wtflow']['workerName'],
+                \Yii::$app->modules['Wtflow']->workerName,
                 new Message\Merge\Task($build->obj_id, $val, $build->branch, Message\Merge\Task::MERGE_TYPE_BUILD)
             );
         }
@@ -131,5 +106,52 @@ class RebuildBranch
         \Yii::$app->webSockets->send('gitBuildRefreshAll', []);
 
         \Yii::$app->debugLogger->message("Tasks sent successfully");
+    }
+
+    /**
+     * @param string $user
+     * @param string $branch
+     * @return GitBuild
+     */
+    private function createGitBuild($user, $branch)
+    {
+        $build = new GitBuild();
+        $build->branch = "tmp/build_" . uniqid();
+        $build->status = GitBuild::STATUS_NEW;
+        $build->user = $user;
+        $build->additional_data = $branch;
+
+        $build->save();
+
+        return $build;
+    }
+
+    /**
+     * @param string $branch
+     * @return string[]
+     */
+    private function getBranchesForBuild($branch)
+    {
+        $jira = new JiraApi(\Yii::$app->debugLogger);
+
+        $jql = "status IN (\"" . implode('", "', $this->map[$branch]) . "\") AND project IN (" . implode(", ", \Yii::$app->params['jiraProjects']) . ") ORDER BY updated ASC";
+        \Yii::$app->debugLogger->message("Getting tickets by jql=$jql");
+
+        $tickets = $jira->getTicketsByJql($jql);
+
+        $branches = [];
+        foreach ($tickets['issues'] as $ticket) {
+            \Yii::$app->debugLogger->debug("Testing {$ticket['key']}");
+            if (!JiraFeature::countByAttributes(['jf_ticket' => $ticket['key']])) {
+                \Yii::$app->debugLogger->debug("Skip {$ticket['key']} as it is not known");
+                //continue;
+            }
+
+            $branches[] = "feature/{$ticket['key']}";
+        }
+
+        \Yii::$app->debugLogger->message("Branches: " . implode(", ", $branches));
+
+        return $branches;
     }
 }

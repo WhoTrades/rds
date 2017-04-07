@@ -45,7 +45,7 @@ $this->registerJs('
         <?php echo $form->field($model, 'rr_release_version')->dropDownList(\app\models\ReleaseVersion::forList()); ?>
     </div>
 
-    <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Save', ['class' => 'btn'])?>
+    <?= Html::submitButton('OK', ['class' => 'btn btn-primary'])?>
 
     <?php
         yii\bootstrap\ActiveForm::end();

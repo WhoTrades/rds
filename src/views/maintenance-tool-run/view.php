@@ -20,7 +20,7 @@ echo yii\widgets\DetailView::widget([
     'model' => $model,
     'attributes' => [
         'obj_id',
-        'obj_created',
+        'obj_created:datetime',
         'obj_modified',
         'obj_status_did',
         'mtr_maintenance_tool_obj_id',

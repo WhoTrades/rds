@@ -18,7 +18,7 @@ echo $this->widget('zii.widgets.CDetailView', array(
     'data' => $model,
     'attributes' => array(
         'obj_id',
-        'obj_created',
+        'obj_created:datetime',
         'obj_modified',
         'obj_status_did',
         'log_user',

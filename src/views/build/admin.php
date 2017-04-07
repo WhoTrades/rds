@@ -37,7 +37,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'obj_id',
-        'obj_created',
+        'obj_created:datetime',
         'project.project_name',
         'worker.worker_name',
         'build_status',
