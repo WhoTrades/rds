@@ -157,7 +157,7 @@ return array(
                         echo "<pre>$releaseRequest->rr_migration_error</pre>";
                         Modal::end();
 
-                        $result .= Html::a('view error', '', [
+                        $result .= Html::a('view error', '#', [
                             'style' => 'info',
                             'data' => ['toggle' => 'modal', 'target' => '#release-request-migration-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
                         ]);
