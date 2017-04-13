@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1cfbc43d78bb2b121064db872c75095b",
-    "content-hash": "85d065e15989706116f24cef8537eabf",
+    "hash": "fc6fe4a77a6514858cfc3957b26e8be9",
+    "content-hash": "0a563237ecc12e0763ad9b5e5a10f8f3",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -1382,23 +1382,23 @@
         },
         {
             "name": "whotrades/phpcs-stash",
-            "version": "0.0.18",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/phpcs-stash.git",
-                "reference": "ff02ecb57842dbb716c18f7837b7ccf3551cac9e"
+                "reference": "1907e670527fa5e3e19ee3d144cce5fc553f1950"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/WhoTrades/phpcs-stash/ff02ecb57842dbb716c18f7837b7ccf3551cac9e",
-                "reference": "ff02ecb57842dbb716c18f7837b7ccf3551cac9e",
+                "url": "https://artifact.finam.ru:443/artifactory/api/composer/packagist-org/vcs-dists/zip/WhoTrades/phpcs-stash/1907e670527fa5e3e19ee3d144cce5fc553f1950",
+                "reference": "1907e670527fa5e3e19ee3d144cce5fc553f1950",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "~5.3",
                 "monolog/monolog": "~1.17",
                 "php": ">=5.4",
-                "squizlabs/php_codesniffer": "~2.5"
+                "squizlabs/php_codesniffer": "~2.8"
             },
             "type": "library",
             "autoload": {
@@ -1407,7 +1407,7 @@
                 }
             },
             "description": "Integration between phpcs and atlassian stash",
-            "time": "2017-03-14 15:01:07"
+            "time": "2017-04-13 14:38:38"
         },
         {
             "name": "yiisoft/yii2",
