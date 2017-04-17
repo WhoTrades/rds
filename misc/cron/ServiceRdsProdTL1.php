@@ -9,7 +9,7 @@ use app\modules\Wtflow\Cronjob\Tool\Git\RebuildBranch;
 use app\modules\Wtflow\Cronjob\Tool\GitDropFeatureBranch;
 use app\modules\Wtflow\Cronjob\Tool\Jira\CloseFeatures;
 use app\modules\Wtflow\Cronjob\Tool\Jira\CodeReview;
-use app\modules\Wtflow\Cronjob\Tool\Jira\CodeReviewNotify;
+use app\modules\Wtflow\Cronjob\Tool\Jira\CodeReviewNotifier;
 use app\modules\Wtflow\Cronjob\Tool\Jira\FixVersionsRelease;
 use app\modules\Wtflow\Cronjob\Tool\Jira\HardMigrationNotifier;
 use app\modules\Wtflow\Cronjob\Tool\Jira\MergeTasks;
@@ -110,7 +110,7 @@ class ServiceRdsProdTL1
             new CronCommand(MergeTasks::getToolCommand(['--max-duration=60'], $verbosity = 1), '*/6 * * * * *', 'rds_jira_merge_tasks'),
             new CronCommand(CloseFeatures::getToolCommand([], $verbosity = 1), '32 10 * * * *', 'rds_jira_close_features'),
             new CronCommand(CodeReview::getToolCommand([], $verbosity = 3), '25 * * * * *', 'rds_jira_code_review'),
-            new CronCommand(CodeReviewNotify::getToolCommand([], $verbosity = 3), '0 3 * * * *', 'rds_jira_code_review_notify'),
+            new CronCommand(CodeReviewNotifier::getToolCommand([], $verbosity = 3), '0 3 * * * *', 'rds_jira_code_review_notify'),
             new CronCommand(HardMigrationNotifier::getToolCommand([], $verbosity = 1), '21 10 4 * * *', 'rds_jira_hard_migration_notifier'),
 
             new Comment("TeamCity integration"),
