@@ -17,7 +17,7 @@
         },
         "psr-4": {
             "app\\": "protected/",
-            "": "../../lib/MigrationSystem/components/"
+            "MigrationSystem\\": "../../lib/MigrationSystem/"
         }
     },
     "require": {
