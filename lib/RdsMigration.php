@@ -1,12 +1,12 @@
 <?php
 class RdsMigration extends Cronjob\RequestHandler\Migration
 {
-    public function __construct(\ServiceBase_IDebugLogger $debugLogger)
+    protected function getMigrationSystemConfig()
     {
-        // an: Инициализируем ядро Yii
-        YiiBridge::init($debugLogger);
+        $config = parent::getMigrationSystemConfig();
 
-        parent::__construct($debugLogger);
+        $config['components']['db'] = $config['components']['db4'];
+
+        return $config;
     }
 }
-
