@@ -159,10 +159,10 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
         return [
             AlertLog::WTS_LAMP_NAME => $monitoringDataProvider,
-            AlertLog::CRM_LAMP_NAME => $monitoringDataProvider,
-            AlertLog::MONITORING_DEV_LAMP_NAME => $this->getMonitoringDataProvider('MonitoringDEV'),
-            AlertLog::MONITORING_TST_LAMP_NAME => $this->getMonitoringDataProvider('MonitoringTST'),
             AlertLog::TEAM_CITY_LAMP_NAME => $this->getTeamCityDataProvider(['WhoTrades_AcceptanceTests_WtSmokeTestProd'], 'TeamCity: Smoke Tests'),
+            //AlertLog::CRM_LAMP_NAME => $monitoringDataProvider,
+            //AlertLog::MONITORING_DEV_LAMP_NAME => $this->getMonitoringDataProvider('MonitoringDEV'),
+            //AlertLog::MONITORING_TST_LAMP_NAME => $this->getMonitoringDataProvider('MonitoringTST'),
         ];
     }
 
