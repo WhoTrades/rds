@@ -13,7 +13,7 @@ use app\models\AlertLog;
 
 class MonitoringDataProvider implements IAlertDataProvider
 {
-    const TIMEOUT = 60;
+    const TIMEOUT = 90;
 
     /**
      * @var string Название провайдера

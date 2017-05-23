@@ -137,20 +137,24 @@ class JsonController extends Controller
         echo time() - strtotime($mtr->obj_created);
     }
 
+    /**
+     * @return string
+     */
     public function actionAddWtFlowStat()
     {
         $developer = Developer::findByAttributes(['whotrades_email' => $_POST['developer']]);
         
         if (!$developer) {
-            echo "Unknown developer ".$_POST['developer'];
-            return;
+            return "Unknown developer " . $_POST['developer'];
         }
 
         $wtflow = new WtFlowStat();
         $wtflow->attributes = $_POST;
         $wtflow->developer_id = $developer->obj_id;
-        $wtflow->log = implode("\n", $_POST['log']);
+        $wtflow->log = implode("\n", $_POST['log'] ?? []);
         $wtflow->save();
+
+        return "OK";
     }
 
     public function actionGetDisabledCronjobs()
@@ -172,8 +176,6 @@ class JsonController extends Controller
             echo json_encode(["OK" => true]);
             return;
         }
-
-        $transaction = \Yii::$app->db->beginTransaction();
 
         foreach ($data as $line => $val) {
             if (!preg_match('~--sys__package=([\w-]+)-([\d.]+)~', $line, $ans)) {
@@ -232,8 +234,6 @@ class JsonController extends Controller
                 'last_run_duration' => $row['last_run_duration'],
             ]);
         }
-
-        $transaction->commit();
 
         echo json_encode(["OK" => true]);
     }
