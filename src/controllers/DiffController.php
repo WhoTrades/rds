@@ -3,6 +3,8 @@ namespace app\controllers;
 
 use app\models\ProjectConfigHistory;
 use app\models\ReleaseRequest;
+use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 
 class DiffController extends Controller
 {
@@ -14,6 +16,10 @@ class DiffController extends Controller
         $rr1 = ReleaseRequest::findByPk($id1);
         /** @var $rr2 ReleaseRequest */
         $rr2 = ReleaseRequest::findByPk($id2);
+
+        if (!$rr1 || !$rr2) {
+            throw new NotFoundHttpException();
+        }
 
         return $this->render('index', array(
             'projectName' => $rr1->project->project_name,
@@ -29,6 +35,10 @@ class DiffController extends Controller
     {
         /** @var $rr1 ProjectConfigHistory */
         $rr1 = ProjectConfigHistory::findByPk($id);
+
+        if (!$rr1) {
+            throw new NotFoundHttpException();
+        }
 
         $rr2 = ProjectConfigHistory::find()->where([
             'pch_project_obj_id' => $rr1->pch_project_obj_id,
