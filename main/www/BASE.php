@@ -11,10 +11,8 @@ if (isset($_REQUEST['profile_enable']) && function_exists('tideways_enable')) {
         $runId = uniqid();
         file_put_contents("/tmp/$runId.profiling.xhprof", serialize($data));
 
-        if (isset($_SERVER['HTTP_HOST']) && false !== strpos($_SERVER['HTTP_HOST'], 'tst.whotrades.net')) {
-            $host = "xhprof.tst.whotrades.net";
-        } elseif (isset($_SERVER['HTTP_HOST']) && preg_match('~\.\w+.whotrades.net~', $_SERVER['HTTP_HOST'])) {
-            $host = "xhprof.dev.whotrades.net";
+        if (preg_match('~\w+\.(\w+\.whotrades.net)~', $_SERVER['HTTP_HOST'], $ans)) {
+            $host = "xhprof." . $ans[1];
         } else {
             $host = "xhprof.whotrades.net";
         }
