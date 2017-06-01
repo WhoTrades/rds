@@ -1,14 +1,4 @@
 <?php
-
-/*
- * This file is part of the Dektrium project.
- *
- * (c) Dektrium project <http://github.com/dektrium/>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace app\components\ExternalStuff;
 
 use Yii;
@@ -55,7 +45,11 @@ class Migration extends \MigrationSystem\components\DbMigration
                 throw new \RuntimeException('Your database is not supported!');
         }
     }
-    
+
+    /**
+     * @param string $table
+     * @param string $column
+     */
     public function dropColumnConstraints($table, $column)
     {
         $table = Yii::$app->db->schema->getRawTableName($table);
@@ -70,7 +64,7 @@ class Migration extends \MigrationSystem\components\DbMigration
                                 
         $constraints = $cmd->queryAll();
         foreach ($constraints as $c) {
-            $this->execute('ALTER TABLE '.Yii::$app->db->quoteTableName($table).' DROP CONSTRAINT '.Yii::$app->db->quoteColumnName($c['name']));
+            $this->execute('ALTER TABLE ' . Yii::$app->db->quoteTableName($table) . ' DROP CONSTRAINT ' . Yii::$app->db->quoteColumnName($c['name']));
         }
     }
 }

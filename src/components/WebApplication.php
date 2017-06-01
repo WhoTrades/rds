@@ -23,6 +23,9 @@ class WebApplication extends \yii\web\Application
         parent::__construct($config);
     }
 
+    /**
+     * @return string
+     */
     public function getTimezone()
     {
         $user = $this->getUser();
