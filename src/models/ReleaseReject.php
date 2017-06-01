@@ -2,7 +2,9 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
+use app\models\User\User;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.release_reject".
@@ -12,10 +14,10 @@ use yii\data\ActiveDataProvider;
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
- * @property string $rr_user
  * @property string $rr_comment
  * @property string $rr_project_obj_id
  * @property string $rr_release_version
+ * @property User $user
  */
 class ReleaseReject extends ActiveRecord
 {
@@ -35,11 +37,11 @@ class ReleaseReject extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_release_version'], 'required'),
+            array(['rr_user_id', 'rr_comment', 'rr_project_obj_id', 'rr_release_version'], 'required'),
             array(['obj_status_did'], 'number'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
-            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_release_version'], 'safe', 'on' => 'search'),
+            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'rr_user_id', 'rr_comment', 'rr_project_obj_id', 'rr_release_version'], 'safe', 'on' => 'search'),
         );
     }
 
@@ -53,7 +55,7 @@ class ReleaseReject extends ActiveRecord
             'obj_created' => 'Дата создания',
             'obj_modified' => 'Modified',
             'obj_status_did' => 'Status Did',
-            'rr_user' => 'Пользователь',
+            'rr_user_id' => 'Пользователь',
             'rr_comment' => 'Комментарий',
             'rr_project_obj_id' => 'Номер проекта',
             'rr_release_version' => 'Версия',
@@ -89,5 +91,13 @@ class ReleaseReject extends ActiveRecord
     public function getProject()
     {
         return $this->hasOne(Project::className(), ['obj_id' => 'rr_project_obj_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'rr_user_id']);
     }
 }

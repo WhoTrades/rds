@@ -51,6 +51,12 @@ echo Nav::widget(
                 'visible' => !\Yii::$app->user->isGuest,
                 'active' => $controllerId == 'hard-migration',
             ),
+            array(
+                'label' => 'РЕГИСТРАЦИЯ',
+                'url' => 'mailto://anaumenko@corp.finam.ru?subject=RDS аккаунт&body=Я пробовал сам восстановить пароль,' .
+                    ' но система не находит мою учетку. Прошу создать мне аккаунт в RDS на текущий ящик.',
+                'visible' => \Yii::$app->user->isGuest,
+            ),
 
             array(
                 'label' => 'Настройка сборки',
@@ -94,11 +100,16 @@ echo Nav::widget(
                 'visible' => !\Yii::$app->user->isGuest,
                 'active' => $controllerId == 'log',
             ),
+
             array(
-                'label' => \Yii::$app->user->getIsGuest() ? "" : "Выйти " . \Yii::$app->user->getIdentity()->username,
+                'label' => \Yii::$app->user->getIsGuest() ? "" : \Yii::$app->user->getIdentity()->email,
                 'icon' => 'log-out',
                 'url' => array('/site/logout'),
                 'visible' => !\Yii::$app->user->isGuest,
+                'items' => [
+                    ['label' => 'Профиль', 'url' => array('/user/settings/profile')],
+                    ['label' => 'Выйти', 'url' => array('/site/logout')],
+                ],
             ),
         ],
     )

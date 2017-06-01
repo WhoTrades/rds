@@ -1,5 +1,5 @@
 <?php
-//an: Так как тестового гита, жиры, тимсити и т.д. у нас нет - то все интеграционные штуки по умолчанию отключаем.
+// an: Так как тестового гита, жиры, тимсити и т.д. у нас нет - то все интеграционные штуки по умолчанию отключаем.
 // Включаем только на время отладки в config.local во время отладки и в config.local на прод контуре
 
 $this->serviceRds['jira']['createTags'] = false;
@@ -28,6 +28,8 @@ $this->serviceRds['alerts']['dataProvider'] = [
     ],
 ];
 
+$this->lock_dir = '/var/lib/cronjob';
+
 $this->serviceRds['jira']['codeReview'] = [
     'WTT' => [
         '*' => 40,
@@ -50,3 +52,7 @@ $this->graphiteSystem = array(
     'env'      => 'prod',
     'prefix'   => 'rds',
 );
+
+
+$this->DSN_DB4   = "pgsql://comon:rhfrflbkkj@pg-0-4.comon.local:5450/comon4";
+$this->DEBUG_MODE = 0;

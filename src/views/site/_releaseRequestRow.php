@@ -13,7 +13,18 @@ use yii\bootstrap\Modal;
 return array(
     'obj_id',
     'obj_created:datetime',
-    'rr_user',
+    [
+        'value' => function (ReleaseRequest $releaseRequest) {
+            $url = $releaseRequest->user->profile->getAvatarUrl(32);
+
+            return Html::img($url, [
+                'class' => 'img-rounded',
+                'alt' => $releaseRequest->user->email,
+                'title' => $releaseRequest->user->email,
+            ]);
+        },
+        'format' => 'raw',
+    ],
     [
         'attribute' => 'rr_comment',
         'value' => function (ReleaseRequest $releaseRequest) {

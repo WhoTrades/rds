@@ -42,7 +42,7 @@ echo yii\grid\GridView::widget(array(
     'filterModel' => $model,
     'columns' => array(
         'obj_created:datetime',
-        'log_user',
+        'user.email',
         [
             'attribute' => 'log_text',
             'format' => 'html',

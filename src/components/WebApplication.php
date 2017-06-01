@@ -1,6 +1,8 @@
 <?php
 namespace app\components;
 
+use ServiceBase_IDebugLogger;
+use Yii;
 use yii\web\HttpException;
 
 class WebApplication extends \yii\web\Application
@@ -20,17 +22,23 @@ class WebApplication extends \yii\web\Application
 
         parent::__construct($config);
     }
-    /**
-     * @param int  $status
-     * @param bool $exit
-     *
-     * @throws \yii\base\ExitException
-     */
-    public function end($status = 0, $exit = true)
+
+    public function getTimezone()
     {
-        if ($exit) {
-            \CoreLight::getInstance()->getFatalWatcher()->stop();
+        $user = $this->getUser();
+        if ($user->getIsGuest()) {
+            return parent::getTimeZone();
         }
+
+        return $this->getUser()->identity->profile->timezone;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function end($status = 0, $response = null)
+    {
+        parent::end($status, $response);
     }
 
     /**

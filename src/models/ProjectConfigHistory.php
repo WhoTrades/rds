@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use app\models\User\User;
 use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
 use yii\db\ActiveQuery;
@@ -14,12 +15,13 @@ use yii\db\ActiveQuery;
  * @property string $obj_modified
  * @property integer $obj_status_did
  * @property string $pch_project_obj_id
- * @property string $pch_user
+ * @property int $pch_user_id
  * @property string $pch_config
  * @property string $pch_filename
  *
  * The followings are the available model relations:
  * @property Project $project
+ * @property User $user
  */
 class ProjectConfigHistory extends ActiveRecord
 {
@@ -39,9 +41,8 @@ class ProjectConfigHistory extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['pch_project_obj_id'], 'required'),
-            array(['obj_status_did'], 'number'),
-            array(['pch_user'], 'string', 'max' => 128),
+            array(['pch_project_obj_id', 'pch_user_id'], 'required'),
+            array(['obj_status_did', 'pch_user_id'], 'number'),
             array(['pch_config'], 'safe'),
             array(['obj_created'], 'datetime'),
         );
@@ -84,8 +85,16 @@ class ProjectConfigHistory extends ActiveRecord
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
             'pch_project_obj_id' => 'Pch Project Obj',
-            'pch_user' => 'Pch User',
+            'pch_user_id' => 'Pch User',
             'pch_config' => 'Pch Config',
         );
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'pch_user_id']);
     }
 }

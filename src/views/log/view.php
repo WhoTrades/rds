@@ -21,7 +21,7 @@ echo $this->widget('zii.widgets.CDetailView', array(
         'obj_created:datetime',
         'obj_modified',
         'obj_status_did',
-        'log_user',
+        'user.email',
         'log_text',
     ),
 ));

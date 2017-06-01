@@ -35,7 +35,7 @@ echo yii\grid\GridView::widget([
     'options' => ['class' => 'table-responsive'],
     'columns' => [
         'obj_created:datetime',
-        'pch_user',
+        'user.email',
         [
             'class' => 'yii\grid\ActionColumn',
             'template' => '{view}',

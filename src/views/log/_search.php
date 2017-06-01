@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'obj_id') ?>
         <?= $form->field($model, 'obj_modified') ?>
         <?= $form->field($model, 'obj_status_did') ?>
-        <?= $form->field($model, 'log_user') ?>
+        <?= $form->field($model, 'log_user_id') ?>
         <?= $form->field($model, 'log_text') ?>
         <?= Html::submitButton('Search'); ?>
     <?php ActiveForm::end() ?>

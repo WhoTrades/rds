@@ -1,5 +1,5 @@
 <?php
-use app\modules\SingleLogin\components\SingleLoginUser;
+use app\models\User\User;
 
 class YiiBridge
 {
@@ -15,8 +15,6 @@ class YiiBridge
         defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 
         $application = new \app\components\ConsoleApplication(require($config), $debugLogger);
-
-        \Yii::$app->user->setIdentity(new SingleLoginUser("Cron", "cron@whotrades.org"));
 
         $application->run();
     }

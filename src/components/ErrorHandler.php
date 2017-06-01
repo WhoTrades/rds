@@ -11,10 +11,8 @@ class ErrorHandler extends \yii\web\ErrorHandler
      */
     public function logException($exception)
     {
-        if ($exception instanceof HttpException) {
-            Yii::$app->debugLogger->dump()->exception('an', $exception)->notice()->save();
-        } else {
-            Yii::$app->debugLogger->dump()->exception('an', $exception)->critical()->save();
-        }
+        /** @var $sentry \mito\sentry\Component */
+        $sentry = Yii::$app->sentry;
+        $sentry->captureException($exception);
     }
 }

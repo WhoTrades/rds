@@ -1,8 +1,10 @@
 <?php
 namespace app\models;
 
+use app\models\User\User;
 use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.log".
@@ -12,8 +14,9 @@ use app\components\ActiveRecord;
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
- * @property string $log_user
+ * @property int $log_user_id
  * @property string $log_text
+ * @property User $user
  */
 class Log extends ActiveRecord
 {
@@ -33,12 +36,11 @@ class Log extends ActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array(['obj_status_did'], 'number'),
-            array(['log_user'], 'string', 'max' => 128),
+            array(['obj_status_did', 'log_user_id'], 'number'),
             array(['log_text'], 'safe'),
         // The following rule is used by search().
         // @todo Please remove those attributes that should not be searched.
-            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'log_user', 'log_text'], 'safe', 'on' => 'search'),
+            array(['obj_id', 'obj_created', 'obj_modified', 'obj_status_did', 'log_user_id', 'log_text'], 'safe', 'on' => 'search'),
         );
     }
 
@@ -52,7 +54,7 @@ class Log extends ActiveRecord
             'obj_created' => 'Obj Created',
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
-            'log_user' => 'Log User',
+            'log_user_id' => 'Log User',
             'log_text' => 'Log Text',
         );
     }
@@ -83,13 +85,9 @@ class Log extends ActiveRecord
      */
     public static function createLogMessage(string $text, string $user = null)
     {
-
-        if ($user == null) {
-            $user = \Yii::$app->user->getIdentity()->username;
-        }
         $log = new self();
         $log->log_text = $text;
-        $log->log_user = $user;
+        $log->log_user_id = empty(\Yii::$app->user) || \Yii::$app->user->isGuest() ? null : \Yii::$app->user->id;
         if (!$log->save()) {
             throw new \Exception("Can't create log request: " . json_encode($log->errors));
         }
@@ -97,5 +95,13 @@ class Log extends ActiveRecord
         \Yii::$app->webSockets->send('logUpdated', []);
 
         return $log;
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'log_user_id']);
     }
 }

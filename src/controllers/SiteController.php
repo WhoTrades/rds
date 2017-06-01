@@ -47,14 +47,14 @@ class SiteController extends Controller
         $sql = "SELECT rr_project_obj_id, COUNT(*)
                 FROM rds.release_request
                 WHERE obj_created > NOW() - interval '3 month'
-                AND rr_user=:user
+                AND rr_user_id=:user
                 AND obj_status_did=:status
                 GROUP BY 1
                 ORDER BY 2 DESC
                 LIMIT 5";
 
         $ids = \Yii::$app->db->createCommand($sql, [
-            ':user' => \Yii::$app->user->getIdentity()->username,
+            ':user' => \Yii::$app->user->id,
             ':status' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
         ])->queryColumn();
 
@@ -84,7 +84,7 @@ class SiteController extends Controller
         try {
             if (isset($_POST['ReleaseRequest'])) {
                 $model->attributes = $_POST['ReleaseRequest'];
-                $model->rr_user = \Yii::$app->user->getIdentity()->username;
+                $model->rr_user_id = \Yii::$app->user->id;
                 if ($model->rr_project_obj_id) {
                     $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
                 }
@@ -100,7 +100,7 @@ class SiteController extends Controller
                         /** @var $dictionaryProject Project */
                         /** @var $whotradesProject Project */
                         $dictionary = new ReleaseRequest();
-                        $dictionary->rr_user = $model->rr_user;
+                        $dictionary->rr_user_id = $model->rr_user_id;
                         $dictionary->rr_project_obj_id = $dictionaryProject->obj_id;
                         $dictionary->rr_comment =
                             $model->rr_comment . " [slave for " . $projectName . "-$model->rr_build_version]";
@@ -110,7 +110,7 @@ class SiteController extends Controller
                         $dictionary->save();
 
                         $whotrades = new ReleaseRequest();
-                        $whotrades->rr_user = $model->rr_user;
+                        $whotrades->rr_user_id = $model->rr_user_id;
                         $whotrades->rr_project_obj_id = $whotradesProject->obj_id;
                         $whotrades->rr_comment =
                             $model->rr_comment . " [slave for " . $projectName . "-$model->rr_build_version]";
@@ -171,7 +171,7 @@ class SiteController extends Controller
                     continue;
                 }
                 $model = new ReleaseReject();
-                $model->rr_user = \Yii::$app->user->getIdentity()->username;
+                $model->rr_user_id = \Yii::$app->user->id;
                 $model->rr_project_obj_id = $projectId;
                 $model->rr_release_version = $_POST['ReleaseReject']['rr_release_version'];
                 $model->rr_comment = $_POST['ReleaseReject']['rr_comment'];
@@ -185,11 +185,11 @@ class SiteController extends Controller
                 if (!$phone) {
                     continue;
                 }
-                $text = "{$model->rr_user} rejected $projects. {$model->rr_comment}";
+                $text = "{$model->user->email} rejected $projects. {$model->rr_comment}";
                 \Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
             }
             \Yii::$app->EmailNotifier->sendRdsReleaseRejectNotification(
-                $model->rr_user,
+                $model->user->email,
                 $projects,
                 $model->rr_comment
             );
@@ -272,33 +272,6 @@ class SiteController extends Controller
         if (!isset($_GET['ajax'])) {
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
         }
-    }
-
-    /**
-     * Форма авторизации
-     */
-    public function actionLogin()
-    {
-        echo $this->render('login');
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function actionSecret()
-    {
-        $identity = new \app\modules\SingleLogin\components\SingleLoginUser(1, 'anaumenko@corp.finam.ru');
-
-        $phone = '79160549864';
-        $identity->setPersistentStates(array(
-            'phone' => $phone,
-            'userRights' => array('admin'),
-        ));
-
-        \Yii::$app->session->set('currentUser', $identity);
-        \Yii::$app->user->login($identity, 3600*24*30);
-
-        $this->redirect('/');
     }
 
     /**

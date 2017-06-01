@@ -49,9 +49,9 @@ class DiffController extends Controller
             'projectName' => $rr1->project->project_name,
             'filename' => $rr1->pch_filename,
             'newText' => $rr1->pch_config,
-            'newTitle' => "Новая версия: " . date('d.m.Y H:i:s', strtotime($rr1->obj_created)) . " " . $rr1->pch_user,
+            'newTitle' => "Новая версия: " . date('d.m.Y H:i:s', strtotime($rr1->obj_created)) . " " . $rr1->user->email,
             'currentText' => $rr2 ? $rr2->pch_config : "",
-            'currentTitle' => "Старая версия: " . ($rr2 ? date('d.m.Y H:i:s', strtotime($rr2->obj_created)) . " " . $rr2->pch_user : ""),
+            'currentTitle' => "Старая версия: " . ($rr2 ? date('d.m.Y H:i:s', strtotime($rr2->obj_created)) . " " . $rr2->user->email : ""),
         ));
     }
 }

@@ -15,6 +15,24 @@ class AlertController extends Controller
     const ALERT_LIST_TYPE_IGNORES = 'ignores';
 
     /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @throws \Exception
      * @return string
      */

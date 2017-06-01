@@ -37,7 +37,7 @@ echo GridView::widget(array(
     'columns' => array(
         'obj_id',
         'obj_created:datetime',
-        'rr_user',
+        'user.email',
         'rr_comment',
         'rr_release_version',
         'project.project_name',

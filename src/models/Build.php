@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
+use app\models\User\User;
 use yii\db\ActiveQuery;
 
 /**
@@ -23,6 +24,7 @@ use yii\db\ActiveQuery;
  * The followings are the available model relations:
  * @property Worker $worker
  * @property Project $project
+ * @property User $user
  * @property ReleaseRequest $releaseRequest
  */
 class Build extends ActiveRecord

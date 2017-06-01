@@ -152,11 +152,11 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     foreach (Yii::$app->params['jiraProjects'] as $jiraProject) {
                         $jiraVersion = new JiraCreateVersion();
                         $jiraVersion->attributes = [
-                                'jira_name' => $project->project_name . "-" . $build->releaseRequest->rr_build_version,
-                                'jira_description' => 'Сборка #' . $build->build_release_request_obj_id . ', ' . $build->releaseRequest->rr_user . ' [auto]',
-                                'jira_project' => $jiraProject,
-                                'jira_archived' => true,
-                                'jira_released' => false,
+                            'jira_name' => $project->project_name . "-" . $build->releaseRequest->rr_build_version,
+                            'jira_description' => 'Сборка #' . $build->build_release_request_obj_id . ', ' . $build->releaseRequest->user->email . ' [auto]',
+                            'jira_project' => $jiraProject,
+                            'jira_archived' => true,
+                            'jira_released' => false,
                         ];
 
                         $jiraVersion->save(false);

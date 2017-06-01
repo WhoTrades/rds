@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use app\models\User\User;
 use yii\data\Sort;
 use app\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
@@ -14,7 +15,7 @@ use yii\db\ActiveQuery;
  * @property string $obj_created
  * @property string $obj_modified
  * @property integer $obj_status_did
- * @property string $rr_user
+ * @property int $rr_user_id
  * @property string $rr_comment
  * @property string $rr_project_obj_id
  * @property integer $rr_leading_id
@@ -39,6 +40,7 @@ use yii\db\ActiveQuery;
  * @property string $rr_build_started
  *
  * @property Build[] $builds
+ * @property User $user
  * @property Project $project
  * @property HardMigration[] $hardMigrations
  * @property ReleaseRequest $leader
@@ -80,10 +82,10 @@ class ReleaseRequest extends ActiveRecord
         // will receive user inputs.
         return array(
             array('rr_status', 'default', 'value' => self::STATUS_NEW),
-            array(['rr_user', 'rr_status', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_release_version'], 'required'),
+            array(['rr_user_id', 'rr_status', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_release_version'], 'required'),
             array(['obj_status_did', 'rr_project_obj_id'], 'number'),
             array(
-                ['obj_id', 'obj_created', 'obj_status_did', 'rr_user', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_status'],
+                ['obj_id', 'obj_created', 'obj_status_did', 'rr_user_id', 'rr_comment', 'rr_project_obj_id', 'rr_build_version', 'rr_status'],
                 'safe',
                 'on' => 'search',
             ),
@@ -112,7 +114,8 @@ class ReleaseRequest extends ActiveRecord
         if ($rejects) {
             $messages = '';
             foreach ($rejects as $reject) {
-                $messages[] = "$reject->rr_comment ($reject->rr_user)";
+                /** @var $reject ReleaseReject */
+                $messages[] = "$reject->rr_comment ({$reject->user->email})";
             }
             $this->addError($attribute, 'Запрет на релиз: ' . implode("; ", $messages));
         }
@@ -150,7 +153,7 @@ class ReleaseRequest extends ActiveRecord
             'obj_created' => 'Дата создания',
             'obj_modified' => 'Дата модификаии',
             'obj_status_did' => 'Системный статус',
-            'rr_user' => 'Пользователь',
+            'rr_user_id' => 'Пользователь',
             'rr_status' => 'Статус',
             'rr_comment' => 'Комментарий',
             'rr_project_obj_id' => 'Проект',
@@ -322,8 +325,8 @@ class ReleaseRequest extends ActiveRecord
             $tasks[] = $task;
         }
 
-        \Yii::$app->EmailNotifier->sendRdsReleaseRequestNotification($this->rr_user, $this->project->project_name, $this->rr_comment);
-        $text = "{$this->rr_user} requested {$this->project->project_name}. {$this->rr_comment}";
+        \Yii::$app->EmailNotifier->sendRdsReleaseRequestNotification($this->user->email, $this->project->project_name, $this->rr_comment);
+        $text = "{$this->user->email} requested {$this->project->project_name}. {$this->rr_comment}";
         foreach (explode(",", \Yii::$app->params['notify']['releaseRequest']['phones']) as $phone) {
             if (!$phone) {
                 continue;
@@ -468,6 +471,14 @@ class ReleaseRequest extends ActiveRecord
     public function getHardMigrations()
     {
         return $this->hasMany(HardMigration::className(), ['migration_release_request_obj_id' => 'obj_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'rr_user_id']);
     }
 
     /**

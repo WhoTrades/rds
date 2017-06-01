@@ -8,6 +8,8 @@ use yii\console\Response;
 
 class ConsoleApplication extends \yii\console\Application
 {
+    public $user;
+
     /** @var \ServiceBase_IDebugLogger */
     public $debugLogger;
 

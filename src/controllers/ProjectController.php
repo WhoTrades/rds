@@ -147,7 +147,7 @@ class ProjectController extends Controller
                     $projectHistoryItem->pch_project_obj_id = $model->obj_id;
                     $projectHistoryItem->pch_filename = $filename;
                     $projectHistoryItem->pch_config = $content;
-                    $projectHistoryItem->pch_user = \Yii::$app->user->getIdentity()->username;
+                    $projectHistoryItem->pch_user_id = \Yii::$app->user->id;
                     $projectHistoryItem->save();
 
 

@@ -13,12 +13,28 @@
     ],
     "autoload": {
         "psr-0": {
-            "Whotrades_": "../../code-standard/Standards/"
+            "ServiceBase_": "../../lib/libcore/",
+            "CoreLight": "../../lib/libcore/",
+            "RequestHandler_": "../../lib/libcore/",
+            "Whotrades_": "../../code-standard/Standards/",
+            "DBFunc_": "../../lib/DBFunc/",
+            "": "lib/"
         },
         "psr-4": {
             "app\\": "protected/",
-            "MigrationSystem\\": "../../lib/MigrationSystem/"
-        }
+            "MigrationSystem\\": "../../lib/MigrationSystem/",
+            "WtConsts\\": "../../lib/WtConsts/",
+            "WtUtils\\": "../../lib/WtUtils/",
+            "CompanyInfrastructure\\": "../../lib/CompanyInfrastructure/",
+
+            "PgQ\\": "../../lib/PgQ/",
+            "GraphiteSystem\\": "../../lib/GraphiteSystem/",
+            "RdsSystem\\": "../../lib/RdsSystem/",
+            "ApplicationRequirementsSystem\\": "../../lib/ApplicationRequirementsSystem/",
+            "Cronjob\\": "../../lib/Cronjob/",
+            "ServiceBase\\Debug\\": "../../lib/libcore/ServiceBase/Debug/"
+        },
+        "classmap": ["misc/cron", "../../lib/creole"]
     },
     "require": {
         "kartik-v/yii2-grid": "~3.1",
@@ -33,7 +49,9 @@
         "php": ">=7.0",
         "yiisoft/yii2-swiftmailer": "~2.0",
         "sentry/sentry": "1.6.2",
-        "telegram-bot/api": "^2.2"
+        "telegram-bot/api": "^2.2",
+        "dektrium/yii2-user": "^0.9.12",
+        "mito/yii2-sentry": "~1.0.0"
     },
     "extra": {
         "asset-installer-paths": {
