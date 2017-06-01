@@ -11,6 +11,7 @@ use app\models\Project;
 use app\models\Project2worker;
 use app\models\ToolJob;
 use app\models\CpuUsage;
+use Exception;
 use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ToolJobStopped;
@@ -102,7 +103,7 @@ class CronjobsController extends Controller
             $stopper->project_obj_id = $project->obj_id;
         }
 
-        $stopper->stopped_till = date("Y-m-d H:i:s", strtotime("+$interval"));
+        $stopper->stopped_till = date("Y-m-d H:i:sP", strtotime("+$interval"));
         $stopper->save();
 
         Log::createLogMessage("Остановлена фоновая задача $key на $interval");

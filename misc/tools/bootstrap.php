@@ -31,15 +31,7 @@ class Config
     public function __construct($configLocations)
     {
         $path = dirname(__FILE__) . '/../../';
-        foreach (array(
-                 'config/config.db.php', // vdm: подключил т.к. он используется внутри config.pgq
-                 'config/config.servicebase.php',
-                 'config/config.services.php',
-                 'config/config.pgq.php', // vdm: NB: см config.pgq.php
-                 'config/config.cronjob.php', // ad: #WTS-855
-                 'config.service.php',
-                 'config.local.php',
-                 ) as $configLocation) {
+        foreach (array('config.service.php', 'config.local.php') as $configLocation) {
             if (file_exists($path . $configLocation)) {
                 require $path . $configLocation;
             }

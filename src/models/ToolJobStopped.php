@@ -12,6 +12,7 @@ use app\components\ActiveRecord;
  * @property string $obj_modified
  * @property integer $obj_status_did
  * @property string $project_obj_id
+ * @property string $project_name
  * @property string $key
  * @property string $stopped_till
  *

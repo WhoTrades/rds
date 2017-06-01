@@ -2,6 +2,8 @@
 /** @var $toolJob ToolJob */
 /** @var $Project Project */
 
+use app\models\Project;
+use app\models\ToolJob;
 use yii\bootstrap\Html;
 
 ?>
@@ -35,7 +37,7 @@ use yii\bootstrap\Html;
     <td>
         <div style="white-space: nowrap">
             <?php if ($stopper = $toolJob->getToolJobStopped()) {?>
-                Остановлено до <?=date('H:i', strtotime($stopper->stopped_till))?>
+                Остановлено до<br /><?=Yii::$app->formatter->asDatetime($stopper->stopped_till)?>
             <?php } else {?>
                 Активен
             <?php }?>
