@@ -73,7 +73,7 @@ class Config
 require_once __DIR__ . '/../../init-libraries.php';
 
 $syslogWriter = new ServiceBase\Debug\SyslogWriter(ServiceBase\Debug\Syslog::getInstance());
-$debugLogger = new ServiceBase\Debug\Logger\LoggerConsoleOutput(3, $syslogWriter, \Cronjob\Factory::getConsoleOutput());
+$debugLogger = new ServiceBase\Debug\Logger\LoggerErrorLog(3, $syslogWriter, \Cronjob\Factory::getConsoleOutput());
 
 $config = dirname(__FILE__) . '/../../protected/config/main.php';
 defined('YII_DEBUG') or define('YII_DEBUG', true);

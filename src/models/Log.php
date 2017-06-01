@@ -87,7 +87,7 @@ class Log extends ActiveRecord
     {
         $log = new self();
         $log->log_text = $text;
-        $log->log_user_id = empty(\Yii::$app->user) || \Yii::$app->user->isGuest() ? null : \Yii::$app->user->id;
+        $log->log_user_id = empty(\Yii::$app->user) || \Yii::$app->user->isGuest ? null : \Yii::$app->user->id;
         if (!$log->save()) {
             throw new \Exception("Can't create log request: " . json_encode($log->errors));
         }
