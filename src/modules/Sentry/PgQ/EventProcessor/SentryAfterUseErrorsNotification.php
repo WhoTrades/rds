@@ -48,7 +48,7 @@ class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
 
         $this->debugLogger->message("Processing event id={$event->getId()}, data = " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
-        $res = parse_url(\Config::getInstance()->sentry['projects']['rds']['dsn']);
+        $res = parse_url(\Yii::$app->sentry->dsn);
         $url = "{$res['scheme']}://{$res['host']}/";
         if (!preg_match('~([\w-]+)-([\d.]+)$~', $tagTo, $ans)) {
             throw new \ApplicationException("Using invalid build version '$tagTo''");
