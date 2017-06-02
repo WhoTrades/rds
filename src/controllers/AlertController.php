@@ -22,6 +22,7 @@ class AlertController extends Controller
         return [
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
+                'only' => ['index'],
                 'rules' => [
                     [
                         'allow' => true,
