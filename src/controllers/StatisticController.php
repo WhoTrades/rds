@@ -7,8 +7,6 @@ use app\models\ReleaseRequest;
 
 class StatisticController extends Controller
 {
-    const LAST_PACKAGE_REMOVE_CALL_TIME_KEY = 'RDS::actionGetProjectBuildsToDelete::last_call_time';
-
     public function actionGetLastBuildTime($projectName)
     {
         $project = Project::findByAttributes(array('project_name' => $projectName));
@@ -24,10 +22,5 @@ class StatisticController extends Controller
         } else {
             echo "unknown";
         }
-    }
-
-    public function actionGetProjectBuildsToDeleteLastCallTime()
-    {
-        echo time() - \CoreLight::getInstance()->getServiceBaseCacheKvdpp()->get(self::LAST_PACKAGE_REMOVE_CALL_TIME_KEY);
     }
 }
