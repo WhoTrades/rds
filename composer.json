@@ -17,7 +17,7 @@
             "CoreLight": "../../lib/libcore/",
             "RequestHandler_": "../../lib/libcore/",
             "Whotrades_": "../../code-standard/Standards/",
-            "DBFunc_": "../../lib/DBFunc/",
+            "DBFunc_": "../../lib/",
             "": "lib/"
         },
         "psr-4": {
