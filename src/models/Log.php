@@ -51,11 +51,11 @@ class Log extends ActiveRecord
     {
         return array(
             'obj_id' => 'Obj',
-            'obj_created' => 'Obj Created',
+            'obj_created' => 'Время',
             'obj_modified' => 'Obj Modified',
             'obj_status_did' => 'Obj Status Did',
-            'log_user_id' => 'Log User',
-            'log_text' => 'Log Text',
+            'log_user_id' => 'Пользователь',
+            'log_text' => 'Событие',
         );
     }
 
@@ -66,7 +66,8 @@ class Log extends ActiveRecord
      */
     public function search(array $params)
     {
-        $query = self::find()->filterWhere($params);
+        $query = self::find()->andWhere(array_filter(['obj_id' => $params['obj_id']]));
+        $query->filterWhere(['like', 'log_text', $params['log_text']]);
 
         if (empty($params['Log_sort'])) {
             $query->orderBy('obj_created desc, obj_id desc');

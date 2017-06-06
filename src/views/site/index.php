@@ -35,7 +35,6 @@ echo GridView::widget(array(
     'filterModel' => $releaseRejectSearchModel,
     'export' => false,
     'columns' => array(
-        'obj_id',
         'obj_created:datetime',
         'user.email',
         'rr_comment',

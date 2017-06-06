@@ -11,11 +11,10 @@ use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 
 return array(
-    'obj_id',
     'obj_created:datetime',
     [
         'value' => function (ReleaseRequest $releaseRequest) {
-            $url = $releaseRequest->user->profile->getAvatarUrl(32);
+            $url = $releaseRequest->user->profile->getAvatarUrl(64);
 
             return Html::img($url, [
                 'class' => 'img-rounded',
