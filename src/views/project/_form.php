@@ -4,6 +4,7 @@
  * @var $form yii\widgets\ActiveForm
  */
 
+use conquer\codemirror\CodemirrorWidget;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 use yii\widgets\ActiveForm;
@@ -47,24 +48,11 @@ use app\models\Project;
                 )
                 : ''
             ?>
-            <?= Html::textarea(
-                'project_config[' . $projectConfig->pc_filename . ']',
-                isset($_POST['project_config'][$projectConfig->pc_filename]) ? $_POST['project_config'][$projectConfig->pc_filename] : $projectConfig->pc_content,
-                ['id' => 'php-config-code-' . $projectConfig->pc_filename]
-            ) ?>
-            <script type="text/javascript">
-                var editor = CodeMirror.fromTextArea(
-                document.getElementById("php-config-code-<?=$projectConfig->pc_filename?>"),
-                {
-                    lineNumbers: true,
-                    matchBrackets: true,
-                    mode: "application/x-httpd-php",
-                    indentUnit: 4,
-                    viewportMargin: Infinity,
-                    indentWithTabs: true
-                }
-                );
-            </script>
+            <?=CodemirrorWidget::widget([
+                'name' => 'project_config[' . $projectConfig->pc_filename . ']',
+                'value' => isset($_POST['project_config'][$projectConfig->pc_filename]) ? $_POST['project_config'][$projectConfig->pc_filename] : $projectConfig->pc_content,
+                'preset' => 'php',
+            ]);?>
         <?php } ?>
         <br />
         Собирать на:<br />

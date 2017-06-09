@@ -121,7 +121,8 @@ class UseController extends Controller
                     new \RdsSystem\Message\MigrationTask(
                         $releaseRequest->project->project_name,
                         $releaseRequest->rr_build_version,
-                        $type
+                        $type,
+                        $releaseRequest->project->script_migration_up
                     )
                 );
         }

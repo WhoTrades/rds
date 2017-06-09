@@ -361,7 +361,7 @@ class ReleaseRequest extends ActiveRecord
                 $build->releaseRequest->rr_build_version,
                 $build->releaseRequest->rr_release_version,
                 $lastSuccess ? $lastSuccess->project->project_name . '-' . $lastSuccess->rr_build_version : null,
-                RdsDbConfig::get()->preprod_online
+                $build->releaseRequest->project->script_migration_new
             ));
         }
     }

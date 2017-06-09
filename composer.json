@@ -32,7 +32,8 @@
             "RdsSystem\\": "../../lib/RdsSystem/",
             "ApplicationRequirementsSystem\\": "../../lib/ApplicationRequirementsSystem/",
             "Cronjob\\": "../../lib/Cronjob/",
-            "ServiceBase\\Debug\\": "../../lib/libcore/ServiceBase/Debug/"
+            "ServiceBase\\Debug\\": "../../lib/libcore/ServiceBase/Debug/",
+            "ServiceBase\\HttpRequest\\": "../../lib/libcore/ServiceBase/HttpRequest/"
         },
         "classmap": ["misc/cron", "../../lib/creole"]
     },
@@ -51,6 +52,7 @@
         "sentry/sentry": "1.6.2",
         "telegram-bot/api": "^2.2",
         "dektrium/yii2-user": "^0.9.12",
+        "conquer/codemirror": "~2.0",
         "mito/yii2-sentry": "~1.0.0"
     },
     "extra": {

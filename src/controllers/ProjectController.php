@@ -81,6 +81,22 @@ class ProjectController extends Controller
         ));
     }
 
+    public function actionUpdateScriptMigration(int $id) : string
+    {
+        $model = $this->loadModel($id);
+
+        if (isset($_POST['Project'])) {
+            $model->attributes = $_POST['Project'];
+            if ($model->save()) {
+                $this->redirect(array('view', 'id' => $model->obj_id));
+            }
+        }
+
+        return $this->render('update-script-migration', array(
+            'project' => $model,
+        ));
+    }
+
     /**
      * Updates a particular model.
      * If update is successful, the browser will be redirected to the 'view' page.
