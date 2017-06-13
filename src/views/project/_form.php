@@ -1,6 +1,7 @@
 <?php
 /**
  * @var $model Project
+ * @var $workers Worker[]
  * @var $form yii\widgets\ActiveForm
  */
 
@@ -9,14 +10,9 @@ use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 use yii\widgets\ActiveForm;
 use app\models\Project;
+use app\models\Worker;
 
 ?>
-
-<script src="/css/codemirror.js"></script>
-<script src="/css/php/clike.js"></script>
-<script src="/css/php/php.js"></script>
-
-<link rel="stylesheet" href="/css/codemirror.css">
 
 <div class="form" style="width: 1200px; margin: auto">
 
@@ -48,10 +44,20 @@ use app\models\Project;
                 )
                 : ''
             ?>
+            <?=Alert::widget([
+                'options' => [
+                    'class' => 'alert-info',
+                ],
+                'body' => "F11 - полноэкранный режим редактора, Esc - выход",
+            ])?>
             <?=CodemirrorWidget::widget([
                 'name' => 'project_config[' . $projectConfig->pc_filename . ']',
                 'value' => isset($_POST['project_config'][$projectConfig->pc_filename]) ? $_POST['project_config'][$projectConfig->pc_filename] : $projectConfig->pc_content,
                 'preset' => 'php',
+                'options' => [
+                    'rows' => 15,
+                    'style' => 'width: 100%',
+                ],
             ]);?>
         <?php } ?>
         <br />
@@ -75,5 +81,4 @@ use app\models\Project;
             <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
         </div>
     <?php ActiveForm::end() ?>
-
 </div>

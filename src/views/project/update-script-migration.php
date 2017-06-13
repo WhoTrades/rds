@@ -3,6 +3,7 @@
 use app\models\Project;
 use conquer\codemirror\CodemirrorWidget;
 use yii\bootstrap\ActiveForm;
+use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 
 $this->params['menu'] = array(
@@ -48,12 +49,18 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
 
 <div class="row">
     <div class="col-md-6 col-sm-9">
+        <?=Alert::widget([
+            'options' => [
+                'class' => 'alert-info',
+            ],
+            'body' => "F11 - полноэкранный режим редактора, Esc - выход",
+        ])?>
         <?= $form->field($project, 'script_migration_new')->widget(
             CodemirrorWidget::className(),
             [
                 'presetsDir' => '../../protected/assets/preset',
                 'preset' => 'bash',
-                'options' => ['rows' => 20],
+                'options' => ['rows' => 15, 'style' => 'width: 100%'],
             ]
         ) ?>
 
