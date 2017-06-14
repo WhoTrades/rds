@@ -35,7 +35,18 @@ Yii::$app->webSockets->registerScripts($this);
 <body>
 <?php
 $this->beginBody();
-$controllerId = \Yii::$app->controller->id;
+$controllerId   = \Yii::$app->controller->id;
+$actionId       = \Yii::$app->controller->action->id;
+$modulesNav     = [];
+
+foreach (\Yii::$app->modules as $module) {
+    if (!$module instanceof app\IHaveNavInterface) {
+        continue;
+    }
+
+    $modulesNav = ArrayHelper::merge($modulesNav, $module::getNav($controllerId, $actionId));
+}
+
 NavBar::begin(['brandLabel' => 'RDS']);
 echo Nav::widget(
     [
@@ -43,24 +54,24 @@ echo Nav::widget(
         'activateParents' => true,
         'items' => ArrayHelper::merge(
             [
-                [
+                'home' => [
                     'label' => 'Главная',
                     'url' => ['/site/index'],
                     'active' => $controllerId == 'site',
                 ],
-                [
+                'hardMigration' => [
                     'label' => 'Миграции',
                     'url' => ['/hard-migration/index'],
                     'visible' => !\Yii::$app->user->isGuest,
                     'active' => $controllerId == 'hard-migration',
                 ],
-                [
+                'registration' => [
                     'label' => 'РЕГИСТРАЦИЯ',
                     'url' => 'mailto://anaumenko@corp.finam.ru?subject=RDS аккаунт&body=Я пробовал сам восстановить пароль,' .
                         ' но система не находит мою учетку. Прошу создать мне аккаунт в RDS на текущий ящик.',
                     'visible' => \Yii::$app->user->isGuest,
                 ],
-                [
+                'releases' => [
                     'label' => 'Настройка сборки',
                     'url' => ['/project/admin'],
                     'visible' => !\Yii::$app->user->isGuest,
@@ -70,21 +81,15 @@ echo Nav::widget(
                         ['label' => 'Версии', 'url' => ['/release-version/admin'], 'active' => $controllerId == 'release-version'],
                     ],
                 ],
-                [
+            ],
+            $modulesNav,
+            [
+                'journal' => [
                     'label' => 'Журнал',
                     'url' => ['/log/index'],
                     'visible' => !\Yii::$app->user->isGuest,
                 ],
-            ],
-            array_map(function ($module) use ($controllerId) {
-                if (!$module instanceof app\IHaveNavInterface) {
-                    return '';
-                }
-
-                return $module::getNav($controllerId);
-            }, Yii::$app->modules),
-            [
-                [
+                'logOut' => [
                     'label' => \Yii::$app->user->getIsGuest() ? "" : \Yii::$app->user->getIdentity()->email,
                     'icon' => 'log-out',
                     'url' => ['/site/logout'],

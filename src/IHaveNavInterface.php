@@ -10,8 +10,9 @@ namespace app;
 interface IHaveNavInterface
 {
     /**
-     * @param int $controllerId
+     * @param string $controllerId
+     * @param string $actionId
      * @return array
      */
-    public static function getNav($controllerId) : array;
+    public static function getNav($controllerId, $actionId) : array;
 }
