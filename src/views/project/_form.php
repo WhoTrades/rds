@@ -1,21 +1,18 @@
 <?php
 /**
  * @var $model Project
+ * @var $workers Worker[]
  * @var $form yii\widgets\ActiveForm
  */
 
+use conquer\codemirror\CodemirrorWidget;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 use yii\widgets\ActiveForm;
 use app\models\Project;
+use app\models\Worker;
 
 ?>
-
-<script src="/css/codemirror.js"></script>
-<script src="/css/php/clike.js"></script>
-<script src="/css/php/php.js"></script>
-
-<link rel="stylesheet" href="/css/codemirror.css">
 
 <div class="form" style="width: 1200px; margin: auto">
 
@@ -47,24 +44,21 @@ use app\models\Project;
                 )
                 : ''
             ?>
-            <?= Html::textarea(
-                'project_config[' . $projectConfig->pc_filename . ']',
-                isset($_POST['project_config'][$projectConfig->pc_filename]) ? $_POST['project_config'][$projectConfig->pc_filename] : $projectConfig->pc_content,
-                ['id' => 'php-config-code-' . $projectConfig->pc_filename]
-            ) ?>
-            <script type="text/javascript">
-                var editor = CodeMirror.fromTextArea(
-                document.getElementById("php-config-code-<?=$projectConfig->pc_filename?>"),
-                {
-                    lineNumbers: true,
-                    matchBrackets: true,
-                    mode: "application/x-httpd-php",
-                    indentUnit: 4,
-                    viewportMargin: Infinity,
-                    indentWithTabs: true
-                }
-                );
-            </script>
+            <?=Alert::widget([
+                'options' => [
+                    'class' => 'alert-info',
+                ],
+                'body' => "F11 - полноэкранный режим редактора, Esc - выход",
+            ])?>
+            <?=CodemirrorWidget::widget([
+                'name' => 'project_config[' . $projectConfig->pc_filename . ']',
+                'value' => isset($_POST['project_config'][$projectConfig->pc_filename]) ? $_POST['project_config'][$projectConfig->pc_filename] : $projectConfig->pc_content,
+                'preset' => 'php',
+                'options' => [
+                    'rows' => 15,
+                    'style' => 'width: 100%',
+                ],
+            ]);?>
         <?php } ?>
         <br />
         Собирать на:<br />
@@ -87,5 +81,4 @@ use app\models\Project;
             <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
         </div>
     <?php ActiveForm::end() ?>
-
 </div>

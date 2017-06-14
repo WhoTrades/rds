@@ -22,6 +22,8 @@ use app\components\ActiveRecord;
  * @property string           $project_post_migration_version
  * @property string           $project_notification_email
  * @property string           $project_notification_subject
+ * @property string           $script_migration_up
+ * @property string           $script_migration_new
  * @property ReleaseRequest[] $releaseRequests
  * @property ProjectConfig[]  $projectConfigs
  * @property Project2Worker[] $project2workers
@@ -48,6 +50,7 @@ class Project extends ActiveRecord
         return [
             ['project_name', 'required'],
             ['obj_status_did', 'number'],
+            [['script_migration_up', 'script_migration_new'], 'string'],
             ['project_notification_email', 'email'],
             ['project_config', 'safe'],
             [['project_notification_email', 'project_notification_subject'], 'string', 'max' => 64],
@@ -147,6 +150,8 @@ class Project extends ActiveRecord
             'project_name' => 'Проект',
             'project_notification_email' => 'Email оповещеиня о выкладке',
             'project_notification_subject' => 'Тема оповещения о выкладке',
+            'script_migration_up' => 'Скрипт по выполнению всех миграций в данной сборке',
+            'script_migration_new' => 'Скрипт которвый выводит список всех невыполненных миграций',
         ];
     }
 

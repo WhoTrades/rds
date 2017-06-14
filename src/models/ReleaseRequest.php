@@ -348,6 +348,7 @@ class ReleaseRequest extends ActiveRecord
     public function sendBuildTasks()
     {
         foreach ($this->builds as $build) {
+            /** @var $lastSuccess ReleaseRequest | null */
             $lastSuccess = static::find()->where([
                 'rr_status' => ReleaseRequest::getInstalledStatuses(),
                 'rr_project_obj_id' => $build->releaseRequest->rr_project_obj_id,
@@ -355,14 +356,17 @@ class ReleaseRequest extends ActiveRecord
             orderBy('rr_build_version desc')->one();
 
             // an: Отправляем задачу в Rabbit на сборку
-            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendBuildTask($build->worker->worker_name, new \RdsSystem\Message\BuildTask(
-                $build->obj_id,
-                $build->project->project_name,
-                $build->releaseRequest->rr_build_version,
-                $build->releaseRequest->rr_release_version,
-                $lastSuccess ? $lastSuccess->project->project_name . '-' . $lastSuccess->rr_build_version : null,
-                RdsDbConfig::get()->preprod_online
-            ));
+            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendBuildTask(
+                $build->worker->worker_name,
+                new \RdsSystem\Message\BuildTask(
+                    $build->obj_id,
+                    $build->project->project_name,
+                    $build->releaseRequest->rr_build_version,
+                    $build->releaseRequest->rr_release_version,
+                    $lastSuccess ? $lastSuccess->getBuildTag() : null,
+                    $build->releaseRequest->project->script_migration_new
+                )
+            );
         }
     }
 
@@ -370,7 +374,7 @@ class ReleaseRequest extends ActiveRecord
      * Отправляет задачи на переключение на сборку
      * @param string $initiatorUserName
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function sendUseTasks($initiatorUserName)
     {
