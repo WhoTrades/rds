@@ -31,6 +31,7 @@ use app\models\Worker;
         <?= $form->field($model, 'project_name') ?>
         <?= $form->field($model, 'project_notification_email') ?>
         <?= $form->field($model, 'project_notification_subject') ?>
+        <?= $form->field($model, 'project_servers')->textarea(['rows' => '6']) ?>
 
         <h2>Локальная конфигурация <a href="<?=Url::to(['/project-config/', 'projectId' => $model->obj_id])?>">управление</a></h2>
         <?php foreach ($model->projectConfigs as $projectConfig) { ?>

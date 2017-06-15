@@ -364,7 +364,8 @@ class ReleaseRequest extends ActiveRecord
                     $build->releaseRequest->rr_build_version,
                     $build->releaseRequest->rr_release_version,
                     $lastSuccess ? $lastSuccess->getBuildTag() : null,
-                    $build->releaseRequest->project->script_migration_new
+                    $build->releaseRequest->project->script_migration_new,
+                    $build->project->getProjectServersArray()
                 )
             );
         }
@@ -390,7 +391,8 @@ class ReleaseRequest extends ActiveRecord
                     $this->project->project_name,
                     $this->obj_id,
                     $this->rr_build_version,
-                    $initiatorUserName
+                    $initiatorUserName,
+                    $this->project->getProjectServersArray()
                 )
             );
         }

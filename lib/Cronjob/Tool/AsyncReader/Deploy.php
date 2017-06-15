@@ -723,7 +723,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             }
         }
 
-        $model->sendGetProjectBuildsToDeleteRequestReply(new Message\ProjectBuildsToDeleteReply($result));
+        $model->sendGetProjectBuildsToDeleteRequestReply(new Message\ProjectBuildsToDeleteReply($result, $projectServersArray = []));
 
         $message->accepted();
     }
