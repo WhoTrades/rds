@@ -7,7 +7,7 @@
                     <?php
                         echo \yii\bootstrap\Nav::widget([
                             'items'     => $this->params['menu'],
-                            'options'   => ['class' => 'operations'],
+                            'options'   => ['class' => 'operations nav-pills'],
                         ]);
                     ?>
                 </div><!-- sidebar -->

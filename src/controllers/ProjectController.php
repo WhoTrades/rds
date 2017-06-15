@@ -8,7 +8,6 @@ use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ProjectConfig;
 use app\models\Project2worker;
-use yii\data\ActiveDataProvider;
 use app\models\ProjectConfigHistory;
 
 class ProjectController extends Controller
@@ -81,6 +80,10 @@ class ProjectController extends Controller
         ));
     }
 
+    /**
+     * @param int $id
+     * @return string
+     */
     public function actionUpdateScriptMigration(int $id) : string
     {
         $model = $this->loadModel($id);
@@ -93,6 +96,26 @@ class ProjectController extends Controller
         }
 
         return $this->render('update-script-migration', array(
+            'project' => $model,
+        ));
+    }
+
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function actionUpdateConfigLocal(int $id) : string
+    {
+        $model = $this->loadModel($id);
+
+        if (isset($_POST['Project'])) {
+            $model->attributes = $_POST['Project'];
+            if ($model->save()) {
+                $this->redirect(array('view', 'id' => $model->obj_id));
+            }
+        }
+
+        return $this->render('update-config-local', array(
             'project' => $model,
         ));
     }
@@ -176,17 +199,7 @@ $diffStat<br />
                 }
 
                 if ($needUpdateConfigs) {
-                    $configs = [];
-                    foreach ($model->projectConfigs as $projectConfig) {
-                        $configs[$projectConfig->pc_filename] = $projectConfig->pc_content;
-                    }
-
-                    (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
-                        new \RdsSystem\Message\ProjectConfig(
-                            $model->project_name,
-                            $configs
-                        )
-                    );
+                    $model->sendNewProjectConfigTasts();
                 }
 
                 if (!$model->hasErrors()) {
@@ -265,7 +278,7 @@ $diffStat<br />
      * Returns the data model based on the primary key given in the GET variable.
      * If the data model is not found, an HTTP exception will be raised.
      * @param integer $id the ID of the model to be loaded
-     * @return Project the loaded model
+     * @return Project
      * @throws HttpException
      */
     public function loadModel($id)

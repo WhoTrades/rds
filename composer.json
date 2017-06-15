@@ -2,15 +2,6 @@
     "name": "whotrades/rds",
     "type": "library",
     "description": "WhoTrades release deployment service",
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://artifact.finam.ru/artifactory/api/composer/packagist-org"
-        },
-        {
-            "packagist": false
-        }
-    ],
     "autoload": {
         "psr-0": {
             "ServiceBase_": "../../lib/libcore/",
@@ -44,19 +35,19 @@
         "php-amqplib/php-amqplib": "~2.6",
         "whotrades/phpcs-stash": "1.0.0",
         "escapestudios/symfony2-coding-standard": "2.9.0",
-        "yiisoft/yii2": "~2.0",
+        "yiisoft/yii2": "2.0.11",
         "yiisoft/yii2-bootstrap": "~2.0",
         "yiisoft/yii2-gii": "~2.0.0",
         "php": ">=7.0",
         "yiisoft/yii2-swiftmailer": "~2.0",
         "sentry/sentry": "1.6.2",
         "telegram-bot/api": "^2.2",
-        "dektrium/yii2-user": "^0.9.12",
+        "dektrium/yii2-user": "0.9.11",
         "conquer/codemirror": "~2.0",
         "mito/yii2-sentry": "~1.0.0"
     },
-    "extra": {
-        "asset-installer-paths": {
+    "config": {
+        "fxp-asset.installer-paths": {
             "npm-asset-library": "vendor/npm",
             "bower-asset-library": "vendor/bower"
         }

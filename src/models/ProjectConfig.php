@@ -17,6 +17,7 @@ use app\extensions\validators\PhpSyntaxValidator;
  * @property string  $pc_project_obj_id
  * @property string  $pc_filename
  * @property string  $pc_content
+ * @property Project $project
  */
 class ProjectConfig extends ActiveRecord
 {
@@ -61,8 +62,8 @@ class ProjectConfig extends ActiveRecord
             'obj_modified' => 'Modified',
             'obj_status_did' => 'status did',
             'pc_project_obj_id' => 'Project Id',
-            'pc_filename' => 'Filename',
-            'pc_content' => 'Content',
+            'pc_filename' => 'Имя файла',
+            'pc_content' => 'Содержимое',
         ];
     }
 }

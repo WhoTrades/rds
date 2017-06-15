@@ -22,7 +22,7 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
             [
                 'presetsDir' => '../../protected/assets/preset',
                 'preset' => 'bash',
-                'options' => ['rows' => 20],
+                'options' => ['rows' => 15],
             ]
         ) ?>
 

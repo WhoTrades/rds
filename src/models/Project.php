@@ -3,6 +3,7 @@ namespace app\models;
 
 use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.project".
@@ -24,6 +25,7 @@ use app\components\ActiveRecord;
  * @property string           $project_notification_subject
  * @property string           $script_migration_up
  * @property string           $script_migration_new
+ * @property string           $script_config_local
  * @property ReleaseRequest[] $releaseRequests
  * @property ProjectConfig[]  $projectConfigs
  * @property Project2Worker[] $project2workers
@@ -50,7 +52,7 @@ class Project extends ActiveRecord
         return [
             ['project_name', 'required'],
             ['obj_status_did', 'number'],
-            [['script_migration_up', 'script_migration_new'], 'string'],
+            [['script_migration_up', 'script_migration_new', 'script_config_local'], 'string'],
             ['project_notification_email', 'email'],
             ['project_config', 'safe'],
             [['project_notification_email', 'project_notification_subject'], 'string', 'max' => 64],
@@ -106,7 +108,7 @@ class Project extends ActiveRecord
     }
 
     /**
-     * @return ReleaseRequest[]
+     * @return ActiveQuery
      */
     public function getReleaseRequests()
     {
@@ -114,7 +116,7 @@ class Project extends ActiveRecord
     }
 
     /**
-     * @return ReleaseReject[]
+     * @return ActiveQuery
      */
     public function getReleaseRejects()
     {
@@ -122,7 +124,7 @@ class Project extends ActiveRecord
     }
 
     /**
-     * @return Project2Worker[]
+     * @return ActiveQuery
      */
     public function getProject2workers()
     {
@@ -130,7 +132,7 @@ class Project extends ActiveRecord
     }
 
     /**
-     * @return ProjectConfig[]
+     * @return ActiveQuery
      */
     public function getProjectConfigs()
     {
@@ -153,6 +155,26 @@ class Project extends ActiveRecord
             'script_migration_up' => 'Скрипт по выполнению всех миграций в данной сборке',
             'script_migration_new' => 'Скрипт которвый выводит список всех невыполненных миграций',
         ];
+    }
+
+    /**
+     * Отправляет с service-deploy всю новую локальную конфигурацию
+     * @void
+     */
+    public function sendNewProjectConfigTasts()
+    {
+        $configs = [];
+        foreach ($this->projectConfigs as $projectConfig) {
+            $configs[$projectConfig->pc_filename] = $projectConfig->pc_content;
+        }
+
+        (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
+            new \RdsSystem\Message\ProjectConfig(
+                $this->project_name,
+                $configs,
+                $this->script_config_local
+            )
+        );
     }
 
     /**
