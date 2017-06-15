@@ -59,12 +59,6 @@ echo Nav::widget(
                     'url' => ['/site/index'],
                     'active' => $controllerId == 'site',
                 ],
-                'hardMigration' => [
-                    'label' => 'Миграции',
-                    'url' => ['/hard-migration/index'],
-                    'visible' => !\Yii::$app->user->isGuest,
-                    'active' => $controllerId == 'hard-migration',
-                ],
                 'registration' => [
                     'label' => 'РЕГИСТРАЦИЯ',
                     'url' => 'mailto://anaumenko@corp.finam.ru?subject=RDS аккаунт&body=Я пробовал сам восстановить пароль,' .
