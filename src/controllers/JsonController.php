@@ -9,8 +9,6 @@ use app\models\RdsDbConfig;
 use app\models\ToolJobStopped;
 use app\models\ReleaseVersion;
 use app\models\ReleaseRequest;
-use app\models\MaintenanceTool;
-use app\models\MaintenanceToolRun;
 use app\modules\Wtflow\models\Developer;
 use app\modules\Wtflow\models\WtFlowStat;
 use app\modules\Wtflow\components\JiraApi;
@@ -112,29 +110,6 @@ class JsonController extends Controller
         $project = Project::findByAttributes(['project_name' => $projectName]);
 
         echo $project ? $project->project_current_version : null;
-    }
-
-    public function actionGetSecondsAfterLastSuccessfulRunOfMaintenanceTool($toolName)
-    {
-        $tool = MaintenanceTool::findByAttributes([
-            'mt_name' => $toolName,
-        ]);
-
-        if (!$tool) {
-            throw new HttpException(404, "Tool $toolName not found");
-        }
-
-        $mtr = MaintenanceToolRun::find()->where([
-            'mtr_maintenance_tool_obj_id' => $tool->obj_id,
-            'mtr_status' => MaintenanceToolRun::STATUS_DONE,
-        ])->orderBy('obj_created desc')->one();
-
-        //an: если тул ни разу не запускали - считаем что его запустили в начале времен
-        if (!$mtr) {
-            echo time();
-        }
-
-        echo time() - strtotime($mtr->obj_created);
     }
 
     /**
