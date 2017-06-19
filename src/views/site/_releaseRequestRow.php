@@ -9,6 +9,7 @@ use app\models\Build;
 use yii\bootstrap\Html;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
+use yii\helpers\Url;
 
 return array(
     'obj_created:datetime',
@@ -228,6 +229,9 @@ return array(
                 ]);
 
                 return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+            },
+            'urlCreator' => function (string $action, ReleaseRequest $model) {
+                return Url::to(["/site/$action", 'id' => $model->obj_id]);
             },
         ],
     ),
