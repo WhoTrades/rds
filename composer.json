@@ -44,7 +44,8 @@
         "telegram-bot/api": "^2.2",
         "dektrium/yii2-user": "0.9.11",
         "conquer/codemirror": "~2.0",
-        "mito/yii2-sentry": "~1.0.0"
+        "mito/yii2-sentry": "~1.0.0",
+        "kartik-v/yii2-widgets": "~3.4.0"
     },
     "config": {
         "fxp-asset.installer-paths": {

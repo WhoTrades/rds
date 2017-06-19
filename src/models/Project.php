@@ -154,7 +154,7 @@ class Project extends ActiveRecord
             'project_name' => 'Проект',
             'project_notification_email' => 'Email оповещеиня о выкладке',
             'project_notification_subject' => 'Тема оповещения о выкладке',
-            'project_servers' => 'Серверы для релиза',
+            'projectserversarray' => 'Серверы для релиза',
             'script_migration_up' => 'Скрипт по выполнению всех миграций в данной сборке',
             'script_migration_new' => 'Скрипт которвый выводит список всех невыполненных миграций',
         ];
@@ -249,6 +249,24 @@ class Project extends ActiveRecord
      */
     public function getProjectServersArray()
     {
-        return explode("\n", preg_replace('/[\r\n]+/', "\n", $this->project_servers));
+        return $this->project_servers ? explode(',', $this->project_servers) : [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getKnownServers()
+    {
+        $serverList = [];
+
+        /** @var Project $project */
+        foreach (static::find()->all() as $project) {
+            $serverList = array_merge($serverList, $project->getProjectServersArray());
+        }
+
+        $serverList =  array_unique($serverList);
+        sort($serverList);
+
+        return array_combine($serverList, $serverList);
     }
 }
