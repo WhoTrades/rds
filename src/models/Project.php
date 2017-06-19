@@ -164,21 +164,24 @@ class Project extends ActiveRecord
      * Отправляет с service-deploy всю новую локальную конфигурацию
      * @void
      */
-    public function sendNewProjectConfigTasts()
+    public function sendNewProjectConfigTasks()
     {
         $configs = [];
         foreach ($this->projectConfigs as $projectConfig) {
             $configs[$projectConfig->pc_filename] = $projectConfig->pc_content;
         }
 
-        (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
-            new \RdsSystem\Message\ProjectConfig(
-                $this->project_name,
-                $configs,
-                $this->script_config_local,
-                $this->getProjectServersArray()
-            )
-        );
+        foreach ($this->project2workers as $p2w) {
+            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
+                $p2w->worker->worker_name,
+                new \RdsSystem\Message\ProjectConfig(
+                    $this->project_name,
+                    $configs,
+                    $this->script_config_local,
+                    $this->getProjectServersArray()
+                )
+            );
+        }
     }
 
     /**

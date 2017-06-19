@@ -9,6 +9,7 @@ use app\models\Build;
 use yii\bootstrap\Html;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
+use yii\helpers\Url;
 
 return array(
     'obj_created:datetime',
@@ -113,8 +114,8 @@ return array(
     ),
     array(
         'attribute' => 'rr_project_obj_id',
-        'value' => function ($r) {
-            return $r->builds[0]->project->project_name;
+        'value' => function (ReleaseRequest $r) {
+            return $r->project->project_name;
         },
         'filter' => Project::forList(),
     ),
@@ -228,6 +229,9 @@ return array(
                 ]);
 
                 return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+            },
+            'urlCreator' => function (string $action, ReleaseRequest $model) {
+                return Url::to(["/site/$action", 'id' => $model->obj_id]);
             },
         ],
     ),

@@ -202,7 +202,7 @@ $diffStat<br />
                 }
 
                 if ($needUpdateConfigs) {
-                    $model->sendNewProjectConfigTasts();
+                    $model->sendNewProjectConfigTasks();
                 }
 
                 if (!$model->hasErrors()) {
