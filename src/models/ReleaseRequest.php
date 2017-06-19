@@ -175,6 +175,7 @@ class ReleaseRequest extends ActiveRecord
             'rr_status' => $params['rr_status'],
             'rr_project_obj_id' => $params['rr_project_obj_id'],
         ]));
+        $query->with = ['user', 'user.profile', 'project', 'builds', 'builds.project', 'hardMigrations'];
         $query->andFilterWhere(['like', 'rr_comment', $params['rr_comment']]);
         $query->andFilterWhere(['like', 'rr_build_version', $params['rr_build_version']]);
         $dataProvider = new ActiveDataProvider([

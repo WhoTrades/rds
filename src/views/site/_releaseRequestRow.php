@@ -114,8 +114,8 @@ return array(
     ),
     array(
         'attribute' => 'rr_project_obj_id',
-        'value' => function ($r) {
-            return $r->builds[0]->project->project_name;
+        'value' => function (ReleaseRequest $r) {
+            return $r->project->project_name;
         },
         'filter' => Project::forList(),
     ),
