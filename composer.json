@@ -47,8 +47,8 @@
         "yiisoft/yii2-debug": "2.0.9",
         "mito/yii2-sentry": "~1.0.0"
     },
-    "config": {
-        "fxp-asset.installer-paths": {
+    "extra": {
+        "asset-installer-paths": {
             "npm-asset-library": "vendor/npm",
             "bower-asset-library": "vendor/bower"
         }
