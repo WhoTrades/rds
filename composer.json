@@ -44,10 +44,8 @@
         "telegram-bot/api": "^2.2",
         "dektrium/yii2-user": "0.9.11",
         "conquer/codemirror": "~2.0",
+        "yiisoft/yii2-debug": "2.0.9",
         "mito/yii2-sentry": "~1.0.0"
-    },
-    "require-dev": {
-        "yiisoft/yii2-debug": "2.0.9"
     },
     "config": {
         "fxp-asset.installer-paths": {
