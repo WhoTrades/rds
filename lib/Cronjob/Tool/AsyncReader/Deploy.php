@@ -700,14 +700,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 continue;
             }
 
-            $model->sendGetProjectBuildsToDeleteRequestReply(
-                new Message\ProjectBuildsToDeleteReply(
-                    'dfgdfgfd',
-                    '87hjjgh',
-                    $project->getProjectServersArray()
-                )
-            );
-
             $numbersOfTest = explode(".", $build['version']);
 
             $numbersOfCurrent = explode(".", $project->project_current_version);
