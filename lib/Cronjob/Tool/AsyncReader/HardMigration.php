@@ -125,7 +125,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
 
         $model = HardMigration::findByPk($id);
 
-        $html = \Yii::$app->view->renderFile('@app/views/hard-migration/_hardMigrationGrid.php', [
+        $html = \Yii::$app->view->renderFile('@app/modules/Wtflow/views/hard-migration/_hardMigrationGrid.php', [
             'dataProvider' => $model->search(['obj_id' => $id]),
             'model' => $model,
         ]);
