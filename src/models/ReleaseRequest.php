@@ -6,6 +6,7 @@ use yii\data\Sort;
 use app\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
+use app\modules\Wtflow\models\HardMigration;
 
 /**
  * This is the model class for table "rds.release_request".
