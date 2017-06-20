@@ -3,7 +3,7 @@
 use app\modules\Wtflow\components\JiraApi;
 use yii\helpers\Url;
 use RdsSystem\Message;
-use app\models\HardMigration;
+use app\modules\Wtflow\models\HardMigration;
 use app\components\Jira\AsyncRpc;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 use app\modules\Wtflow\models\JiraMoveTicket;
