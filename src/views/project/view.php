@@ -25,9 +25,8 @@ $this->params['menu'] = array(
     'attributes' => [
         'obj_id',
         'obj_created:datetime',
-        'obj_modified',
-        'obj_status_did',
         'project_name',
+        'project_servers',
     ],
 ]);
 

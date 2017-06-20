@@ -700,6 +700,14 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                 continue;
             }
 
+            $model->sendGetProjectBuildsToDeleteRequestReply(
+                new Message\ProjectBuildsToDeleteReply(
+                    'dfgdfgfd',
+                    '87hjjgh',
+                    $project->getProjectServersArray()
+                )
+            );
+
             $numbersOfTest = explode(".", $build['version']);
 
             $numbersOfCurrent = explode(".", $project->project_current_version);
@@ -709,7 +717,13 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
                 if ($count > 10) {
                     // an: Нужно наличие минимум 10 версий от текущей, что бы было куда откатываться
-                    $result[] = $build;
+                    $model->sendGetProjectBuildsToDeleteRequestReply(
+                        new Message\ProjectBuildsToDeleteReply(
+                            $build['project'],
+                            $build['version'],
+                            $project->getProjectServersArray()
+                        )
+                    );
                     $this->debugLogger->message("(!) Removing build of current build (build={$build['project']}-{$build['version']})");
                 } else {
                     $this->debugLogger->message("Projects of current version at prod=$count, less then 10 (build={$build['project']}-{$build['version']})");
@@ -719,15 +733,19 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
                 if ($count > 5) {
                     // an: Нужно наличие минимум 2 версий в текущем релизе, что бы точно могли откатиться
-                    $result[] = $build;
+                    $model->sendGetProjectBuildsToDeleteRequestReply(
+                        new Message\ProjectBuildsToDeleteReply(
+                            $build['project'],
+                            $build['version'],
+                            $project->getProjectServersArray()
+                        )
+                    );
                     $this->debugLogger->message("(!) Removing build of previous build (build={$build['project']}-{$build['version']})");
                 } else {
                     $this->debugLogger->message("Projects of previous version at prod=$count, less then 5 (build={$build['project']}-{$build['version']})");
                 }
             }
         }
-
-        $model->sendGetProjectBuildsToDeleteRequestReply(new Message\ProjectBuildsToDeleteReply($result, $projectServersArray = []));
 
         $message->accepted();
     }

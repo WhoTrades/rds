@@ -155,6 +155,7 @@ class Project extends ActiveRecord
             'project_notification_email' => 'Email оповещеиня о выкладке',
             'project_notification_subject' => 'Тема оповещения о выкладке',
             'projectserversarray' => 'Серверы для релиза',
+            'project_servers' => 'Серверы для релиза',
             'script_migration_up' => 'Скрипт по выполнению всех миграций в данной сборке',
             'script_migration_new' => 'Скрипт которвый выводит список всех невыполненных миграций',
         ];
@@ -220,7 +221,7 @@ class Project extends ActiveRecord
      */
     public function search(array $params)
     {
-        $query = self::find()->filterWhere($params);
+        $query = self::find()->filterWhere($params)->with(['project2workers', 'project2workers.worker']);
 
         $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 100]]);
         $this->load($params, 'search');

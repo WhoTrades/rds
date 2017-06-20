@@ -12,7 +12,7 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use app\models\Project;
 use app\models\Worker;
-use kartik\widgets\Select2;
+use kartik\select2\Select2;
 
 ?>
 
