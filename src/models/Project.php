@@ -23,6 +23,7 @@ use yii\db\ActiveQuery;
  * @property string           $project_post_migration_version
  * @property string           $project_notification_email
  * @property string           $project_notification_subject
+ * @property string           $project_servers
  * @property string           $script_migration_up
  * @property string           $script_migration_new
  * @property string           $script_config_local
@@ -54,6 +55,7 @@ class Project extends ActiveRecord
             ['obj_status_did', 'number'],
             [['script_migration_up', 'script_migration_new', 'script_config_local'], 'string'],
             ['project_notification_email', 'email'],
+            ['project_servers', 'safe'],
             ['project_config', 'safe'],
             [['project_notification_email', 'project_notification_subject'], 'string', 'max' => 64],
             [['obj_id', 'obj_created', 'obj_modified', 'obj_status_did, project_name', 'project_build_version', 'project_current_version'], 'safe', 'on' => 'search'],
@@ -152,6 +154,8 @@ class Project extends ActiveRecord
             'project_name' => 'Проект',
             'project_notification_email' => 'Email оповещеиня о выкладке',
             'project_notification_subject' => 'Тема оповещения о выкладке',
+            'projectserversarray' => 'Серверы для релиза',
+            'project_servers' => 'Серверы для релиза',
             'script_migration_up' => 'Скрипт по выполнению всех миграций в данной сборке',
             'script_migration_new' => 'Скрипт которвый выводит список всех невыполненных миграций',
         ];
@@ -174,7 +178,8 @@ class Project extends ActiveRecord
                 new \RdsSystem\Message\ProjectConfig(
                     $this->project_name,
                     $configs,
-                    $this->script_config_local
+                    $this->script_config_local,
+                    $this->getProjectServersArray()
                 )
             );
         }
@@ -216,7 +221,7 @@ class Project extends ActiveRecord
      */
     public function search(array $params)
     {
-        $query = self::find()->filterWhere($params);
+        $query = self::find()->filterWhere($params)->with(['project2workers', 'project2workers.worker']);
 
         $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 100]]);
         $this->load($params, 'search');
@@ -241,5 +246,31 @@ class Project extends ActiveRecord
         } else {
             return $config['*']($migration, $this->project_name, $type, $buildVersion);
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getProjectServersArray()
+    {
+        return $this->project_servers ? explode(',', $this->project_servers) : [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getKnownServers()
+    {
+        $serverList = [];
+
+        /** @var Project $project */
+        foreach (static::find()->all() as $project) {
+            $serverList = array_merge($serverList, $project->getProjectServersArray());
+        }
+
+        $serverList =  array_unique($serverList);
+        sort($serverList);
+
+        return array_combine($serverList, $serverList);
     }
 }

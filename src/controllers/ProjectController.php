@@ -128,9 +128,12 @@ class ProjectController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->loadModel($id);
+        $projectServersOld = $model->project_servers;
         $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
 
         if (isset($_POST['Project']) && $deployment_enabled) {
+            $_POST['Project']['project_servers'] = implode(',', $_POST['Project']['projectserversarray']);
+            unset($_POST['Project']['projectserversarray']);
             $model->attributes = $_POST['Project'];
             $transaction = $model->getDbConnection()->beginTransaction();
             $existingProject = Project::findByPk($model->obj_id);
@@ -211,6 +214,10 @@ $diffStat<br />
             } else {
                 $transaction->rollBack();
             }
+        }
+
+        if ($model->project_servers !== $projectServersOld) {
+            Log::createLogMessage("В проекте {$model->project_name} изменился список серверов: с {$projectServersOld} на {$model->project_servers}");
         }
 
         $list = array();
