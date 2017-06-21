@@ -1,7 +1,7 @@
 <?php
 
 use RdsSystem\Message;
-use app\models\HardMigration;
+use app\modules\Wtflow\models\HardMigration;
 use \RdsSystem\Model\Rabbit\MessagingRdsMs;
 
 /**

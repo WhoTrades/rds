@@ -7,6 +7,7 @@ $this->params['menu'] = array(
     array('label' => 'Create Project', 'url' => array('create')),
     array('label' => 'Update Project', 'url' => array('update', 'id' => $model->obj_id)),
     ['label' => 'Миграции', 'url' => ['/project/update-script-migration', 'id' => $model->obj_id]],
+    ['label' => 'Локальная настройка', 'url' => ['/project/update-config-local', 'id' => $model->obj_id]],
     array(
         'label' => 'Delete Project',
         'url' => '#',

@@ -8,13 +8,14 @@
 use conquer\codemirror\CodemirrorWidget;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use app\models\Project;
 use app\models\Worker;
 
 ?>
 
-<div class="form" style="width: 1200px; margin: auto">
+<div class="form">
 
     <?php $form = ActiveForm::begin(['id' => 'project-form']) ?>
         <?php if (count($model->projectConfigs)) { ?>
@@ -31,8 +32,14 @@ use app\models\Worker;
         <?= $form->field($model, 'project_notification_email') ?>
         <?= $form->field($model, 'project_notification_subject') ?>
 
+        <h2>Локальная конфигурация <a href="<?=Url::to(['/project-config/', 'projectId' => $model->obj_id])?>">управление</a></h2>
         <?php foreach ($model->projectConfigs as $projectConfig) { ?>
-            <h3><?=$projectConfig->pc_filename?></h3>
+            <h3>
+                <?=$projectConfig->pc_filename?>
+                <a href="<?=Url::to(['/project-config/update', 'id' => $projectConfig->obj_id])?>">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </a>
+            </h3>
             <?=$model->getFirstError($projectConfig->pc_filename)
                 ? Html::error(
                     $model,

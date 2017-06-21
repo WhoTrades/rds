@@ -1,18 +1,22 @@
 <?php
-/** @var $model Project */
-/** @var $deployment_enabled bool */
+/**
+ * @var $model Project
+ * @var $workers Worker[]
+ * @var $list bool[]
+ * @var $deployment_enabled bool
+ */
 
 use app\models\Project;
 use yii\bootstrap\Alert;
 
 $this->params['menu'] = array(
-    array('label' => 'Create Project', 'url' => array('create')),
-    array('label' => 'View Project', 'url' => array('view', 'id' => $model->obj_id)),
-    array('label' => 'Manage Project', 'url' => array('admin')),
+    array('label' => 'Добавить проект', 'url' => array('create')),
+    array('label' => 'Просмотр', 'url' => array('view', 'id' => $model->obj_id)),
+    array('label' => 'Управление проектами', 'url' => array('admin')),
 );
 ?>
 
-<h1>Update Project <?php echo $model->obj_id; ?></h1>
+<h1>Управление <?php echo $model->project_name; ?></h1>
 
 <?php
 if ($deployment_enabled) {

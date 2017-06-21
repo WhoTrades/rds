@@ -7,7 +7,7 @@ use app\models\ReleaseRequest;
 use app\modules\Wtflow\models\JiraCreateVersion;
 use app\models\Project;
 use app\modules\Wtflow\models\JiraCommit;
-use app\models\HardMigration;
+use app\modules\Wtflow\models\HardMigration;
 use app\models\ToolJob;
 use app\models\Worker;
 use app\models\Project2worker;
@@ -185,8 +185,10 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
                 $releaseRequest = $build->releaseRequest;
-                $releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
-                $releaseRequest->save();
+                if (!empty($releaseRequest)) {
+                    $releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
+                    $releaseRequest->save();
+                }
                 break;
             case Build::STATUS_BUILDING:
                 if (!empty($build->releaseRequest) && empty($build->releaseRequest->rr_build_started)) {
@@ -201,15 +203,17 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     "'>Подробнее</a>";
 
                 $releaseRequest = $build->releaseRequest;
-                $releaseRequest->rr_status = ReleaseRequest::STATUS_CANCELLED;
-                $releaseRequest->save();
+                if (!empty($releaseRequest)) {
+                    $releaseRequest->rr_status = ReleaseRequest::STATUS_CANCELLED;
+                    $releaseRequest->save();
 
-                Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
-                foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
-                    if (!$phone) {
-                        continue;
+                    Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
+                    foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
+                        if (!$phone) {
+                            continue;
+                        }
+                        Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                     }
-                    Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
                 }
                 break;
         }
@@ -826,7 +830,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
             }
         }
 
-        $text = json_encode(array('ok' => $releaseRequest->save()));
+        $releaseRequest->save();
         $transaction->commit();
 
         \Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);

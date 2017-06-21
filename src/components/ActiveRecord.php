@@ -83,6 +83,4 @@ class ActiveRecord extends \yii\db\ActiveRecord
     {
         return static::getDb();
     }
-
-
 }
