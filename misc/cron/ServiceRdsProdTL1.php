@@ -143,14 +143,6 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_AsyncReader_HardMigrationProgress::getToolCommand(['--max-duration=60'], $verbosity = 1), '* * * * * *', 'rds_hard_migration_progress'),
             new CronCommand(Cronjob_Tool_AsyncReader_HardMigrationLogChunk::getToolCommand(['--max-duration=60'], $verbosity = 1), '* * * * * *', 'rds_hard_migration_log_chunk'),
 
-            new Comment("Maintenance tools"),
-            new CronCommand(Cronjob_Tool_AsyncReader_MaintenanceTool::getToolCommand(['--max-duration=60'], $verbosity = 1), '* * * * * *', 'rds_maintenance_tool'),
-            new CronCommand(
-                Cronjob_Tool_MaintenanceToolRun::getToolCommand(['--tool-name=systemTest --env=main'], $verbosity = 1),
-                '8 */10 * * * *',
-                'rds_maintenance_tool_run-system'
-            ),     // an: для проверки работоспособности системы запуска тулов
-
             new Comment("Управляющий тул (убивает другие тулы)"),
             new CronCommand(Cronjob_Tool_Maintenance_MasterTool::getToolCommand(['--max-duration=60'], $verbosity = 1), '* * * * * *', 'rds_master_tool'),
 
