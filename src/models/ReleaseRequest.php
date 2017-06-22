@@ -338,7 +338,7 @@ class ReleaseRequest extends ActiveRecord
             if (!$phone) {
                 continue;
             }
-            \Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+            \Yii::$app->smsSender->sendSms($phone, $text);
         }
 
         Log::createLogMessage("Создан {$this->getTitle()}");

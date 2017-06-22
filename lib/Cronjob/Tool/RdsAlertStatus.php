@@ -107,7 +107,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
         foreach ($lamp->getReceivers() as $phone) {
             $sms = "[ERROR] $alertLog->alert_name";
-            Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $sms);
+            Yii::$app->smsSender->sendSms($phone, $sms);
         }
     }
 
@@ -125,9 +125,9 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
 
         $lamp = Lamp::findByLampName($alertLog->alert_lamp);
 
+        $message = "[OK] $alertLog->alert_name";
         foreach ($lamp->getReceivers() as $phone) {
-            $sms = "[OK] $alertLog->alert_name";
-            Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $sms);
+            Yii::$app->smsSender->sendSms($phone, $message);
         }
     }
 

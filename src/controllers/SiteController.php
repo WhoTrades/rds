@@ -186,7 +186,7 @@ class SiteController extends Controller
                     continue;
                 }
                 $text = "{$model->user->email} rejected $projects. {$model->rr_comment}";
-                \Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $text);
+                \Yii::$app->smsSender->sendSms($phone, $text);
             }
             \Yii::$app->EmailNotifier->sendRdsReleaseRejectNotification(
                 $model->user->email,
