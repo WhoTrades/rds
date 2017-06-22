@@ -167,7 +167,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                         if (!$phone) {
                             continue;
                         }
-                        Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
+                        Yii::$app->smsSender->sendSms($phone, $title);
                     }
                 }
                 break;
@@ -182,7 +182,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                     if (!$phone) {
                         continue;
                     }
-                    Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
+                    Yii::$app->smsSender->sendSms($phone, $title);
                 }
                 $releaseRequest = $build->releaseRequest;
                 if (!empty($releaseRequest)) {
@@ -212,7 +212,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
                         if (!$phone) {
                             continue;
                         }
-                        Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}($phone, $title);
+                        Yii::$app->smsSender->sendSms($phone, $title);
                     }
                 }
                 break;
