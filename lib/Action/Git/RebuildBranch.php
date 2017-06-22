@@ -14,8 +14,6 @@ class RebuildBranch
         'develop' => [
             \CompanyInfrastructure\Jira\Status::STATUS_CODE_REVIEW,
             \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_DEVELOP,
-            \CompanyInfrastructure\Jira\Status::STATUS_WAITING_FOR_TEST,
-            \CompanyInfrastructure\Jira\Status::STATUS_TESTING,
 
             \CompanyInfrastructure\Jira\Status::STATUS_MERGE_TO_STAGING,
             \CompanyInfrastructure\Jira\Status::STATUS_READY_FOR_CHECK,
