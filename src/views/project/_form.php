@@ -12,6 +12,7 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use app\models\Project;
 use app\models\Worker;
+use kartik\select2\Select2;
 
 ?>
 
@@ -31,6 +32,16 @@ use app\models\Worker;
         <?= $form->field($model, 'project_name') ?>
         <?= $form->field($model, 'project_notification_email') ?>
         <?= $form->field($model, 'project_notification_subject') ?>
+
+        <?= $form->field($model, 'projectserversarray')->widget(Select2::classname(), [
+            'data' => $model->getKnownServers(),
+            'options' => ['placeholder' => 'Select a servers ...', 'multiple' => true],
+            'pluginOptions' => [
+                'tags' => true,
+                'tokenSeparators' => [',', ' '],
+                'maximumInputLength' => 30,
+            ],
+        ]); ?>
 
         <h2>Локальная конфигурация <a href="<?=Url::to(['/project-config/', 'projectId' => $model->obj_id])?>">управление</a></h2>
         <?php foreach ($model->projectConfigs as $projectConfig) { ?>
