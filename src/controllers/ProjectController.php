@@ -132,7 +132,7 @@ class ProjectController extends Controller
         $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
 
         if (isset($_POST['Project']) && $deployment_enabled) {
-            $_POST['Project']['project_servers'] = implode(',', $_POST['Project']['projectserversarray']);
+            $_POST['Project']['project_servers'] = implode(',', $_POST['Project']['projectserversarray'] ?? []);
             unset($_POST['Project']['projectserversarray']);
             $model->attributes = $_POST['Project'];
             $transaction = $model->getDbConnection()->beginTransaction();
