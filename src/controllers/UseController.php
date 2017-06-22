@@ -70,7 +70,7 @@ class UseController extends Controller
         $releaseRequest->rr_status = ReleaseRequest::STATUS_CODES;
 
         $text = "Code: %s. USE {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}";
-        \Yii::$app->whotrades->{'getFinamTenderSystemFactory.getSmsSender.sendSms'}(\Yii::$app->user->identity->getPhone(), sprintf($text, $code1));
+        \Yii::$app->smsSender->sendSms(\Yii::$app->user->identity->getPhone(), sprintf($text, $code1));
 
         if ($releaseRequest->save()) {
             Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
