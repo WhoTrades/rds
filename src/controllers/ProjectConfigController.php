@@ -75,7 +75,7 @@ class ProjectConfigController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Log::createLogMessage("Создан конфигурационный файл {$model->project->project_name} $model->pc_filename");
-            $model->project->sendNewProjectConfigTasts();
+            $model->project->sendNewProjectConfigTasks();
 
             return $this->redirect(['/project/update', 'id' => $model->pc_project_obj_id]);
         } else {
@@ -101,7 +101,7 @@ class ProjectConfigController extends Controller
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Log::createLogMessage("Переименован конфигурационный файл {$model->project->project_name} $oldName -> $model->pc_filename");
             if ($oldAttributes != $model->attributes) {
-                $model->project->sendNewProjectConfigTasts();
+                $model->project->sendNewProjectConfigTasks();
             }
 
             return $this->redirect(['/project/update', 'id' => $model->pc_project_obj_id]);
@@ -125,7 +125,7 @@ class ProjectConfigController extends Controller
         Log::createLogMessage("Создан конфигурационный файл {$model->project->project_name} $model->pc_filename");
         $model->delete();
 
-        $project->sendNewProjectConfigTasts();
+        $project->sendNewProjectConfigTasks();
 
         return $this->redirect(['index']);
     }

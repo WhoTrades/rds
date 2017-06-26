@@ -152,53 +152,55 @@ class ProjectController extends Controller
 
                 $needUpdateConfigs = false;
 
-                foreach ($_POST['project_config'] as $filename => $content) {
-                    /** @var $projectConfig ProjectConfig */
-                    $projectConfig = ProjectConfig::findByAttributes([
-                        'pc_filename'       => $filename,
-                        'pc_project_obj_id' => $model->obj_id,
-                    ]);
+                if (!empty($_POST['project_config'])) {
+                    foreach ($_POST['project_config'] as $filename => $content) {
+                        /** @var $projectConfig ProjectConfig */
+                        $projectConfig = ProjectConfig::findByAttributes([
+                            'pc_filename' => $filename,
+                            'pc_project_obj_id' => $model->obj_id,
+                        ]);
 
-                    if (!$projectConfig) {
-                        $projectConfig = new ProjectConfig();
-                        $projectConfig->pc_project_obj_id = $model->obj_id;
-                    }
+                        if (!$projectConfig) {
+                            $projectConfig = new ProjectConfig();
+                            $projectConfig->pc_project_obj_id = $model->obj_id;
+                        }
 
-                    if ($projectConfig->pc_content === $content) {
-                        continue;
-                    }
+                        if ($projectConfig->pc_content === $content) {
+                            continue;
+                        }
 
-                    $diffStat = \Yii::$app->diffStat->getDiffStat(
-                        str_replace("\r", "", $projectConfig->pc_content),
-                        str_replace("\r", "", $content)
-                    );
+                        $diffStat = \Yii::$app->diffStat->getDiffStat(
+                            str_replace("\r", "", $projectConfig->pc_content),
+                            str_replace("\r", "", $content)
+                        );
 
-                    $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
-                    $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
+                        $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
+                        $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
 
-                    $projectConfig->pc_content = $content;
-                    if (!$projectConfig->validate(['pc_content'])) {
-                        $model->addError($filename, $projectConfig->getFirstError('pc_content'));
-                        continue;
-                    }
-
-
-                    $needUpdateConfigs = true;
-
-                    $projectHistoryItem = new ProjectConfigHistory();
-                    $projectHistoryItem->pch_project_obj_id = $model->obj_id;
-                    $projectHistoryItem->pch_filename = $filename;
-                    $projectHistoryItem->pch_config = $content;
-                    $projectHistoryItem->pch_user_id = \Yii::$app->user->id;
-                    $projectHistoryItem->save();
+                        $projectConfig->pc_content = $content;
+                        if (!$projectConfig->validate(['pc_content'])) {
+                            $model->addError($filename, $projectConfig->getFirstError('pc_content'));
+                            continue;
+                        }
 
 
-                    $projectConfig->save();
+                        $needUpdateConfigs = true;
 
-                    Log::createLogMessage("Изменение в конфигурации $existingProject->project_name/$filename:<br />
+                        $projectHistoryItem = new ProjectConfigHistory();
+                        $projectHistoryItem->pch_project_obj_id = $model->obj_id;
+                        $projectHistoryItem->pch_filename = $filename;
+                        $projectHistoryItem->pch_config = $content;
+                        $projectHistoryItem->pch_user_id = \Yii::$app->user->id;
+                        $projectHistoryItem->save();
+
+
+                        $projectConfig->save();
+
+                        Log::createLogMessage("Изменение в конфигурации $existingProject->project_name/$filename:<br />
 $diffStat<br />
 <a href='" . \yii\helpers\Url::to(["/diff/project_config", 'id' => $projectHistoryItem->obj_id]) . "'>Посмотреть подробнее</a>
 ");
+                    }
                 }
 
                 if ($needUpdateConfigs) {
@@ -255,14 +257,7 @@ $diffStat<br />
      */
     public function actionIndex()
     {
-        $model = new Project(['scenario' => 'search']);
-        if (isset($_GET['Project'])) {
-            $model->attributes = $_GET['Project'];
-        }
-
-        return $this->render('index', array(
-            'model' => $model,
-        ));
+        return $this->actionAdmin();
     }
 
     /**
