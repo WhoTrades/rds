@@ -26,6 +26,8 @@ use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraUse;
 use app\modules\Wtflow\PgQ\EventProcessor\RdsJiraUseExternalNotifier;
 use app\modules\Wtflow\PgQ\EventProcessor\RdsTeamCityBuildComplete;
 use app\modules\Wtflow\PgQ\EventProcessor\RdsTeamCityRunTest;
+use app\modules\Whotrades\lib\Cronjob\Tool\BitBucket2Graphite;
+use app\modules\Whotrades\lib\Cronjob\Tool\RdsAlertStatus;
 use Cronjob\ConfigGenerator\Comment;
 use Cronjob\ConfigGenerator\MultiCronCommand;
 use Cronjob\ConfigGenerator\CronCommand;
@@ -132,7 +134,7 @@ class ServiceRdsProdTL1
                 '* * * * * *',
                 'rds_create_pull_request'
             ),
-            new CronCommand(Cronjob_Tool_BitBucket2Graphite::getToolCommand([], $verbosity = 1), '0 * * * * *', 'rds_bitbucket_stat2graphite'),
+            new CronCommand(BitBucket2Graphite::getToolCommand([], $verbosity = 1), '0 * * * * *', 'rds_bitbucket_stat2graphite'),
 
             new Comment("Deployment"),
             new CronCommand(Cronjob_Tool_AsyncReader_Deploy::getToolCommand(['--max-duration=60'], $verbosity = 1), '* * * * * *', 'rds_async_reader_deploy'),
@@ -147,7 +149,7 @@ class ServiceRdsProdTL1
             new CronCommand(Cronjob_Tool_Maintenance_MasterTool::getToolCommand(['--max-duration=60'], $verbosity = 1), '* * * * * *', 'rds_master_tool'),
 
             new Comment("Лампа"),
-            new CronCommand(Cronjob_Tool_RdsAlertStatus::getToolCommand([], $verbosity = 1), '*/20 * * * * *', 'rds_alert_status'),
+            new CronCommand(RdsAlertStatus::getToolCommand([], $verbosity = 1), '*/20 * * * * *', 'rds_alert_status'),
 
             new Comment("Ротация логом тяжелых миграций"),
             new CronCommand(Cronjob_Tool_HardMigrationLogRotator::getToolCommand([], $verbosity = 1), '*/28 * * * * *', 'rds_hard_migration_log_rotator'),
