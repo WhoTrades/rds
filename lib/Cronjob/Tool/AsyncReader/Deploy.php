@@ -8,7 +8,7 @@ use app\modules\Wtflow\models\JiraCreateVersion;
 use app\models\Project;
 use app\modules\Wtflow\models\JiraCommit;
 use app\modules\Wtflow\models\HardMigration;
-use app\models\ToolJob;
+use app\modules\Whotrades\models\ToolJob;
 use app\models\Worker;
 use app\models\Project2worker;
 use app\modules\Wtflow\models\JiraUse;

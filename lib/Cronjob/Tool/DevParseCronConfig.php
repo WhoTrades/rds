@@ -4,7 +4,7 @@
  */
 
 use app\models\Project;
-use app\models\ToolJob;
+use app\modules\Whotrades\models\ToolJob;
 use app\models\ReleaseRequest;
 
 class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon

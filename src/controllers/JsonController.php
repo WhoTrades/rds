@@ -2,11 +2,11 @@
 namespace app\controllers;
 
 use app\models\Project;
-use app\models\ToolJob;
+use app\modules\Whotrades\models\ToolJob;
 use yii\base\Module;
 use yii\web\HttpException;
 use app\models\RdsDbConfig;
-use app\models\ToolJobStopped;
+use app\modules\Whotrades\models\ToolJobStopped;
 use app\models\ReleaseVersion;
 use app\models\ReleaseRequest;
 use app\modules\Wtflow\models\Developer;

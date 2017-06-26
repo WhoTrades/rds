@@ -1,12 +1,12 @@
 <?php
 
-use app\components\AlertLog\AlertData;
-use app\components\AlertLog\IAlertDataProvider;
-use app\models\Lamp;
-use app\models\AlertLog;
-use app\components\AlertLog\CompoundDataProvider;
-use app\components\AlertLog\TeamCityDataProvider;
-use app\components\AlertLog\MonitoringDataProvider;
+use app\modules\Whotrades\components\AlertLog\AlertData;
+use app\modules\Whotrades\components\AlertLog\IAlertDataProvider;
+use app\modules\Whotrades\models\Lamp;
+use app\modules\Whotrades\models\AlertLog;
+use app\modules\Whotrades\components\AlertLog\CompoundDataProvider;
+use app\modules\Whotrades\components\AlertLog\TeamCityDataProvider;
+use app\modules\Whotrades\components\AlertLog\MonitoringDataProvider;
 
 /**
  * @example dev/services/rds/misc/tools/runner.php --tool=RdsAlertStatus -vv
@@ -96,7 +96,7 @@ class Cronjob_Tool_RdsAlertStatus extends \Cronjob\Tool\ToolBase
         $text = "$alertLog->alert_text<br />\n";
 
         $prev = date_default_timezone_get();
-        date_default_timezone_set(\app\controllers\AlertController::TIMEZONE);
+        date_default_timezone_set(Yii::$app->params['alertTimeZone']);
         $text .= "Лампа включена<br />Взять ошибку в работу - http://rds.whotrades.net/alert/ (лампа погаснет на 10 минут)\n";
         date_default_timezone_set($prev);
 
