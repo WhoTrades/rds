@@ -7,6 +7,7 @@ use app\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use app\modules\Wtflow\models\HardMigration;
+use app\modules\Whotrades\models\ToolJob;
 
 /**
  * This is the model class for table "rds.release_request".
