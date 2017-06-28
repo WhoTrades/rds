@@ -273,4 +273,28 @@ class Project extends ActiveRecord
 
         return array_combine($serverList, $serverList);
     }
+
+    /**
+     * @return array[]
+     */
+    public function getChildProjectIdArray()
+    {
+        return array_map(function (Project2Project $item) {
+            return $item->getChild()->obj_id;
+        }, Project2Project::findAll(['parent_project_obj_id' => $this->obj_id]));
+    }
+
+    /**
+     * @return array
+     */
+    public function getKnownProjectsIdNameArray()
+    {
+        $array = [];
+        foreach (Project::find()->all() as $project) {
+            $array[$project->obj_id] = $project->project_name;
+        }
+        asort($array);
+
+        return $array;
+    }
 }
