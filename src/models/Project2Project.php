@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\ActiveRecord;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.project2project".
@@ -42,19 +43,19 @@ class Project2Project extends ActiveRecord
     }
 
     /**
-     * @return Project
+     * @return ActiveQuery
      */
     public function getParent()
     {
-        return Project::findOne(['obj_id' => $this->parent_project_obj_id]);
+        return $this->hasOne(Project::className(), ['obj_id' => 'parent_project_obj_id']);
     }
 
     /**
-     * @return Project
+     * @return ActiveQuery
      */
     public function getChild()
     {
-        return Project::findOne(['obj_id' => $this->child_project_obj_id]);
+        return $this->hasOne(Project::className(), ['obj_id' => 'child_project_obj_id']);
     }
 
     /**

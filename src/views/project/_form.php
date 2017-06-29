@@ -46,8 +46,8 @@ use kartik\select2\Select2;
         <label>Дочерние проекты:</label>
         <?= Select2::widget([
             'name' => 'child_project_array',
-            'value' => $model->getChildProjectIdArray(),
-            'data' => $model->getKnownProjectsIdNameArray(),
+            'value' => $model->getChildProjectIdList(),
+            'data' => $model->getKnownProjectsIdNameList(),
             'options' => ['placeholder' => 'Select child project ...', 'multiple' => true],
         ]) ?>
 

@@ -152,13 +152,15 @@ class ProjectController extends Controller
                 }
 
                 Project2Project::deleteAll(array('parent_project_obj_id' => $model->obj_id));
-                foreach ($_POST['child_project_array'] as $childProjectId) {
-                    $projectToProjectObject = new Project2Project();
-                    $projectToProjectObject->parent_project_obj_id = $model->obj_id;
-                    $projectToProjectObject->child_project_obj_id = $childProjectId;
-                    $projectToProjectObject->save();
+                if (isset($_POST['child_project_array']) && is_array($_POST['child_project_array'])) {
+                    foreach ($_POST['child_project_array'] as $childProjectId) {
+                        $projectToProjectObject = new Project2Project();
+                        $projectToProjectObject->parent_project_obj_id = $model->obj_id;
+                        $projectToProjectObject->child_project_obj_id = $childProjectId;
+                        $projectToProjectObject->save();
 
-                    Log::createLogMessage("Создана {$projectToProjectObject->getTitle()}");
+                        Log::createLogMessage("Создана {$projectToProjectObject->getTitle()}");
+                    }
                 }
 
                 $needUpdateConfigs = false;

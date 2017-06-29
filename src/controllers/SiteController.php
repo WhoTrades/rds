@@ -81,7 +81,6 @@ class SiteController extends Controller
         $model = new ReleaseRequest();
 
         $transaction = $model->getDbConnection()->beginTransaction();
-
         try {
             if (isset($_POST['ReleaseRequest'])) {
                 $model->attributes = $_POST['ReleaseRequest'];
@@ -90,9 +89,9 @@ class SiteController extends Controller
                     $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
                 }
                 if ($model->save()) {
-                    foreach (Project2Project::findAll(['parent_project_obj_id' => $model->project->obj_id]) as $p2p) {
+                    foreach ($model->project->project2ProjectList as $project2ProjectObject) {
                         /** @var Project $childProject */
-                        $childProject = $p2p->getChild();
+                        $childProject = $project2ProjectObject->child;
 
                         $childReleaseRequest = new ReleaseRequest();
                         $childReleaseRequest->rr_user_id = $model->rr_user_id;

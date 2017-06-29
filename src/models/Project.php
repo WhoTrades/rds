@@ -10,26 +10,27 @@ use yii\db\ActiveQuery;
  *
  * The followings are the available columns in table 'rds.project':
  *
- * @property string           $obj_id
- * @property string           $obj_created
- * @property string           $obj_modified
- * @property integer          $obj_status_did
- * @property string           $project_name
- * @property string           $project_config
- * @property string           $project_build_version
- * @property array            $project_build_subversion
- * @property string           $project_current_version
- * @property string           $project_pre_migration_version
- * @property string           $project_post_migration_version
- * @property string           $project_notification_email
- * @property string           $project_notification_subject
- * @property string           $project_servers
- * @property string           $script_migration_up
- * @property string           $script_migration_new
- * @property string           $script_config_local
- * @property ReleaseRequest[] $releaseRequests
- * @property ProjectConfig[]  $projectConfigs
- * @property Project2Worker[] $project2workers
+ * @property string             $obj_id
+ * @property string             $obj_created
+ * @property string             $obj_modified
+ * @property integer            $obj_status_did
+ * @property string             $project_name
+ * @property string             $project_config
+ * @property string             $project_build_version
+ * @property array              $project_build_subversion
+ * @property string             $project_current_version
+ * @property string             $project_pre_migration_version
+ * @property string             $project_post_migration_version
+ * @property string             $project_notification_email
+ * @property string             $project_notification_subject
+ * @property string             $project_servers
+ * @property string             $script_migration_up
+ * @property string             $script_migration_new
+ * @property string             $script_config_local
+ * @property ReleaseRequest[]   $releaseRequests
+ * @property ProjectConfig[]    $projectConfigs
+ * @property Project2Worker[]   $project2workers
+ * @property Project2Project[]  $project2ProjectList
  */
 class Project extends ActiveRecord
 {
@@ -139,6 +140,14 @@ class Project extends ActiveRecord
     public function getProjectConfigs()
     {
         return $this->hasMany(ProjectConfig::class, ['pc_project_obj_id' => 'obj_id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getProject2ProjectList()
+    {
+        return $this->hasMany(Project2Project::class, ['parent_project_obj_id' => 'obj_id']);
     }
 
     /**
@@ -275,26 +284,20 @@ class Project extends ActiveRecord
     }
 
     /**
-     * @return array[]
+     * @return array
      */
-    public function getChildProjectIdArray()
+    public function getChildProjectIdList()
     {
         return array_map(function (Project2Project $item) {
-            return $item->getChild()->obj_id;
-        }, Project2Project::findAll(['parent_project_obj_id' => $this->obj_id]));
+            return $item->child_project_obj_id;
+        }, $this->project2ProjectList);
     }
 
     /**
      * @return array
      */
-    public function getKnownProjectsIdNameArray()
+    public function getKnownProjectsIdNameList()
     {
-        $array = [];
-        foreach (Project::find()->all() as $project) {
-            $array[$project->obj_id] = $project->project_name;
-        }
-        asort($array);
-
-        return $array;
+        return Project::find()->select('project_name')->indexBy('obj_id')->orderBy('project_name')->column();
     }
 }
