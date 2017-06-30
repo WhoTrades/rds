@@ -131,7 +131,7 @@ class RebuildBranch
      */
     private function getBranchesForBuild($branch)
     {
-        $jira = new JiraApi(\Yii::$app->debugLogger);
+        $jira = \Yii::$app->getModule('Wtflow')->jira;
 
         $jql = "status IN (\"" . implode('", "', $this->map[$branch]) . "\") AND project IN (" . implode(", ", \Yii::$app->params['jiraProjects']) . ") ORDER BY updated ASC";
         \Yii::$app->debugLogger->message("Getting tickets by jql=$jql");

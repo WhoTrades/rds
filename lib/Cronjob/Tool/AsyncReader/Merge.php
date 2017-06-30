@@ -90,7 +90,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             return;
         }
 
-        $jira = new JiraApi($this->debugLogger);
+        $jira = \Yii::$app->getModule('Wtflow')->jira;
         try {
             $ticketInfo = $jira->getTicketInfo($feature->jf_ticket);
         } catch (\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {

@@ -230,7 +230,7 @@ class JsonController extends Controller
         $branch = trim($branch) ? html_entity_decode(strip_tags($branch)) : 'master';
         $issueKey = trim($issueKey) ? html_entity_decode(strip_tags($issueKey)) : '';
 
-        $jiraApi = new JiraApi(\Yii::$app->debugLogger);
+        $jiraApi = \Yii::$app->getModule('Wtflow')->jira;
         try {
             $ticket = $jiraApi->getTicketInfo($issueKey);
         } catch(\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
