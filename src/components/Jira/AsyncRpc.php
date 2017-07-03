@@ -5,20 +5,6 @@ use app\modules\Wtflow\models\JiraAsyncRpc;
 
 class AsyncRpc extends \yii\base\Object
 {
-    /** @var \ServiceBase_IDebugLogger */
-    private $debugLogger;
-
-    /**
-     * AsyncRpc constructor.
-     * @param \ServiceBase_IDebugLogger $debugLogger
-     */
-    public function __construct(\ServiceBase_IDebugLogger $debugLogger)
-    {
-        $this->debugLogger = \Yii::$app->debugLogger;
-
-        parent::__construct();
-    }
-
     /**
      * @param string $method
      * @param array $args

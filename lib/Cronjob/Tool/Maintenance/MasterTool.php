@@ -3,8 +3,6 @@
  * @example dev/services/rds/misc/tools/runner.php --tool=Maintenance_MasterTool -vv
  */
 
-use RdsSystem\Message;
-
 class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
 {
     /**
@@ -38,7 +36,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
         $workerName = $cronJob->getOption('worker-name');
 
         $model->readToolGetInfoTaskRequest($workerName, false, function (RdsSystem\Message\Tool\GetInfoTask $task) use ($server, $model, $commandExecutor, $workerName) {
-            $this->debugLogger->message("Received get process info message");
+            Yii::info("Received get process info message");
 
             try {
                 $command = "ps -Ao pid,bsdstart,command|grep 'sys__key=$task->key'|grep -P '\s--sys__package=$task->project-[0-9.]+(\s|$)' | grep -v 'set -o pipefail'";
@@ -63,12 +61,12 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
                 new RdsSystem\Message\Tool\GetInfoResult($task->getUniqueTag(), $server, $processList)
             );
 
-            $this->debugLogger->message("Message accepted");
+            Yii::info("Message accepted");
             $task->accepted();
         });
 
         $model->readToolKillTaskRequest($workerName, false, function (RdsSystem\Message\Tool\KillTask $task) use ($server, $model, $commandExecutor, $workerName) {
-            $this->debugLogger->message("Received message");
+            Yii::info("Received message");
 
             try {
                 $text = $commandExecutor->executeCommand("ps -Ao pid,command|grep 'sys__key=$task->key'|grep 'sys__package=$task->project-' | grep -v 'set -o pipefail'");
@@ -93,10 +91,10 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
 
             foreach ($processList as $pid => $data) {
                 if ($pid != getmypid()) {
-                    $this->debugLogger->message("Killing process $pid");
+                    Yii::info("Killing process $pid");
                     $processList[$pid]['killed'] = posix_kill($pid, $task->signal);
                 } else {
-                    $this->debugLogger->error("Attempt to kil myself, skip");
+                    Yii::error("Attempt to kil myself, skip");
                     $processList[$pid]['killed'] = false;
                 }
             }
@@ -105,12 +103,12 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
                 new RdsSystem\Message\Tool\KillResult($task->getUniqueTag(), $server, $processList)
             );
 
-            $this->debugLogger->message("Message accepted");
+            Yii::info("Message accepted");
             $task->accepted();
         });
 
         $model->readToolGetToolLogTail($workerName, false, function (RdsSystem\Message\Tool\ToolLogTail $task) use ($server, $model, $commandExecutor, $workerName) {
-            $this->debugLogger->message("Received message of tail ");
+            Yii::info("Received message of tail ");
 
             $text = '';
             $isSuccess = true;
@@ -127,7 +125,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
                 // dg: Проверяем наличие файла
                 if (!file_exists($filename)) {
                     if ($daysAgo === 0) {
-                        $this->debugLogger->message("File $filename not found");
+                        Yii::info("File $filename not found");
                         $text = "No logs";
                         $isSuccess = false;
                     }
@@ -137,7 +135,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
                 try {
                     $command = "tail -n " . ((int) $task->linesCount - $linesCount) . " " . escapeshellarg($filename);
                 } catch (\RdsSystem\lib\CommandExecutorException $e) {
-                    $this->debugLogger->error("Error occurred during command execution: " . $e->getMessage());
+                    Yii::error("Error occurred during command execution: " . $e->getMessage());
                     $text = $e->getMessage();
                     $isSuccess = false;
                     break;
@@ -153,7 +151,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
                 new RdsSystem\Message\Tool\ToolLogTailResult($task->getUniqueTag(), $isSuccess, $server, $text)
             );
 
-            $this->debugLogger->message("Message accepted");
+            Yii::info("Message accepted");
             $task->accepted();
         });
 

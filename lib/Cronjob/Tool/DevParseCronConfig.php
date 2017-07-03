@@ -41,14 +41,14 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
         $project = $cronJob->getOption('project');
 
         if (!file_exists($filename) || !is_readable($filename)) {
-            $this->debugLogger->error("File $filename not exists or not readable");
+            Yii::error("File $filename not exists or not readable");
 
             return 1;
         }
 
         $Project = Project::findByAttributes(['project_name' => $project]);
         if (!$Project) {
-            $this->debugLogger->error("Project $project not exists at DB");
+            Yii::error("Project $project not exists at DB");
 
             return 2;
         }
@@ -60,7 +60,7 @@ class Cronjob_Tool_DevParseCronConfig extends RdsSystem\Cron\RabbitDaemon
         ]);
 
         if (!$rr) {
-            $this->debugLogger->error("No any release request for project=$project");
+            Yii::error("No any release request for project=$project");
 
             return 3;
         }

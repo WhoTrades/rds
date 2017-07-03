@@ -23,14 +23,14 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $model  = $this->getMessagingModel($cronJob);
+        $model = $this->getMessagingModel($cronJob);
 
         $model->readHardMigrationProgress(false, function (Message\HardMigrationProgress $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received harm migration progress changed: " . json_encode($message));
+            Yii::info("env={$model->getEnv()}, Received harm migration progress changed: " . json_encode($message));
             $this->actionHardMigrationProgressChanged($message, $model);
         });
 
-        $this->debugLogger->message("Start listening");
+        Yii::info("Start listening");
         $this->waitForMessages($model, $cronJob);
     }
 
@@ -56,13 +56,13 @@ class Cronjob_Tool_AsyncReader_HardMigrationProgress extends RdsSystem\Cron\Rabb
 
         $this->sendMigrationProgressbarChanged(str_replace("/", "", "{$message->migration}_{$model->getEnv()}"), $message->progress, $message->action);
 
-        $this->debugLogger->message("Progress of migration $message->migration updated ($message->progress%)");
-        $this->debugLogger->message("Executing progress got " . sprintf("%.2f", 1000 * (microtime(true) - $t)) . " ms");
+        Yii::info("Progress of migration $message->migration updated ($message->progress%)");
+        Yii::info("Executing progress got " . sprintf("%.2f", 1000 * (microtime(true) - $t)) . " ms");
     }
 
     private function sendMigrationProgressbarChanged($id, $percent, $key)
     {
-        $this->debugLogger->message("Sending migraion progressbar to comet");
+        Yii::info("Sending migraion progressbar to comet");
         Yii::$app->webSockets->send('migrationProgressbarChanged', ['migration' => $id, 'percent' => (float) $percent, 'key' => $key]);
     }
 }

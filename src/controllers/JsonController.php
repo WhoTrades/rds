@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use Yii;
 use app\models\Project;
 use app\modules\Whotrades\models\ToolJob;
 use yii\base\Module;
@@ -230,7 +231,7 @@ class JsonController extends Controller
         $branch = trim($branch) ? html_entity_decode(strip_tags($branch)) : 'master';
         $issueKey = trim($issueKey) ? html_entity_decode(strip_tags($issueKey)) : '';
 
-        $jiraApi = new JiraApi(\Yii::$app->debugLogger);
+        $jiraApi = new JiraApi();
         try {
             $ticket = $jiraApi->getTicketInfo($issueKey);
         } catch(\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
@@ -321,7 +322,7 @@ class JsonController extends Controller
      * Метод API, который дергает JIRA посредством web хука при переводе задачи из статуса "Ready for staging" назад
      * @param string $ticket
      *
-     * @throws ApplicationException
+     * @throws \ApplicationException
      * @return void
      */
     public function actionTicketRemovedFromStaging($ticket)

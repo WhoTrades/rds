@@ -25,17 +25,18 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
 
     /**
      * Performs actual work
+     * @param \Cronjob\ICronjob $cronJob
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $model  = $this->getMessagingModel($cronJob);
 
-        $model->readHardMigrationStatus(false, function(Message\HardMigrationStatus $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received changing status of hard migration: ".json_encode($message));
+        $model->readHardMigrationStatus(false, function (Message\HardMigrationStatus $message) use ($model) {
+            Yii::info("env={$model->getEnv()}, Received changing status of hard migration: " . json_encode($message));
             $this->actionUpdateHardMigrationStatus($message, $model);
         });
 
-        $this->debugLogger->message("Start listening");
+        Yii::info("Start listening");
         $this->waitForMessages($model, $cronJob);
     }
 
@@ -49,7 +50,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         ]);
 
         if (!$migration) {
-            $this->debugLogger->error("Can't find migration $message->migration, environment={$model->getEnv()}");
+            Yii::error("Can't find migration $message->migration, environment={$model->getEnv()}");
             $message->accepted();
 
             return;
@@ -60,7 +61,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
         if ($model->getEnv() == 'main' && $migration->migration_status != $message->status) {
             if (\Config::getInstance()->serviceRds['jira']['repostMigrationStatus']) {
                 /** @var $jira JiraApi */
-                $jira = new AsyncRpc($this->debugLogger);
+                $jira = new AsyncRpc();
 
                 switch ($message->status) {
                     case HardMigration::MIGRATION_STATUS_NEW:
@@ -86,10 +87,10 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
                             'jira_direction' => JiraMoveTicket::DIRECTION_UP,
                         ];
 
-                        $this->debugLogger->message("Adding ticket {$migration->migration_ticket} for moving up");
+                        Yii::info("Adding ticket {$migration->migration_ticket} for moving up");
 
                         if (!$jiraMove->save()) {
-                            $this->debugLogger->error("Can't save JiraMoveTicket, errors: " . json_encode($jiraMove->errors));
+                            Yii::error("Can't save JiraMoveTicket, errors: " . json_encode($jiraMove->errors));
                         }
 
                         break;
@@ -119,9 +120,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
 
     public static function sendHardMigrationUpdated($id)
     {
-        /** @var $debugLogger \ServiceBase_IDebugLogger */
-        $debugLogger = \Yii::$app->debugLogger;
-        $debugLogger->message("Sending to comet new data of hard migration #$id");
+        Yii::info("Sending to comet new data of hard migration #$id");
 
         $model = HardMigration::findByPk($id);
 
@@ -130,7 +129,7 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
             'model' => $model,
         ]);
 
-        $debugLogger->message("html code generated");
+        Yii::info("html code generated");
 
         Yii::$app->webSockets->send('hardMigrationChanged', ['rr_id' => str_replace("/", "", "{$model->migration_name}_$model->migration_environment"), 'html' => $html]);
     }

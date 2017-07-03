@@ -27,17 +27,18 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
 
     /**
      * Performs actual work
+     * @param \Cronjob\ICronjob $cronJob
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
         $model  = $this->getMessagingModel($cronJob);
 
         $model->readHardMigrationLogChunk(false, function (Message\HardMigrationLogChunk $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received next log chunk: " . json_encode($message));
+            Yii::info("env={$model->getEnv()}, Received next log chunk: " . json_encode($message));
             $this->actionProcessHardMigrationLogChunk($message, $model);
         });
 
-        $this->debugLogger->message("Start listening");
+        Yii::info("Start listening");
         $this->waitForMessages($model, $cronJob);
     }
 
@@ -57,7 +58,7 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
         ])->execute();
 
         $id = str_replace("/", "", $message->migration) . "_" . $model->getEnv();
-        $this->debugLogger->message("id=$id");
+        Yii::info("id=$id");
 
         // an: Максимальный размер пакета, который умещается в comet - 8KB. Потому и нам нужно разбивать
         foreach (str_split($message->text, self::MAX_TEXT_SIZE) as $chunk) {
@@ -66,6 +67,6 @@ class Cronjob_Tool_AsyncReader_HardMigrationLogChunk extends RdsSystem\Cron\Rabb
 
         $message->accepted();
 
-        $this->debugLogger->message("Executing log chunk got " . sprintf("%.2f", 1000 * (microtime(true) - $t)) . " ms");
+        Yii::info("Executing log chunk got " . sprintf("%.2f", 1000 * (microtime(true) - $t)) . " ms");
     }
 }

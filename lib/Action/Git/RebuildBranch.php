@@ -1,6 +1,7 @@
 <?php
 namespace Action\Git;
 
+use Yii;
 use app\models\Log;
 use RdsSystem\Message;
 use app\modules\Wtflow\models\GitBuild;
@@ -62,9 +63,9 @@ class RebuildBranch
         $branches = $this->getBranchesForBuild($branch);
 
         if (!$branches) {
-            \Yii::$app->debugLogger->message("No branches, se just create $branch from master branch");
+            Yii::info("No branches, se just create $branch from master branch");
             $model->sendMergeCreateBranch(
-                \Yii::$app->modules['Wtflow']->workerName,
+                Yii::$app->modules['Wtflow']->workerName,
                 new Message\Merge\CreateBranch($branch, "master", true)
             );
 
@@ -73,10 +74,10 @@ class RebuildBranch
 
         $build = $this->createGitBuild($user, $branch);
 
-        \Yii::$app->debugLogger->message("Target branch: $build->branch, sending create branch task");
+        Yii::info("Target branch: $build->branch, sending create branch task");
 
         $model->sendMergeTask(
-            \Yii::$app->modules['Wtflow']->workerName,
+            Yii::$app->modules['Wtflow']->workerName,
             new Message\Merge\Task(-1, "master", $build->branch, Message\Merge\Task::MERGE_TYPE_FEATURE)
         );
 
@@ -94,17 +95,17 @@ class RebuildBranch
             }
 
 
-            \Yii::$app->debugLogger->message("Branch: $val, sending merge branch task");
+            Yii::info("Branch: $val, sending merge branch task");
             $model->sendMergeTask(
-                \Yii::$app->modules['Wtflow']->workerName,
+                Yii::$app->modules['Wtflow']->workerName,
                 new Message\Merge\Task($build->obj_id, $val, $build->branch, Message\Merge\Task::MERGE_TYPE_BUILD)
             );
         }
 
         Log::createLogMessage("Заказана пересборка #$build->obj_id ветки $branch");
-        \Yii::$app->webSockets->send('gitBuildRefreshAll', []);
+        Yii::$app->webSockets->send('gitBuildRefreshAll', []);
 
-        \Yii::$app->debugLogger->message("Tasks sent successfully");
+        Yii::info("Tasks sent successfully");
     }
 
     /**
@@ -131,25 +132,24 @@ class RebuildBranch
      */
     private function getBranchesForBuild($branch)
     {
-        $jira = new JiraApi(\Yii::$app->debugLogger);
+        $jira = new JiraApi();
 
-        $jql = "status IN (\"" . implode('", "', $this->map[$branch]) . "\") AND project IN (" . implode(", ", \Yii::$app->params['jiraProjects']) . ") ORDER BY updated ASC";
-        \Yii::$app->debugLogger->message("Getting tickets by jql=$jql");
+        $jql = "status IN (\"" . implode('", "', $this->map[$branch]) . "\") AND project IN (" . implode(", ", Yii::$app->params['jiraProjects']) . ") ORDER BY updated ASC";
+        Yii::info("Getting tickets by jql=$jql");
 
         $tickets = $jira->getTicketsByJql($jql);
 
         $branches = [];
         foreach ($tickets['issues'] as $ticket) {
-            \Yii::$app->debugLogger->debug("Testing {$ticket['key']}");
+            Yii::trace("Testing {$ticket['key']}");
             if (!JiraFeature::countByAttributes(['jf_ticket' => $ticket['key']])) {
-                \Yii::$app->debugLogger->debug("Skip {$ticket['key']} as it is not known");
-                //continue;
+                Yii::trace("Skip {$ticket['key']} as it is not known");
             }
 
             $branches[] = "feature/{$ticket['key']}";
         }
 
-        \Yii::$app->debugLogger->message("Branches: " . implode(", ", $branches));
+        Yii::info("Branches: " . implode(", ", $branches));
 
         return $branches;
     }

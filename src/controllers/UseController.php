@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use Yii;
 use app\models\Log;
 use app\models\Project2worker;
 use Cronjob_Tool_AsyncReader_Deploy;
