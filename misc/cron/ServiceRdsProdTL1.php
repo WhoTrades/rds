@@ -5,11 +5,11 @@
  */
 
 use app\modules\Sentry\PgQ\EventProcessor\SentryAfterUseErrorsNotification;
+use app\modules\Whotrades\Cronjob\Tool\CodeReviewNotifier;
 use app\modules\Wtflow\Cronjob\Tool\Git\RebuildBranch;
 use app\modules\Wtflow\Cronjob\Tool\GitDropFeatureBranch;
 use app\modules\Wtflow\Cronjob\Tool\Jira\CloseFeatures;
 use app\modules\Wtflow\Cronjob\Tool\Jira\CodeReview;
-use app\modules\Wtflow\Cronjob\Tool\Jira\CodeReviewNotifier;
 use app\modules\Wtflow\Cronjob\Tool\Jira\FixVersionsRelease;
 use app\modules\Wtflow\Cronjob\Tool\Jira\HardMigrationNotifier;
 use app\modules\Wtflow\Cronjob\Tool\Jira\MergeTasks;
