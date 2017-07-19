@@ -294,30 +294,6 @@ class JsonController extends Controller
     }
 
     /**
-     * Точка входа для Telegram Callback и (пока) регистрация callback-хука который будет вызывать сервис Tekegram на каждое входящее сообщение
-     *
-     * @throws \TelegramBot\Api\Exception
-     *
-     * @todo Установку хука надо перенести отсюда в более подходящее место, возможно в пункты меню интеграции RDS
-     * @todo Добавить обработку того, что это действительно обращение к нашему боту (проверять токен в урле)
-     *
-     * @return void
-     */
-    public function actionTelegramCallback()
-    {
-        /* @var \app\modules\Wtflow\components\TelegramBot $telegramBot */
-        $telegramBot = \Yii::$app->getModule('Wtflow')->telegramBot;
-
-        if (\Yii::$app->request->isPost) {
-            $telegramBot->processTelegramCallback();
-        } else {
-            $telegramBot->setWebhook(\Yii::$app->request->getAbsoluteUrl());
-        }
-
-        echo 'OK';
-    }
-
-    /**
      * Метод API, который дергает JIRA посредством web хука при переводе задачи из статуса "Ready for staging" назад
      * @param string $ticket
      *
