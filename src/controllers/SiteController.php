@@ -1,7 +1,6 @@
 <?php
 namespace app\controllers;
 
-use app\models\Project2Project;
 use app\models\ReleaseRequest;
 use app\models\ReleaseReject;
 use app\models\Project;
@@ -9,7 +8,6 @@ use app\models\Log;
 use app\models\Build;
 use app\modules\Wtflow\models\JiraCommit;
 use RdsSystem;
-use Yii;
 
 class SiteController extends Controller
 {
@@ -89,6 +87,7 @@ class SiteController extends Controller
                     $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
                 }
                 if ($model->save()) {
+                    $childModels = [];
                     foreach ($model->project->project2ProjectList as $project2ProjectObject) {
                         /** @var Project $childProject */
                         $childProject = $project2ProjectObject->child;
@@ -102,24 +101,21 @@ class SiteController extends Controller
                         $childReleaseRequest->rr_build_version = $childProject->getNextVersion($childReleaseRequest->rr_release_version);
                         $childReleaseRequest->rr_leading_id = $model->obj_id;
                         $childReleaseRequest->save();
+
+                        $childReleaseRequest->createBuildTasks();
+
+                        $childModels[] = $childReleaseRequest;
                     }
 
                     $model->rr_comment = "$model->rr_comment";
                     $model->save();
 
-                    // an: Отправку задач в rabbit делаем по-ближе к комиту транзакции, что бы не получилось что задачи уже
-                    // начали выполняться, а транзакция ещё не отправлена и билда у нас в базе ещё нет
                     $model->createBuildTasks();
-                    if (!empty($dictionary) && !empty($whotrades)) {
-                        $dictionary->createBuildTasks();
-                        $whotrades->createBuildTasks();
-                    }
                     $transaction->commit();
 
                     $model->sendBuildTasks();
-                    if (!empty($dictionary) && !empty($whotrades)) {
-                        $dictionary->sendBuildTasks();
-                        $whotrades->sendBuildTasks();
+                    foreach ($childModels as $releaseRequest) {
+                        $releaseRequest->sendBuildTasks();
                     }
 
                     \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
