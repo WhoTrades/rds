@@ -863,7 +863,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         ]);
 
         Yii::$app->webSockets->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);
-        Yii::info("Sended");
+        Yii::info("Sent");
     }
 
     /**

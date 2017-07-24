@@ -115,7 +115,7 @@ class UseController extends Controller
         foreach ($releaseRequest->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
             $worker = $p2w->worker;
-            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->
+            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->
                 getMessagingRdsMsModel()->
                 sendMigrationTask(
                     $worker->worker_name,

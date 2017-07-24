@@ -8,6 +8,7 @@ use app\models\Log;
 use app\models\Build;
 use app\modules\Wtflow\models\JiraCommit;
 use RdsSystem;
+use Yii;
 
 class SiteController extends Controller
 {
@@ -196,7 +197,7 @@ class SiteController extends Controller
             return;
         }
 
-        $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
+        $messageModel = (new RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel();
 
         $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/

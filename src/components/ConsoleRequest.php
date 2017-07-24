@@ -17,4 +17,34 @@ class ConsoleRequest extends Request
     {
         return [];
     }
+
+    public function getAbsoluteUrl()
+    {
+        return "console://" . implode("_", $_SERVER['argv']);
+    }
+
+    public function getRawBody()
+    {
+        return null;
+    }
+
+    public function getIsAjax()
+    {
+        return false;
+    }
+
+    public function getMethod()
+    {
+        return 'console';
+    }
+
+    public function getUserIP()
+    {
+        return null;
+    }
+
+    public function getHeaders()
+    {
+        return [];
+    }
 }

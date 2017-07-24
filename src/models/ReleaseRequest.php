@@ -360,7 +360,7 @@ class ReleaseRequest extends ActiveRecord
             orderBy('rr_build_version desc')->one();
 
             // an: Отправляем задачу в Rabbit на сборку
-            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendBuildTask(
+            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel()->sendBuildTask(
                 $build->worker->worker_name,
                 new \RdsSystem\Message\BuildTask(
                     $build->obj_id,
@@ -389,7 +389,7 @@ class ReleaseRequest extends ActiveRecord
 
         foreach ($this->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
-            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
+            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
                 $p2w->worker->worker_name,
                 new \RdsSystem\Message\UseTask(
                     $this->project->project_name,

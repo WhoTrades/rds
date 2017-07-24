@@ -47,6 +47,7 @@
         "conquer/codemirror": "~2.0",
         "kartik-v/yii2-widget-select2": "2.0.9",
         "yiisoft/yii2-debug": "2.0.9",
+        "codemix/yii2-streamlog": "1.2.1",
         "mito/yii2-sentry": "~1.0.0"
     },
     "extra": {

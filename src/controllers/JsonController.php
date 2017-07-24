@@ -247,7 +247,7 @@ class JsonController extends Controller
         $result = array();
         $projectsAllowed = \Yii::$app->params['teamCityProjectAllowed'];
         $parameterName = \Yii::$app->params['teamCityBuildComponentParameter'];
-        $teamCity = new \CompanyInfrastructure\WtTeamCityClient(\Yii::$app->debugLogger);
+        $teamCity = new \CompanyInfrastructure\WtTeamCityClient(Yii::$app->getModule('Whotrades')->debugLogger);
         $components = $ticket['fields']['components'];
 
         foreach ($projectsAllowed as $project) {
@@ -310,7 +310,12 @@ class JsonController extends Controller
         }
 
         $action = new \Action\Git\RebuildBranch();
-        $action->run('staging', 'JIRA-hook', (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel(), false);
+        $action->run(
+            'staging',
+            'JIRA-hook',
+            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel(),
+            false
+        );
 
         echo 'OK';
     }

@@ -71,14 +71,14 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
                         $jira->addCommentOrAppendMyComment(
                             $migration->migration_ticket,
                             date("d.m.Y H:i") . ": " . "Запущена миграция $message->migration. Лог миграции: " .
-                                $this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])
+                                $this->createUrl('/Wtflow/hard-migration/log', ['id' => $migration->obj_id])
                         );
                         break;
                     case HardMigration::MIGRATION_STATUS_DONE:
                         $jira->addCommentOrAppendMyComment(
                             $migration->migration_ticket,
                             date("d.m.Y H:i") . ": " . "Выполнена миграция $message->migration. Лог миграции: " .
-                                $this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])
+                                $this->createUrl('/Wtflow/hard-migration/log', ['id' => $migration->obj_id])
                         );
 
                         $jiraMove = new JiraMoveTicket();
@@ -98,14 +98,14 @@ class Cronjob_Tool_AsyncReader_HardMigration extends RdsSystem\Cron\RabbitDaemon
                         $jira->addCommentOrAppendMyComment(
                             $migration->migration_ticket,
                             date("d.m.Y H:i") . ": " . "Завершилась с ошибкой миграция $message->migration. Лог миграции: " .
-                                $this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])
+                                $this->createUrl('/Wtflow/hard-migration/log', ['id' => $migration->obj_id])
                         );
                         break;
                     default:
                         $jira->addCommentOrAppendMyComment(
                             $migration->migration_ticket,
                             date("d.m.Y H:i") . ": " . "Статус миграции $message->migration изменился на $message->status. Лог миграции: " .
-                                $this->createUrl('/hardMigration/log', ['id' => $migration->obj_id])
+                                $this->createUrl('/Wtflow/hard-migration/log', ['id' => $migration->obj_id])
                         );
                         break;
                 }
