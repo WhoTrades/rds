@@ -4,6 +4,7 @@
     "description": "WhoTrades release deployment service",
     "autoload": {
         "psr-0": {
+            "Monitoring_": "../../lib/libcore/",
             "ServiceBase_": "../../lib/libcore/",
             "CoreLight": "../../lib/libcore/",
             "RequestHandler_": "../../lib/libcore/",
@@ -26,7 +27,7 @@
             "ServiceBase\\Debug\\": "../../lib/libcore/ServiceBase/Debug/",
             "ServiceBase\\HttpRequest\\": "../../lib/libcore/ServiceBase/HttpRequest/"
         },
-        "classmap": ["misc/cron", "../../lib/creole"]
+        "classmap": ["misc/cron", "../../lib/creole", "../../lib/libcore"]
     },
     "require": {
         "kartik-v/yii2-grid": "~3.1",
@@ -42,10 +43,11 @@
         "yiisoft/yii2-swiftmailer": "~2.0",
         "sentry/sentry": "1.6.2",
         "telegram-bot/api": "^2.2",
-        "dektrium/yii2-user": "0.9.11",
+        "dektrium/yii2-user": "0.9.12",
         "conquer/codemirror": "~2.0",
         "kartik-v/yii2-widget-select2": "2.0.9",
         "yiisoft/yii2-debug": "2.0.9",
+        "codemix/yii2-streamlog": "1.2.1",
         "mito/yii2-sentry": "~1.0.0"
     },
     "extra": {

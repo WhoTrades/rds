@@ -80,7 +80,6 @@ class SiteController extends Controller
         $model = new ReleaseRequest();
 
         $transaction = $model->getDbConnection()->beginTransaction();
-
         try {
             if (isset($_POST['ReleaseRequest'])) {
                 $model->attributes = $_POST['ReleaseRequest'];
@@ -89,53 +88,35 @@ class SiteController extends Controller
                     $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
                 }
                 if ($model->save()) {
-                    // an: Для comon мы выкладываем паралельно и dictionary. В данный момент это реализовано на уровне хардкода тут. В будущем, когда появится больше
-                    // взаимосвязанныъ проектов - нужно подумать как это объединить в целостную систему
+                    $childModels = [];
+                    foreach ($model->project->project2ProjectList as $project2ProjectObject) {
+                        /** @var Project $childProject */
+                        $childProject = $project2ProjectObject->child;
 
-                    $projectName = $model->project->project_name;
-                    if (in_array($projectName, ['comon'])
-                        && ($dictionaryProject = Project::findByAttributes(['project_name' => 'dictionary']))
-                        && ($whotradesProject = Project::findByAttributes(['project_name' => 'whotrades']))
-                    ) {
-                        /** @var $dictionaryProject Project */
-                        /** @var $whotradesProject Project */
-                        $dictionary = new ReleaseRequest();
-                        $dictionary->rr_user_id = $model->rr_user_id;
-                        $dictionary->rr_project_obj_id = $dictionaryProject->obj_id;
-                        $dictionary->rr_comment =
-                            $model->rr_comment . " [slave for " . $projectName . "-$model->rr_build_version]";
-                        $dictionary->rr_release_version = $model->rr_release_version;
-                        $dictionary->rr_build_version = $dictionaryProject->getNextVersion($dictionary->rr_release_version);
-                        $dictionary->rr_leading_id = $model->obj_id;
-                        $dictionary->save();
+                        $childReleaseRequest = new ReleaseRequest();
+                        $childReleaseRequest->rr_user_id = $model->rr_user_id;
+                        $childReleaseRequest->rr_project_obj_id = $childProject->obj_id;
+                        $childReleaseRequest->rr_comment =
+                            $model->rr_comment . " [slave for " . $model->project->project_name . "-$model->rr_build_version]";
+                        $childReleaseRequest->rr_release_version = $model->rr_release_version;
+                        $childReleaseRequest->rr_build_version = $childProject->getNextVersion($childReleaseRequest->rr_release_version);
+                        $childReleaseRequest->rr_leading_id = $model->obj_id;
+                        $childReleaseRequest->save();
 
-                        $whotrades = new ReleaseRequest();
-                        $whotrades->rr_user_id = $model->rr_user_id;
-                        $whotrades->rr_project_obj_id = $whotradesProject->obj_id;
-                        $whotrades->rr_comment =
-                            $model->rr_comment . " [slave for " . $projectName . "-$model->rr_build_version]";
-                        $whotrades->rr_release_version = $model->rr_release_version;
-                        $whotrades->rr_build_version = $whotradesProject->getNextVersion($whotrades->rr_release_version);
-                        $whotrades->rr_leading_id = $model->obj_id;
-                        $whotrades->save();
+                        $childReleaseRequest->createBuildTasks();
 
-                        $model->rr_comment = "$model->rr_comment";
-                        $model->save();
+                        $childModels[] = $childReleaseRequest;
                     }
 
-                    // an: Отправку задач в rabbit делаем по-ближе к комиту транзакции, что бы не получилось что задачи уже
-                    // начали выполняться, а транзакция ещё не отправлена и билда у нас в базе ещё нет
+                    $model->rr_comment = "$model->rr_comment";
+                    $model->save();
+
                     $model->createBuildTasks();
-                    if (!empty($dictionary) && !empty($whotrades)) {
-                        $dictionary->createBuildTasks();
-                        $whotrades->createBuildTasks();
-                    }
                     $transaction->commit();
 
                     $model->sendBuildTasks();
-                    if (!empty($dictionary) && !empty($whotrades)) {
-                        $dictionary->sendBuildTasks();
-                        $whotrades->sendBuildTasks();
+                    foreach ($childModels as $releaseRequest) {
+                        $releaseRequest->sendBuildTasks();
                     }
 
                     \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
@@ -216,7 +197,7 @@ class SiteController extends Controller
             return;
         }
 
-        $messageModel = (new RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel();
+        $messageModel = (new RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel();
 
         $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/

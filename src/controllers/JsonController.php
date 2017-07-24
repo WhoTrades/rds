@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use Yii;
 use app\models\Project;
 use app\modules\Whotrades\models\ToolJob;
 use yii\base\Module;
@@ -94,7 +95,7 @@ class JsonController extends Controller
 
         $result = [];
         foreach ($versions as $version) {
-            $result[] = 'release-'.$version->rv_version;
+            $result[] = 'release-' . $version->rv_version;
         }
 
         echo json_encode($result, JSON_PRETTY_PRINT);
@@ -118,7 +119,7 @@ class JsonController extends Controller
     public function actionAddWtFlowStat()
     {
         $developer = Developer::findByAttributes(['whotrades_email' => $_POST['developer']]);
-        
+
         if (!$developer) {
             return "Unknown developer " . $_POST['developer'];
         }
@@ -149,6 +150,7 @@ class JsonController extends Controller
 
         if (!$data) {
             echo json_encode(["OK" => true]);
+
             return;
         }
 
@@ -157,7 +159,7 @@ class JsonController extends Controller
                 continue;
             }
 
-            list(,$project, $version) = $ans;
+            list(, $project, $version) = $ans;
 
             if (!preg_match('~--sys__key=(\w+)~', $line, $ans)) {
                 continue;
@@ -221,7 +223,7 @@ class JsonController extends Controller
     {
         echo json_encode([
             'ok' => true,
-            'enabled' => RdsDbConfig::get()->is_tst_updating_enabled
+            'enabled' => RdsDbConfig::get()->is_tst_updating_enabled,
         ]);
     }
 
@@ -233,46 +235,46 @@ class JsonController extends Controller
         $jiraApi = \Yii::$app->getModule('Wtflow')->jira;
         try {
             $ticket = $jiraApi->getTicketInfo($issueKey);
-        } catch(\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
-            echo json_encode(["ERROR" => 'Wrong issue key given: "'.$issueKey.'"']);
+        } catch (\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
+            echo json_encode(["ERROR" => 'Wrong issue key given: "' . $issueKey . '"']);
+
             return;
         }
 
         if (!isset($ticket['fields']['components'])) {
-            echo json_encode(["ERROR" => 'Issue "'.$issueKey.'" have not allowed components']);
+            echo json_encode(["ERROR" => 'Issue "' . $issueKey . '" have not allowed components']);
+
             return;
         }
 
         $result = array();
         $projectsAllowed = \Yii::$app->params['teamCityProjectAllowed'];
         $parameterName = \Yii::$app->params['teamCityBuildComponentParameter'];
-        $teamCity = new \CompanyInfrastructure\WtTeamCityClient(\Yii::$app->debugLogger);
+        $teamCity = new \CompanyInfrastructure\WtTeamCityClient(Yii::$app->getModule('Whotrades')->debugLogger);
         $components = $ticket['fields']['components'];
 
         foreach ($projectsAllowed as $project) {
             $buildList = $teamCity->getBuildTypesList($project);
-                foreach ($buildList as $build) {
-                    $buildId = (string)$build['id'];
-                    try {
-                        $parameter = $teamCity->getBuildTypeParameterByName($buildId, $parameterName);
-                    } catch (\Exception $e) {
-                        /** go forward **/
-                        continue;
-                    }
-
-                    $teamcityJiraComponent = (string)$parameter;
-                    foreach ($components as $component) {
-                        if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
-                            $result[] = $teamCity->startBuild(
-                                $buildId, $branch, "Teamcity build run on request"
-                            );
-                        }
-                    }
+            foreach ($buildList as $build) {
+                $buildId = (string) $build['id'];
+                try {
+                    $parameter = $teamCity->getBuildTypeParameterByName($buildId, $parameterName);
+                } catch (\Exception $e) {
+                    /** go forward **/
+                    continue;
                 }
 
+                $teamcityJiraComponent = (string) $parameter;
+                foreach ($components as $component) {
+                    if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
+                        $result[] = $teamCity->startBuild($buildId, $branch, "Teamcity build run on request");
+                    }
+                }
+            }
         }
 
         echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
+
         return;
     }
 
@@ -294,34 +296,10 @@ class JsonController extends Controller
     }
 
     /**
-     * Точка входа для Telegram Callback и (пока) регистрация callback-хука который будет вызывать сервис Tekegram на каждое входящее сообщение
-     *
-     * @throws \TelegramBot\Api\Exception
-     *
-     * @todo Установку хука надо перенести отсюда в более подходящее место, возможно в пункты меню интеграции RDS
-     * @todo Добавить обработку того, что это действительно обращение к нашему боту (проверять токен в урле)
-     *
-     * @return void
-     */
-    public function actionTelegramCallback()
-    {
-        /* @var \app\modules\Wtflow\components\TelegramBot $telegramBot */
-        $telegramBot = \Yii::$app->getModule('Wtflow')->telegramBot;
-
-        if (\Yii::$app->request->isPost) {
-            $telegramBot->processTelegramCallback();
-        } else {
-            $telegramBot->setWebhook(\Yii::$app->request->getAbsoluteUrl());
-        }
-
-        echo 'OK';
-    }
-
-    /**
      * Метод API, который дергает JIRA посредством web хука при переводе задачи из статуса "Ready for staging" назад
      * @param string $ticket
      *
-     * @throws ApplicationException
+     * @throws \ApplicationException
      * @return void
      */
     public function actionTicketRemovedFromStaging($ticket)
@@ -333,7 +311,12 @@ class JsonController extends Controller
         }
 
         $action = new \Action\Git\RebuildBranch();
-        $action->run('staging', 'JIRA-hook', (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel(), false);
+        $action->run(
+            'staging',
+            'JIRA-hook',
+            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel(),
+            false
+        );
 
         echo 'OK';
     }

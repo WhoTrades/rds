@@ -3,15 +3,16 @@
  * Консьюмер, который двигает статусы тикетов из Ready for deploy -> Ready for acceptance в случае выкатывания релиза, и обратно в случае откатывания
  *
  * @author Artem Naumenko
- * @example sphp dev/services/rds/misc/tools/db/pgq/process.php --event-processor=SentryAfterUseErrorsNotification \
+ * @example sphp dev/services/rds/misc/tools/db/pgq/process.php --event-processor=app\\modules\\Sentry\\PgQ\\EventProcessor\\SentryAfterUseErrorsNotification \
    --queue-name=rds_jira_use --consumer-name=sentry_after_use_errors_notification_consumer --partition=1 --dsn-name=DSN_DB4 --strategy=simple+retry -vvv \
    process_queue
  */
 namespace app\modules\Sentry\PgQ\EventProcessor;
 
+use Yii;
+use PgQ;
 use app\components\RdsEventProcessorBase;
 use ApplicationException;
-use PgQ;
 use ServiceBase\HttpRequest\Exception\ResponseCode;
 
 class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
@@ -33,20 +34,20 @@ class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
 
         // an: На откаты не реагируем
         if ($tagFrom > $tagTo) {
-            $this->debugLogger->message("Revert detected (from $tagFrom to $tagTo),skip it");
+            Yii::info("Revert detected (from $tagFrom to $tagTo),skip it");
 
             return;
         }
 
         if (time() - strtotime($data['obj_created']) < self::INTERVAL_FROM_USE) {
             $interval = self::INTERVAL_FROM_USE - (time() - strtotime($data['obj_created']));
-            $this->debugLogger->message("Data is not ready, retry for later ($interval seconds)");
+            Yii::info("Data is not ready, retry for later ($interval seconds)");
             $event->retry($interval);
 
             return;
         }
 
-        $this->debugLogger->message("Processing event id={$event->getId()}, data = " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        Yii::info("Processing event id={$event->getId()}, data = " . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
         $res = parse_url(\Yii::$app->sentry->dsn);
         $url = "{$res['scheme']}://{$res['host']}/";
@@ -56,13 +57,12 @@ class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
         $project = $ans[1];
         $buildVersion = $ans[2];
 
-
-        $api = new \CompanyInfrastructure\SentryApi($this->debugLogger, $url);
+        $api = new \CompanyInfrastructure\SentryApi(Yii::$app->getModule('Whotrades')->debugLogger, $url);
         try {
             $errors = iterator_to_array($api->getNewFatalErrorsIterator('sentry', $project, $buildVersion));
         } catch (ResponseCode $e) {
             if ($e->getHttpCode() == 404 && $e->getResponse() == '{"detail": ""}') {
-                $this->debugLogger->warning("Project $project not integrated with sentry");
+                Yii::warning("Project $project not integrated with sentry");
 
                 return;
             } else {
@@ -71,12 +71,12 @@ class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
         }
 
         if (empty($errors)) {
-            $this->debugLogger->message("No errors, skip email");
+            Yii::info("No errors, skip email");
 
             return;
         }
 
-        $this->debugLogger->message("Errors count: " . count($errors));
+        Yii::info("Errors count: " . count($errors));
 
         \Yii::$app->EmailNotifier->sentNewSentryErrors(
             $initiatorUserName,

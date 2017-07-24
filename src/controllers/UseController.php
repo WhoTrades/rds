@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use Yii;
 use app\models\Log;
 use app\models\Project2worker;
 use Cronjob_Tool_AsyncReader_Deploy;
@@ -114,7 +115,7 @@ class UseController extends Controller
         foreach ($releaseRequest->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
             $worker = $p2w->worker;
-            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->
+            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->
                 getMessagingRdsMsModel()->
                 sendMigrationTask(
                     $worker->worker_name,

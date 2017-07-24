@@ -43,6 +43,14 @@ use kartik\select2\Select2;
             ],
         ]); ?>
 
+        <label>Дочерние проекты:</label>
+        <?= Select2::widget([
+            'name' => 'child_project_array',
+            'value' => $model->getChildProjectIdList(),
+            'data' => $model->getKnownProjectsIdNameList(),
+            'options' => ['placeholder' => 'Select child project ...', 'multiple' => true],
+        ]) ?>
+
         <h2>Локальная конфигурация <a href="<?=Url::to(['/project-config/', 'projectId' => $model->obj_id])?>">управление</a></h2>
         <?php foreach ($model->projectConfigs as $projectConfig) { ?>
             <h3>

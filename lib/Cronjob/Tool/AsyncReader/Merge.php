@@ -32,7 +32,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         $workerName = \Config::getInstance()->workerName;
 
         $model->readMergeTaskResult($workerName, false, function (Message\Merge\TaskResult $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received merge result: " . json_encode($message));
+            Yii::info("env={$model->getEnv()}, Received merge result: " . json_encode($message));
 
             if ($message->type == Message\Merge\Task::MERGE_TYPE_BUILD) {
                 $this->actionProcessMergeBuildResult($message, $model);
@@ -42,18 +42,18 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         });
 
         $model->readDroppedBranches(false, function (Message\Merge\DroppedBranches $message) use ($model) {
-            $this->debugLogger->message("env={$model->getEnv()}, Received merge result: " . json_encode($message));
+            Yii::info("env={$model->getEnv()}, Received merge result: " . json_encode($message));
             $this->actionProcessDroppedBranches($message, $model);
         });
 
-        $this->debugLogger->message("Start listening");
+        Yii::info("Start listening");
 
         $this->waitForMessages($model, $cronJob);
     }
 
     private function actionProcessDroppedBranches(Message\Merge\DroppedBranches $message, MessagingRdsMs $model)
     {
-        $this->debugLogger->message("Received removed branches: branch=$message->branch, skippedRepositories: " . json_encode($message->skippedRepositories));
+        Yii::info("Received removed branches: branch=$message->branch, skippedRepositories: " . json_encode($message->skippedRepositories));
         $updateWhere    = ['jf_branch' => $message->branch, 'jf_status' => JiraFeature::STATUS_REMOVING];
         $updateFields   = ['jf_blocker_commits' => json_encode($message->skippedRepositories, JSON_PRETTY_PRINT)];
 
@@ -63,7 +63,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
 
         JiraFeature::updateAll($updateFields, $updateWhere);
         $message->accepted();
-        $this->debugLogger->message("Message accepted");
+        Yii::info("Message accepted");
     }
 
     /**
@@ -84,7 +84,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         /** @var $feature JiraFeature */
         $feature = JiraFeature::findByPk($message->featureId);
         if (!$feature) {
-            $this->debugLogger->error("Feature #$message->featureId not found");
+            Yii::error("Feature #$message->featureId not found");
             $message->accepted();
 
             return;
@@ -94,7 +94,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         try {
             $ticketInfo = $jira->getTicketInfo($feature->jf_ticket);
         } catch (\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
-            $this->debugLogger->error("Skip accepting ticket $feature->jf_ticket, as it was deleted");
+            Yii::error("Skip accepting ticket $feature->jf_ticket, as it was deleted");
             $message->accepted();
 
             return;
@@ -103,7 +103,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         if (isset($transitionMap[$message->targetBranch])) {
             if ($message->status) {
                 // an: Если мерж прошел успешно - двигаем задачу в след. статус
-                $this->debugLogger->message("Branch was merged successful, transition ticket to next status");
+                Yii::info("Branch was merged successful, transition ticket to next status");
                 $transition = $transitionMap[$message->targetBranch];
                 // ar: Сохраняем время мержа задачи в мастер
                 if ($message->targetBranch === 'master') {
@@ -114,7 +114,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 $jira->transitionTicket($ticketInfo, $transition, "Задача была успешно слита в ветку $message->targetBranch", true);
             } else {
                 // an: Если не смержилась - просто пишем комент с ошибками мержа
-                $this->debugLogger->message("Branch was merged fail, sending comment");
+                Yii::info("Branch was merged fail, sending comment");
                 $mergeFix = $message->targetBranch == 'master' ? "$message->targetBranch в $message->sourceBranch" : "$message->sourceBranch в $message->targetBranch";
                 $text = "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. " .
                         "Разрешите эти ошибки путем мержа $mergeFix:\n" . implode("\n", $message->errors);
@@ -147,11 +147,11 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 try {
                     $jira->assign($feature->jf_ticket, $lastDeveloper);
                 } catch (\Exception $e) {
-                    $this->debugLogger->error("Can't assign $lastDeveloper to $feature->jf_ticket");
+                    Yii::error("Can't assign $lastDeveloper to $feature->jf_ticket");
                 }
             }
         } else {
-            $this->debugLogger->error("Unknown target branch, skip jira integration");
+            Yii::error("Unknown target branch, skip jira integration");
         }
         $message->accepted();
     }
@@ -165,7 +165,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
         /** @var $gitBuild GitBuild */
         $gitBuild = GitBuild::findByPk($message->featureId);
         if (!$gitBuild) {
-            $this->debugLogger->message("Can't find build $message->featureId, skip message");
+            Yii::info("Can't find build $message->featureId, skip message");
             $message->accepted();
 
             return;
@@ -186,7 +186,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             'git_build_id' => $gitBuild->obj_id,
             'status' => GitBuildBranch::STATUS_NEW,
         ])) {
-            $this->debugLogger->message("Build #$gitBuild->obj_id finished");
+            Yii::info("Build #$gitBuild->obj_id finished");
             // an: Если смержили (с ошибками или успешно) все ветки, но билд считаем завершенным
 
             $errorsCount = GitBuildBranch::countByAttributes([
@@ -216,10 +216,10 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
             $gitBuild->status = GitBuild::STATUS_FINISHED;
             $gitBuild->save();
         } else {
-            $this->debugLogger->message("Build #$gitBuild->obj_id NOT finished");
+            Yii::info("Build #$gitBuild->obj_id NOT finished");
         }
 
-        $this->debugLogger->message("Message accepted");
+        Yii::info("Message accepted");
         $message->accepted();
 
         self::updateGitBuildAtInterface($gitBuild);

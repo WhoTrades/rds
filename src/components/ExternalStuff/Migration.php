@@ -16,7 +16,6 @@ class Migration extends \MigrationSystem\components\DbMigration
     protected $restrict = 'RESTRICT';
     protected $cascade = 'CASCADE';
     protected $dbType;
-    
 
     /**
      * @inheritdoc

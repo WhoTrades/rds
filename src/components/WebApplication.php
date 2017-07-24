@@ -37,28 +37,6 @@ class WebApplication extends \yii\web\Application
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function end($status = 0, $response = null)
-    {
-        parent::end($status, $response);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function handleException($exception)
-    {
-        if ($exception instanceof HttpException) {
-            $this->debugLogger->dump()->exception('an', $exception)->notice()->save();
-        } else {
-            $this->debugLogger->dump()->exception('an', $exception)->critical()->save();
-        }
-
-        parent::handleException($exception);
-    }
-
-    /**
      * Метод используется в частности при авторизации для формирования имени сессии
      * Так как по дефолту для определения идентификатора приложения используется абсолютный путь - то при каждом релизе происходило вылогинивание
      *

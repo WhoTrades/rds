@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use Yii;
 use app\models\User\User;
 use yii\data\Sort;
 use app\components\ActiveRecord;
@@ -359,7 +360,7 @@ class ReleaseRequest extends ActiveRecord
             orderBy('rr_build_version desc')->one();
 
             // an: Отправляем задачу в Rabbit на сборку
-            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendBuildTask(
+            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel()->sendBuildTask(
                 $build->worker->worker_name,
                 new \RdsSystem\Message\BuildTask(
                     $build->obj_id,
@@ -388,7 +389,7 @@ class ReleaseRequest extends ActiveRecord
 
         foreach ($this->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
-            (new \RdsSystem\Factory(\Yii::$app->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
+            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel()->sendUseTask(
                 $p2w->worker->worker_name,
                 new \RdsSystem\Message\UseTask(
                     $this->project->project_name,
@@ -419,13 +420,11 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @param string $forcePackage
      *
-     * @throws Exception
+     * @throws \Exception
      */
     public function parseCronConfig($forcePackage = null)
     {
         $group = null;
-        /** @var $debugLogger \ServiceBase_IDebugLogger */
-        $debugLogger = \Yii::$app->debugLogger;
 
         foreach (array_filter(explode("\n", str_replace("\r", "", $this->rr_cron_config))) as $line) {
             if (preg_match('~^#\s*(\S.*)$~', $line, $ans)) {
@@ -439,14 +438,14 @@ class ReleaseRequest extends ActiveRecord
             if (preg_match('~\s*--sys__key=(\w+)~', $line, $ans)) {
                 $key = $ans[1];
             } else {
-                $debugLogger->message("Can't parse line $line");
+                Yii::info("Can't parse line $line");
                 continue;
             }
 
             if (preg_match('~\s*--sys__package=([\w.-]+)~', $line, $ans)) {
                 $package = $forcePackage ?: $ans[1];
             } else {
-                $debugLogger->message("Can't parse line $line");
+                Yii::info("Can't parse line $line");
                 continue;
             }
 
@@ -466,7 +465,7 @@ class ReleaseRequest extends ActiveRecord
             $job->command = $line;
 
             if (!$job->save()) {
-                $debugLogger->message("Can't save ToolJob: " . json_encode($job->errors, JSON_UNESCAPED_UNICODE));
+                Yii::info("Can't save ToolJob: " . json_encode($job->errors, JSON_UNESCAPED_UNICODE));
             }
         }
     }

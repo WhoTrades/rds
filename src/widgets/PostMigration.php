@@ -24,7 +24,7 @@ class PostMigration extends \yii\base\Widget
                         and rr_project_obj_id=project.obj_id
                         and rr_last_time_on_prod <= NOW() - interval '$interval'
                         and obj_status_did = :status
-                        order by rr_build_version desc
+                        order by obj_id desc
                         limit 1
                     ) as rr_obj_id from rds.project
                 )  as subquery where not rr_obj_id is null";

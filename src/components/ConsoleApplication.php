@@ -1,10 +1,9 @@
 <?php
 namespace app\components;
 
-use app\controllers\Controller;
-use ServiceBase_IDebugLogger;
 use Yii;
-use yii\console\Response;
+use ServiceBase_IDebugLogger;
+use yii\base\Controller;
 
 class ConsoleApplication extends \yii\console\Application
 {
@@ -36,7 +35,7 @@ class ConsoleApplication extends \yii\console\Application
      */
     public function runAction($route, $params = [])
     {
-        return new Response();
+        return new ConsoleResponse();
     }
 
     /**
@@ -47,6 +46,7 @@ class ConsoleApplication extends \yii\console\Application
         $base = parent::coreComponents();
 
         $base['request'] = ['class' => ConsoleRequest::class];
+        $base['response'] = ['class' => ConsoleResponse::class];
 
         return $base;
     }
