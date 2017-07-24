@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Artem Naumenko
- * Класс, который реализует хендлер логов для монолога, и пишет логи внутрь debugLogger
+ * Класс, который реализует хендлер логов для монолога, и пишет логи внутрь Yii::log()
  */
 
 namespace app\components\Logs;
@@ -11,19 +11,6 @@ use Monolog\Logger;
 
 class DebugLoggerHandler extends AbstractProcessingHandler
 {
-    /** @var \ServiceBase_IDebugLogger */
-    private $debugLogger;
-
-    /**
-     * @param \ServiceBase_IDebugLogger $debugLogger
-     */
-    public function __construct(\ServiceBase_IDebugLogger $debugLogger)
-    {
-        $this->debugLogger = $debugLogger;
-
-        parent::__construct(Logger::DEBUG);
-    }
-
     /**
      * Writes the record down to the log of the implementing handler
      *
@@ -37,24 +24,24 @@ class DebugLoggerHandler extends AbstractProcessingHandler
 
         switch ($record['level']) {
             case Logger::DEBUG:
-                $this->debugLogger->debug($message);
+                \Yii::trace($message);
                 break;
 
             case Logger::INFO:
-                $this->debugLogger->info($message);
+                \Yii::info($message);
                 break;
 
             case Logger::NOTICE:
-                $this->debugLogger->message($message);
+                \Yii::trace($message);
                 break;
 
             case Logger::WARNING:
-                $this->debugLogger->warning($message);
+                \Yii::warning($message);
                 break;
 
             default:
                 // an: все остальное - ошибка
-                $this->debugLogger->error($message);
+                \Yii::error($message);
         }
     }
 }

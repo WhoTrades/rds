@@ -29,7 +29,7 @@ class Cronjob_Tool_Test_ApplicationInstallation extends Cronjob\Tool\ToolBase
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $checkerSystem = new ApplicationRequirementsSystem\Factory($this->debugLogger);
+        $checkerSystem = new ApplicationRequirementsSystem\Factory();
         $container = $checkerSystem->createCheckerContainer();
 
         $this->addRdsCheckers($container);

@@ -250,7 +250,7 @@ class JsonController extends Controller
         $result = array();
         $projectsAllowed = \Yii::$app->params['teamCityProjectAllowed'];
         $parameterName = \Yii::$app->params['teamCityBuildComponentParameter'];
-        $teamCity = new \CompanyInfrastructure\WtTeamCityClient(Yii::$app->getModule('Whotrades')->debugLogger);
+        $teamCity = new \CompanyInfrastructure\WtTeamCityClient();
         $components = $ticket['fields']['components'];
 
         foreach ($projectsAllowed as $project) {

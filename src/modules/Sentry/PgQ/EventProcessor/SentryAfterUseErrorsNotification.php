@@ -57,7 +57,7 @@ class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
         $project = $ans[1];
         $buildVersion = $ans[2];
 
-        $api = new \CompanyInfrastructure\SentryApi(Yii::$app->getModule('Whotrades')->debugLogger, $url);
+        $api = new \CompanyInfrastructure\SentryApi($url);
         try {
             $errors = iterator_to_array($api->getNewFatalErrorsIterator('sentry', $project, $buildVersion));
         } catch (ResponseCode $e) {
