@@ -267,7 +267,7 @@ class JsonController extends Controller
                 $teamcityJiraComponent = (string) $parameter;
                 foreach ($components as $component) {
                     if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
-                        $result[] = $teamCity->startBuild($buildId, $branch, "Teamcity build run on request");
+                        $result[] = $teamCity->startBuild($buildId, $branch);
                     }
                 }
             }
@@ -286,8 +286,7 @@ class JsonController extends Controller
           last_run_time,
           extract(epoch from (NOW() - last_run_time)) as sec_from_last_run
         from cronjobs.cpu_usage
-        join cronjobs.tool_job ON cpu_usage.key=tool_job.key AND tool_job.obj_status_did=1
-        ";
+        join cronjobs.tool_job ON cpu_usage.key=tool_job.key AND tool_job.obj_status_did=1";
 
         $result = \Yii::$app->db->createCommand($sql)->queryAll();
 

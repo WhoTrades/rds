@@ -69,7 +69,6 @@ class WebSockets extends Component
         ];
 
         foreach ($this->sockets as $sockets) {
-            var_export($package);
             $sockets->send(json_encode($package));
         }
     }
