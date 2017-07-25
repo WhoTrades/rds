@@ -69,9 +69,6 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
     /**
      * @param Message\Merge\TaskResult $message
      * @param MessagingRdsMs           $model
-     *
-     * @throws ApplicationException
-     * @throws \ServiceBase\HttpRequest\Exception\ResponseCode
      */
     public function actionProcessMergeFeatureResult(Message\Merge\TaskResult $message, MessagingRdsMs $model)
     {

@@ -13,7 +13,7 @@ use Yii;
 use PgQ;
 use app\components\RdsEventProcessorBase;
 use ApplicationException;
-use ServiceBase\HttpRequest\Exception\ResponseCode;
+use GuzzleHttp\Exception\ClientException;
 
 class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
 {
@@ -60,8 +60,8 @@ class SentryAfterUseErrorsNotification extends RdsEventProcessorBase
         $api = new \CompanyInfrastructure\SentryApi($url);
         try {
             $errors = iterator_to_array($api->getNewFatalErrorsIterator('sentry', $project, $buildVersion));
-        } catch (ResponseCode $e) {
-            if ($e->getHttpCode() == 404 && $e->getResponse() == '{"detail": ""}') {
+        } catch (ClientException $e) {
+            if ($e->getCode() == 404 && $e->getResponse()->getBody()->getContents() == '{"detail": ""}') {
                 Yii::warning("Project $project not integrated with sentry");
 
                 return;
