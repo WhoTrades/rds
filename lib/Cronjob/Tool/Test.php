@@ -29,6 +29,12 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
+        $jira = \Yii::$app->getModule('Wtflow')->jira;
+        try {
+            $jira->getTicketInfo('WTX-000');
+        } catch (Exception $e) {
+            var_dump($e->getResponse());
+        }
+
     }
 }
