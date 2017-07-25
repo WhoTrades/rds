@@ -29,11 +29,6 @@ class Cronjob_Tool_Test extends RdsSystem\Cron\RabbitDaemon
      */
     public function run(\Cronjob\ICronjob $cronJob)
     {
-        $res = parse_url(\Yii::$app->sentry->dsn);
-        $url = "{$res['scheme']}://{$res['host']}/";
-        $api = new \CompanyInfrastructure\SentryApi($url);
-        $list = iterator_to_array($api->getNewFatalErrorsIterator('sentry', 'comon', 'dev'));
-
-        var_export($list);
+        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
     }
 }

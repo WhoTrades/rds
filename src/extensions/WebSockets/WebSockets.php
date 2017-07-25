@@ -3,6 +3,9 @@ namespace app\extensions\WebSockets;
 
 use yii\base\Component;
 use app\components\View;
+use ZMQ;
+use ZMQContext;
+use ZMQSocket;
 
 class WebSockets extends Component
 {
@@ -11,20 +14,20 @@ class WebSockets extends Component
     public $maxRetries = 50;
     public $retryDelay = 50;
 
-    /**
-     * @var \ServiceBase_WebSocketsManager
-     */
-    public $webSocketsManager;
+    /** @var ZMQSocket[]*/
+    private $sockets;
+
+    private $isSocketConnected = false;
 
     /**
      * Инициализация сервиса вебсокетов
      */
     public function init()
     {
-        $this->webSocketsManager = new \ServiceBase_WebSocketsManager(
-            $this->zmqLocations,
-            \Yii::$app->debugLogger
-        );
+        foreach ($this->zmqLocations as $location) {
+            $context = new ZMQContext();
+            $this->sockets[$location] = $context->getSocket(ZMQ::SOCKET_PUSH)->setSockOpt(ZMQ::SOCKOPT_LINGER, 0);
+        }
     }
 
     /**
@@ -36,13 +39,39 @@ class WebSockets extends Component
         $view->registerJs($this->getInlineJs(), $view::POS_BEGIN);
     }
 
+    private function ensureConnected()
+    {
+        if ($this->isSocketConnected) {
+            return;
+        }
+
+        foreach ($this->zmqLocations as $location) {
+            $this->sockets[$location]->connect($location);
+        }
+
+        $this->isSocketConnected = true;
+    }
+
     /**
      * @param string $channel
      * @param array $data
      */
     public function send($channel, $data)
     {
-        $this->webSocketsManager->sendEvent($channel, null, $data);
+        $this->ensureConnected();
+        $package = [
+            'channel' => $channel,
+            'data' => array(
+                'event' => null,
+                'data'  => $data,
+            ),
+            'time' => time(),
+        ];
+
+        foreach ($this->sockets as $sockets) {
+            var_export($package);
+            $sockets->send(json_encode($package));
+        }
     }
 
     private function getInlineJs()

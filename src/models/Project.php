@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use Yii;
 use yii\data\ActiveDataProvider;
 use app\components\ActiveRecord;
 use yii\db\ActiveQuery;

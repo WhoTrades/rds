@@ -7,7 +7,7 @@ use ApplicationRequirementsSystem\Checker\Container;
 use ApplicationRequirementsSystem\Checker\DirectoryAccessible;
 use ApplicationRequirementsSystem\Checker\FileAccessible;
 use ApplicationRequirementsSystem\Checker\UrlAcceptable;
-use CompanyInfrastructure\StashApi;
+use CompanyInfrastructure\BitBacketApi;
 use RdsSystem\Model\Rabbit\MessagingRdsMs;
 
 class Cronjob_Tool_Test_ApplicationInstallation extends Cronjob\Tool\ToolBase
@@ -52,7 +52,7 @@ class Cronjob_Tool_Test_ApplicationInstallation extends Cronjob\Tool\ToolBase
 
         $container->addChecker(new UrlAcceptable(Yii::$app->modules['SingleLogin']['components']['auth']['crmUrl']), 'CRM URL');
         $container->addChecker(new UrlAcceptable(Yii::$app->params['jira']['baseRdsJiraUrl']), 'JIRA URL');
-        $container->addChecker(new UrlAcceptable(StashApi::DEFAULT_STASH_URL), 'Stash/Bitbucket URL');
+        $container->addChecker(new UrlAcceptable(BitBacketApi::DEFAULT_STASH_URL), 'Stash/Bitbucket URL');
         $container->addChecker(new UrlAcceptable('tcp://' . MessagingRdsMs::HOST . ":" . MessagingRdsMs::PORT));
     }
 }

@@ -70,17 +70,14 @@ class Config
     }
 }
 
-require_once __DIR__ . '/../../init-libraries.php';
-
-$syslogWriter = new ServiceBase\Debug\SyslogWriter(ServiceBase\Debug\Syslog::getInstance());
-$debugLogger = new ServiceBase\Debug\Logger\LoggerErrorLog(3, $syslogWriter, \Cronjob\Factory::getConsoleOutput());
+require_once(__DIR__ . "/../../vendor/autoload.php");
 
 $config = dirname(__FILE__) . '/../../protected/config/main.php';
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 
 require(__DIR__ . '/../../vendor/yiisoft/yii2/Yii.php');
-$application = new \app\components\WebApplication(require($config), $debugLogger);
+$application = new \app\components\WebApplication(require($config));
 
 if (is_dir(__DIR__ . '/../lib/MigrationSystem')) {
     \Yii::setAlias('@MigrationSystem', __DIR__ . '/../lib/MigrationSystem');

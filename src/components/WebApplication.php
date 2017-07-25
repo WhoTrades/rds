@@ -7,19 +7,13 @@ use yii\web\HttpException;
 
 class WebApplication extends \yii\web\Application
 {
-    /** @var \ServiceBase_IDebugLogger */
-    public $debugLogger;
-
     /**
      * WebApplication constructor.
      *
      * @param array                    $config
-     * @param ServiceBase_IDebugLogger $debugLogger
      */
-    public function __construct(array $config, \ServiceBase_IDebugLogger $debugLogger)
+    public function __construct(array $config)
     {
-        $this->debugLogger = $debugLogger;
-
         parent::__construct($config);
     }
 
@@ -45,7 +39,7 @@ class WebApplication extends \yii\web\Application
      */
     public function getId()
     {
-        return \Config::getInstance()->project;
+        return 'service-rds';
     }
 
     public function setRuntimePath($path)
