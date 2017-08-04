@@ -32,7 +32,7 @@ class Cronjob_Tool_Maintenance_MasterTool extends RdsSystem\Cron\RabbitDaemon
     {
         $server = $cronJob->getOption('server') ?: gethostname();
         $model = $this->getMessagingModel($cronJob);
-        $commandExecutor = new \RdsSystem\lib\CommandExecutor($this->debugLogger);
+        $commandExecutor = new \RdsSystem\lib\CommandExecutor();
         $workerName = $cronJob->getOption('worker-name');
 
         $model->readToolGetInfoTaskRequest($workerName, false, function (RdsSystem\Message\Tool\GetInfoTask $task) use ($server, $model, $commandExecutor, $workerName) {

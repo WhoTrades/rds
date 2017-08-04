@@ -197,10 +197,11 @@ class SiteController extends Controller
             return;
         }
 
-        $messageModel = (new RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel();
+        $messageModel = (new RdsSystem\Factory())->getMessagingRdsMsModel();
 
         $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/
+        $stopped = false;
         foreach ($model->builds as $build) {
             if (in_array($build->build_status, Build::getInstallingStatuses())) {
                 $model->rr_status = ReleaseRequest::STATUS_CANCELLING;
@@ -211,23 +212,21 @@ class SiteController extends Controller
                     $build->obj_id
                 ));
 
-                Log::createLogMessage("Отменен {$model->getTitle()}");
-                $transaction->commit();
-
-                return;
+                Log::createLogMessage("Отменен {$model->getTitle()} на {$build->worker->worker_name}");
+                $stopped = true;
             }
         }
 
-        Log::createLogMessage("Удален {$model->getTitle()}");
-        $model->delete();
+        if (!$stopped) {
+            Log::createLogMessage("Удален {$model->getTitle()}");
+            $model->delete();
+        }
 
         \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $transaction->commit();
 
-        if (!isset($_GET['ajax'])) {
-            $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
-        }
+        $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
     }
 
     /**

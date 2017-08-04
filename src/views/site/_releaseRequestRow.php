@@ -225,13 +225,13 @@ return array(
                     'aria-label' => Yii::t('yii', 'Delete'),
                     'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
                     'data-method' => 'post',
-                    'data-pjax' => '0',
+                    'data-pjax' => '1',
                 ]);
 
                 return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
             },
             'urlCreator' => function (string $action, ReleaseRequest $model) {
-                return Url::to(["/site/$action", 'id' => $model->obj_id]);
+                return Url::to(["/site/$action", 'id' => $model->obj_id, 'returnUrl' => Yii::$app->request->getUrl()]);
             },
         ],
     ),

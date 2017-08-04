@@ -183,7 +183,7 @@ class Project extends ActiveRecord
         }
 
         foreach ($this->project2workers as $p2w) {
-            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel()->sendProjectConfig(
+            (new \RdsSystem\Factory())->getMessagingRdsMsModel()->sendProjectConfig(
                 $p2w->worker->worker_name,
                 new \RdsSystem\Message\ProjectConfig(
                     $this->project_name,

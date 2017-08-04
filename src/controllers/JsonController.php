@@ -313,7 +313,7 @@ class JsonController extends Controller
         $action->run(
             'staging',
             'JIRA-hook',
-            (new \RdsSystem\Factory(Yii::$app->getModule('Whotrades')->debugLogger))->getMessagingRdsMsModel(),
+            (new \RdsSystem\Factory())->getMessagingRdsMsModel(),
             false
         );
 
