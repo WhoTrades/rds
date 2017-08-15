@@ -59,12 +59,6 @@ echo Nav::widget(
                     'url' => ['/site/index'],
                     'active' => $controllerId == 'site',
                 ],
-                'registration' => [
-                    'label' => 'РЕГИСТРАЦИЯ',
-                    'url' => 'mailto://anaumenko@corp.finam.ru?subject=RDS аккаунт&body=Я пробовал сам восстановить пароль,' .
-                        ' но система не находит мою учетку. Прошу создать мне аккаунт в RDS на текущий ящик.',
-                    'visible' => \Yii::$app->user->isGuest,
-                ],
                 'releases' => [
                     'label' => 'Настройка сборки',
                     'url' => ['/project/admin'],

@@ -2,7 +2,6 @@
 namespace app\components;
 
 use Yii;
-use ServiceBase_IDebugLogger;
 use yii\base\Controller;
 
 class ConsoleApplication extends \yii\console\Application
@@ -13,7 +12,6 @@ class ConsoleApplication extends \yii\console\Application
      * ConsoleApplication constructor.
      *
      * @param array                    $config
-     * @param ServiceBase_IDebugLogger $debugLogger
      */
     public function __construct(array $config)
     {
