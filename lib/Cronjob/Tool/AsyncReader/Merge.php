@@ -114,7 +114,7 @@ class Cronjob_Tool_AsyncReader_Merge extends RdsSystem\Cron\RabbitDaemon
                 Yii::info("Branch was merged fail, sending comment");
                 $mergeFix = $message->targetBranch == 'master' ? "$message->targetBranch в $message->sourceBranch" : "$message->sourceBranch в $message->targetBranch";
                 $text = "Случились ошибки при мерже ветки $message->sourceBranch в $message->targetBranch. " .
-                        "Разрешите эти ошибки путем мержа $mergeFix:\n" . implode("\n", $message->errors);
+                        "Разрешите эти ошибки путем мержа $mergeFix:\n{quote}" . implode("\n", $message->errors) . "{quote}";
 
                 if ($jira->addCommentOrModifyMyComment($feature->jf_ticket, $text)) {
                     $text = str_replace("\r", "", $text);
