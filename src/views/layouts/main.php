@@ -53,7 +53,7 @@ echo Nav::widget(
         'options' => ['class' => 'navbar-nav navbar-left'],
         'activateParents' => true,
         'items' => ArrayHelper::merge(
-            [
+            [Jira
                 'home' => [
                     'label' => 'Главная',
                     'url' => ['/site/index'],
@@ -67,7 +67,7 @@ echo Nav::widget(
                         ['label' => 'Проекты', 'url' => ['/project/admin'], 'active' => $controllerId == 'project'],
                         ['label' => 'Сборщики', 'url' => ['/worker/admin'], 'active' => $controllerId == 'worker'],
                         ['label' => 'Версии', 'url' => ['/release-version/admin'], 'active' => $controllerId == 'release-version'],
-                        ['label' => 'Ограничение функциональности', 'url' => ['/system/index'], 'active' => $controllerId == 'system'],
+                        ['label' => 'Ограничение функциональности', 'url' => ['/Whotrades/system/index'], 'active' => $controllerId == 'system'],
                     ],
                 ],
             ],
