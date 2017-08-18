@@ -53,7 +53,7 @@ echo Nav::widget(
         'options' => ['class' => 'navbar-nav navbar-left'],
         'activateParents' => true,
         'items' => ArrayHelper::merge(
-            [Jira
+            [
                 'home' => [
                     'label' => 'Главная',
                     'url' => ['/site/index'],
