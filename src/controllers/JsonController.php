@@ -1,6 +1,8 @@
 <?php
 namespace app\controllers;
 
+use app\components\Status;
+use app\modules\Whotrades\actions\Git\RebuildBranch;
 use Yii;
 use app\models\Project;
 use app\modules\Whotrades\models\ToolJob;
@@ -181,7 +183,7 @@ class JsonController extends Controller
 
             $toolJob = ToolJob::findByAttributes([
                 'key' => $key,
-                'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
+                'obj_status_did' => Status::ACTIVE,
             ]);
             if ($toolJob) {
                 \Yii::$app->graphite->getGraphite()->gauge(
@@ -227,57 +229,6 @@ class JsonController extends Controller
         ]);
     }
 
-    public function actionStartTeamcityBuild($issueKey, $branch = 'master')
-    {
-        $branch = trim($branch) ? html_entity_decode(strip_tags($branch)) : 'master';
-        $issueKey = trim($issueKey) ? html_entity_decode(strip_tags($issueKey)) : '';
-
-        $jiraApi = \Yii::$app->getModule('Wtflow')->jira;
-        try {
-            $ticket = $jiraApi->getTicketInfo($issueKey);
-        } catch (\CompanyInfrastructure\Exception\Jira\TicketNotFound $e) {
-            echo json_encode(["ERROR" => 'Wrong issue key given: "' . $issueKey . '"']);
-
-            return;
-        }
-
-        if (!isset($ticket['fields']['components'])) {
-            echo json_encode(["ERROR" => 'Issue "' . $issueKey . '" have not allowed components']);
-
-            return;
-        }
-
-        $result = array();
-        $projectsAllowed = \Yii::$app->params['teamCityProjectAllowed'];
-        $parameterName = \Yii::$app->params['teamCityBuildComponentParameter'];
-        $teamCity = new \CompanyInfrastructure\WtTeamCityClient();
-        $components = $ticket['fields']['components'];
-
-        foreach ($projectsAllowed as $project) {
-            $buildList = $teamCity->getBuildTypesList($project);
-            foreach ($buildList as $build) {
-                $buildId = (string) $build['id'];
-                try {
-                    $parameter = $teamCity->getBuildTypeParameterByName($buildId, $parameterName);
-                } catch (\Exception $e) {
-                    /** go forward **/
-                    continue;
-                }
-
-                $teamcityJiraComponent = (string) $parameter;
-                foreach ($components as $component) {
-                    if (strtolower($teamcityJiraComponent) == strtolower($component['name'])) {
-                        $result[] = $teamCity->startBuild($buildId, $branch);
-                    }
-                }
-            }
-        }
-
-        echo json_encode(["OK" => true, 'TEAMCITY_RESPONSE' => json_encode($result)]);
-
-        return;
-    }
-
     public function actionGetCronJobsStatus()
     {
         $sql = "select
@@ -309,7 +260,7 @@ class JsonController extends Controller
             return;
         }
 
-        $action = new \Action\Git\RebuildBranch();
+        $action = new RebuildBranch();
         $action->run(
             'staging',
             'JIRA-hook',

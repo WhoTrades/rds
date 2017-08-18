@@ -1,6 +1,7 @@
 <?php
 namespace app\controllers;
 
+use app\components\Status;
 use app\models\ReleaseRequest;
 use app\models\ReleaseReject;
 use app\models\Project;
@@ -55,7 +56,7 @@ class SiteController extends Controller
 
         $ids = \Yii::$app->db->createCommand($sql, [
             ':user' => \Yii::$app->user->id,
-            ':status' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
+            ':status' => Status::ACTIVE,
         ])->queryColumn();
 
         $mainProjects = Project::find()->where(['in', 'obj_id', $ids])->all();

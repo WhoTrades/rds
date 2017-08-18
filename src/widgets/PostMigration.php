@@ -1,6 +1,7 @@
 <?php
 namespace app\widgets;
 
+use app\components\Status;
 use app\models\ReleaseRequest;
 use Yii;
 
@@ -29,7 +30,7 @@ class PostMigration extends \yii\base\Widget
                     ) as rr_obj_id from rds.project
                 )  as subquery where not rr_obj_id is null";
 
-        $ids = \Yii::$app->db->createCommand($sql)->bindValue(':status', \ServiceBase_IHasStatus::STATUS_ACTIVE)->queryColumn();
+        $ids = \Yii::$app->db->createCommand($sql)->bindValue(':status', Status::ACTIVE)->queryColumn();
 
         $releaseRequests = ReleaseRequest::find()->with('project')->andWhere(['in', 'release_request.obj_id', $ids])
             ->andWhere(['<>', 'release_request.rr_post_migration_status', ReleaseRequest::MIGRATION_STATUS_UP])

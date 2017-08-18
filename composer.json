@@ -3,31 +3,12 @@
     "type": "library",
     "description": "WhoTrades release deployment service",
     "autoload": {
-        "psr-0": {
-            "Monitoring_": "../../lib/libcore/",
-            "ServiceBase_": "../../lib/libcore/",
-            "CoreLight": "../../lib/libcore/",
-            "RequestHandler_": "../../lib/libcore/",
-            "Whotrades_": "../../code-standard/Standards/",
-            "DBFunc_": "../../lib/",
-            "": "lib/"
-        },
         "psr-4": {
             "app\\": "protected/",
-            "MigrationSystem\\": "../../lib/MigrationSystem/",
-            "WtConsts\\": "../../lib/WtConsts/",
-            "WtUtils\\": "../../lib/WtUtils/",
             "CompanyInfrastructure\\": "../../lib/CompanyInfrastructure/",
-
-            "PgQ\\": "../../lib/PgQ/",
             "GraphiteSystem\\": "../../lib/GraphiteSystem/",
-            "RdsSystem\\": "../../lib/RdsSystem/",
-            "ApplicationRequirementsSystem\\": "../../lib/ApplicationRequirementsSystem/",
-            "Cronjob\\": "../../lib/Cronjob/",
-            "ServiceBase\\Debug\\": "../../lib/libcore/ServiceBase/Debug/",
-            "ServiceBase\\HttpRequest\\": "../../lib/libcore/ServiceBase/HttpRequest/"
-        },
-        "classmap": ["misc/cron", "../../lib/creole", "../../lib/libcore"]
+            "RdsSystem\\": "../../lib/RdsSystem/"
+        }
     },
     "require": {
         "kartik-v/yii2-grid": "~3.1",

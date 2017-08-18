@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use app\components\Status;
 use Yii;
 use app\models\User\User;
 use yii\data\Sort;
@@ -142,7 +143,7 @@ class ReleaseRequest extends ActiveRecord
     public static function find()
     {
         return parent::find()->andWhere([
-            'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
+            'obj_status_did' => Status::ACTIVE,
         ]);
     }
 
@@ -196,7 +197,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function delete($real = null)
     {
-        $this->obj_status_did = \ServiceBase_IHasStatus::STATUS_DELETED;
+        $this->obj_status_did = Status::DELETED;
 
         return (bool) $real ? parent::delete() : $this->save();
     }

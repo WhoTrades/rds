@@ -1,4 +1,9 @@
 <?php
+namespace app\commands;
+
+use app\components\Status;
+use RdsSystem\Cron\RabbitListener;
+use Yii;
 use yii\helpers\Url;
 use RdsSystem\Message;
 use RdsSystem\Model\Rabbit\MessagingRdsMs;
@@ -15,25 +20,16 @@ use app\modules\Wtflow\models\JiraUse;
 use app\modules\Wtflow\models\JiraNotificationQueue;
 
 /**
- * @example dev/services/rds/misc/tools/runner.php --tool=AsyncReader_Deploy -vv
+ * @example php yii.php deploy/index
  */
-class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
+class DeployController extends RabbitListener
 {
     /**
-     * Use this function to get command line spec for cronjob
-     * @return array
+     * @return void
      */
-    public static function getCommandLineSpec()
+    public function actionIndex()
     {
-        return array() + parent::getCommandLineSpec();
-    }
-
-    /**
-     * @param \Cronjob\ICronjob $cronJob
-     */
-    public function run(\Cronjob\ICronjob $cronJob)
-    {
-        $model  = $this->getMessagingModel($cronJob);
+        $model  = $this->getMessagingModel();
 
         $model->readTaskStatusChanged(false, function (Message\TaskStatusChanged $message) use ($model) {
             Yii::info("Received status changed message: " . json_encode($message));
@@ -97,16 +93,16 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         Yii::info("Start listening");
 
-        $this->waitForMessages($model, $cronJob);
+        $this->waitForMessages($model);
     }
 
     /**
      * @param Message\TaskStatusChanged $message
      * @param MessagingRdsMs            $model
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function actionSetStatus(Message\TaskStatusChanged $message, MessagingRdsMs $model)
+    private function actionSetStatus(Message\TaskStatusChanged $message, MessagingRdsMs $model)
     {
         $status = $message->status;
         $version = $message->version;
@@ -226,9 +222,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      * @param Message\ReleaseRequestBuildPatch $message
      * @param MessagingRdsMs                   $model
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function actionSetBuildPatch(Message\ReleaseRequestBuildPatch $message, MessagingRdsMs $model)
+    private function actionSetBuildPatch(Message\ReleaseRequestBuildPatch $message, MessagingRdsMs $model)
     {
         if (!$Project = Project::findByAttributes(['project_name' => $message->project])) {
             Yii::error("Project $message->project not found");
@@ -288,9 +284,9 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      * @param Message\ReleaseRequestMigrations $message
      * @param MessagingRdsMs                   $model
      *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function actionSetMigrations(Message\ReleaseRequestMigrations $message, MessagingRdsMs $model)
+    private function actionSetMigrations(Message\ReleaseRequestMigrations $message, MessagingRdsMs $model)
     {
         /** @var $project Project */
         $project = Project::findByAttributes(['project_name' => $message->project]);
@@ -354,11 +350,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     /**
      * @param Message\ReleaseRequestCronConfig $message
      * @param MessagingRdsMs                   $model
-     *
-     * @throws CDbException
-     * @throws Exception
      */
-    public function actionSetCronConfig(Message\ReleaseRequestCronConfig $message, MessagingRdsMs $model)
+    private function actionSetCronConfig(Message\ReleaseRequestCronConfig $message, MessagingRdsMs $model)
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
@@ -388,7 +381,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
             ToolJob::updateAll(
                 [
-                    'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED,
+                    'obj_status_did' => Status::DELETED,
                 ],
                 'project_obj_id=:id AND "version"=:version',
                 [
@@ -411,10 +404,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     /**
      * @param Message\ReleaseRequestUseError $message
      * @param MessagingRdsMs                 $model
-     *
-     * @throws Exception
      */
-    public function actionSetUseError(Message\ReleaseRequestUseError $message, MessagingRdsMs $model)
+    private function actionSetUseError(Message\ReleaseRequestUseError $message, MessagingRdsMs $model)
     {
         $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
         if (!$releaseRequest) {
@@ -435,10 +426,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     /**
      * @param Message\ReleaseRequestOldVersion $message
      * @param MessagingRdsMs                   $model
-     *
-     * @throws Exception
      */
-    public function actionSetOldVersion(Message\ReleaseRequestOldVersion $message, MessagingRdsMs $model)
+    private function actionSetOldVersion(Message\ReleaseRequestOldVersion $message, MessagingRdsMs $model)
     {
         $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
 
@@ -462,11 +451,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     /**
      * @param Message\ReleaseRequestUsedVersion $message
      * @param MessagingRdsMs                    $model
-     *
-     * @throws CDbException
-     * @throws Exception
      */
-    public function actionSetUsedVersion(Message\ReleaseRequestUsedVersion $message, MessagingRdsMs $model)
+    private function actionSetUsedVersion(Message\ReleaseRequestUsedVersion $message, MessagingRdsMs $model)
     {
         $worker = Worker::findByAttributes(array('worker_name' => $message->worker));
         if (!$worker) {
@@ -579,7 +565,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
             ToolJob::updateAll(
                 [
-                    'obj_status_did' => \ServiceBase_IHasStatus::STATUS_DELETED,
+                    'obj_status_did' => Status::DELETED,
                 ],
                 "project_obj_id=:id",
                 [
@@ -589,7 +575,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
             ToolJob::updateAll(
                 [
-                    'obj_status_did' => \ServiceBase_IHasStatus::STATUS_ACTIVE,
+                    'obj_status_did' => Status::ACTIVE,
                 ],
                 'project_obj_id=:id AND "version"=:version',
                 [
@@ -610,8 +596,6 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
 
         $transaction->commit();
 
-        //self::sendReleaseRequestUpdated($releaseRequest->obj_id);
-
         Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $message->accepted();
@@ -621,7 +605,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      * @param Message\ReleaseRequestCurrentStatusRequest $message
      * @param MessagingRdsMs                             $model
      */
-    public function replyToCurrentStatusRequest(Message\ReleaseRequestCurrentStatusRequest $message, MessagingRdsMs $model)
+    private function replyToCurrentStatusRequest(Message\ReleaseRequestCurrentStatusRequest $message, MessagingRdsMs $model)
     {
         $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
 
@@ -635,7 +619,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      * @param Message\ProjectsRequest $message
      * @param MessagingRdsMs          $model
      */
-    public function actionReplyProjectsList(Message\ProjectsRequest $message, MessagingRdsMs $model)
+    private function actionReplyProjectsList(Message\ProjectsRequest $message, MessagingRdsMs $model)
     {
         $projects = Project::find()->all();
         $result = array();
@@ -655,10 +639,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     /**
      * @param Message\ProjectBuildsToDeleteRequest $message
      * @param MessagingRdsMs                       $model
-     *
-     * @throws CException
      */
-    public function actionReplyProjectsBuildsToDelete(Message\ProjectBuildsToDeleteRequest $message, MessagingRdsMs $model)
+    private function actionReplyProjectsBuildsToDelete(Message\ProjectBuildsToDeleteRequest $message, MessagingRdsMs $model)
     {
         $builds = $message->allBuilds;
 
@@ -747,7 +729,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
      * @param string $endVersion
      * @return int|string
      */
-    public static function countInstalledBuildsBetweenVersions(int $projectId, string $startVersion, string $endVersion)
+    private static function countInstalledBuildsBetweenVersions(int $projectId, string $startVersion, string $endVersion)
     {
         $count = ReleaseRequest::find()
             ->andWhere(['rr_project_obj_id' => $projectId])
@@ -762,10 +744,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     /**
      * @param Message\RemoveReleaseRequest $message
      * @param MessagingRdsMs               $model
-     *
-     * @throws CDbException
      */
-    public function actionRemoveReleaseRequest(Message\RemoveReleaseRequest $message, MessagingRdsMs $model)
+    private function actionRemoveReleaseRequest(Message\RemoveReleaseRequest $message, MessagingRdsMs $model)
     {
         $project = Project::findByAttributes(['project_name' => $message->projectName]);
         if (!$project) {
@@ -792,11 +772,8 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
     /**
      * @param Message\ReleaseRequestMigrationStatus $message
      * @param MessagingRdsMs                        $model
-     *
-     * @throws CDbException
-     * @throws Exception
      */
-    public function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message, MessagingRdsMs $model)
+    private function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message, MessagingRdsMs $model)
     {
         $projectObj = Project::findByAttributes(array('project_name' => $message->project));
 
@@ -842,7 +819,7 @@ class Cronjob_Tool_AsyncReader_Deploy extends RdsSystem\Cron\RabbitDaemon
         $releaseRequest->save();
         $transaction->commit();
 
-        \Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
+        static::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();
     }

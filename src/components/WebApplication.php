@@ -1,10 +1,6 @@
 <?php
 namespace app\components;
 
-use ServiceBase_IDebugLogger;
-use Yii;
-use yii\web\HttpException;
-
 class WebApplication extends \yii\web\Application
 {
     /**

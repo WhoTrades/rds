@@ -28,28 +28,8 @@ class ProgressController extends Controller
         $build->save();
 
         $this->sendProgressbarChanged($build);
-        $this->sendGraphiteActionData(
-            $build->releaseRequest->project->project_name,
-            $build->releaseRequest->rr_build_version,
-            $lastAction,
-            $timeDiff
-        );
 
         echo json_encode(['ok' => true]);
-    }
-
-    /**
-     * @param $project
-     * @param $build
-     * @param $action
-     * @param $value
-     */
-    private function sendGraphiteActionData($project, $build, $action, $value)
-    {
-        \Yii::$app->graphite->getGraphite()->gauge(
-            \GraphiteSystem\Metrics::dynamicName(\GraphiteSystem\Metrics::PROJECT__ACTION__TIME, [$project, $action]),
-            $value
-        );
     }
 
     private function sendProgressbarChanged(Build $build)

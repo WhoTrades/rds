@@ -17,18 +17,21 @@ class ConsoleApplication extends \yii\console\Application
     {
         parent::__construct($config);
 
-        $this->controller = Yii::createObject(Controller::class, [null, $this, 'route' => [null, null]]);
+        //$this->controller = Yii::createObject(Controller::class, [null, $this, 'route' => [null, null]]);
 
         Yii::setAlias('@webroot', '/');
         Yii::setAlias('@web', '/');
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function runAction($route, $params = [])
+    public function coreCommands()
     {
-        return new ConsoleResponse();
+        return [
+            'help' => 'yii\console\controllers\HelpController',
+            'migrate' => 'yii\console\controllers\MigrateController',
+        ];
     }
 
     /**
