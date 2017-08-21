@@ -9,7 +9,6 @@ use RdsSystem\Message;
 use RdsSystem\Model\Rabbit\MessagingRdsMs;
 use app\models\Build;
 use app\models\ReleaseRequest;
-use app\modules\Wtflow\models\JiraCreateVersion;
 use app\models\Project;
 use app\modules\Wtflow\models\JiraCommit;
 use app\modules\Wtflow\models\HardMigration;
@@ -142,19 +141,6 @@ class DeployController extends RabbitListener
                         $text .= "<a href='" .
                             Url::to(['build/view', 'id' => $val->obj_id], true) .
                             "'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
-                    }
-
-                    foreach (Yii::$app->params['jiraProjects'] as $jiraProject) {
-                        $jiraVersion = new JiraCreateVersion();
-                        $jiraVersion->attributes = [
-                            'jira_name' => $project->project_name . "-" . $build->releaseRequest->rr_build_version,
-                            'jira_description' => 'Сборка #' . $build->build_release_request_obj_id . ', ' . $build->releaseRequest->user->email . ' [auto]',
-                            'jira_project' => $jiraProject,
-                            'jira_archived' => true,
-                            'jira_released' => false,
-                        ];
-
-                        $jiraVersion->save(false);
                     }
 
                     Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
