@@ -13,8 +13,8 @@ $this->registerJs('
         btn.attr("disabled", true);
 
         $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(html) {
-            var qq = $("#release-request-form", $(html)).html();
-            $("#release-request-form").html(qq);
+            var formHtml = $("#release-request-form", $(html)).html();
+            $("#release-request-form").html(formHtml);
             if ($("#release-request-form .error-summary").length == 0) {
                 modal.modal("hide");
             }
