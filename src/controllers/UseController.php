@@ -1,10 +1,10 @@
 <?php
 namespace app\controllers;
 
+use app\commands\DeployController;
 use Yii;
 use app\models\Log;
 use app\models\Project2worker;
-use Cronjob_Tool_AsyncReader_Deploy;
 use yii\web\HttpException;
 use app\models\RdsDbConfig;
 use app\models\ReleaseRequest;
@@ -43,51 +43,23 @@ class UseController extends Controller
             throw new HttpException(500, 'Deployment disabled');
         }
 
-        if ($releaseRequest->canByUsedImmediately()) {
-            $slaveList = ReleaseRequest::findAllByAttributes([
-                'rr_leading_id' => $releaseRequest->obj_id,
-                'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
-            ]);
-            $releaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
-            foreach ($slaveList as $slave) {
-                /** @var $slave ReleaseRequest */
-                $slave->sendUseTasks(\Yii::$app->user->getIdentity()->username);
-            }
-            if (!empty($_GET['ajax'])) {
-                echo "using";
-
-                return;
-            } else {
-                $this->redirect('/');
-            }
+        $slaveList = ReleaseRequest::findAllByAttributes([
+            'rr_leading_id' => $releaseRequest->obj_id,
+            'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
+        ]);
+        $releaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
+        foreach ($slaveList as $slave) {
+            /** @var $slave ReleaseRequest */
+            $slave->sendUseTasks(\Yii::$app->user->getIdentity()->username);
         }
 
-        $code1 = rand(pow(10, 2), pow(10, 3) - 1);
-        $code2 = rand(pow(10, 2), pow(10, 3) - 1);
-        $releaseRequest->rr_project_owner_code = $code1;
-        $releaseRequest->rr_release_engineer_code = $code2;
-        $releaseRequest->rr_project_owner_code_entered = false;
-        $releaseRequest->rr_release_engineer_code_entered = true;
-        $releaseRequest->rr_status = ReleaseRequest::STATUS_CODES;
+        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
-        $text = "Code: %s. USE {$releaseRequest->project->project_name} v.{$releaseRequest->rr_build_version}";
-        \Yii::$app->smsSender->sendSms(\Yii::$app->user->identity->getPhone(), sprintf($text, $code1));
-
-        if ($releaseRequest->save()) {
-            Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
-
-            $currentUsed = ReleaseRequest::findByAttributes([
-                'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
-                'rr_status' => ReleaseRequest::STATUS_USED,
-            ]);
-            if ($currentUsed) {
-                Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($currentUsed->obj_id);
-            }
-
-            Log::createLogMessage("CODES {$releaseRequest->getTitle()}");
+        if (!empty($_GET['ajax'])) {
+            return "using";
+        } else {
+            $this->redirect('/');
         }
-
-        return $this->redirect(['/use/index', 'id' => $id]);
     }
 
     /**
@@ -129,82 +101,11 @@ class UseController extends Controller
         }
 
         if ($releaseRequest->save()) {
-            Cronjob_Tool_AsyncReader_Deploy::sendReleaseRequestUpdated($releaseRequest->obj_id);
+            DeployController::sendReleaseRequestUpdated($releaseRequest->obj_id);
             Log::createLogMessage($logMessage);
         }
 
         $this->redirect('/');
-    }
-
-    /**
-     * Проверки смс кодов
-     *
-     * @param $model
-     * @param $releaseRequest
-     */
-    private function checkReleaseCode(ReleaseRequest $model, ReleaseRequest $releaseRequest)
-    {
-        if ($model->rr_project_owner_code == $releaseRequest->rr_project_owner_code) {
-            Log::createLogMessage("Введен правильный Project Owner код {$releaseRequest->getTitle()}");
-            $releaseRequest->rr_project_owner_code_entered = true;
-        } else {
-            $model->addError('rr_project_owner_code', "Код не подошел");
-        }
-        if ($model->rr_release_engineer_code == $releaseRequest->rr_release_engineer_code) {
-            Log::createLogMessage("Введен правильный Release Engineer код {$releaseRequest->getTitle()}");
-            $releaseRequest->rr_release_engineer_code_entered = true;
-        }
-    }
-
-    /**
-     * @param int $id
-     * Lists all models.
-     * @return string
-    */
-    public function actionIndex($id)
-    {
-        $releaseRequest = $this->loadModel($id);
-        if ($releaseRequest->rr_status != ReleaseRequest::STATUS_CODES) {
-            $this->redirect('/');
-        }
-
-        $model = new ReleaseRequest(['scenario' => 'use']);
-        if (isset($_POST['ReleaseRequest'])) {
-            $model->attributes = $_POST['ReleaseRequest'];
-
-            $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
-            if (!$deployment_enabled) {
-                $model->addError('rr_project_owner_code', 'Обновление серверов временно отключено, причина: ' . RdsDbConfig::get()->deployment_enabled_reason);
-            }
-            // проверяем правильность ввода смс
-            $this->checkReleaseCode($model, $releaseRequest);
-
-            if (isset($_POST['ajax']) && $_POST['ajax'] == 'release-request-use-form') {
-                \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-                return \yii\widgets\ActiveForm::validate($model);
-            }
-
-            if ($releaseRequest->rr_project_owner_code_entered && $deployment_enabled) {
-                $releaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
-
-                $slaveList = ReleaseRequest::findAllByAttributes([
-                    'rr_leading_id' => $releaseRequest->obj_id,
-                    'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
-                ]);
-                foreach ($slaveList as $slave) {
-                    /** @var $slave ReleaseRequest */
-                    $slave->sendUseTasks(\Yii::$app->user->getIdentity()->username);
-                }
-            }
-            $releaseRequest->save();
-            $this->redirect('/');
-        }
-
-        return $this->render('index', array(
-            'model' => $model,
-            'releaseRequest' => $releaseRequest,
-        ));
     }
 
     /**

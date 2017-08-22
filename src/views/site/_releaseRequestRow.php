@@ -196,17 +196,11 @@ return array(
                     return "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
                         "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
                 }
-            } elseif ($releaseRequest->rr_status == ReleaseRequest::STATUS_CODES) {
-                return "<a href='" . yii\helpers\Url::to(['/use/index', 'id' => $releaseRequest->obj_id]) .
-                    "' onclick='showForm($releaseRequest->obj_id); return false;'>Ввести sms код</a>";
             } elseif ($releaseRequest->rr_status == ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
-                if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest($releaseRequest->rr_project_obj_id, $releaseRequest->rr_old_version)) {
+                if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest()) {
                     if ($oldReleaseRequest->canBeUsed()) {
                         return "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $oldReleaseRequest->obj_id]) .
                             "' --data-id='$oldReleaseRequest->obj_id' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
-                    } elseif ($oldReleaseRequest->rr_status == ReleaseRequest::STATUS_CODES) {
-                        return "<a href='" . yii\helpers\Url::to(['/use/index', 'id' => $oldReleaseRequest->obj_id]) .
-                            "' onclick='showForm($oldReleaseRequest->obj_id); return false;'>Sms код для отката до $releaseRequest->rr_old_version</a>";
                     }
                 }
             }

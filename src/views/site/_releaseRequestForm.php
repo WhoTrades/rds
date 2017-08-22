@@ -7,15 +7,19 @@ use yii\bootstrap\Html;
 $this->registerJs('
     $("#release-request-form").on("beforeSubmit", function(e) {
         var form = $("#release-request-form"),
-            btn  = form.find("button[type=\"submit\"]"),
-            modal= $("#release-request-form-modal");
+        btn  = form.find("button[type=\"submit\"]"),
+        modal= $("#release-request-form-modal");
 
-            btn.attr("disabled", true);
+        btn.attr("disabled", true);
 
-            $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(){
+        $.post($("#release-request-form").attr("action"), $("#release-request-form").serialize()).done(function(html) {
+            var qq = $("#release-request-form", $(html)).html();
+            $("#release-request-form").html(qq);
+            if ($("#release-request-form .error-summary").length == 0) {
                 modal.modal("hide");
-                btn.attr("disabled", false);
-            });
+            }
+            btn.attr("disabled", false);
+        });
 
         return false;
     });

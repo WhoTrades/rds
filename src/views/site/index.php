@@ -70,7 +70,7 @@ Pjax::end();
             'header' => 'Запрос релиза',
             //'toggleButton' => ['label' => 'Собрать проект', 'class' => 'btn'],
         ));
-        echo $this->render('createReleaseRequest', ['model' => $releaseRequest['model']], true);
+        echo $this->render('_releaseRequestForm', ['model' => $releaseRequest['model']], true);
         yii\bootstrap\Modal::end();
         ?>
         <h2 style="margin:0;">
@@ -96,16 +96,7 @@ Pjax::end();
     </div>
 
 </div>
-<h2>
 
-
-
-    <div style="float: right">
-
-    </div>
-</h2>
-
-<div style="clear: both"></div>
 <?php
 
 \yii\widgets\Pjax::begin(['timeout' => 10000, 'id' => 'release-request-grid-container']);
@@ -171,30 +162,11 @@ echo $this->render('_releaseRequestGrid', [
         });
         $('body').on('click', '.use-button', function(e){
             var obj = this;
-            $.ajax({url: this.href, data: {"ajax": 1}}).done(function(html, b, c, d){
-                if (html == "using" || html == 'used') {
-                    return;
-                }
-
-                showForm($(obj).attr('--data-id'));
-            });
+            obj.innerHTML = '<span class="glyphicon glyphicon-refresh"></span>';
+            $.ajax({url: this.href, data: {"ajax": 1}}).done(function(){});
             e.preventDefault();
         });
     })
-    function showForm(id)
-    {
-        $.ajax({url: "/use/index/" + id}).done(function(html){
-            if (html == "using") {
-                return;
-            }
-            $('#release-request-use-form-modal .modal-body').html($("#use-form", $(html)).html());
-            $('body').append($(html).filter('script:last'))
-            $("#release-request-use-form-modal").modal("show");
-            setTimeout(function(){
-                $('#release-request-use-form-modal .modal-body input:first').focus();
-            }, 500);
-        });
-    }
 
     function popup(title, url, data)
     {

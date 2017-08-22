@@ -237,18 +237,6 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @return bool
-     */
-    public function canByUsedImmediately()
-    {
-        return !empty(\Yii::$app->params['useImmediately'])
-                || (
-                    in_array($this->rr_status, array(self::STATUS_OLD))
-                    && (time() - $this->getLastTimeOnProdTimestamp() < self::IMMEDIATELY_TIME)
-                );
-    }
-
-    /**
      * @return int
      */
     public function getLastTimeOnProdTimestamp()
@@ -314,7 +302,7 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function createBuildTasks()
     {
@@ -386,6 +374,7 @@ class ReleaseRequest extends ActiveRecord
     {
         $this->rr_status = ReleaseRequest::STATUS_USING;
         $this->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
+        $this->rr_old_version = $this->project->project_current_version;
         Log::createLogMessage("USE {$this->getTitle()}");
 
         foreach ($this->project->project2workers as $p2w) {
@@ -403,7 +392,6 @@ class ReleaseRequest extends ActiveRecord
         }
 
         $this->save();
-        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
     }
 
     /**
@@ -472,7 +460,7 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @return Build[]
+     * @return ActiveQuery
      */
     public function getBuilds()
     {
@@ -480,7 +468,7 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @return HardMigration
+     * @return ActiveQuery
      */
     public function getHardMigrations()
     {
@@ -496,7 +484,7 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @return Project
+     * @return ActiveQuery
      */
     public function getProject()
     {
@@ -504,7 +492,7 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @return ReleaseRequest[]
+     * @return ActiveQuery
      */
     public function getReleaseRequests()
     {

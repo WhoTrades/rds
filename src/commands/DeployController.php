@@ -55,11 +55,6 @@ class DeployController extends RabbitListener
             $this->actionSetUseError($message, $model);
         });
 
-        $model->readOldVersion(false, function (Message\ReleaseRequestOldVersion $message) use ($model) {
-            Yii::info("Received old version message: " . json_encode($message));
-            $this->actionSetOldVersion($message, $model);
-        });
-
         $model->readUsedVersion(false, function (Message\ReleaseRequestUsedVersion $message) use ($model) {
             Yii::info("Received used version message: " . json_encode($message));
             $this->actionSetUsedVersion($message, $model);
@@ -405,31 +400,6 @@ class DeployController extends RabbitListener
         $releaseRequest->save();
 
         self::sendReleaseRequestUpdated($releaseRequest->obj_id);
-
-        $message->accepted();
-    }
-
-    /**
-     * @param Message\ReleaseRequestOldVersion $message
-     * @param MessagingRdsMs                   $model
-     */
-    private function actionSetOldVersion(Message\ReleaseRequestOldVersion $message, MessagingRdsMs $model)
-    {
-        $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
-
-        if (!$releaseRequest) {
-            Yii::error("Release Request #$message->releaseRequestId not found");
-            $message->accepted();
-
-            return;
-        }
-
-        if (!$releaseRequest->rr_old_version) {
-            $releaseRequest->rr_old_version = $message->version;
-            $releaseRequest->save(false);
-
-            self::sendReleaseRequestUpdated($releaseRequest->obj_id);
-        }
 
         $message->accepted();
     }

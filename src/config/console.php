@@ -2,6 +2,7 @@
 use RdsSystem\lib\ConsoleErrorHandler;
 
 $config = include('main.php');
+$config['controllerMap']['stubs']['class'] = 'bazilio\stubsgenerator\StubsController';
 
 $config['bootstrap'][] = 'Whotrades';
 $config['controllerNamespace'] = 'app\\commands';
