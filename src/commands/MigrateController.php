@@ -1,5 +1,5 @@
 <?php
-namespace app\controllers;
+namespace app\commands;
 
 use yii\console\controllers\MigrateController as BaseMigrateController;
 
@@ -10,7 +10,7 @@ class MigrateController extends BaseMigrateController
      */
     public function init()
     {
-        $this->migrationTable = "migration_rds";
         parent::init();
+        $this->migrationTable = "rds.migration_rds";
     }
 }

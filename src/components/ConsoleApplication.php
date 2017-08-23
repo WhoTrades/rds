@@ -17,8 +17,6 @@ class ConsoleApplication extends \yii\console\Application
     {
         parent::__construct($config);
 
-        //$this->controller = Yii::createObject(Controller::class, [null, $this, 'route' => [null, null]]);
-
         Yii::setAlias('@webroot', '/');
         Yii::setAlias('@web', '/');
     }
@@ -30,7 +28,6 @@ class ConsoleApplication extends \yii\console\Application
     {
         return [
             'help' => 'yii\console\controllers\HelpController',
-            'migrate' => 'yii\console\controllers\MigrateController',
         ];
     }
 
