@@ -1,5 +1,5 @@
 /config
 config.local.php
 /vendor
-main/www/assets/*
+/web/assets/*
 
