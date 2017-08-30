@@ -20,7 +20,7 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
         <?= $form->field($project, 'script_migration_up')->widget(
             CodemirrorWidget::className(),
             [
-                'presetsDir' => '../../protected/assets/preset',
+                'presetsDir' => '../protected/assets/preset',
                 'preset' => 'bash',
                 'options' => ['rows' => 15],
             ]
@@ -38,7 +38,7 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
                     <li><strong>$projectName</strong> имя проекта</li>
                     <li><strong>$version</strong> версия сборки</li>
                     <li><strong>$type</strong> тип миграции (pre/post)</li>
-                    <li><strong>$projectDir</strong> папка с проектов (это будет текущая папка)</li>
+                    <li><strong>$projectDir</strong> папка с проектом (это будет текущая папка)</li>
                 </ul>
                 <p><strong>Результат работы</strong>: Данный скрипт должен выполнить все невыполненные миграции. В случае ошибки - завершиться с exit-code != 0</p>
             </div>
@@ -58,7 +58,7 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
         <?= $form->field($project, 'script_migration_new')->widget(
             CodemirrorWidget::className(),
             [
-                'presetsDir' => '../../protected/assets/preset',
+                'presetsDir' => '../protected/assets/preset',
                 'preset' => 'bash',
                 'options' => ['rows' => 15, 'style' => 'width: 100%'],
             ]
@@ -75,7 +75,7 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
                     <li><strong>$projectName</strong> имя проекта</li>
                     <li><strong>$version</strong> версия сборки</li>
                     <li><strong>$type</strong> тип миграции (pre/post)</li>
-                    <li><strong>$projectDir</strong> папка с проектов (это будет текущая папка)</li>
+                    <li><strong>$projectDir</strong> папка с проектом (это будет текущая папка)</li>
                 </ul>
                 <p>
                     <strong>Результат работы</strong>: Данный скрипт должен вывести на экран список всех невыполненных миграций (одна строчка == одна миграция).

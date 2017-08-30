@@ -65,16 +65,6 @@ class DeployController extends RabbitListener
             $this->replyToCurrentStatusRequest($message, $model);
         });
 
-        $model->readGetProjectsRequest(false, function (Message\ProjectsRequest $message) use ($model) {
-            Yii::info("Received request of projects list: " . json_encode($message));
-            $this->actionReplyProjectsList($message, $model);
-        });
-
-        $model->readGetProjectBuildsToDeleteRequest(false, function (Message\ProjectBuildsToDeleteRequest $message) use ($model) {
-            Yii::info("Received request of projects to delete: " . json_encode($message));
-            $this->actionReplyProjectsBuildsToDelete($message, $model);
-        });
-
         $model->readRemoveReleaseRequest(false, function (Message\RemoveReleaseRequest $message) use ($model) {
             Yii::info("Received remove release request message: " . json_encode($message));
             $this->actionRemoveReleaseRequest($message, $model);
@@ -298,24 +288,22 @@ class DeployController extends RabbitListener
             foreach ($message->migrations as $migration) {
                 list($migration, $ticket) = preg_split('~\s+~', $migration);
 
-                foreach (Yii::$app->params['environments'] as $env) {
-                    Yii::info("Adding migration $migration with env=$env");
-                    $hm = new HardMigration();
-                    $hm->attributes = [
-                        'migration_release_request_obj_id' => $releaseRequest->obj_id,
-                        'migration_project_obj_id' => $releaseRequest->rr_project_obj_id,
-                        'migration_type' => 'hard',
-                        'migration_name' => $migration,
-                        'migration_ticket' => str_replace('#', '', $ticket),
-                        'migration_status' => HardMigration::MIGRATION_STATUS_NEW,
-                        'migration_environment' => $env,
-                    ];
-                    if (!$hm->save()) {
-                        if (count($hm->errors) != 1 || !isset($hm->errors["migration_name"])) {
-                            Yii::error("Can't save HardMigration: " . json_encode($hm->errors));
-                        } else {
-                            Yii::info("Skip migration $migration as already exists in DB (" . json_encode($hm->errors) . ")");
-                        }
+                $hm = new HardMigration();
+                $hm->attributes = [
+                    'migration_release_request_obj_id' => $releaseRequest->obj_id,
+                    'migration_project_obj_id' => $releaseRequest->rr_project_obj_id,
+                    'migration_type' => 'hard',
+                    'migration_name' => $migration,
+                    'migration_ticket' => str_replace('#', '', $ticket),
+                    'migration_status' => HardMigration::MIGRATION_STATUS_NEW,
+                    'migration_environment' => 'main',
+                ];
+
+                if (!$hm->save()) {
+                    if (count($hm->errors) != 1 || !isset($hm->errors["migration_name"])) {
+                        Yii::error("Can't save HardMigration: " . json_encode($hm->errors));
+                    } else {
+                        Yii::info("Skip migration $migration as already exists in DB (" . json_encode($hm->errors) . ")");
                     }
                 }
             }
@@ -567,114 +555,6 @@ class DeployController extends RabbitListener
 
         // an: В любом случае что-то ответить нужно, даже если запрос релиза уже удалили. Иначе будет таймаут у системы, которые запросила данные
         $model->sendCurrentStatusReply(new Message\ReleaseRequestCurrentStatusReply($releaseRequest ? $releaseRequest->rr_status : null, $message->getUniqueTag()));
-
-        $message->accepted();
-    }
-
-    /**
-     * @param Message\ProjectsRequest $message
-     * @param MessagingRdsMs          $model
-     */
-    private function actionReplyProjectsList(Message\ProjectsRequest $message, MessagingRdsMs $model)
-    {
-        $projects = Project::find()->all();
-        $result = array();
-        foreach ($projects as $project) {
-            /** @var $project Project */
-            $result[] = array(
-                'name' => $project->project_name,
-                'current_version' => $project->project_current_version,
-            );
-        }
-
-        $model->sendGetProjectsReply(new Message\ProjectsReply($result));
-
-        $message->accepted();
-    }
-
-    /**
-     * @param Message\ProjectBuildsToDeleteRequest $message
-     * @param MessagingRdsMs                       $model
-     */
-    private function actionReplyProjectsBuildsToDelete(Message\ProjectBuildsToDeleteRequest $message, MessagingRdsMs $model)
-    {
-        $builds = $message->allBuilds;
-
-        $result = array();
-        foreach ($builds as $build) {
-            if (!preg_match('~\d{2,3}\.\d\d\.\d+\.\d+~', $build['version']) && !preg_match('~2014\.\d{2,3}\.\d\d\.\d+\.\d+~', $build['version'])) {
-                // an: неизвестный формат версии, лучше не будем удалять :) фиг его знает что это
-                Yii::error("Unknown version format: {$build['version']} (build={$build['project']}-{$build['version']})");
-                continue;
-            }
-            /** @var $project Project */
-            $project = Project::findByAttributes(['project_name' => $build['project']]);
-            if (!$project) {
-                // an: непонятно что и зачем это нам прислали, лучше не будем удалять
-                Yii::error("Unknown project: {$build['project']} (build={$build['project']}-{$build['version']})");
-                continue;
-            }
-
-            if ($build['version'] == $project->project_current_version) {
-                // an: Ну никак нельзя удалять ту версию, что сейчас зарелижена
-                Yii::info("Active project and version (build={$build['project']}-{$build['version']})");
-                continue;
-            }
-
-            $releaseRequest = ReleaseRequest::findByAttributes([
-                'rr_project_obj_id' => $project->obj_id,
-                'rr_build_version' => $build['version'],
-            ]);
-
-            $interval = "-" . Yii::$app->params['garbageCollector']['minTimeAtProd'];
-            if (empty($interval)) {
-                Yii::error("Empty interval at RDS garbage collector. Stop removing packets");
-                break;
-            }
-            if ($releaseRequest && $releaseRequest->rr_last_time_on_prod > date('Y-m-d', strtotime($interval))) {
-                // an: Не удаляем те билды, что были на проде меньше недели назад
-                Yii::info("Last time at prod less then `$interval` (build={$build['project']}-{$build['version']})");
-                continue;
-            }
-
-            $numbersOfTest = explode(".", $build['version']);
-
-            $numbersOfCurrent = explode(".", $project->project_current_version);
-
-            if ($numbersOfCurrent[0] - 1 > $numbersOfTest[0] || $numbersOfCurrent[0] == $numbersOfTest[0]) {
-                $count = $this->countInstalledBuildsBetweenVersions($project->obj_id, $build['version'], $project->project_current_version);
-
-                if ($count > 10) {
-                    // an: Нужно наличие минимум 10 версий от текущей, что бы было куда откатываться
-                    $model->sendGetProjectBuildsToDeleteRequestReply(
-                        new Message\ProjectBuildsToDeleteReply(
-                            $build['project'],
-                            $build['version'],
-                            $project->getProjectServersArray()
-                        )
-                    );
-                    Yii::info("(!) Removing build of current build (build={$build['project']}-{$build['version']})");
-                } else {
-                    Yii::info("Projects of current version at prod=$count, less then 10 (build={$build['project']}-{$build['version']})");
-                }
-            } elseif ($numbersOfCurrent[0] - 1 == $numbersOfTest[0]) {
-                $count = $this->countInstalledBuildsBetweenVersions($project->obj_id, $build['version'], $numbersOfCurrent[0] . ".00.000.000");
-
-                if ($count > 5) {
-                    // an: Нужно наличие минимум 2 версий в текущем релизе, что бы точно могли откатиться
-                    $model->sendGetProjectBuildsToDeleteRequestReply(
-                        new Message\ProjectBuildsToDeleteReply(
-                            $build['project'],
-                            $build['version'],
-                            $project->getProjectServersArray()
-                        )
-                    );
-                    Yii::info("(!) Removing build of previous build (build={$build['project']}-{$build['version']})");
-                } else {
-                    Yii::info("Projects of previous version at prod=$count, less then 5 (build={$build['project']}-{$build['version']})");
-                }
-            }
-        }
 
         $message->accepted();
     }

@@ -2,57 +2,14 @@
 namespace app\controllers;
 
 use app\components\Status;
-use app\modules\Whotrades\actions\Git\RebuildBranch;
-use Yii;
 use app\models\Project;
 use app\modules\Whotrades\models\ToolJob;
-use yii\base\Module;
-use yii\web\HttpException;
-use app\models\RdsDbConfig;
 use app\modules\Whotrades\models\ToolJobStopped;
-use app\models\ReleaseVersion;
+use yii\web\HttpException;
 use app\models\ReleaseRequest;
-use app\modules\Wtflow\models\Developer;
-use app\modules\Wtflow\models\WtFlowStat;
-use app\modules\Wtflow\components\JiraApi;
 
 class JsonController extends Controller
 {
-    /**
-     * JsonController constructor.
-     * @param string $id
-     * @param Module $module
-     * @param array $config
-     */
-    public function __construct($id, Module $module, array $config = [])
-    {
-        $this->enableCsrfValidation = false;
-        parent::__construct($id, $module, $config);
-    }
-
-    public function actionGetReleaseRequests($project)
-    {
-        /** @var $Project Project */
-        $Project = Project::findByAttributes(['project_name' => $project]);
-        if (!$Project) {
-            throw new HttpException(404, 'Project not found');
-        }
-
-        $releaseRequests = $Project->releaseRequests;
-
-        $result = [];
-        foreach ($releaseRequests as $releaseRequest) {
-            /** @var $project Project */
-            $result[] = array(
-                'project' => $project,
-                'version' => $releaseRequest->rr_build_version,
-                'old_version' => $releaseRequest->rr_old_version,
-            );
-        }
-
-        echo json_encode($result);
-    }
-
     /**
      * Возвращает список пакетов, установленных на PROD сервера
      * @param string $project название проекта (Поле в БД project.project_name)
@@ -91,18 +48,6 @@ class JsonController extends Controller
         }
     }
 
-    public function actionGetAllowedReleaseBranches()
-    {
-        $versions = ReleaseVersion::find()->all();
-
-        $result = [];
-        foreach ($versions as $version) {
-            $result[] = 'release-' . $version->rv_version;
-        }
-
-        echo json_encode($result, JSON_PRETTY_PRINT);
-    }
-
     /**
      * Метод используется git хуком update.php, который проверяет можно ли команде CRM пушить в хотрелизную ветку после кодфриза и до релиза
      * @param string $projectName
@@ -116,25 +61,9 @@ class JsonController extends Controller
     }
 
     /**
-     * @return string
+     * @deprecated
+     * @remove me
      */
-    public function actionAddWtFlowStat()
-    {
-        $developer = Developer::findByAttributes(['whotrades_email' => $_POST['developer']]);
-
-        if (!$developer) {
-            return "Unknown developer " . $_POST['developer'];
-        }
-
-        $wtflow = new WtFlowStat();
-        $wtflow->attributes = $_POST;
-        $wtflow->developer_id = $developer->obj_id;
-        $wtflow->log = implode("\n", $_POST['log'] ?? []);
-        $wtflow->save();
-
-        return "OK";
-    }
-
     public function actionGetDisabledCronjobs()
     {
         $list = ToolJobStopped::find()->where(['>', 'stopped_till', 'NOW()'])->all();
@@ -146,6 +75,10 @@ class JsonController extends Controller
         echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
+    /**
+     * @deprecated
+     * @remove me
+     */
     public function actionSetCronJobsStats()
     {
         $data = json_decode(file_get_contents("php://input"), true);
@@ -215,59 +148,5 @@ class JsonController extends Controller
         }
 
         echo json_encode(["OK" => true]);
-    }
-
-    /**
-     * Этот метод дергается скриптом updater.php на tst контуре, что бы понять нужно ли обновлять контур
-     * Сделано в связи с регламентом http://wiki/pages/viewpage.action?pageId=72813392
-     */
-    public function actionGetTstUpdatingEnabled()
-    {
-        echo json_encode([
-            'ok' => true,
-            'enabled' => RdsDbConfig::get()->is_tst_updating_enabled,
-        ]);
-    }
-
-    public function actionGetCronJobsStatus()
-    {
-        $sql = "select
-          project_name,
-          command,
-          last_run_time,
-          extract(epoch from (NOW() - last_run_time)) as sec_from_last_run
-        from cronjobs.cpu_usage
-        join cronjobs.tool_job ON cpu_usage.key=tool_job.key AND tool_job.obj_status_did=1";
-
-        $result = \Yii::$app->db->createCommand($sql)->queryAll();
-
-        header("Content-type: application/javascript");
-        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    }
-
-    /**
-     * Метод API, который дергает JIRA посредством web хука при переводе задачи из статуса "Ready for staging" назад
-     * @param string $ticket
-     *
-     * @throws \ApplicationException
-     * @return void
-     */
-    public function actionTicketRemovedFromStaging($ticket)
-    {
-        if (false === strpos($ticket, 'WTS') && false === strpos($ticket, 'WTT')) {
-            echo 'Skip ticket';
-
-            return;
-        }
-
-        $action = new RebuildBranch();
-        $action->run(
-            'staging',
-            'JIRA-hook',
-            (new \RdsSystem\Factory())->getMessagingRdsMsModel(),
-            false
-        );
-
-        echo 'OK';
     }
 }

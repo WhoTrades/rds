@@ -35,9 +35,10 @@ Yii::$app->webSockets->registerScripts($this);
 <body>
 <?php
 $this->beginBody();
-$controllerId   = \Yii::$app->controller->id;
-$actionId       = \Yii::$app->controller->action->id;
-$modulesNav     = [];
+$controllerId       = \Yii::$app->controller->id;
+$controllerUniqueId = \Yii::$app->controller->uniqueId;
+$actionId           = \Yii::$app->controller->action->id;
+$modulesNav         = [];
 
 foreach (\Yii::$app->modules as $module) {
     if (!$module instanceof app\IHaveNavInterface) {
@@ -46,7 +47,6 @@ foreach (\Yii::$app->modules as $module) {
 
     $modulesNav = ArrayHelper::merge($modulesNav, $module::getNav($controllerId, $actionId));
 }
-
 NavBar::begin(['brandLabel' => 'RDS']);
 echo Nav::widget(
     [
@@ -77,6 +77,12 @@ echo Nav::widget(
                     'label' => 'Журнал',
                     'url' => ['/log/index'],
                     'visible' => !\Yii::$app->user->isGuest,
+                ],
+                'users' => [
+                    'label' => 'Пользователи',
+                    'url' => ['/user/admin'],
+                    'active' => $controllerUniqueId == 'user/admin',
+                    'visible' => Yii::$app->user->identity->isAdmin,
                 ],
                 'logOut' => [
                     'label' => \Yii::$app->user->getIsGuest() ? "" : \Yii::$app->user->getIdentity()->email,

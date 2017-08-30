@@ -71,6 +71,7 @@ class ProjectConfigHistory extends ActiveRecord
 
         return new ActiveDataProvider([
             'query' => $query,
+            'sort' => ['defaultOrder' => ['obj_created' => SORT_DESC]],
         ]);
     }
 
@@ -80,9 +81,9 @@ class ProjectConfigHistory extends ActiveRecord
     public function attributeLabels()
     {
         return array(
-            'obj_id' => 'Obj',
-            'obj_created' => 'Obj Created',
-            'obj_modified' => 'Obj Modified',
+            'obj_id' => 'ID',
+            'obj_created' => 'Created',
+            'obj_modified' => 'Modified',
             'obj_status_did' => 'Obj Status Did',
             'pch_project_obj_id' => 'Pch Project Obj',
             'pch_user_id' => 'Pch User',
