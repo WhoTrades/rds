@@ -7,6 +7,11 @@ use app\models\ReleaseRequest;
 
 class StatisticController extends Controller
 {
+    /**
+     * @param string $projectName
+     * @return string
+     * @throws HttpException
+     */
     public function actionGetLastBuildTime($projectName)
     {
         $project = Project::findByAttributes(array('project_name' => $projectName));
@@ -15,12 +20,16 @@ class StatisticController extends Controller
             throw new HttpException(404, 'unknown project');
         }
 
-        $releaseRequest = ReleaseRequest::find()->andWhere(['rr_project_obj_id' => $project->obj_id])->andWhere(['not', ['rr_built_time' => null]])->orderBy('obj_id desc')->one();
+        $releaseRequest = ReleaseRequest::find()->
+            andWhere(['rr_project_obj_id' => $project->obj_id])->
+            andWhere(['not', ['rr_built_time' => null]])->
+            orderBy('obj_id desc')->
+            one();
 
         if ($releaseRequest && $releaseRequest->rr_built_time) {
-            echo strtotime($releaseRequest->rr_built_time) - strtotime($releaseRequest->rr_build_started ?: $releaseRequest->obj_created);
+            return strtotime($releaseRequest->rr_built_time) - strtotime($releaseRequest->rr_build_started ?: $releaseRequest->obj_created);
         } else {
-            echo "unknown";
+            return "unknown";
         }
     }
 }

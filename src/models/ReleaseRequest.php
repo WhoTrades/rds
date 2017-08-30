@@ -57,7 +57,6 @@ class ReleaseRequest extends ActiveRecord
     const STATUS_NEW                 = 'new';
     const STATUS_FAILED              = 'failed';
     const STATUS_INSTALLED           = 'installed';
-    const STATUS_CODES               = 'codes';
     const STATUS_USING               = 'using';
     const STATUS_USED                = 'used';
     const STATUS_OLD                 = 'old';
@@ -281,7 +280,6 @@ class ReleaseRequest extends ActiveRecord
             self::STATUS_INSTALLED,
             self::STATUS_OLD,
             self::STATUS_USED,
-            self::STATUS_CODES,
         ];
     }
 

@@ -100,6 +100,25 @@ class ProjectController extends Controller
             'project' => $model,
         ));
     }
+    /**
+     * @param int $id
+     * @return string
+     */
+    public function actionUpdateScriptRemove(int $id) : string
+    {
+        $model = $this->loadModel($id);
+
+        if (isset($_POST['Project'])) {
+            $model->attributes = $_POST['Project'];
+            if ($model->save()) {
+                $this->redirect(array('view', 'id' => $model->obj_id));
+            }
+        }
+
+        return $this->render('update-script-remove', array(
+            'project' => $model,
+        ));
+    }
 
     /**
      * @param int $id

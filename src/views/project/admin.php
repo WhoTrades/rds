@@ -49,6 +49,10 @@ $this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
                         'url' => ['/project/update-config-local/', 'id' => $project->obj_id],
                         'hint' => 'Управление настройками окружения (то, что не лежит в git и чем отличается dev и prod контура)',
                     ],
+                    'Очистка пакетов' => [
+                        'url' => ['/project/update-script-remove/', 'id' => $project->obj_id],
+                        'hint' => 'Скрипты удаления старых версий проекта',
+                    ],
                     '[todo] Сборка проекта' => [
                         'url' => ['#', 'id' => $project->obj_id],
                         'hint' => 'В простейшем случае сдесь находится просто git clone',
@@ -57,11 +61,6 @@ $this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
                     '[todo] Заливка проекта на сервера' => [
                         'url' => ['#', 'id' => $project->obj_id],
                         'hint' => 'Непосредственно скрипты заливки на сервера. Как правило, тут находится rsync',
-                        'not-ready' => true,
-                    ],
-                    '[todo] Удаление проекта' => [
-                        'url' => ['#', 'id' => $project->obj_id],
-                        'hint' => 'Скрипты удаления старых версий проекта',
                         'not-ready' => true,
                     ],
                     '[todo] cron конфиги' => [
