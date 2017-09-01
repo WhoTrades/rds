@@ -10,6 +10,8 @@ use app\models\ReleaseRequest;
 
 class JsonController extends Controller
 {
+    public $enableCsrfValidation = false;
+
     /**
      * Возвращает список пакетов, установленных на PROD сервера
      * @param string $project название проекта (Поле в БД project.project_name)
@@ -119,14 +121,14 @@ class JsonController extends Controller
                 'obj_status_did' => Status::ACTIVE,
             ]);
             if ($toolJob) {
-                \Yii::$app->graphite->getGraphite()->gauge(
+                \Yii::$app->getModule('Whotrades')->graphite->getGraphite()->gauge(
                     \GraphiteSystem\Metrics::dynamicName(
                         \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMEREAL,
                         [$project, $toolJob->getLoggerTag() . "-" . $key]
                     ),
                     $val['time'] / $val['count']
                 );
-                \Yii::$app->graphite->getGraphite()->gauge(
+                \Yii::$app->getModule('Whotrades')->graphite->getGraphite()->gauge(
                     \GraphiteSystem\Metrics::dynamicName(
                         \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMECPU,
                         [$project, $toolJob->getLoggerTag() . "-" . $key]
