@@ -9,7 +9,7 @@ use Yii;
 
 class RemovePackagesController extends SingleInstanceController
 {
-    public $limit = 30;
+    public $limit = 1000;
     public $dryRun = false;
     public $projectName = null;
 
