@@ -110,6 +110,7 @@ class ProjectController extends Controller
 
         if (isset($_POST['Project'])) {
             $model->attributes = $_POST['Project'];
+            $model->script_remove_release = str_replace("\r", "", $model->script_remove_release);
             if ($model->save()) {
                 $this->redirect(array('view', 'id' => $model->obj_id));
             }

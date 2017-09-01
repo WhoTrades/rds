@@ -15,6 +15,7 @@ class CommandController extends \RdsSystem\commands\CommandController
         return [
             "# Основной обработчик событий",
             $this->createCommand(DeployController::class, 'index', [], "rds_async_reader_deploy"),
+            $this->createCommand(RemovePackagesController::class, 'index', [], "rds_async_reader_deploy", '1 1 * * * *'),
         ];
     }
 }

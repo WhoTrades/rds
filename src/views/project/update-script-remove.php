@@ -10,13 +10,13 @@ $this->params['menu'] = array(
     array('label' => 'Проекты', 'url' => array('/project/admin')),
 );
 
-$project->script_migration_remove = $project->script_migration_remove ?: "#!/bin/bash -e\n";
+$project->script_remove_release = $project->script_remove_release ?: "#!/bin/bash -e\n";
 ?>
 <?php $form = ActiveForm::begin() ?>
 <h1>Настройка удаления сборок проекта <?=$project->project_name?></h1>
 <div class="row">
     <div class="col-md-6 col-sm-9">
-        <?= $form->field($project, 'script_migration_remove')->widget(
+        <?= $form->field($project, 'script_remove_release')->widget(
             CodemirrorWidget::className(),
             [
                 'presetsDir' => '../protected/assets/preset',
