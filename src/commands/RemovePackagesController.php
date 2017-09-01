@@ -31,7 +31,7 @@ class RemovePackagesController extends SingleInstanceController
         $minBuildsCountBeforeActive = Yii::$app->params['garbageCollector']['minBuildsCountBeforeActive'];
         $model = (new \RdsSystem\Factory())->getMessagingRdsMsModel();
 
-        $maxDate = date('Y-m-d H:i:s', strtotime($minTimeAtProd));
+        $maxDate = date('Y-m-d H:i:s', strtotime("-" . $minTimeAtProd));
 
         $releaseRequestsQuery = ReleaseRequest::find()->joinWith(['project'])->where(['<=', 'release_request.obj_created', $maxDate]);
         $releaseRequestsQuery->andWhere('rr_build_version <> project_current_version');
