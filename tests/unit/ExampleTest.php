@@ -10,4 +10,8 @@ final class EmailTest extends TestCase
     {
         $this->assertTrue(true);
     }
+    public function testError()
+    {
+        $this->assertTrue(false);
+    }
 }
