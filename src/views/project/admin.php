@@ -42,30 +42,28 @@ $this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
             'value' => function (Project $project) {
                 $data = [
                     'Миграции' => [
-                        'url' => ['/project/update-script-migration/', 'id' => $project->obj_id],
+                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-migration'],
                         'hint' => 'Настройка выполнения SQL миграций: команда для получения списка новых миграций и для запуска миграции',
                     ],
                     'Локальная настройка' => [
-                        'url' => ['/project/update-config-local/', 'id' => $project->obj_id],
+                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-config-local'],
                         'hint' => 'Управление настройками окружения (то, что не лежит в git и чем отличается dev и prod контура)',
                     ],
                     'Очистка пакетов' => [
-                        'url' => ['/project/update-script-remove/', 'id' => $project->obj_id],
+                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-remove'],
                         'hint' => 'Скрипты удаления старых версий проекта',
+                    ],
+                    'Заливка/активация проекта' => [
+                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-deploy'],
+                        'hint' => 'Непосредственно скрипты заливки на сервера. Как правило, тут находится rsync',
+                    ],
+                    'CRON конфиги' => [
+                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-cron'],
+                        'hint' => 'Скрипты генерации cron конфигов',
                     ],
                     '[todo] Сборка проекта' => [
                         'url' => ['#', 'id' => $project->obj_id],
                         'hint' => 'В простейшем случае сдесь находится просто git clone',
-                        'not-ready' => true,
-                    ],
-                    '[todo] Заливка проекта на сервера' => [
-                        'url' => ['#', 'id' => $project->obj_id],
-                        'hint' => 'Непосредственно скрипты заливки на сервера. Как правило, тут находится rsync',
-                        'not-ready' => true,
-                    ],
-                    '[todo] cron конфиги' => [
-                        'url' => ['#', 'id' => $project->obj_id],
-                        'hint' => 'Скрипты генерации cron конфигов',
                         'not-ready' => true,
                     ],
                 ];

@@ -83,9 +83,10 @@ class ProjectController extends Controller
 
     /**
      * @param int $id
+     * @param string $type
      * @return string
      */
-    public function actionUpdateScriptMigration(int $id) : string
+    public function actionUpdateScript(int $id, $type) : string
     {
         $model = $this->loadModel($id);
 
@@ -96,47 +97,7 @@ class ProjectController extends Controller
             }
         }
 
-        return $this->render('update-script-migration', array(
-            'project' => $model,
-        ));
-    }
-    /**
-     * @param int $id
-     * @return string
-     */
-    public function actionUpdateScriptRemove(int $id) : string
-    {
-        $model = $this->loadModel($id);
-
-        if (isset($_POST['Project'])) {
-            $model->attributes = $_POST['Project'];
-            $model->script_remove_release = str_replace("\r", "", $model->script_remove_release);
-            if ($model->save()) {
-                $this->redirect(array('view', 'id' => $model->obj_id));
-            }
-        }
-
-        return $this->render('update-script-remove', array(
-            'project' => $model,
-        ));
-    }
-
-    /**
-     * @param int $id
-     * @return string
-     */
-    public function actionUpdateConfigLocal(int $id) : string
-    {
-        $model = $this->loadModel($id);
-
-        if (isset($_POST['Project'])) {
-            $model->attributes = $_POST['Project'];
-            if ($model->save()) {
-                $this->redirect(array('view', 'id' => $model->obj_id));
-            }
-        }
-
-        return $this->render('update-config-local', array(
+        return $this->render($type, array(
             'project' => $model,
         ));
     }

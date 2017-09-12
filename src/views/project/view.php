@@ -6,8 +6,11 @@ use yii\helpers\Url;
 $this->params['menu'] = array(
     array('label' => 'Create Project', 'url' => array('create')),
     array('label' => 'Update Project', 'url' => array('update', 'id' => $model->obj_id)),
-    ['label' => 'Миграции', 'url' => ['/project/update-script-migration', 'id' => $model->obj_id]],
-    ['label' => 'Локальная настройка', 'url' => ['/project/update-config-local', 'id' => $model->obj_id]],
+    ['label' => 'Миграции', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-migration']],
+    ['label' => 'Локальная настройка', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-config-local']],
+    ['label' => 'Очистка пакетов', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-remove']],
+    ['label' => 'Заливка/активация проекта', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-deploy']],
+    ['label' => 'CRON конфиги', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-cron']],
     array(
         'label' => 'Delete Project',
         'url' => '#',

@@ -2,6 +2,7 @@
 namespace app\models;
 
 use app\components\Status;
+use RdsSystem\Message\BuildTask;
 use Yii;
 use app\models\User\User;
 use yii\data\Sort;
@@ -349,13 +350,15 @@ class ReleaseRequest extends ActiveRecord
             // an: Отправляем задачу в Rabbit на сборку
             (new \RdsSystem\Factory())->getMessagingRdsMsModel()->sendBuildTask(
                 $build->worker->worker_name,
-                new \RdsSystem\Message\BuildTask(
+                new BuildTask(
                     $build->obj_id,
                     $build->project->project_name,
                     $build->releaseRequest->rr_build_version,
                     $build->releaseRequest->rr_release_version,
                     $lastSuccess ? $lastSuccess->getBuildTag() : null,
                     $build->releaseRequest->project->script_migration_new,
+                    $build->releaseRequest->project->script_deploy,
+                    $build->releaseRequest->project->script_cron,
                     $build->project->getProjectServersArray()
                 )
             );

@@ -191,14 +191,18 @@ return array(
                         return $result;
                     }
                 } else {
-                    return "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
+                    $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
                         "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
+
+                    return $result;
                 }
             } elseif ($releaseRequest->rr_status == ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
                 if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest()) {
                     if ($oldReleaseRequest->canBeUsed()) {
-                        return "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $oldReleaseRequest->obj_id]) .
+                        $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $oldReleaseRequest->obj_id]) .
                             "' --data-id='$oldReleaseRequest->obj_id' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
+
+                        return $result;
                     }
                 }
             }
