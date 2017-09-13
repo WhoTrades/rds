@@ -23,11 +23,17 @@ Yii::$app->webSockets->registerScripts($this);
     <?php $this->head() ?>
     <script>
         document.onload = [];
-        function webSocketSubscribe(channel, callback)
+        function webSocketSubscribe(channels, callback)
         {
-            webSocketSession.subscribe(channel, function (topic, event) {
-                callback(event.data.data);
-            });
+            if (typeof channels === 'string') {
+                channels = [channels];
+            }
+
+            for (var i = 0; i < channels.length; i++) {
+                webSocketSession.subscribe(channels[i], function (topic, event) {
+                    callback(event.data.data);
+                });
+            }
         }
     </script>
 </head>
@@ -130,24 +136,15 @@ NavBar::end();
         document.onload[i]();
     }
 
-    webSocketSubscribe('deployment_status_changed', function(event){
-        if (event.deployment_enabled) {
-            var title = "Обновление серверов включено";
-            var body = <?=json_encode(Alert::widget([
-                'options' => ['class' => 'alert-success'],
-                'body' => "Теперь можно собирать, активировать сборки, синхронизировать конфигурацию",
-            ]))?>;
-        } else {
-            var title = "Обновление серверов отключено";
-            var body = <?=json_encode(Alert::widget([
-                'options' => ['class' => 'alert-danger'],
-                'body' => "Сборки проектов, активация сборок и синронизация конфигов временно отключена",
-            ]))?>;
-            body += '<b>Причина</b>: ' + event.reason;
-        }
-        $("#modal-popup .modal-header h4").html(title);
-        $("#modal-popup .modal-body").html(body);
-        $("#modal-popup").modal("show");
+    webSocketSubscribe(['popup_message', 'popup_message_' + <?= Yii::$app->user->getId() ?>], function(event) {
+        var popup = $('#modal-popup'),
+            body  = event.body,
+            title = event.title;
+
+        popup.find('.modal-body').html(body);
+        popup.find('.modal-header h4').html(title);
+
+        popup.modal('show');
     });
 
 </script>

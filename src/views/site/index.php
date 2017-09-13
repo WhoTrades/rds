@@ -20,7 +20,7 @@ $modal = yii\bootstrap\Modal::begin(array(
 ))->end();
 yii\bootstrap\Modal::begin(array(
     'id' => 'modal-popup',
-    'header' => '',
+    'header' => '<h4></h4>',
 ))->end(); ?>
 
 <h1>Запреты релиза</h1>
