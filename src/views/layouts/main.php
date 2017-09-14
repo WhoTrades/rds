@@ -139,10 +139,17 @@ NavBar::end();
     webSocketSubscribe(['popup_message', 'popup_message_' + <?= Yii::$app->user->getId() ?>], function(event) {
         var popup = $('#modal-popup'),
             body  = event.body,
-            title = event.title;
+            title = event.title,
+            type  = event.type || 'default';
 
         popup.find('.modal-body').html(body);
-        popup.find('.modal-header h4').html(title);
+        popup.find('.modal-title').html(title);
+
+        // Add message type to modal
+        popup.find('.modal-header').removeClass(function () {
+            return (this.className.match(/alert-\w+/i) || '').toString();
+        });
+        popup.find('.modal-header').addClass('alert-' + type);
 
         popup.modal('show');
     });

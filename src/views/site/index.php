@@ -19,8 +19,9 @@ $modal = yii\bootstrap\Modal::begin(array(
     'header' => 'Активировать',
 ))->end();
 yii\bootstrap\Modal::begin(array(
-    'id' => 'modal-popup',
-    'header' => '<h4></h4>',
+    'id'            => 'modal-popup',
+    'header'        => '<h4 class="modal-title"></h4>',
+    'headerOptions' => ['class' => 'alert'],
 ))->end(); ?>
 
 <h1>Запреты релиза</h1>

@@ -70,3 +70,7 @@
 .error-summary {
     color: #a94442;
 }
+
+.modal-header.alert {
+    margin-bottom: 0;
+}
