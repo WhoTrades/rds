@@ -10,19 +10,7 @@ use yii\widgets\Pjax;
 /** @var $releaseRejectSearchModel ReleaseReject */
 /** @var $releaseRequestSearchModel ReleaseRequest */
 /** @var $mainProjects Project[] */
-/** @var $modal yii\bootstrap\Modal */
 ?>
-
-<?php
-$modal = yii\bootstrap\Modal::begin(array(
-    'id' => 'release-request-use-form-modal',
-    'header' => 'Активировать',
-))->end();
-yii\bootstrap\Modal::begin(array(
-    'id'            => 'modal-popup',
-    'header'        => '<h4 class="modal-title"></h4>',
-    'headerOptions' => ['class' => 'alert'],
-))->end(); ?>
 
 <h1>Запреты релиза</h1>
 <a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>">Создать</a>

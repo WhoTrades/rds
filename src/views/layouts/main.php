@@ -3,7 +3,6 @@ use app\assets\AppAsset;
 use yii\helpers\Html;
 use yii\bootstrap\NavBar;
 use yii\bootstrap\Nav;
-use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
 
 /** @var $this yii\web\View */
@@ -112,7 +111,21 @@ NavBar::end();
 
 
 <div id="page" class="container-fluid">
-    <?php echo $content; ?>
+
+    <?php
+        yii\bootstrap\Modal::begin([
+            'id' => 'release-request-use-form-modal',
+            'header' => 'Активировать',
+        ])->end();
+        yii\bootstrap\Modal::begin([
+            'id'            => 'modal-popup',
+            'header'        => '<h4 class="modal-title"></h4>',
+            'headerOptions' => ['class' => 'alert'],
+        ])->end();
+
+        echo $content;
+    ?>
+
     <div class="clear"></div>
 </div><!-- page -->
 <?php $this->endBody() ?>
