@@ -3,7 +3,6 @@ use app\assets\AppAsset;
 use yii\helpers\Html;
 use yii\bootstrap\NavBar;
 use yii\bootstrap\Nav;
-use yii\bootstrap\Alert;
 use yii\helpers\ArrayHelper;
 
 /** @var $this yii\web\View */
@@ -23,11 +22,17 @@ Yii::$app->webSockets->registerScripts($this);
     <?php $this->head() ?>
     <script>
         document.onload = [];
-        function webSocketSubscribe(channel, callback)
+        function webSocketSubscribe(channels, callback)
         {
-            webSocketSession.subscribe(channel, function (topic, event) {
-                callback(event.data.data);
-            });
+            if (typeof channels === 'string') {
+                channels = [channels];
+            }
+
+            for (var i = 0; i < channels.length; i++) {
+                webSocketSession.subscribe(channels[i], function (topic, event) {
+                    callback(event.data.data);
+                });
+            }
         }
     </script>
 </head>
@@ -106,7 +111,21 @@ NavBar::end();
 
 
 <div id="page" class="container-fluid">
-    <?php echo $content; ?>
+
+    <?php
+        yii\bootstrap\Modal::begin([
+            'id' => 'release-request-use-form-modal',
+            'header' => 'Активировать',
+        ])->end();
+        yii\bootstrap\Modal::begin([
+            'id'            => 'modal-popup',
+            'header'        => '<h4 class="modal-title"></h4>',
+            'headerOptions' => ['class' => 'alert'],
+        ])->end();
+
+        echo $content;
+    ?>
+
     <div class="clear"></div>
 </div><!-- page -->
 <?php $this->endBody() ?>
@@ -130,24 +149,22 @@ NavBar::end();
         document.onload[i]();
     }
 
-    webSocketSubscribe('deployment_status_changed', function(event){
-        if (event.deployment_enabled) {
-            var title = "Обновление серверов включено";
-            var body = <?=json_encode(Alert::widget([
-                'options' => ['class' => 'alert-success'],
-                'body' => "Теперь можно собирать, активировать сборки, синхронизировать конфигурацию",
-            ]))?>;
-        } else {
-            var title = "Обновление серверов отключено";
-            var body = <?=json_encode(Alert::widget([
-                'options' => ['class' => 'alert-danger'],
-                'body' => "Сборки проектов, активация сборок и синронизация конфигов временно отключена",
-            ]))?>;
-            body += '<b>Причина</b>: ' + event.reason;
-        }
-        $("#modal-popup .modal-header h4").html(title);
-        $("#modal-popup .modal-body").html(body);
-        $("#modal-popup").modal("show");
+    webSocketSubscribe(['popup_message', 'popup_message_' + <?= Yii::$app->user->getId() ?>], function(event) {
+        var popup = $('#modal-popup'),
+            body  = event.body,
+            title = event.title,
+            type  = event.type || 'default';
+
+        popup.find('.modal-body').html(body);
+        popup.find('.modal-title').html(title);
+
+        // Add message type to modal
+        popup.find('.modal-header').removeClass(function () {
+            return (this.className.match(/alert-\w+/i) || '').toString();
+        });
+        popup.find('.modal-header').addClass('alert-' + type);
+
+        popup.modal('show');
     });
 
 </script>
