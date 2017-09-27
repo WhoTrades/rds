@@ -5,6 +5,7 @@
  * @var $filterModel yii\base\Model | null
  */
 
+use app\models\ReleaseRequest;
 use \kartik\grid\GridView;
 
 echo GridView::widget([
@@ -15,7 +16,9 @@ echo GridView::widget([
     'responsive'   => true,
     'hover'        => true,
     'export'       => false,
-    'rowOptions' => function ($rr, $key, $index) {
-        return ['class' => 'release-request-' . $rr->obj_id . " release-request-" . $rr->rr_status];
+    'rowOptions' => function (ReleaseRequest $rr, $key, $index) {
+        return [
+            'class' => 'release-request-' . $rr->obj_id . " release-request-" . $rr->rr_status . " " . ($rr->isDeleted() ? "release-request-deleted" : ""),
+        ];
     },
 ]);

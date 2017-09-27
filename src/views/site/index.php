@@ -191,4 +191,7 @@ echo $this->render('_releaseRequestGrid', [
     body table.table tbody tr.release-request-used {
         background: #EEFFEE;
     }
+    body table.table tr.release-request-deleted {
+        background: rgba(248, 215, 218, 0.3);
+    }
 </style>
