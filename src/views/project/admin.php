@@ -41,18 +41,6 @@ $this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
         [
             'value' => function (Project $project) {
                 $data = [
-                    'Сборка проекта' => [
-                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-build'],
-                        'hint' => 'Сценарий сборки проекта',
-                    ],
-                    'Заливка/активация проекта' => [
-                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-deploy'],
-                        'hint' => 'Непосредственно скрипты заливки на сервера. Как правило, тут находится rsync',
-                    ],
-                    'Очистка пакетов' => [
-                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-remove'],
-                        'hint' => 'Скрипты удаления старых версий проекта',
-                    ],
                     'Миграции' => [
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-migration'],
                         'hint' => 'Настройка выполнения SQL миграций: команда для получения списка новых миграций и для запуска миграции',
@@ -61,9 +49,22 @@ $this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-config-local'],
                         'hint' => 'Управление настройками окружения (то, что не лежит в git и чем отличается dev и prod контура)',
                     ],
+                    'Очистка пакетов' => [
+                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-remove'],
+                        'hint' => 'Скрипты удаления старых версий проекта',
+                    ],
+                    'Заливка/активация проекта' => [
+                        'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-deploy'],
+                        'hint' => 'Непосредственно скрипты заливки на сервера. Как правило, тут находится rsync',
+                    ],
                     'CRON конфиги' => [
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-cron'],
                         'hint' => 'Скрипты генерации cron конфигов',
+                    ],
+                    '[todo] Сборка проекта' => [
+                        'url' => ['#', 'id' => $project->obj_id],
+                        'hint' => 'В простейшем случае сдесь находится просто git clone',
+                        'not-ready' => true,
                     ],
                 ];
                 $links = [];

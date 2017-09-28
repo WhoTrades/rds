@@ -35,6 +35,11 @@ class DeployController extends RabbitListener
             $this->actionSetStatus($message, $model);
         });
 
+        $model->readBuildPatch(false, function (Message\ReleaseRequestBuildPatch $message) use ($model) {
+            Yii::info("Received build patch message: " . json_encode($message));
+            $this->actionSetBuildPatch($message, $model);
+        });
+
         $model->readMigrations(false, function (Message\ReleaseRequestMigrations $message) use ($model) {
             Yii::info("Received migrations message: " . json_encode($message));
             $this->actionSetMigrations($message, $model);
@@ -180,6 +185,68 @@ class DeployController extends RabbitListener
         }
 
         self::sendReleaseRequestUpdated($build->build_release_request_obj_id);
+
+        $message->accepted();
+    }
+
+    /**
+     * @param Message\ReleaseRequestBuildPatch $message
+     * @param MessagingRdsMs                   $model
+     *
+     * @throws \Exception
+     */
+    private function actionSetBuildPatch(Message\ReleaseRequestBuildPatch $message, MessagingRdsMs $model)
+    {
+        if (!$Project = Project::findByAttributes(['project_name' => $message->project])) {
+            Yii::error("Project $message->project not found");
+            $message->accepted();
+
+            return;
+        }
+
+        $releaseRequest = ReleaseRequest::findByAttributes([
+            'rr_project_obj_id' => $Project->obj_id,
+            'rr_build_version' => $message->version,
+        ]);
+
+        if (!$releaseRequest) {
+            Yii::error("Release request of project=$message->project, version=$message->version not found");
+            $message->accepted();
+
+            return;
+        }
+
+        $lines = explode("\n", str_replace("\r", "", $message->output));
+
+        $repository = null;
+        foreach ($lines as $line) {
+            Yii::trace("Processing $line");
+            if (preg_match('~>>> origin\s*ssh://(?:\w+@)?git2?.whotrades.net/srv/git/([\w-]+)\s~', $line, $ans)) {
+                $repository = $ans[1];
+                Yii::info("Repo: $repository");
+                continue;
+            }
+            if (preg_match('~^\s*(?<hash>\w+)\|(?<comment>.*)\|/(?<author>.*?)/$~', $line, $matches)) {
+                $commit = new JiraCommit();
+                if (preg_match_all('~#(WT\w+-\d+)~', $matches['comment'], $ans)) {
+                    foreach ($ans[1] as $val2) {
+                        $commit->attributes = [
+                            'jira_commit_build_tag' => $releaseRequest->getBuildTag(),
+                            'jira_commit_hash' => $matches['hash'],
+                            'jira_commit_author' => $matches['author'],
+                            'jira_commit_comment' => $matches['comment'],
+                            'jira_commit_ticket' => $val2,
+                            'jira_commit_project' => explode('-', $val2)[0],
+                            'jira_commit_repository' => $repository,
+                        ];
+
+                        $commit->save();
+                    }
+                }
+            }
+        }
+
+        self::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();
     }

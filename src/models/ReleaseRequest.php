@@ -357,7 +357,6 @@ class ReleaseRequest extends ActiveRecord
                     $build->releaseRequest->rr_release_version,
                     $lastSuccess ? $lastSuccess->getBuildTag() : null,
                     $build->releaseRequest->project->script_migration_new,
-                    $build->releaseRequest->project->script_build,
                     $build->releaseRequest->project->script_deploy,
                     $build->releaseRequest->project->script_cron,
                     $build->project->getProjectServersArray()
