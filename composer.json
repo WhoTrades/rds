@@ -15,7 +15,7 @@
         "fxp/composer-asset-plugin": "~1.0",
         "react/zmq": "~0.3",
         "php-amqplib/php-amqplib": "~2.6",
-        "whotrades/phpcs-stash": "1.0.1",
+        "whotrades/phpcs-stash": "1.0.2",
         "escapestudios/symfony2-coding-standard": "2.9.0",
         "yiisoft/yii2": "2.0.11",
         "yiisoft/yii2-bootstrap": "~2.0",
