@@ -27,7 +27,7 @@ class ProgressController extends Controller
         }
 
         /** @var $rr ReleaseRequest */
-        $rr = Project::find()->where(['rr_project_obj_id' => $project->id, 'rr_build_version' => $version])->one();
+        $rr = ReleaseRequest::find()->where(['rr_project_obj_id' => $project->obj_id, 'rr_build_version' => $version])->one();
         if (!$rr) {
             throw new HttpException(404, 'Release request not found');
         }
