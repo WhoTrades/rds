@@ -175,7 +175,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function search(array $params)
     {
-        $query = self::find()->andWhere(array_filter([
+        $query = self::find()->where(array_filter([
             'rr_status' => $params['rr_status'],
             'rr_project_obj_id' => $params['rr_project_obj_id'],
         ]));
@@ -189,6 +189,15 @@ class ReleaseRequest extends ActiveRecord
         $this->load($params, 'search');
 
         return $dataProvider;
+    }
+
+    /**
+     * Djpdhfoftn true, если запись в статусе "удалена"
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return $this->obj_status_did == Status::DELETED;
     }
 
     /**
@@ -233,7 +242,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function canBeUsed()
     {
-        return in_array($this->rr_status, array(self::STATUS_INSTALLED, self::STATUS_OLD));
+        return !$this->isDeleted() && in_array($this->rr_status, array(self::STATUS_INSTALLED, self::STATUS_OLD));
     }
 
     /**

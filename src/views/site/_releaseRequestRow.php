@@ -91,7 +91,7 @@ return array(
                 }
 
                 if ($text = $val->determineHumanReadableError()) {
-                    $result[] = Alert::widget(['options' => ['class' => 'alert-warning'], 'body' => $text]);
+                    $result[] = Alert::widget(['options' => ['class' => 'alert-warning'], 'body' => $text, 'closeButton' => false]);
                 }
             }
 
@@ -132,6 +132,9 @@ return array(
     ),
     array(
         'value' => function (ReleaseRequest $releaseRequest) {
+            if ($releaseRequest->isDeleted()) {
+                return 'Сборка удалена';
+            }
             $result = "";
             if ($releaseRequest->canBeUsed()) {
                 /** @var $currentUsed ReleaseRequest */
