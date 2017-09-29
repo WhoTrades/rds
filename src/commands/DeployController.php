@@ -263,6 +263,7 @@ class DeployController extends RabbitListener
             if (!$build) {
                 Yii::error("Build #$message->taskId not found");
                 $message->accepted();
+                $transaction->rollBack();
 
                 return;
             }
@@ -271,6 +272,7 @@ class DeployController extends RabbitListener
             if (!$releaseRequest) {
                 Yii::error("Build #$message->taskId has no release request");
                 $message->accepted();
+                $transaction->rollBack();
 
                 return;
             }
