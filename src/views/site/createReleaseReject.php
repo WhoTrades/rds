@@ -6,6 +6,6 @@ use yii\web\View;
 /** @var $model ReleaseRequest */
 ?>
 
-<h1>Create ReleaseReject</h1>
+<h1>Запретить релиз</h1>
 
 <?php echo $this->render('_releaseRejectForm', array('model' => $model));

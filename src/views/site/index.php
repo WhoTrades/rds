@@ -12,8 +12,11 @@ use yii\widgets\Pjax;
 /** @var $mainProjects Project[] */
 ?>
 
-<h1>Запреты релиза</h1>
-<a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>">Создать</a>
+<h1>
+    Запреты релиза
+    <a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>" class="btn btn-primary">Создать</a>
+</h1>
+
 <?php
 \yii\widgets\Pjax::begin([
     'timeout' => 10000,
