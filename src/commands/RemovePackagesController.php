@@ -1,6 +1,7 @@
 <?php
 namespace app\commands;
 
+use app\components\Status;
 use app\models\Project2worker;
 use app\models\ReleaseRequest;
 use RdsSystem\Cron\SingleInstanceController;
@@ -35,7 +36,7 @@ class RemovePackagesController extends SingleInstanceController
 
         $releaseRequestsQuery = ReleaseRequest::find()->joinWith(['project'])->where(['<=', 'release_request.obj_created', $maxDate]);
         $releaseRequestsQuery->andWhere('rr_build_version <> project_current_version');
-        $releaseRequestsQuery->andWhere('release_request.obj_status_did=1');
+        $releaseRequestsQuery->andWhere('release_request.obj_status_did <> ' . Status::DESTROYED);
         if ($this->projectName) {
             $releaseRequestsQuery->andWhere(['project_name' => $this->projectName]);
         }

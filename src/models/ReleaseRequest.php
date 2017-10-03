@@ -212,6 +212,16 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * @return bool
+     */
+    public function markAsDestroyed()
+    {
+        $this->obj_status_did = Status::DESTROYED;
+
+        return (bool) $this->save();
+    }
+
+    /**
      * @return int
      */
     public function countNotFinishedBuilds()

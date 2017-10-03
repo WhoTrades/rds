@@ -533,7 +533,7 @@ class DeployController extends RabbitListener
 
         if ($rr) {
             Yii::info("Removed release request $message->projectName-$message->version");
-            $rr->delete();
+            $rr->markAsDestroyed();
         }
         Yii::info("Skipped removing release request $message->projectName-$message->version as not exists");
 
