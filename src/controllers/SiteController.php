@@ -198,7 +198,7 @@ class SiteController extends Controller
             return;
         }
 
-        $messageModel = (new whotrades\RdsSystem\Factory())->getMessagingRdsMsModel();
+        $messageModel = (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel();
 
         $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/
