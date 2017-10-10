@@ -5,7 +5,7 @@
 
 namespace app\commands;
 
-class CommandController extends \RdsSystem\commands\CommandController
+class CommandController extends \whotrades\RdsSystem\commands\CommandController
 {
     /**
      * @return array

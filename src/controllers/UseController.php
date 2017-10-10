@@ -87,11 +87,11 @@ class UseController extends Controller
         foreach ($releaseRequest->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
             $worker = $p2w->worker;
-            (new \RdsSystem\Factory())->
+            (new \whotrades\RdsSystem\Factory())->
                 getMessagingRdsMsModel()->
                 sendMigrationTask(
                     $worker->worker_name,
-                    new \RdsSystem\Message\MigrationTask(
+                    new \whotrades\RdsSystem\Message\MigrationTask(
                         $releaseRequest->project->project_name,
                         $releaseRequest->rr_build_version,
                         $type,

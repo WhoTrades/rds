@@ -1,13 +1,13 @@
 {
     "name": "whotrades/rds",
     "type": "library",
+    "author": "Artem Naumenko (entsupml@gmail.com)",
     "description": "WhoTrades release deployment service",
     "autoload": {
         "psr-4": {
             "app\\": "protected/",
             "CompanyInfrastructure\\": "../../lib/CompanyInfrastructure/",
-            "GraphiteSystem\\": "../../lib/GraphiteSystem/",
-            "RdsSystem\\": "../../lib/RdsSystem/"
+            "GraphiteSystem\\": "../../lib/GraphiteSystem/"
         }
     },
     "require": {
@@ -16,6 +16,7 @@
         "react/zmq": "~0.3",
         "php-amqplib/php-amqplib": "~2.6",
         "whotrades/phpcs-stash": "1.0.2",
+        "whotrades/rds-system": "dev-master",
         "escapestudios/symfony2-coding-standard": "2.9.0",
         "yiisoft/yii2": "2.0.11",
         "yiisoft/yii2-bootstrap": "~2.0",

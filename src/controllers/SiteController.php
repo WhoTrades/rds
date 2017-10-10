@@ -8,7 +8,7 @@ use app\models\Project;
 use app\models\Log;
 use app\models\Build;
 use app\modules\Wtflow\models\JiraCommit;
-use RdsSystem;
+use whotrades\RdsSystem;
 use Yii;
 
 class SiteController extends Controller
@@ -198,7 +198,7 @@ class SiteController extends Controller
             return;
         }
 
-        $messageModel = (new RdsSystem\Factory())->getMessagingRdsMsModel();
+        $messageModel = (new whotrades\RdsSystem\Factory())->getMessagingRdsMsModel();
 
         $transaction = $model->getDbConnection()->beginTransaction();
         /** @var $model ReleaseRequest*/
@@ -208,7 +208,7 @@ class SiteController extends Controller
                 $model->rr_status = ReleaseRequest::STATUS_CANCELLING;
                 $model->save();
 
-                $messageModel->sendKillTask($build->worker->worker_name, new \RdsSystem\Message\KillTask(
+                $messageModel->sendKillTask($build->worker->worker_name, new \whotrades\RdsSystem\Message\KillTask(
                     $model->project->project_name,
                     $build->obj_id
                 ));

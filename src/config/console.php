@@ -1,5 +1,5 @@
 <?php
-use RdsSystem\lib\ConsoleErrorHandler;
+use whotrades\RdsSystem\lib\ConsoleErrorHandler;
 
 $config = include('main.php');
 $config['controllerMap']['stubs']['class'] = 'bazilio\stubsgenerator\StubsController';

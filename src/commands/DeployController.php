@@ -2,11 +2,11 @@
 namespace app\commands;
 
 use app\components\Status;
-use RdsSystem\Cron\RabbitListener;
+use whotrades\RdsSystem\Cron\RabbitListener;
 use Yii;
 use yii\helpers\Url;
-use RdsSystem\Message;
-use RdsSystem\Model\Rabbit\MessagingRdsMs;
+use whotrades\RdsSystem\Message;
+use whotrades\RdsSystem\Model\Rabbit\MessagingRdsMs;
 use app\models\Build;
 use app\models\ReleaseRequest;
 use app\models\Project;

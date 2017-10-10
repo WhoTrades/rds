@@ -4,8 +4,8 @@ namespace app\commands;
 use app\components\Status;
 use app\models\Project2worker;
 use app\models\ReleaseRequest;
-use RdsSystem\Cron\SingleInstanceController;
-use RdsSystem\Message\DropReleaseRequest;
+use whotrades\RdsSystem\Cron\SingleInstanceController;
+use whotrades\RdsSystem\Message\DropReleaseRequest;
 use Yii;
 
 class RemovePackagesController extends SingleInstanceController
@@ -30,7 +30,7 @@ class RemovePackagesController extends SingleInstanceController
     {
         $minTimeAtProd = Yii::$app->params['garbageCollector']['minTimeAtProd'];
         $minBuildsCountBeforeActive = Yii::$app->params['garbageCollector']['minBuildsCountBeforeActive'];
-        $model = (new \RdsSystem\Factory())->getMessagingRdsMsModel();
+        $model = (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel();
 
         $maxDate = date('Y-m-d H:i:s', strtotime("-" . $minTimeAtProd));
 

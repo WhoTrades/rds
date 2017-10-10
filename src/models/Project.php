@@ -188,9 +188,9 @@ class Project extends ActiveRecord
         }
 
         foreach ($this->project2workers as $p2w) {
-            (new \RdsSystem\Factory())->getMessagingRdsMsModel()->sendProjectConfig(
+            (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel()->sendProjectConfig(
                 $p2w->worker->worker_name,
-                new \RdsSystem\Message\ProjectConfig(
+                new \whotrades\RdsSystem\Message\ProjectConfig(
                     $this->project_name,
                     $configs,
                     $this->script_config_local,

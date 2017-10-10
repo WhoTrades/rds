@@ -2,7 +2,7 @@
 namespace app\models;
 
 use app\components\Status;
-use RdsSystem\Message\BuildTask;
+use whotrades\RdsSystem\Message\BuildTask;
 use Yii;
 use app\models\User\User;
 use yii\data\Sort;
@@ -367,7 +367,7 @@ class ReleaseRequest extends ActiveRecord
             orderBy('rr_build_version desc')->one();
 
             // an: Отправляем задачу в Rabbit на сборку
-            (new \RdsSystem\Factory())->getMessagingRdsMsModel()->sendBuildTask(
+            (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel()->sendBuildTask(
                 $build->worker->worker_name,
                 new BuildTask(
                     $build->obj_id,
@@ -400,9 +400,9 @@ class ReleaseRequest extends ActiveRecord
 
         foreach ($this->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
-            (new \RdsSystem\Factory())->getMessagingRdsMsModel()->sendUseTask(
+            (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel()->sendUseTask(
                 $p2w->worker->worker_name,
-                new \RdsSystem\Message\UseTask(
+                new \whotrades\RdsSystem\Message\UseTask(
                     $this->project->project_name,
                     $this->obj_id,
                     $this->rr_build_version,
