@@ -1,6 +1,6 @@
 <?php
 /**
- * @var $model app\models\Log
+ * @var $model whotrades\rds\models\Log
  */
 use kartik\grid\GridView;
 ?>

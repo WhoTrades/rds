@@ -1,9 +1,9 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\models\Project;
+use whotrades\rds\models\Project;
 use yii\web\HttpException;
-use app\models\ReleaseRequest;
+use whotrades\rds\models\ReleaseRequest;
 
 class StatisticController extends Controller
 {

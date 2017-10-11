@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\ProjectConfig */
+/* @var $model whotrades\rds\models\ProjectConfig */
 
 $this->title = 'Изменение имени локального конфигурационного файла: ' . $model->pc_filename;
 $this->params['breadcrumbs'][] = ['label' => 'Project Configs', 'url' => ['index']];

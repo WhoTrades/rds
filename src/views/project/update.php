@@ -6,7 +6,7 @@
  * @var $deployment_enabled bool
  */
 
-use app\models\Project;
+use whotrades\rds\models\Project;
 use yii\bootstrap\Alert;
 
 $this->params['menu'] = array(

@@ -1,6 +1,6 @@
 <?php
 /**
- * @var $model app\models\Project2worker
+ * @var $model whotrades\rds\models\Project2worker
  * @var $form yii\widgets\ActiveForm
  */
 

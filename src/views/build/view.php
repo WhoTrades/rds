@@ -1,5 +1,5 @@
 <?php
-/** @var $model app\models\Build */
+/** @var $model whotrades\rds\models\Build */
 ?>
 
     <h1>Сборка #<?php echo $model->obj_id; ?> (<?= $model->project->project_name ?>

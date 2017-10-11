@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Project;
+use whotrades\rds\models\Project;
 use kartik\grid\ActionColumn;
 use kartik\grid\GridView;
 use yii\helpers\Html;

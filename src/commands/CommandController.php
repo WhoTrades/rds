@@ -3,7 +3,7 @@
  * @author Artem Naumenko
  */
 
-namespace app\commands;
+namespace whotrades\rds\commands;
 
 class CommandController extends \whotrades\RdsSystem\commands\CommandController
 {

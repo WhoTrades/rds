@@ -1,8 +1,8 @@
 <?php
-namespace app\extensions\WebSockets;
+namespace whotrades\rds\extensions\WebSockets;
 
 use yii\base\Component;
-use app\components\View;
+use whotrades\rds\components\View;
 use ZMQ;
 use ZMQContext;
 use ZMQSocket;

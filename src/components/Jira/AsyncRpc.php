@@ -1,7 +1,7 @@
 <?php
-namespace app\components\Jira;
+namespace whotrades\rds\components\Jira;
 
-use app\modules\Wtflow\models\JiraAsyncRpc;
+use whotrades\rds\modules\Wtflow\models\JiraAsyncRpc;
 
 class AsyncRpc extends \yii\base\Object
 {

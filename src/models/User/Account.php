@@ -1,5 +1,5 @@
 <?php
-namespace app\models\User;
+namespace whotrades\rds\models\User;
 
 class Account extends \dektrium\user\models\Account
 {

@@ -1,7 +1,7 @@
 <?php
 /** @var $model ReleaseVersion */
 
-use app\models\ReleaseVersion;
+use whotrades\rds\models\ReleaseVersion;
 
 $this->params['menu'] = array(
     array('label' => 'List ReleaseVersion', 'url' => array('index')),

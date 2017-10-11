@@ -1,8 +1,8 @@
 <?php
-namespace app\models;
+namespace whotrades\rds\models;
 
 use yii\data\ActiveDataProvider;
-use app\components\ActiveRecord;
+use whotrades\rds\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.release_version".

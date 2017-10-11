@@ -1,5 +1,5 @@
 <?php
-namespace app\extensions\validators;
+namespace whotrades\rds\extensions\validators;
 
 use yii\validators\Validator;
 use Exception;

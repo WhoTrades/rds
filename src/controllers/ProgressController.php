@@ -1,9 +1,9 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\models\Build;
-use app\models\Project;
-use app\models\ReleaseRequest;
+use whotrades\rds\models\Build;
+use whotrades\rds\models\Project;
+use whotrades\rds\models\ReleaseRequest;
 use yii\web\HttpException;
 use \GraphiteSystem\Graphite;
 

@@ -1,5 +1,5 @@
 <?php
-namespace app\extensions\jsdifflib;
+namespace whotrades\rds\extensions\jsdifflib;
 
 use yii\web\AssetBundle;
 

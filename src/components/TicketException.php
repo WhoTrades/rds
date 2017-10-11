@@ -1,5 +1,5 @@
 <?php
-namespace app\components;
+namespace whotrades\rds\components;
 
 /**
  * Custom exception to catch while handle tickets by JIRA API

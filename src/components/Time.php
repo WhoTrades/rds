@@ -1,6 +1,6 @@
 <?php
 
-namespace app\components;
+namespace whotrades\rds\components;
 
 class Time
 {

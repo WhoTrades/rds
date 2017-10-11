@@ -1,5 +1,5 @@
 <?php
-/** @var $model app\models\Worker */
+/** @var $model whotrades\rds\models\Worker */
 
 $this->params['menu'] = array(
     array('label' => 'List Worker', 'url' => array('index')),

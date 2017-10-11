@@ -1,7 +1,7 @@
 <?php
 /** @var $this ReleaseVersionController */
-use app\controllers\ReleaseVersionController;
-use app\models\ReleaseVersion;
+use whotrades\rds\controllers\ReleaseVersionController;
+use whotrades\rds\models\ReleaseVersion;
 
 /** @var $data ReleaseVersion */
 ?>

@@ -1,5 +1,5 @@
 <?php
-namespace app\commands;
+namespace whotrades\rds\commands;
 
 use yii\console\controllers\MigrateController as BaseMigrateController;
 

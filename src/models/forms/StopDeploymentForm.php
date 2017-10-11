@@ -1,5 +1,5 @@
 <?php
-namespace app\models\forms;
+namespace whotrades\rds\models\forms;
 
 class StopDeploymentForm extends \yii\base\Model
 {

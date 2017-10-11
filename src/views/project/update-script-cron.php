@@ -1,6 +1,6 @@
 <?php
 /** @var $project Project */
-use app\models\Project;
+use whotrades\rds\models\Project;
 use conquer\codemirror\CodemirrorWidget;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Alert;

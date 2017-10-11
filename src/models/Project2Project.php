@@ -1,7 +1,7 @@
 <?php
-namespace app\models;
+namespace whotrades\rds\models;
 
-use app\components\ActiveRecord;
+use whotrades\rds\components\ActiveRecord;
 use yii\db\ActiveQuery;
 
 /**

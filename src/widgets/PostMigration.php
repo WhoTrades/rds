@@ -1,8 +1,8 @@
 <?php
-namespace app\widgets;
+namespace whotrades\rds\widgets;
 
-use app\components\Status;
-use app\models\ReleaseRequest;
+use whotrades\rds\components\Status;
+use whotrades\rds\models\ReleaseRequest;
 use Yii;
 
 class PostMigration extends \yii\base\Widget

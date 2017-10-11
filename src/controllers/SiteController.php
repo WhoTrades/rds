@@ -1,13 +1,13 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\components\Status;
-use app\models\ReleaseRequest;
-use app\models\ReleaseReject;
-use app\models\Project;
-use app\models\Log;
-use app\models\Build;
-use app\modules\Wtflow\models\JiraCommit;
+use whotrades\rds\components\Status;
+use whotrades\rds\models\ReleaseRequest;
+use whotrades\rds\models\ReleaseReject;
+use whotrades\rds\models\Project;
+use whotrades\rds\models\Log;
+use whotrades\rds\models\Build;
+use whotrades\rds\modules\Wtflow\models\JiraCommit;
 use whotrades\RdsSystem;
 use Yii;
 

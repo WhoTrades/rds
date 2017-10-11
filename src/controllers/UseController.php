@@ -1,13 +1,13 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\commands\DeployController;
+use whotrades\rds\commands\DeployController;
 use Yii;
-use app\models\Log;
-use app\models\Project2worker;
+use whotrades\rds\models\Log;
+use whotrades\rds\models\Project2worker;
 use yii\web\HttpException;
-use app\models\RdsDbConfig;
-use app\models\ReleaseRequest;
+use whotrades\rds\models\RdsDbConfig;
+use whotrades\rds\models\ReleaseRequest;
 
 class UseController extends Controller
 {

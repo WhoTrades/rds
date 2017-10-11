@@ -1,9 +1,9 @@
 <?php
-namespace app\commands;
+namespace whotrades\rds\commands;
 
-use app\components\Status;
-use app\models\Project2worker;
-use app\models\ReleaseRequest;
+use whotrades\rds\components\Status;
+use whotrades\rds\models\Project2worker;
+use whotrades\rds\models\ReleaseRequest;
 use whotrades\RdsSystem\Cron\SingleInstanceController;
 use whotrades\RdsSystem\Message\DropReleaseRequest;
 use Yii;

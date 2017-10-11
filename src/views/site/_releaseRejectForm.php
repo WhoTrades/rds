@@ -1,9 +1,9 @@
 <?php
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
-use app\models\ReleaseReject;
-use app\models\Project;
-use app\models\ReleaseVersion;
+use whotrades\rds\models\ReleaseReject;
+use whotrades\rds\models\Project;
+use whotrades\rds\models\ReleaseVersion;
 
 /** @var $this SiteController */
 /** @var $model ReleaseReject */

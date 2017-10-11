@@ -1,9 +1,9 @@
 <?php
-namespace app\models;
+namespace whotrades\rds\models;
 
-use app\models\User\User;
+use whotrades\rds\models\User\User;
 use yii\data\ActiveDataProvider;
-use app\components\ActiveRecord;
+use whotrades\rds\components\ActiveRecord;
 use yii\db\ActiveQuery;
 
 /**

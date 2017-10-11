@@ -1,5 +1,5 @@
 <?php
-namespace app\widgets;
+namespace whotrades\rds\widgets;
 
 use GlobalWarningItem;
 
@@ -15,7 +15,7 @@ class GlobalWarnings extends \yii\base\Widget
         }
 
         $warnings = [];
-        $config = \app\models\RdsDbConfig::get();
+        $config = \whotrades\rds\models\RdsDbConfig::get();
 
         if (!$config->is_tst_updating_enabled) {
             $warnings[] = new GlobalWarningItem(

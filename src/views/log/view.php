@@ -1,7 +1,7 @@
 <?php
 /** @var $model Log */
 
-use app\models\Log;
+use whotrades\rds\models\Log;
 
 $this->params['menu'] = array(
     array('label' => 'List Log', 'url' => array('index')),

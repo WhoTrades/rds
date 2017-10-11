@@ -1,12 +1,12 @@
 <?php
 /**
- * @var $model app\models\Project2worker
+ * @var $model whotrades\rds\models\Project2worker
  * @var $form yii\widgets\ActiveForm
  */
 
 use yii\helpers\Html;
-use app\models\Worker;
-use app\models\Project;
+use whotrades\rds\models\Worker;
+use whotrades\rds\models\Project;
 use yii\widgets\ActiveForm;
 
 ?>

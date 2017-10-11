@@ -1,5 +1,5 @@
 <?php
-namespace app\components;
+namespace whotrades\rds\components;
 
 class View extends \yii\web\View
 {

@@ -1,5 +1,5 @@
 <?php
-namespace app\components\ExternalStuff;
+namespace whotrades\rds\components\ExternalStuff;
 
 use Yii;
 

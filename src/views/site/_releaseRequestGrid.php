@@ -5,7 +5,7 @@
  * @var $filterModel yii\base\Model | null
  */
 
-use app\models\ReleaseRequest;
+use whotrades\rds\models\ReleaseRequest;
 use \kartik\grid\GridView;
 
 echo GridView::widget([

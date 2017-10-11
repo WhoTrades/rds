@@ -1,15 +1,15 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\models\Log;
-use app\models\Worker;
-use app\models\Project;
+use whotrades\rds\models\Log;
+use whotrades\rds\models\Worker;
+use whotrades\rds\models\Project;
 use yii\web\HttpException;
-use app\models\RdsDbConfig;
-use app\models\ProjectConfig;
-use app\models\Project2worker;
-use app\models\Project2Project;
-use app\models\ProjectConfigHistory;
+use whotrades\rds\models\RdsDbConfig;
+use whotrades\rds\models\ProjectConfig;
+use whotrades\rds\models\Project2worker;
+use whotrades\rds\models\Project2Project;
+use whotrades\rds\models\ProjectConfigHistory;
 
 class ProjectController extends Controller
 {

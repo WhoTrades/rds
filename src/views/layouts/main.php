@@ -1,5 +1,5 @@
 <?php
-use app\assets\AppAsset;
+use whotrades\rds\assets\AppAsset;
 use yii\helpers\Html;
 use yii\bootstrap\NavBar;
 use yii\bootstrap\Nav;
@@ -46,7 +46,7 @@ $actionId           = \Yii::$app->controller->action->id;
 $modulesNav         = [];
 
 foreach (\Yii::$app->modules as $module) {
-    if (!$module instanceof app\IHaveNavInterface) {
+    if (!$module instanceof whotrades\rds\IHaveNavInterface) {
         continue;
     }
 
@@ -106,8 +106,8 @@ echo Nav::widget(
 NavBar::end();
 ?>
 
-<?=app\widgets\GlobalWarnings::widget([])?>
-<?=app\widgets\PostMigration::widget([])?>
+<?=whotrades\rds\widgets\GlobalWarnings::widget([])?>
+<?=whotrades\rds\widgets\PostMigration::widget([])?>
 
 
 <div id="page" class="container-fluid">

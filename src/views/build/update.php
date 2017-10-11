@@ -1,7 +1,7 @@
 <?php
 /** @var $this BuildController */
-use app\controllers\BuildController;
-use app\models\Build;
+use whotrades\rds\controllers\BuildController;
+use whotrades\rds\models\Build;
 
 /** @var $model Build */
 

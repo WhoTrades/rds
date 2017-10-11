@@ -1,5 +1,5 @@
-<?php /** @var $this app\components\View */
-use app\models\ReleaseRequest;
+<?php /** @var $this whotrades\rds\components\View */
+use whotrades\rds\models\ReleaseRequest;
 use yii\helpers\Url;
 ?>
 <?php /** @var $releaseRequests ReleaseRequest[]*/ ?>

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\components;
+namespace whotrades\rds\components;
 
 final class DiffStat extends \yii\base\Object
 {

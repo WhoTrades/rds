@@ -1,5 +1,5 @@
 <?php
-/** @var $model app\models\Build */
+/** @var $model whotrades\rds\models\Build */
 use yii\helpers\Html;
 
 $this->registerJs("

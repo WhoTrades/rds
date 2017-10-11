@@ -1,7 +1,7 @@
 <?php
 /**
- * @var $model app\models\ReleaseRequest
- * @var $releaseRequest app\models\ReleaseRequest
+ * @var $model whotrades\rds\models\ReleaseRequest
+ * @var $releaseRequest whotrades\rds\models\ReleaseRequest
  * @var $form yii\widgets\ActiveForm
  */
 

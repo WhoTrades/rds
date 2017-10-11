@@ -1,9 +1,9 @@
 <?php
 
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
 use yii\web\HttpException;
-use app\models\Project2worker;
+use whotrades\rds\models\Project2worker;
 use yii\data\ActiveDataProvider;
 
 class Project2workerController extends Controller

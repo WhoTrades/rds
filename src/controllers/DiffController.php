@@ -1,8 +1,8 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\models\ProjectConfigHistory;
-use app\models\ReleaseRequest;
+use whotrades\rds\models\ProjectConfigHistory;
+use whotrades\rds\models\ReleaseRequest;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 

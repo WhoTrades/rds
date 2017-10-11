@@ -1,5 +1,5 @@
 <?php
-/** @var $model app\models\Project */
+/** @var $model whotrades\rds\models\Project */
 
 use yii\helpers\Url;
 

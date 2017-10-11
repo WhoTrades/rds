@@ -1,7 +1,7 @@
 <?php
 /** @var $model Project2worker */
 
-use app\models\Project2worker;
+use whotrades\rds\models\Project2worker;
 
 $this->params['menu'] = array(
     array('label' => 'List Project2worker', 'url' => array('index')),

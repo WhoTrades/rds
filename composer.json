@@ -5,7 +5,7 @@
     "description": "WhoTrades release deployment service",
     "autoload": {
         "psr-4": {
-            "app\\": "src/"
+            "whotrades\\rds\\": "src/"
         }
     },
     "require": {

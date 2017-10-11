@@ -10,8 +10,8 @@ use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use app\models\Project;
-use app\models\Worker;
+use whotrades\rds\models\Project;
+use whotrades\rds\models\Worker;
 use kartik\select2\Select2;
 
 ?>

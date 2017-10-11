@@ -1,6 +1,6 @@
 <?php
 /**
- * @var $model app\models\ReleaseVersion
+ * @var $model whotrades\rds\models\ReleaseVersion
  * @var $form yii\widgets\ActiveForm
  */
 

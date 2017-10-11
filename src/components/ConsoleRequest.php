@@ -3,7 +3,7 @@
  * Класс, который объединяет в себе поведение как консольного, так и http запроса. Для http пишем просто загрушки, что бы
  * могла обрабатывать логика генерации html кода
  */
-namespace app\components;
+namespace whotrades\rds\components;
 
 use yii\console\Request;
 

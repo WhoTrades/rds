@@ -4,7 +4,7 @@
  * Класс, который реализует хендлер логов для монолога, и пишет логи внутрь Yii::log()
  */
 
-namespace app\components\Logs;
+namespace whotrades\rds\components\Logs;
 
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;

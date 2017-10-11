@@ -1,5 +1,5 @@
 <?php
-namespace app\components;
+namespace whotrades\rds\components;
 
 use Yii;
 use yii\base\Controller;

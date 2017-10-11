@@ -1,6 +1,6 @@
 <?php
 /** @var $model Project2worker */
-use app\models\Project2worker;
+use whotrades\rds\models\Project2worker;
 use yii\helpers\Html;
 
 $this->params['menu'] = array(

@@ -1,7 +1,7 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\models\Build;
+use whotrades\rds\models\Build;
 use yii\web\HttpException;
 
 class BuildController extends Controller

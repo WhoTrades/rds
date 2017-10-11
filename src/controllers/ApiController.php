@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
 class ApiController extends JsonController
 {

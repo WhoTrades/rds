@@ -1,7 +1,7 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\models\Log;
+use whotrades\rds\models\Log;
 use yii\web\HttpException;
 
 class LogController extends Controller

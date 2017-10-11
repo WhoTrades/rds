@@ -1,8 +1,8 @@
 <?php
 
-namespace app\extensions\jsdifflib\components;
+namespace whotrades\rds\extensions\jsdifflib\components;
 
-use app\extensions\jsdifflib\JsDiffLibAsset;
+use whotrades\rds\extensions\jsdifflib\JsDiffLibAsset;
 
 class JsDiffLib extends \yii\base\Component
 {

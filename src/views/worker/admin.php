@@ -1,5 +1,5 @@
 <?php
-/** @var $model app\models\Worker */
+/** @var $model whotrades\rds\models\Worker */
 
 use yii\helpers\Html;
 

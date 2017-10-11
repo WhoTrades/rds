@@ -1,16 +1,16 @@
 <?php
-namespace app\models;
+namespace whotrades\rds\models;
 
-use app\components\Status;
+use whotrades\rds\components\Status;
 use whotrades\RdsSystem\Message\BuildTask;
 use Yii;
-use app\models\User\User;
+use whotrades\rds\models\User\User;
 use yii\data\Sort;
-use app\components\ActiveRecord;
+use whotrades\rds\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
-use app\modules\Wtflow\models\HardMigration;
-use app\modules\Whotrades\models\ToolJob;
+use whotrades\rds\modules\Wtflow\models\HardMigration;
+use whotrades\rds\modules\Whotrades\models\ToolJob;
 
 /**
  * This is the model class for table "rds.release_request".

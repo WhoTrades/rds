@@ -1,9 +1,9 @@
 <?php
 
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
 use yii\web\HttpException;
-use app\models\ReleaseVersion;
+use whotrades\rds\models\ReleaseVersion;
 
 class ReleaseVersionController extends Controller
 {

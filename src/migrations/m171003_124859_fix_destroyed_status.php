@@ -1,7 +1,7 @@
 <?php
 
-use app\components\Status;
-use app\models\ReleaseRequest;
+use whotrades\rds\components\Status;
+use whotrades\rds\models\ReleaseRequest;
 use yii\db\Migration;
 
 class m171003_124859_fix_destroyed_status extends Migration

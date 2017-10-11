@@ -1,7 +1,7 @@
 <?php
-use app\models\ReleaseReject;
-use app\models\ReleaseRequest;
-use app\models\Project;
+use whotrades\rds\models\ReleaseReject;
+use whotrades\rds\models\ReleaseRequest;
+use whotrades\rds\models\Project;
 use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\Pjax;

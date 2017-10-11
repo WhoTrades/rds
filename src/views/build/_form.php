@@ -1,9 +1,9 @@
 <?php
 /**
- * @var $model app\models\Build
+ * @var $model whotrades\rds\models\Build
  * @var $form yii\widgets\ActiveForm
  */
-use app\models\Build;
+use whotrades\rds\models\Build;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 

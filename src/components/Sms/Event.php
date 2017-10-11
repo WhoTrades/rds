@@ -1,5 +1,5 @@
 <?php
-namespace app\components\Sms;
+namespace whotrades\rds\components\Sms;
 
 use \yii\base\Event as EventBase;
 

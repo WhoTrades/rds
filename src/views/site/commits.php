@@ -1,4 +1,4 @@
-<?php use app\modules\Wtflow\models\JiraCommit;?>
+<?php use whotrades\rds\modules\Wtflow\models\JiraCommit;?>
 <table class="items table table-hover">
     <thead>
     <tr>

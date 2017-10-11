@@ -15,7 +15,7 @@ require(__DIR__ . '/vendor/yiisoft/yii2/Yii.php');
 
 $config = require(__DIR__ . '/protected/config/console.php');
 
-$application = new \app\components\ConsoleApplication($config);
+$application = new \whotrades\rds\components\ConsoleApplication($config);
 
 $exitCode = $application->run();
 

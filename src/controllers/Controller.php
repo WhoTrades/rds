@@ -4,7 +4,7 @@
  * All controller classes for this application should extend from this base class.
  */
 
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
 use Yii;
 use yii\base\InlineAction;

@@ -3,9 +3,9 @@
  *
  */
 
-use app\models\ReleaseRequest;
-use app\models\Project;
-use app\models\Build;
+use whotrades\rds\models\ReleaseRequest;
+use whotrades\rds\models\Project;
+use whotrades\rds\models\Build;
 use yii\bootstrap\Html;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;

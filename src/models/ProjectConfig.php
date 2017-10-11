@@ -1,8 +1,8 @@
 <?php
-namespace app\models;
+namespace whotrades\rds\models;
 
-use app\components\ActiveRecord;
-use app\extensions\validators\PhpSyntaxValidator;
+use whotrades\rds\components\ActiveRecord;
+use whotrades\rds\extensions\validators\PhpSyntaxValidator;
 
 /**
  * @author Artem Naumenko

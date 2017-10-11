@@ -1,22 +1,22 @@
 <?php
-namespace app\commands;
+namespace whotrades\rds\commands;
 
-use app\components\Status;
+use whotrades\rds\components\Status;
 use whotrades\RdsSystem\Cron\RabbitListener;
 use Yii;
 use yii\helpers\Url;
 use whotrades\RdsSystem\Message;
 use whotrades\RdsSystem\Model\Rabbit\MessagingRdsMs;
-use app\models\Build;
-use app\models\ReleaseRequest;
-use app\models\Project;
-use app\modules\Wtflow\models\JiraCommit;
-use app\modules\Wtflow\models\HardMigration;
-use app\modules\Whotrades\models\ToolJob;
-use app\models\Worker;
-use app\models\Project2worker;
-use app\modules\Wtflow\models\JiraUse;
-use app\modules\Wtflow\models\JiraNotificationQueue;
+use whotrades\rds\models\Build;
+use whotrades\rds\models\ReleaseRequest;
+use whotrades\rds\models\Project;
+use whotrades\rds\modules\Wtflow\models\JiraCommit;
+use whotrades\rds\modules\Wtflow\models\HardMigration;
+use whotrades\rds\modules\Whotrades\models\ToolJob;
+use whotrades\rds\models\Worker;
+use whotrades\rds\models\Project2worker;
+use whotrades\rds\modules\Wtflow\models\JiraUse;
+use whotrades\rds\modules\Wtflow\models\JiraNotificationQueue;
 
 /**
  * @example php yii.php deploy/index

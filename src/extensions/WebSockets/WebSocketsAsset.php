@@ -1,5 +1,5 @@
 <?php
-namespace app\extensions\WebSockets;
+namespace whotrades\rds\extensions\WebSockets;
 
 use yii\web\AssetBundle;
 

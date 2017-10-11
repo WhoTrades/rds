@@ -1,7 +1,7 @@
 <?php
-namespace app\models;
+namespace whotrades\rds\models;
 
-use app\components\ActiveRecord;
+use whotrades\rds\components\ActiveRecord;
 
 /**
  * This is the model class for table "rds.rds_db_config".

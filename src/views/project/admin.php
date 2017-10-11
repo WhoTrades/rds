@@ -1,9 +1,9 @@
 <?php
 /**
- * @var $model app\models\Project
- * @var $workers app\models\Worker[]
+ * @var $model whotrades\rds\models\Project
+ * @var $workers whotrades\rds\models\Worker[]
  */
-use app\models\Project;
+use whotrades\rds\models\Project;
 use kartik\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;

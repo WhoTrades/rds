@@ -1,7 +1,7 @@
 <?php
 /** @var $model Project */
 
-use app\models\Project;
+use whotrades\rds\models\Project;
 
 $this->params['menu'] = array(
     array('label' => 'Manage Project', 'url' => array('admin')),

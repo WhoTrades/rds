@@ -1,12 +1,12 @@
 <?php
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\components\Status;
-use app\models\Project;
-use app\modules\Whotrades\models\ToolJob;
-use app\modules\Whotrades\models\ToolJobStopped;
+use whotrades\rds\components\Status;
+use whotrades\rds\models\Project;
+use whotrades\rds\modules\Whotrades\models\ToolJob;
+use whotrades\rds\modules\Whotrades\models\ToolJobStopped;
 use yii\web\HttpException;
-use app\models\ReleaseRequest;
+use whotrades\rds\models\ReleaseRequest;
 
 class JsonController extends Controller
 {

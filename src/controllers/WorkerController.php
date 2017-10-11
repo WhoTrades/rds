@@ -1,8 +1,8 @@
 <?php
 
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\models\Worker;
+use whotrades\rds\models\Worker;
 use yii\web\HttpException;
 use yii\data\ActiveDataProvider;
 

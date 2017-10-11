@@ -1,6 +1,6 @@
 <?php
-/** @var $this app\components\View */
-/** @var $model app\models\ReleaseRequest
+/** @var $this whotrades\rds\components\View */
+/** @var $model whotrades\rds\models\ReleaseRequest
 /** @var $form yii\bootstrap\ActiveForm */
 use yii\bootstrap\Html;
 
@@ -41,12 +41,12 @@ $this->registerJs('
     </a>
 
     <?php echo $form->field($model, 'rr_project_obj_id')->dropDownList(
-        \app\models\Project::forList(),
+        \whotrades\rds\models\Project::forList(),
         ['onchange' => 'updateStashUri();']
     ); ?>
 
     <div style="display: none">
-        <?php echo $form->field($model, 'rr_release_version')->dropDownList(\app\models\ReleaseVersion::forList()); ?>
+        <?php echo $form->field($model, 'rr_release_version')->dropDownList(\whotrades\rds\models\ReleaseVersion::forList()); ?>
     </div>
 
     <?= Html::submitButton('OK', ['class' => 'btn btn-primary'])?>

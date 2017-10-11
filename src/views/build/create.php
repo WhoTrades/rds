@@ -1,7 +1,7 @@
 <?php
 /** @var $model Build */
 
-use app\models\Build;
+use whotrades\rds\models\Build;
 
 $this->params['menu'] = array(
     array('label' => 'Manage Build', 'url' => array('admin')),

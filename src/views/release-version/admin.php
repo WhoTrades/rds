@@ -1,5 +1,5 @@
 <?php
-/** @var $model app\models\ReleaseVersion */
+/** @var $model whotrades\rds\models\ReleaseVersion */
 
 use yii\helpers\Html;
 

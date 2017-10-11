@@ -1,5 +1,5 @@
 <?php
-/** @var $model app\models\ReleaseVersion */
+/** @var $model whotrades\rds\models\ReleaseVersion */
 
 $this->params['menu'] = array(
     array('label' => 'List ReleaseVersion', 'url' => array('index')),

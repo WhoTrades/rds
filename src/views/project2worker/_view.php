@@ -1,6 +1,6 @@
 <?php
 /** @var $data Project2worker */
-use app\models\Project2worker;
+use whotrades\rds\models\Project2worker;
 
 ?>
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace app\controllers;
+namespace whotrades\rds\controllers;
 
-use app\models\Log;
-use app\models\Project;
+use whotrades\rds\models\Log;
+use whotrades\rds\models\Project;
 use Yii;
-use app\models\ProjectConfig;
+use whotrades\rds\models\ProjectConfig;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
