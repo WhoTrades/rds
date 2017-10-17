@@ -9,8 +9,7 @@ use yii\data\Sort;
 use whotrades\rds\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
-use whotrades\rds\modules\Wtflow\models\HardMigration;
-use whotrades\rds\modules\Whotrades\models\ToolJob;
+use app\modules\Whotrades\models\ToolJob;
 
 /**
  * This is the model class for table "rds.release_request".
@@ -47,7 +46,6 @@ use whotrades\rds\modules\Whotrades\models\ToolJob;
  * @property Build[] $builds
  * @property User $user
  * @property Project $project
- * @property HardMigration[] $hardMigrations
  * @property ReleaseRequest $leader
  */
 class ReleaseRequest extends ActiveRecord
@@ -179,7 +177,7 @@ class ReleaseRequest extends ActiveRecord
             'rr_status' => $params['rr_status'],
             'rr_project_obj_id' => $params['rr_project_obj_id'],
         ]));
-        $query->with = ['user', 'user.profile', 'project', 'builds', 'builds.project', 'hardMigrations'];
+        $query->with = ['user', 'user.profile', 'project', 'builds', 'builds.project'];
         $query->andFilterWhere(['like', 'rr_comment', $params['rr_comment']]);
         $query->andFilterWhere(['like', 'rr_build_version', $params['rr_build_version']]);
         $dataProvider = new ActiveDataProvider([
@@ -427,58 +425,7 @@ class ReleaseRequest extends ActiveRecord
         return $text;
     }
 
-    /**
-     * @param string $forcePackage
-     *
-     * @throws \Exception
-     */
-    public function parseCronConfig($forcePackage = null)
-    {
-        $group = null;
 
-        foreach (array_filter(explode("\n", str_replace("\r", "", $this->rr_cron_config))) as $line) {
-            if (preg_match('~^#\s*(\S.*)$~', $line, $ans)) {
-                $group = $ans[1];
-                continue;
-            }
-            if (preg_match('~^\w+\=.*~', $line)) {
-                continue;
-            }
-
-            if (preg_match('~\s*--sys__key=(\w+)~', $line, $ans)) {
-                $key = $ans[1];
-            } else {
-                Yii::info("Can't parse line $line");
-                continue;
-            }
-
-            if (preg_match('~\s*--sys__package=([\w.-]+)~', $line, $ans)) {
-                $package = $forcePackage ?: $ans[1];
-            } else {
-                Yii::info("Can't parse line $line");
-                continue;
-            }
-
-            if (!$job = ToolJob::findByAttributes([
-                'key' => $key,
-                'package' => $package,
-                'project_obj_id' => $this->rr_project_obj_id,
-            ])) {
-                $job = new ToolJob();
-                $job->key = $key;
-                $job->package = $package;
-                $job->project_obj_id = $this->rr_project_obj_id;
-            }
-
-            $job->version = $this->rr_build_version;
-            $job->group = $group;
-            $job->command = $line;
-
-            if (!$job->save()) {
-                Yii::info("Can't save ToolJob: " . json_encode($job->errors, JSON_UNESCAPED_UNICODE));
-            }
-        }
-    }
 
     /**
      * @return ActiveQuery
@@ -486,14 +433,6 @@ class ReleaseRequest extends ActiveRecord
     public function getBuilds()
     {
         return $this->hasMany(Build::className(), ['build_release_request_obj_id' => 'obj_id']);
-    }
-
-    /**
-     * @return ActiveQuery
-     */
-    public function getHardMigrations()
-    {
-        return $this->hasMany(HardMigration::className(), ['migration_release_request_obj_id' => 'obj_id']);
     }
 
     /**

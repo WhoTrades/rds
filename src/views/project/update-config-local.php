@@ -18,7 +18,7 @@ $project->script_config_local = $project->script_config_local ?: "#!/bin/bash -e
         <?= $form->field($project, 'script_config_local')->widget(
             CodemirrorWidget::className(),
             [
-                'presetsDir' => '../protected/assets/preset',
+                'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',
                 'options' => ['rows' => 15],
             ]

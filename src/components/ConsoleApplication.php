@@ -2,7 +2,6 @@
 namespace whotrades\rds\components;
 
 use Yii;
-use yii\base\Controller;
 
 class ConsoleApplication extends \yii\console\Application
 {

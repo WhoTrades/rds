@@ -1,6 +1,6 @@
 <?php
 
-namespace app;
+namespace whotrades\rds;
 
 /**
  * @since #WTA-1149

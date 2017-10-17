@@ -30,11 +30,13 @@ return array(
         'value' => function (ReleaseRequest $releaseRequest) {
             $result = strip_tags($releaseRequest->rr_comment) . "<br />";
 
-            if ($releaseRequest->isInstalledStatus()) {
-                $result .= "<a href='" . yii\helpers\Url::to(['/Wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id]) .
-                    "' target='_blank'>Тикеты</a><br />";
+            if (Yii::$app->hasModule('Wtflow')) {
+                if ($releaseRequest->isInstalledStatus()) {
+                    $result .= "<a href='" . yii\helpers\Url::to(['/Wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id]) .
+                        "' target='_blank'>Тикеты</a><br />";
+                }
+                $result .= "<a href='/Wtflow/git/commits/?id=$releaseRequest->obj_id' onclick=\"popup('Комиты', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>";
             }
-            $result .= "<a href='/site/commits/$releaseRequest->obj_id' onclick=\"popup('test', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>";
 
             return $result;
         },
@@ -149,11 +151,6 @@ return array(
                     $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
                     $result .= "<a href='" . yii\helpers\Url::to(['/diff/index/', 'id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id]) .
                         "'>CRON изменен<br />$diffStat</a><br />";
-                }
-
-                if ($releaseRequest->hardMigrations) {
-                    $result .= "<a href='" . yii\helpers\Url::to(['hard-migration/index', 'HardMigration[migration_release_request_obj_id]' => $releaseRequest->obj_id]) .
-                        "'>Покажать тяжелые миграции (" . count($releaseRequest->hardMigrations) . ")</a><br />";
                 }
 
                 if ($releaseRequest->rr_new_migration_count) {

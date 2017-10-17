@@ -1,7 +1,6 @@
 <?php
 namespace whotrades\rds\models;
 
-use whotrades\rds\models\ReleaseRequest;
 use yii\data\ActiveDataProvider;
 
 /**

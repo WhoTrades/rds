@@ -1,4 +1,5 @@
 <?php
+use whotrades\rds\controllers\SiteController;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 use whotrades\rds\models\ReleaseReject;

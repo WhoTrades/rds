@@ -19,7 +19,7 @@ $project->script_remove_release = $project->script_remove_release ?: "#!/bin/bas
         <?= $form->field($project, 'script_remove_release')->widget(
             CodemirrorWidget::className(),
             [
-                'presetsDir' => '../protected/assets/preset',
+                'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',
                 'options' => ['rows' => 15],
             ]

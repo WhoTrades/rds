@@ -1,10 +1,7 @@
 <?php
 namespace whotrades\rds\controllers;
 
-use whotrades\rds\components\Status;
 use whotrades\rds\models\Project;
-use whotrades\rds\modules\Whotrades\models\ToolJob;
-use whotrades\rds\modules\Whotrades\models\ToolJobStopped;
 use yii\web\HttpException;
 use whotrades\rds\models\ReleaseRequest;
 
@@ -60,95 +57,5 @@ class JsonController extends Controller
         $project = Project::findByAttributes(['project_name' => $projectName]);
 
         echo $project ? $project->project_current_version : null;
-    }
-
-    /**
-     * @deprecated
-     * @remove me
-     */
-    public function actionGetDisabledCronjobs()
-    {
-        $list = ToolJobStopped::find()->where(['>', 'stopped_till', 'NOW()'])->all();
-        $result = [];
-        foreach ($list as $val) {
-            $result[] = [$val->project_name, $val->key];
-        }
-        header("Content-type: application/javascript");
-        echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    }
-
-    /**
-     * @deprecated
-     * @remove me
-     */
-    public function actionSetCronJobsStats()
-    {
-        $data = json_decode(file_get_contents("php://input"), true);
-
-        if (!$data) {
-            echo json_encode(["OK" => true]);
-
-            return;
-        }
-
-        foreach ($data as $line => $val) {
-            if (!preg_match('~--sys__package=([\w-]+)-([\d.]+)~', $line, $ans)) {
-                continue;
-            }
-
-            list(, $project, $version) = $ans;
-
-            if (!preg_match('~--sys__key=(\w+)~', $line, $ans)) {
-                continue;
-            }
-
-            list(, $key) = $ans;
-
-            $bind = [
-                ':project' => $project,
-                ':key' => $key,
-                ':cpu' => 1000 * ($val['CPUUser'] + $val['CPUSystem']),
-                ':last_run' => date("r", round($val['lastRunTimestamp'])),
-                ':exit_code' => $val['errors'],
-                ':duration' => (int) $val['time'] / $val['count'],
-            ];
-
-            $row = \Yii::$app->db->createCommand("SELECT * FROM cronjobs.add_cronjobs_cpu_usage(:project, :key, :cpu, :last_run, :exit_code, :duration)", $bind)
-                    ->queryOne(\PDO::FETCH_ASSOC);
-
-            $toolJob = ToolJob::findByAttributes([
-                'key' => $key,
-                'obj_status_did' => Status::ACTIVE,
-            ]);
-            if ($toolJob) {
-                \Yii::$app->getModule('Whotrades')->graphite->getGraphite()->gauge(
-                    \GraphiteSystem\Metrics::dynamicName(
-                        \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMEREAL,
-                        [$project, $toolJob->getLoggerTag() . "-" . $key]
-                    ),
-                    $val['time'] / $val['count']
-                );
-                \Yii::$app->getModule('Whotrades')->graphite->getGraphite()->gauge(
-                    \GraphiteSystem\Metrics::dynamicName(
-                        \GraphiteSystem\Metrics::SYSTEM__TOOL__TIMECPU,
-                        [$project, $toolJob->getLoggerTag() . "-" . $key]
-                    ),
-                    ($val['CPUUser'] + $val['CPUSystem']) / $val['count']
-                );
-            }
-
-            \Yii::$app->webSockets->send('updateToolJobPerformanceStats', [
-                'key' => $key,
-                'version' => $version,
-                'project' => $project,
-                'package' => "$project-$version",
-                'cpuTime' => $row['cpu_time'] / 1000,
-                'last_exit_code' => $row['last_exit_code'],
-                'last_run_time' => date("Y-m-d H:i:s", strtotime($row['last_run_time'])),
-                'last_run_duration' => $row['last_run_duration'],
-            ]);
-        }
-
-        echo json_encode(["OK" => true]);
     }
 }

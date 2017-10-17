@@ -30,17 +30,6 @@ class BuildController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                     ],
-                    /*[
-                        'allow' => true,
-                        'actions' => ['create', 'update'],
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['admin', 'delete'],
-                        'roles' => ['@'],
-                        'roles' => ['admin'],
-                    ],*/
                 ],
             ],
         ];

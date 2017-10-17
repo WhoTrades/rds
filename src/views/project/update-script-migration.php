@@ -20,7 +20,7 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
         <?= $form->field($project, 'script_migration_up')->widget(
             CodemirrorWidget::className(),
             [
-                'presetsDir' => '../protected/assets/preset',
+                'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',
                 'options' => ['rows' => 15],
             ]

@@ -1,7 +1,10 @@
 <?php
 namespace whotrades\rds\commands;
 
+use app\modules\Whotrades\commands\DevParseCronConfigController;
+use app\modules\Whotrades\models\ToolJob;
 use whotrades\rds\components\Status;
+use whotrades\rds\models\JiraUse;
 use whotrades\RdsSystem\Cron\RabbitListener;
 use Yii;
 use yii\helpers\Url;
@@ -10,13 +13,10 @@ use whotrades\RdsSystem\Model\Rabbit\MessagingRdsMs;
 use whotrades\rds\models\Build;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Project;
-use whotrades\rds\modules\Wtflow\models\JiraCommit;
-use whotrades\rds\modules\Wtflow\models\HardMigration;
-use whotrades\rds\modules\Whotrades\models\ToolJob;
+use app\modules\Wtflow\models\HardMigration;
 use whotrades\rds\models\Worker;
 use whotrades\rds\models\Project2worker;
-use whotrades\rds\modules\Wtflow\models\JiraUse;
-use whotrades\rds\modules\Wtflow\models\JiraNotificationQueue;
+use app\modules\Wtflow\models\JiraNotificationQueue;
 
 /**
  * @example php yii.php deploy/index
@@ -281,7 +281,7 @@ class DeployController extends RabbitListener
 
             $releaseRequest->save(false);
 
-            $releaseRequest->parseCronConfig();
+            DevParseCronConfigController::parseCronConfig($releaseRequest);
 
             ToolJob::updateAll(
                 [
@@ -463,13 +463,15 @@ class DeployController extends RabbitListener
                 ]
             );
 
-            // an: Асинхронная задача на email/sms/... оповещение
-            $notificationItem = new JiraNotificationQueue();
-            $notificationItem->jnq_project_obj_id = $project->obj_id;
-            $notificationItem->jnq_old_version = $oldVersion;
-            $notificationItem->jnq_new_version = $message->version;
-            if (!$notificationItem->save()) {
-                Yii::error("Can't send notification task: " . json_encode($notificationItem->errors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            if (Yii::$app->hasModule('Wtflow')) {
+                // an: Асинхронная задача на email/sms/... оповещение
+                $notificationItem = new JiraNotificationQueue();
+                $notificationItem->jnq_project_obj_id = $project->obj_id;
+                $notificationItem->jnq_old_version = $oldVersion;
+                $notificationItem->jnq_new_version = $message->version;
+                if (!$notificationItem->save()) {
+                    Yii::error("Can't send notification task: " . json_encode($notificationItem->errors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+                }
             }
         }
 

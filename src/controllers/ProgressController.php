@@ -5,7 +5,6 @@ use whotrades\rds\models\Build;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\ReleaseRequest;
 use yii\web\HttpException;
-use \GraphiteSystem\Graphite;
 
 class ProgressController extends Controller
 {

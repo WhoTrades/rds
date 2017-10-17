@@ -18,7 +18,7 @@ $project->script_build = $project->script_build ?: "#!/bin/bash -e\n";
         <?= $form->field($project, 'script_build')->widget(
             CodemirrorWidget::className(),
             [
-                'presetsDir' => '../protected/assets/preset',
+                'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',
                 'options' => ['rows' => 15],
             ]

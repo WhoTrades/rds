@@ -7,9 +7,6 @@ use whotrades\rds\models\ReleaseReject;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\Log;
 use whotrades\rds\models\Build;
-use whotrades\rds\modules\Wtflow\models\JiraCommit;
-use whotrades\RdsSystem;
-use Yii;
 
 class SiteController extends Controller
 {
@@ -262,27 +259,5 @@ class SiteController extends Controller
     {
         \Yii::$app->user->logout();
         $this->redirect(\Yii::$app->homeUrl);
-    }
-
-    /**
-     * @param int  $id
-     * @param bool $ajax
-     *
-     * @throws \Exception
-     */
-    public function actionCommits($id, $ajax = null)
-    {
-        /** @var $releaseRequest ReleaseRequest */
-        if (!$releaseRequest = ReleaseRequest::findByPk($id)) {
-            throw new \yii\web\NotFoundHttpException("Сборка #$id не найдена");
-        }
-
-        $commits = JiraCommit::find()->where(['jira_commit_build_tag' => $releaseRequest->getBuildTag()])->orderBy('jira_commit_repository')->all();
-
-        if ($ajax) {
-            echo $this->renderPartial('commits', ['commits' => $commits]);
-        } else {
-            echo $this->render('commits', ['commits' => $commits]);
-        }
     }
 }

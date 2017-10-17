@@ -1,5 +1,6 @@
 <?php
 /** @var $data Build */
+use whotrades\rds\models\Build;
 use yii\helpers\Html;
 
 ?>

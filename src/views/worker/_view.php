@@ -1,5 +1,6 @@
 <?php
 /** @var $data whotrades\rds\models\Worker */
+/** @var $model whotrades\rds\models\Worker */
 ?>
 
 <div class="view">
