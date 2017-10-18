@@ -96,6 +96,7 @@ $config = array(
             ],
         ],
         'user' => [
+            'class' => yii\web\User::class,
             'identityClass' => whotrades\rds\models\User\User::class,
             'loginUrl' => ['/user/login'],
         ],
