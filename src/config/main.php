@@ -85,6 +85,10 @@ $config = array(
         'diffStat' => array(
             'class' => whotrades\rds\components\DiffStat::class,
         ),
+        'smsSender' => [
+            'class' => whotrades\rds\components\Sms\Sender::class,
+            'on send_sms' => [app\modules\Whotrades\components\EventHandler::class, 'handleSendSms'],
+        ],
         'sessionCache' => [
             'class' => yii\caching\MemCache::class,
             'useMemcached' => true,
