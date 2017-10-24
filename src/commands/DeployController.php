@@ -433,6 +433,7 @@ class DeployController extends RabbitListener
             }
 
             if ($releaseRequest) {
+                $releaseRequest->rr_use_text = null;
                 $releaseRequest->rr_status = ReleaseRequest::STATUS_USED;
                 $releaseRequest->save(false);
 
