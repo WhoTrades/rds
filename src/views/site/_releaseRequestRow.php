@@ -191,6 +191,20 @@ return array(
                         return $result;
                     }
                 } else {
+                    if ($releaseRequest->rr_use_text) {
+                        Modal::begin([
+                            'id' => 'release-request-use-error-' . $releaseRequest->obj_id,
+                            'header' => 'Ошибка активации сборки',
+                            'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
+                        ]);
+                        echo "<pre>$releaseRequest->rr_use_text</pre>";
+                        Modal::end();
+
+                        $result .= Html::a('Ошибка активации', '#', [
+                            'style' => 'info',
+                            'data' => ['toggle' => 'modal', 'target' => '#release-request-use-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
+                        ]) . "<br />";
+                    }
                     $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
                         "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
 

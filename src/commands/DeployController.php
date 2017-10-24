@@ -5,6 +5,7 @@ use app\modules\Whotrades\commands\DevParseCronConfigController;
 use app\modules\Whotrades\models\ToolJob;
 use whotrades\rds\components\Status;
 use whotrades\rds\models\JiraUse;
+use whotrades\rds\models\Log;
 use whotrades\RdsSystem\Cron\RabbitListener;
 use Yii;
 use yii\helpers\Url;
@@ -319,8 +320,10 @@ class DeployController extends RabbitListener
             return;
         }
         $releaseRequest->rr_use_text = $message->text;
-        $releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
+        $releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLED;
         $releaseRequest->save();
+
+        Log::createLogMessage("Use error at release request {$releaseRequest->getTitle()}: " . $message->text, $message->initiatorUserName);
 
         self::sendReleaseRequestUpdated($releaseRequest->obj_id);
 

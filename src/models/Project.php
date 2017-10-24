@@ -31,6 +31,7 @@ use yii\db\ActiveQuery;
  * @property string             $script_remove_release
  * @property string             $script_build
  * @property string             $script_deploy
+ * @property string             $script_use
  * @property string             $script_cron
  *
  * @property ReleaseRequest[]   $releaseRequests
@@ -60,7 +61,7 @@ class Project extends ActiveRecord
         return [
             ['project_name', 'required'],
             ['obj_status_did', 'number'],
-            [['script_migration_up', 'script_migration_new', 'script_config_local', 'script_remove_release', 'script_cron', 'script_deploy', 'script_build'], 'string'],
+            [['script_migration_up', 'script_migration_new', 'script_config_local', 'script_remove_release', 'script_cron', 'script_deploy', 'script_build', 'script_use'], 'string'],
             ['project_notification_email', 'email'],
             ['project_servers', 'safe'],
             ['project_config', 'safe'],

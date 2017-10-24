@@ -3,6 +3,7 @@ namespace whotrades\rds\models;
 
 use whotrades\rds\components\Status;
 use whotrades\RdsSystem\Message\BuildTask;
+use whotrades\RdsSystem\Message\UseTask;
 use Yii;
 use whotrades\rds\models\User\User;
 use yii\data\Sort;
@@ -24,6 +25,7 @@ use app\modules\Whotrades\models\ToolJob;
  * @property string $rr_project_obj_id
  * @property integer $rr_leading_id
  * @property string $rr_status
+ * @property string $rr_use_text
  * @property string $rr_old_version
  * @property string $rr_build_version
  * @property string $rr_project_owner_code
@@ -400,11 +402,12 @@ class ReleaseRequest extends ActiveRecord
             /** @var Project2worker $p2w */
             (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel()->sendUseTask(
                 $p2w->worker->worker_name,
-                new \whotrades\RdsSystem\Message\UseTask(
+                new UseTask(
                     $this->project->project_name,
                     $this->obj_id,
                     $this->rr_build_version,
                     $initiatorUserName,
+                    $this->project->script_use,
                     $this->project->getProjectServersArray()
                 )
             );
