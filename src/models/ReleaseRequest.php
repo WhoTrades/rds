@@ -4,13 +4,11 @@ namespace whotrades\rds\models;
 use whotrades\rds\components\Status;
 use whotrades\RdsSystem\Message\BuildTask;
 use whotrades\RdsSystem\Message\UseTask;
-use Yii;
 use whotrades\rds\models\User\User;
 use yii\data\Sort;
 use whotrades\rds\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
-use app\modules\Whotrades\models\ToolJob;
 
 /**
  * This is the model class for table "rds.release_request".
@@ -101,9 +99,8 @@ class ReleaseRequest extends ActiveRecord
 
     /**
      * @param string $attribute
-     * @param array $params
      */
-    public function checkForReleaseReject($attribute, $params)
+    public function checkForReleaseReject($attribute)
     {
         // an: Правило действует только для новых запросов на релиз
         if (!$this->isNewRecord || !$this->rr_project_obj_id) {
@@ -116,7 +113,7 @@ class ReleaseRequest extends ActiveRecord
         ]);
 
         if ($rejects) {
-            $messages = '';
+            $messages = [];
             foreach ($rejects as $reject) {
                 /** @var $reject ReleaseReject */
                 $messages[] = "$reject->rr_comment ({$reject->user->email})";
@@ -127,9 +124,8 @@ class ReleaseRequest extends ActiveRecord
 
     /**
      * @param string $attribute
-     * @param array $params
      */
-    public function checkDeploymentEnabled($attribute, $params)
+    public function checkDeploymentEnabled($attribute)
     {
         $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
         if (!$deployment_enabled) {
@@ -232,10 +228,10 @@ class ReleaseRequest extends ActiveRecord
     /** @return ReleaseRequest|null */
     public function getOldReleaseRequest()
     {
-        return self::find()->where(array(
+        return self::findByAttributes(array(
             'rr_build_version' => $this->rr_old_version,
             'rr_project_obj_id' => $this->rr_project_obj_id,
-        ))->one();
+        ));
     }
 
     /** @return ReleaseRequest|null */

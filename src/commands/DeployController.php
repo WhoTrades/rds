@@ -10,7 +10,6 @@ use whotrades\RdsSystem\Cron\RabbitListener;
 use Yii;
 use yii\helpers\Url;
 use whotrades\RdsSystem\Message;
-use whotrades\RdsSystem\Model\Rabbit\MessagingRdsMs;
 use whotrades\rds\models\Build;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Project;
@@ -33,42 +32,37 @@ class DeployController extends RabbitListener
 
         $model->readTaskStatusChanged(false, function (Message\TaskStatusChanged $message) use ($model) {
             Yii::info("Received status changed message: " . json_encode($message));
-            $this->actionSetStatus($message, $model);
+            $this->actionSetStatus($message);
         });
 
         $model->readMigrations(false, function (Message\ReleaseRequestMigrations $message) use ($model) {
             Yii::info("Received migrations message: " . json_encode($message));
-            $this->actionSetMigrations($message, $model);
+            $this->actionSetMigrations($message);
         });
 
         $model->readCronConfig(false, function (Message\ReleaseRequestCronConfig $message) use ($model) {
             Yii::info("Received cron config message: " . json_encode($message));
-            $this->actionSetCronConfig($message, $model);
+            $this->actionSetCronConfig($message);
         });
 
         $model->readUseError(false, function (Message\ReleaseRequestUseError $message) use ($model) {
             Yii::info("Received use error message: " . json_encode($message));
-            $this->actionSetUseError($message, $model);
+            $this->actionSetUseError($message);
         });
 
         $model->readUsedVersion(false, function (Message\ReleaseRequestUsedVersion $message) use ($model) {
             Yii::info("Received used version message: " . json_encode($message));
-            $this->actionSetUsedVersion($message, $model);
-        });
-
-        $model->readCurrentStatusRequest(false, function (Message\ReleaseRequestCurrentStatusRequest $message) use ($model) {
-            Yii::info("Received request of release request status: " . json_encode($message));
-            $this->replyToCurrentStatusRequest($message, $model);
+            $this->actionSetUsedVersion($message);
         });
 
         $model->readRemoveReleaseRequest(false, function (Message\RemoveReleaseRequest $message) use ($model) {
             Yii::info("Received remove release request message: " . json_encode($message));
-            $this->actionRemoveReleaseRequest($message, $model);
+            $this->actionRemoveReleaseRequest($message);
         });
 
         $model->readMigrationStatus(false, function (Message\ReleaseRequestMigrationStatus $message) use ($model) {
             Yii::info("env={$model->getEnv()}, Received request of release request status: " . json_encode($message));
-            $this->actionSetMigrationStatus($message, $model);
+            $this->actionSetMigrationStatus($message);
         });
 
         Yii::info("Start listening");
@@ -78,11 +72,10 @@ class DeployController extends RabbitListener
 
     /**
      * @param Message\TaskStatusChanged $message
-     * @param MessagingRdsMs            $model
      *
      * @throws \Exception
      */
-    private function actionSetStatus(Message\TaskStatusChanged $message, MessagingRdsMs $model)
+    private function actionSetStatus(Message\TaskStatusChanged $message)
     {
         $status = $message->status;
         $version = $message->version;
@@ -187,11 +180,10 @@ class DeployController extends RabbitListener
 
     /**
      * @param Message\ReleaseRequestMigrations $message
-     * @param MessagingRdsMs                   $model
      *
      * @throws \Exception
      */
-    private function actionSetMigrations(Message\ReleaseRequestMigrations $message, MessagingRdsMs $model)
+    private function actionSetMigrations(Message\ReleaseRequestMigrations $message)
     {
         /** @var $project Project */
         $project = Project::findByAttributes(['project_name' => $message->project]);
@@ -252,9 +244,8 @@ class DeployController extends RabbitListener
 
     /**
      * @param Message\ReleaseRequestCronConfig $message
-     * @param MessagingRdsMs                   $model
      */
-    private function actionSetCronConfig(Message\ReleaseRequestCronConfig $message, MessagingRdsMs $model)
+    private function actionSetCronConfig(Message\ReleaseRequestCronConfig $message)
     {
         $transaction = \Yii::$app->db->beginTransaction();
         try {
@@ -308,9 +299,8 @@ class DeployController extends RabbitListener
 
     /**
      * @param Message\ReleaseRequestUseError $message
-     * @param MessagingRdsMs                 $model
      */
-    private function actionSetUseError(Message\ReleaseRequestUseError $message, MessagingRdsMs $model)
+    private function actionSetUseError(Message\ReleaseRequestUseError $message)
     {
         $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
         if (!$releaseRequest) {
@@ -332,9 +322,8 @@ class DeployController extends RabbitListener
 
     /**
      * @param Message\ReleaseRequestUsedVersion $message
-     * @param MessagingRdsMs                    $model
      */
-    private function actionSetUsedVersion(Message\ReleaseRequestUsedVersion $message, MessagingRdsMs $model)
+    private function actionSetUsedVersion(Message\ReleaseRequestUsedVersion $message)
     {
         $worker = Worker::findByAttributes(array('worker_name' => $message->worker));
         if (!$worker) {
@@ -486,42 +475,9 @@ class DeployController extends RabbitListener
     }
 
     /**
-     * @param Message\ReleaseRequestCurrentStatusRequest $message
-     * @param MessagingRdsMs                             $model
-     */
-    private function replyToCurrentStatusRequest(Message\ReleaseRequestCurrentStatusRequest $message, MessagingRdsMs $model)
-    {
-        $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
-
-        // an: В любом случае что-то ответить нужно, даже если запрос релиза уже удалили. Иначе будет таймаут у системы, которые запросила данные
-        $model->sendCurrentStatusReply(new Message\ReleaseRequestCurrentStatusReply($releaseRequest ? $releaseRequest->rr_status : null, $message->getUniqueTag()));
-
-        $message->accepted();
-    }
-
-    /**
-     * @param int $projectId
-     * @param string $startVersion
-     * @param string $endVersion
-     * @return int|string
-     */
-    private static function countInstalledBuildsBetweenVersions(int $projectId, string $startVersion, string $endVersion)
-    {
-        $count = ReleaseRequest::find()
-            ->andWhere(['rr_project_obj_id' => $projectId])
-            ->andWhere("string_to_array(rr_build_version, '.')::int[] > string_to_array('" . addslashes($startVersion) . "', '.')::int[]")
-            ->andWhere("string_to_array(rr_build_version, '.')::int[] < string_to_array('" . addslashes($endVersion) . "', '.')::int[]")
-            ->andWhere(['in', 'rr_status', [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD]])
-            ->count();
-
-        return $count;
-    }
-
-    /**
      * @param Message\RemoveReleaseRequest $message
-     * @param MessagingRdsMs               $model
      */
-    private function actionRemoveReleaseRequest(Message\RemoveReleaseRequest $message, MessagingRdsMs $model)
+    private function actionRemoveReleaseRequest(Message\RemoveReleaseRequest $message)
     {
         $project = Project::findByAttributes(['project_name' => $message->projectName]);
         if (!$project) {
@@ -547,9 +503,8 @@ class DeployController extends RabbitListener
 
     /**
      * @param Message\ReleaseRequestMigrationStatus $message
-     * @param MessagingRdsMs                        $model
      */
-    private function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message, MessagingRdsMs $model)
+    private function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message)
     {
         $projectObj = Project::findByAttributes(array('project_name' => $message->project));
 
