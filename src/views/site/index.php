@@ -2,7 +2,7 @@
 use whotrades\rds\models\ReleaseReject;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Project;
-use kartik\grid\GridView;
+use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 
@@ -25,7 +25,6 @@ use yii\widgets\Pjax;
 echo GridView::widget(array(
     'dataProvider' => $releaseRejectSearchModel->search($releaseRejectSearchModel->attributes),
     'filterModel' => $releaseRejectSearchModel,
-    'export' => false,
     'columns' => array(
         'obj_created:datetime',
         'user.email',

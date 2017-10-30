@@ -189,6 +189,13 @@ $config = array(
     ),
 
     'params' => array(
+        'messaging' => [
+            'host'  => 'localhost',
+            'port'  => 5672,
+            'user'  => 'rds',
+            'pass'  => 'rds',
+            'vhost' => '/',
+        ],
         'notify' => array(
             'releaseEngineers' => array(
                 'phones' => '',
