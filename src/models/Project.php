@@ -75,7 +75,7 @@ class Project extends ActiveRecord
      */
     public function afterFind()
     {
-        $this->projectBuildSubversionArray = eval('return array(' . $this->project_build_subversion . ');');
+        $this->projectBuildSubversionArray = json_decode($this->project_build_subversion, true);
     }
 
     /**
@@ -108,13 +108,15 @@ class Project extends ActiveRecord
     {
         $releaseVersion = (int) $releaseVersion;
         $this->project_build_version;
-        $subversion = isset($this->projectBuildSubversionArray[$releaseVersion]) ? $this->projectBuildSubversionArray[$releaseVersion] + 1 : 2;
+
+        $this->projectBuildSubversionArray[$releaseVersion] = isset($this->projectBuildSubversionArray[$releaseVersion]) ? $this->projectBuildSubversionArray[$releaseVersion] + 1 : 1;
 
         $sql = "UPDATE {$this->tableName()}
-            SET project_build_version=$this->project_build_version+1, project_build_subversion = project_build_subversion || '$releaseVersion=>$subversion'::hstore
+            SET project_build_version = ?,
+            project_build_subversion = ?
             WHERE obj_id=$this->obj_id";
 
-        \Yii::$app->db->createCommand($sql)->execute();
+        \Yii::$app->db->createCommand($sql, [1 => $this->project_build_version+1, 2 => json_encode($this->projectBuildSubversionArray)])->execute();
     }
 
     /**

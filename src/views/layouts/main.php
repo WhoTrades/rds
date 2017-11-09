@@ -87,7 +87,7 @@ echo Nav::widget(
                     'label' => 'Пользователи',
                     'url' => ['/user/admin'],
                     'active' => $controllerUniqueId == 'user/admin',
-                    'visible' => Yii::$app->user->identity->isAdmin,
+                    'visible' => Yii::$app->user->identity && Yii::$app->user->identity->isAdmin,
                 ],
                 'logOut' => [
                     'label' => \Yii::$app->user->getIsGuest() ? "" : \Yii::$app->user->getIdentity()->email,

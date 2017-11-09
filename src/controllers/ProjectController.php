@@ -56,6 +56,7 @@ class ProjectController extends Controller
 
         if (isset($_POST['Project'])) {
             $model->attributes = $_POST['Project'];
+            $model->project_build_subversion = '[]';
             if ($model->save()) {
                 foreach ($_POST['workers'] as $workerId) {
                     $p2w = new Project2worker();

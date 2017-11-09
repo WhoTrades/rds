@@ -16,7 +16,7 @@ $this->params['menu'] = array(
 );
 ?>
 
-<h1>View Project2worker #<?php echo $model->obj_id; ?></h1>
+<h1>Обзор связки проекта со сборочными агентами #<?php echo $model->obj_id; ?></h1>
 
 <?php $this->widget('zii.widgets.CDetailView', array(
     'data' => $model,

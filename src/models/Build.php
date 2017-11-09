@@ -116,6 +116,10 @@ class Build extends ActiveRecord
             'build_worker_obj_id' => $this->build_worker_obj_id,
         ])->orderBy('obj_id desc')->limit(1)->one();
 
+        if (!$prev) {
+            return null;
+        }
+
         $dataCurrent = array_reverse(array_keys(json_decode($this->build_time_log, true)));
 
         $data = json_decode($prev->build_time_log, true);

@@ -13,7 +13,7 @@ defined('YII_ENV') or define('YII_ENV', 'dev');
 require(__DIR__ . '/vendor/autoload.php');
 require(__DIR__ . '/vendor/yiisoft/yii2/Yii.php');
 
-$config = require(__DIR__ . '/protected/config/console.php');
+$config = require(__DIR__ . '/src/config/console.php');
 
 $application = new \whotrades\rds\components\ConsoleApplication($config);
 

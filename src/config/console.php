@@ -3,8 +3,8 @@ use whotrades\RdsSystem\lib\ConsoleErrorHandler;
 
 $config = include('main.php');
 $config['controllerMap']['stubs']['class'] = 'bazilio\stubsgenerator\StubsController';
+$config['aliases']['@whotrades/rds'] = 'src';
 
-$config['bootstrap'][] = 'Whotrades';
 $config['controllerNamespace'] = 'whotrades\\rds\\commands';
 unset($config['components']['session']);
 unset($config['components']['request']);

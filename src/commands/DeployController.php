@@ -113,7 +113,7 @@ class DeployController extends RabbitListener
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
                     foreach ($builds as $val) {
                         $text .= "<a href='" .
-                            Url::to(['build/view', 'id' => $val->obj_id], true) .
+                            Url::to(['build/view', 'id' => $val->obj_id]) .
                             "'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
                     }
 
@@ -129,7 +129,7 @@ class DeployController extends RabbitListener
             case Build::STATUS_FAILED:
                 $title = "Failed to install $project->project_name";
                 $text = "Проект $project->project_name не удалось собрать. <a href='" .
-                    Url::to(['build/view', 'id' => $build->obj_id], true) .
+                    Url::to(['build/view', 'id' => $build->obj_id]) .
                     "'>Подробнее</a>";
 
                 Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
@@ -273,18 +273,20 @@ class DeployController extends RabbitListener
 
             $releaseRequest->save(false);
 
-            DevParseCronConfigController::parseCronConfig($releaseRequest);
+            if (class_exists(DevParseCronConfigController::class)) {
+                DevParseCronConfigController::parseCronConfig($releaseRequest);
 
-            ToolJob::updateAll(
-                [
-                    'obj_status_did' => Status::DELETED,
-                ],
-                'project_obj_id=:id AND "version"=:version',
-                [
-                    ':id' => $releaseRequest->rr_project_obj_id,
-                    ':version' => $releaseRequest->rr_build_version,
-                ]
-            );
+                ToolJob::updateAll(
+                    [
+                        'obj_status_did' => Status::DELETED,
+                    ],
+                    'project_obj_id=:id AND "version"=:version',
+                    [
+                        ':id' => $releaseRequest->rr_project_obj_id,
+                        ':version' => $releaseRequest->rr_build_version,
+                    ]
+                );
+            }
 
             self::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
@@ -569,6 +571,7 @@ class DeployController extends RabbitListener
 
         $html = \Yii::$app->view->renderFile('@app/views/site/_releaseRequestGrid.php', [
             'dataProvider' => $releaseRequest->search(['obj_id' => $id]),
+            'filterModel' => new ReleaseRequest(),
         ]);
 
         Yii::$app->webSockets->send('releaseRequestChanged', ['rr_id' => $id, 'html' => $html]);

@@ -154,16 +154,16 @@
         },
         {
             "name": "bower-asset/codemirror",
-            "version": "5.30.0",
+            "version": "5.31.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/components/codemirror.git",
-                "reference": "19a829623e9c2571d0ce313011744b5f0baed7cd"
+                "reference": "ba5ccbcf92e33c8d738b3f5ec5e587ff1da838fe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/components/codemirror/zipball/19a829623e9c2571d0ce313011744b5f0baed7cd",
-                "reference": "19a829623e9c2571d0ce313011744b5f0baed7cd",
+                "url": "https://api.github.com/repos/components/codemirror/zipball/ba5ccbcf92e33c8d738b3f5ec5e587ff1da838fe",
+                "reference": "ba5ccbcf92e33c8d738b3f5ec5e587ff1da838fe",
                 "shasum": ""
             },
             "type": "bower-asset-library",
@@ -186,7 +186,7 @@
                     "mode/*/*.html"
                 ]
             },
-            "time": "2017-09-20T10:17:09+00:00"
+            "time": "2017-10-31T11:17:09+00:00"
         },
         {
             "name": "bower-asset/jquery",
@@ -558,26 +558,26 @@
         },
         {
             "name": "conquer/helpers",
-            "version": "2.0.9",
+            "version": "2.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/borodulin/yii2-helpers.git",
-                "reference": "dc19c3adab120cefc2741cc4760a122fc170c4ab"
+                "reference": "0b6a1b5a6c18f5b1b4fba3cd279eaec2edf6654c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/borodulin/yii2-helpers/zipball/dc19c3adab120cefc2741cc4760a122fc170c4ab",
-                "reference": "dc19c3adab120cefc2741cc4760a122fc170c4ab",
+                "url": "https://api.github.com/repos/borodulin/yii2-helpers/zipball/0b6a1b5a6c18f5b1b4fba3cd279eaec2edf6654c",
+                "reference": "0b6a1b5a6c18f5b1b4fba3cd279eaec2edf6654c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4.0",
-                "yiisoft/yii2": "*"
+                "yiisoft/yii2": ">=2.0.6"
             },
             "type": "yii2-extension",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0.9.x-dev"
+                    "dev-master": "2.0.12.x-dev"
                 }
             },
             "autoload": {
@@ -603,7 +603,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2015-11-26T18:35:13+00:00"
+            "time": "2017-10-27T11:59:47+00:00"
         },
         {
             "name": "dektrium/yii2-user",
@@ -930,16 +930,16 @@
         },
         {
             "name": "kartik-v/yii2-dialog",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-dialog.git",
-                "reference": "cd80ac5bf7c3f43d0452b1b3ff1559f3db053674"
+                "reference": "ae6de7328251b084de7f1a66bac1f7c6279c9ad1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-dialog/zipball/cd80ac5bf7c3f43d0452b1b3ff1559f3db053674",
-                "reference": "cd80ac5bf7c3f43d0452b1b3ff1559f3db053674",
+                "url": "https://api.github.com/repos/kartik-v/yii2-dialog/zipball/ae6de7328251b084de7f1a66bac1f7c6279c9ad1",
+                "reference": "ae6de7328251b084de7f1a66bac1f7c6279c9ad1",
                 "shasum": ""
             },
             "require": {
@@ -978,7 +978,7 @@
                 "modal",
                 "yii2"
             ],
-            "time": "2017-10-20T11:01:19+00:00"
+            "time": "2017-11-06T16:04:54+00:00"
         },
         {
             "name": "kartik-v/yii2-grid",
@@ -1512,12 +1512,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/rds-system.git",
-                "reference": "86c1969f75d5e3528d1002426565723277a811da"
+                "reference": "d31cea39d91749252a19fdcae505fdc712ae2553"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/86c1969f75d5e3528d1002426565723277a811da",
-                "reference": "86c1969f75d5e3528d1002426565723277a811da",
+                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/d31cea39d91749252a19fdcae505fdc712ae2553",
+                "reference": "d31cea39d91749252a19fdcae505fdc712ae2553",
                 "shasum": ""
             },
             "type": "library",
@@ -1528,7 +1528,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "Core part of RDS service",
-            "time": "2017-10-24T09:35:28+00:00"
+            "time": "2017-10-30T09:14:18+00:00"
         },
         {
             "name": "yiisoft/yii2",
