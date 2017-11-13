@@ -21,7 +21,7 @@ $this->params['menu'] = array(
 );
 ?>
 
-<h1>View Project #<?php echo $model->obj_id; ?></h1>
+<h1>Обзор проекта #<?php echo $model->obj_id; ?></h1>
 
 <?= yii\widgets\DetailView::widget([
     'model' => $model,

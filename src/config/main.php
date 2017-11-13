@@ -1,12 +1,11 @@
 <?php
+
 /**
  * Глобальный конфиг
  * Что бы его переопределить для себя используйте protected/config/config.local.php
  */
 
 use whotrades\RdsSystem\lib\WebErrorHandler;
-
-define('KEEP_STDOUT_UNCHANGED', true);
 
 $config = array(
     'id' => 'RDS',
@@ -39,9 +38,7 @@ $config = array(
             'enableRegistration' => false,
             'enablePasswordRecovery' => true,
             'enableFlashMessages' => true,
-            'admins' => [
-                'entsupml@gmail.com',
-            ],
+            'admins' => ['rds'],
             'modelMap' => [
                 'User' => [
                     'class' => whotrades\rds\models\User\User::class,
@@ -76,33 +73,27 @@ $config = array(
         ],
         'commandInstanceMutex' => [
             'class' => 'yii\mutex\FileMutex',
-            'mutexPath' => '/var/lib/cronjob/service-rds',
+            'mutexPath' => '/tmp/rds/mutex',
         ],
         'sentry' => [
+            'enabled' => false,
             'class' => mito\sentry\Component::class,
-            'dsn' => '<your sentry DSN>', // private DSN
+            'dsn' => 'https://36096034f31943d5e183555b2de11221:431c23f004608d05993c8df0ef54e096@sentry.com/1', // private DSN
         ],
         'diffStat' => array(
             'class' => whotrades\rds\components\DiffStat::class,
         ),
         'smsSender' => [
             'class' => whotrades\rds\components\Sms\Sender::class,
-            'on send_sms' => [app\modules\Whotrades\components\EventHandler::class, 'handleSendSms'],
         ],
         'sessionCache' => [
-            'class' => yii\caching\MemCache::class,
-            'useMemcached' => true,
-            'servers' => [
-                [
-                    'host' => 'localhost',
-                    'port' => 11211,
-                ],
-            ],
+            'class' => yii\caching\DbCache::class,
+            'cacheTable' => 'rds.session',
         ],
         'user' => [
             'class' => yii\web\User::class,
             'identityClass' => whotrades\rds\models\User\User::class,
-            'loginUrl' => ['/user/login'],
+            'loginUrl' => '/user/login',
         ],
         'log' => [
             'flushInterval' => 1,
@@ -150,10 +141,10 @@ $config = array(
         ),
         'EmailNotifier' => array(
             'class' => whotrades\rds\components\NotifierEmail::class,
-            'releaseRequestedEmail' => '',
-            'releaseRejectedEmail'  => '',
-            'releaseReleasedEmail'  => '',
-            'mergeConflictEmail'    => '',
+            'releaseRequestedEmail' => 'noreply@example.com',
+            'releaseRejectedEmail'  => 'noreply@example.com',
+            'releaseReleasedEmail'  => 'noreply@example.com',
+            'mergeConflictEmail'    => 'noreply@example.com',
         ),
         'jsdifflib' => array(
             'class' => whotrades\rds\extensions\jsdifflib\components\JsDiffLib::class,
@@ -177,7 +168,6 @@ $config = array(
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
             ),
-            'hostInfo' => 'https://' . $_SERVER['HTTP_HOST'],
         ),
         'assetManager' => [
             'basePath' => __DIR__ . '/../../web/assets',
@@ -195,6 +185,9 @@ $config = array(
             'user'  => 'rds',
             'pass'  => 'rds',
             'vhost' => '/',
+        ],
+        'garbageCollector' => [
+            'minTimeAtProd' => '1 week',
         ],
         'notify' => array(
             'releaseEngineers' => array(
@@ -216,5 +209,8 @@ $config = array(
     ),
 );
 
+if (file_exists(__DIR__ . "/../../config.local.php")) {
+    require(__DIR__ . "/../../config.local.php");
+}
 
 return $config;

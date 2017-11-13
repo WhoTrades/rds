@@ -172,12 +172,12 @@ class ReleaseRequest extends ActiveRecord
     public function search(array $params)
     {
         $query = self::find()->where(array_filter([
-            'rr_status' => $params['rr_status'],
-            'rr_project_obj_id' => $params['rr_project_obj_id'],
+            'rr_status' => $params['rr_status'] ?? null,
+            'rr_project_obj_id' => $params['rr_project_obj_id'] ?? null,
         ]));
         $query->with = ['user', 'user.profile', 'project', 'builds', 'builds.project'];
-        $query->andFilterWhere(['like', 'rr_comment', $params['rr_comment']]);
-        $query->andFilterWhere(['like', 'rr_build_version', $params['rr_build_version']]);
+        $query->andFilterWhere(['like', 'rr_comment', $params['rr_comment'] ?? ""]);
+        $query->andFilterWhere(['like', 'rr_build_version', $params['rr_build_version'] ?? ""]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => new Sort(['defaultOrder' => ['obj_id' => SORT_DESC]]),
