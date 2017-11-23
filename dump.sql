@@ -524,3 +524,7 @@ alter table rds.worker owner to rds;
 
 INSERT INTO "rds"."user" (id, username, email, password_hash, auth_key, confirmed_at, unconfirmed_email, blocked_at, registration_ip, created_at, updated_at, flags, last_login_at, phone) VALUES (1, 'rds', 'rds@whotrades.org', '$2y$10$lt0EyF3ncaolvd2zH7dpLevLf6Y2D1wOxNQmBZaW2U4l0rAWzp9g.', 'sowjrEIgzpBNcuX7pkvkm7-Et2g2aK_X', 1510211975, NULL, NULL, NULL, 1510211975, 1510211975, 0, 1510213995, NULL);
 
+INSERT INTO profile (user_id, name, public_email, gravatar_email, gravatar_id, location, website, bio, timezone) VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+GRANT USAGE ON SCHEMA rds TO rds;
+
