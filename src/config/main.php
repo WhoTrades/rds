@@ -179,6 +179,11 @@ $config = array(
     ),
 
     'params' => array(
+	'projectMigrationUrlMask' => [
+            '*' => function ($migration, $projectName, $type, $buildVersion) {
+                return "https://github.com/WhoTrades/rds/blob/master/src/migrations/$migration.php?at=refs/tags/$projectName-$buildVersion";
+            }
+	],
         'messaging' => [
             'host'  => 'localhost',
             'port'  => 5672,
