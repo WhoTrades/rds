@@ -258,7 +258,7 @@ class Project extends ActiveRecord
      */
     public function getMigrationUrl($migration, $type, $buildVersion)
     {
-        $config = \Yii::$app->params['projectMigrationUrlMask'];
+        $config = \Yii::$app->params['projectMigrationUrlMask'] ?? [];
         if (isset($config[$this->project_name])) {
             return $config[$this->project_name]($migration, $this->project_name, $type, $buildVersion);
         } else {
