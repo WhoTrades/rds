@@ -525,6 +525,29 @@ alter table rds.worker owner to rds;
 INSERT INTO "rds"."user" (id, username, email, password_hash, auth_key, confirmed_at, unconfirmed_email, blocked_at, registration_ip, created_at, updated_at, flags, last_login_at, phone) VALUES (1, 'rds', 'rds@whotrades.org', '$2y$10$lt0EyF3ncaolvd2zH7dpLevLf6Y2D1wOxNQmBZaW2U4l0rAWzp9g.', 'sowjrEIgzpBNcuX7pkvkm7-Et2g2aK_X', 1510211975, NULL, NULL, NULL, 1510211975, 1510211975, 0, 1510213995, NULL);
 
 INSERT INTO "rds"."profile" (user_id, name, public_email, gravatar_email, gravatar_id, location, website, bio, timezone) VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO "rds".worker (obj_id, obj_created, obj_modified, obj_status_did, worker_name) VALUES (1, '2017-11-23 12:07:47.205588+00', '2017-11-23 12:07:47.205588+00', 1, 'test_worker');
+
+INSERT INTO project (obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version, project_build_subversion, project_current_version, project_notification_email, project_notification_subject, script_migration_up, script_migration_new, script_config_local, project_servers, script_remove_release, script_cron, script_deploy, script_build, script_use) VALUES (1, '2017-11-23 12:08:01.236368+00', '2017-11-23 12:08:01.236368+00', 1, 'test_project', 6, '{"1":5}', NULL, '', '', '#!/bin/bash -e
+
+sleep 1
+', '#!/bin/bash -e
+
+#echo m170908_130001_project_scripts_cron_deploy
+', NULL, NULL, '#!/bin/bash -e
+
+sleep 0.1', NULL, '#!/bin/bash -e
+
+sleep 0.1
+', '#!/bin/bash -e
+
+sleep 3
+', '#!/bin/bash -e
+
+sleep 0.1
+');
+
+INSERT INTO rds.project2worker (obj_id, obj_created, obj_modified, obj_status_did, worker_obj_id, project_obj_id, p2w_current_version) VALUES (1, '2017-11-23 12:08:01.245921+00', '2017-11-23 12:08:01.245921+00', 1, 1, 1, NULL);
+INSERT INTO rds.release_version (obj_id, obj_created, obj_modified, obj_status_did, rv_version, rv_name) VALUES (1, '2017-11-23 12:08:09.051372+00', '2017-11-23 12:08:09.051372+00', 1, '1', 'First');
 
 GRANT USAGE ON SCHEMA rds TO rds;
 
