@@ -1,0 +1,2 @@
+* * * * * root cd /var/www/rds && php yii.php deploy/index test_worker >> /var/log/rds_index.log 2>&1
+1 * * * * root cd /var/www/rds && php yii.php remove-packages/index test_worker >> /var/log/rds_remove.log 2>&1
