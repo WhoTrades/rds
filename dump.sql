@@ -1,4 +1,5 @@
 create schema rds;
+GRANT USAGE ON SCHEMA rds TO rds;
 
 CREATE TABLE rds."user" (
     id integer NOT NULL,
@@ -548,6 +549,4 @@ sleep 0.1
 
 INSERT INTO rds.project2worker (obj_id, obj_created, obj_modified, obj_status_did, worker_obj_id, project_obj_id, p2w_current_version) VALUES (1, '2017-11-23 12:08:01.245921+00', '2017-11-23 12:08:01.245921+00', 1, 1, 1, NULL);
 INSERT INTO rds.release_version (obj_id, obj_created, obj_modified, obj_status_did, rv_version, rv_name) VALUES (1, '2017-11-23 12:08:09.051372+00', '2017-11-23 12:08:09.051372+00', 1, '1', 'First');
-
-GRANT USAGE ON SCHEMA rds TO rds;
 
