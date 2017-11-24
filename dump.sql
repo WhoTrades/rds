@@ -527,7 +527,7 @@ INSERT INTO "rds"."user" (id, username, email, password_hash, auth_key, confirme
 INSERT INTO "rds"."profile" (user_id, name, public_email, gravatar_email, gravatar_id, location, website, bio, timezone) VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO "rds".worker (obj_id, obj_created, obj_modified, obj_status_did, worker_name) VALUES (1, '2017-11-23 12:07:47.205588+00', '2017-11-23 12:07:47.205588+00', 1, 'test_worker');
 
-INSERT INTO project (obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version, project_build_subversion, project_current_version, project_notification_email, project_notification_subject, script_migration_up, script_migration_new, script_config_local, project_servers, script_remove_release, script_cron, script_deploy, script_build, script_use) VALUES (1, '2017-11-23 12:08:01.236368+00', '2017-11-23 12:08:01.236368+00', 1, 'test_project', 6, '{"1":5}', NULL, '', '', '#!/bin/bash -e
+INSERT INTO rds.project (obj_id, obj_created, obj_modified, obj_status_did, project_name, project_build_version, project_build_subversion, project_current_version, project_notification_email, project_notification_subject, script_migration_up, script_migration_new, script_config_local, project_servers, script_remove_release, script_cron, script_deploy, script_build, script_use) VALUES (1, '2017-11-23 12:08:01.236368+00', '2017-11-23 12:08:01.236368+00', 1, 'test_project', 6, '{"1":5}', NULL, '', '', '#!/bin/bash -e
 
 sleep 1
 ', '#!/bin/bash -e
