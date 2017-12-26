@@ -74,3 +74,11 @@
 .modal-header.alert {
     margin-bottom: 0;
 }
+
+.phing_info {
+    color:#00BBA1;
+}
+.phing_verbose {
+    color:#008000;
+}
+
