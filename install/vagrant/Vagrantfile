@@ -1,0 +1,85 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/contrib-jessie64"
+  config.ssh.insert_key = false
+  
+  config.vm.provider "virtualbox" do |vb|
+	vb.name = "rds2"
+	vb.gui = false
+	vb.memory = "512"
+	vb.cpus = 2
+  end
+  
+  config.vm.network "forwarded_port", guest: 80, host: 8085, id: "http", host_ip: "0.0.0.0"
+  config.vm.network "forwarded_port", guest: 22, host: 2220, id: "public-ssh", host_ip: "0.0.0.0"
+  config.vm.network "forwarded_port", guest: 5432, host: 5432, id: "postgres", host_ip: "0.0.0.0"
+  
+  config.vm.provision "shell", inline: <<-SHELL
+	set -e
+	echo 'root:root' | chpasswd
+	sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+	sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+	
+	/etc/init.d/ssh restart
+	
+	apt-get install --yes apt-transport-https ca-certificates >> /tmp/install.log
+	wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg >> /tmp/install.log
+	echo "deb https://packages.sury.org/php/ jessie main" > /etc/apt/sources.list.d/php.list
+	
+	apt-get update --yes >> /tmp/install.log
+
+	apt-get upgrade --yes >> /tmp/install.log
+	apt-get dist-upgrade --yes >> /tmp/install.log
+
+	apt-get install --yes php7.1 git libapache2-mod-php7.1 rabbitmq-server php7.1-bcmath php7.1-mbstring php7.1-curl php7.1-zmq zip php7.1-zip postgresql php7.1-pgsql git >> /tmp/install.log
+	
+	rabbitmqctl add_user rds rds
+	rabbitmqctl set_permissions rds ".*" ".*" ".*"
+
+	wget https://getcomposer.org/composer.phar -O /usr/bin/composer
+	chmod +x /usr/bin/composer
+
+	rm -rf /var/www/html/
+	git clone https://github.com/WhoTrades/rds.git /var/www/rds/
+	(cd /var/www/; ln -s rds/web html)
+	(cd /var/www/rds/ && composer install)
+	chmod -R 777 /var/www/rds/src/config/../../web/assets
+
+	echo "CREATE ROLE rds login PASSWORD 'rds' NOINHERIT" | sudo -u postgres psql
+	echo "create database RDS" | sudo -u postgres psql
+	cat /var/www/rds/dump.sql | sudo -u postgres psql rds
+
+	sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+
+	sudo a2enmod rewrite
+
+	/etc/init.d/apache2 restart
+	
+	mkdir /tmp/rds/
+	mkdir /tmp/rds/mutex
+	mkdir /tmp/rds/debug/
+	mkdir /tmp/rds/debug/mail/
+	chmod -R 777 /tmp/rds/
+
+	mkdir /tmp/rds-build-agent/
+	mkdir /tmp/rds-build-agent/pid/
+	
+	
+	git clone https://github.com/WhoTrades/rds-build-agent.git /var/www/rds-build-agent/
+	(cd /var/www/rds-build-agent/ && composer install)
+	cp /var/www/rds-build-agent/config.local.php-dist /var/www/rds-build-agent/config.local.php
+  SHELL
+  
+  config.vm.provision "file", source: "cron.d/build-agent", destination: "/tmp/build-agent-cron"
+  config.vm.provision "file", source: "cron.d/rds", destination: "/tmp/rds-cron"
+  
+  config.vm.provision "shell", inline: <<-SHELL
+	cp /tmp/build-agent-cron /etc/cron.d/build-agent
+	cp /tmp/rds-cron /etc/cron.d/rds
+	sudo chown root:root /etc/cron.d/rds
+	sudo chown root:root /etc/cron.d/build-agent
+  SHELL
+end
+

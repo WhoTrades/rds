@@ -1,0 +1,5 @@
+* * * * * root cd /var/www/rds-build-agent && php yii.php deploy/index test_worker >> /var/log/rds-build-agent_build.log 2>&1
+* * * * * root cd /var/www/rds-build-agent && php yii.php use/index test_worker >> /var/log/rds-build-agent_use.log 2>&1
+* * * * * root cd /var/www/rds-build-agent && php yii.php killer/index test_worker >> /var/log/rds-build-agent_killer.log 2>&1
+* * * * * root cd /var/www/rds-build-agent && php yii.php garbage-collector/index test_worker >> /var/log/rds-build-agent_garbage-collector.log 2>&1
+* * * * * root cd /var/www/rds-build-agent && php yii.php migration/index test_worker >> /var/log/rds-build-agent_migration.log 2>&1

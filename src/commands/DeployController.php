@@ -154,7 +154,7 @@ class DeployController extends RabbitListener
             case Build::STATUS_CANCELLED:
                 $title = "Cancelled installation of $project->project_name";
                 $text = "Сборка $project->project_name отменена. <a href='" .
-                    Url::to(['build/view', 'id' => $build->obj_id], true) .
+                    Url::to(['build/view', 'id' => $build->obj_id]) .
                     "'>Подробнее</a>";
 
                 $releaseRequest = $build->releaseRequest;
