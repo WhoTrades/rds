@@ -81,4 +81,14 @@
 .phing_verbose {
     color:#008000;
 }
+.phing_err {
+    color: red;
+    font-weight: bold;
+}
+.phing_debug {
+    color: #888888;
+}
+.phing_warn {
+    color: #FF8888;
+}
 
