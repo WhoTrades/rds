@@ -81,6 +81,9 @@ use kartik\select2\Select2;
                 'name' => 'project_config[' . $projectConfig->pc_filename . ']',
                 'value' => isset($_POST['project_config'][$projectConfig->pc_filename]) ? $_POST['project_config'][$projectConfig->pc_filename] : $projectConfig->pc_content,
                 'preset' => 'php',
+                'settings' => [
+                    'viewportMargin' => 1000000,
+                ],
                 'options' => [
                     'rows' => 15,
                     'style' => 'width: 100%',
