@@ -6,6 +6,7 @@
  */
 
 use conquer\codemirror\CodemirrorWidget;
+use conquer\codemirror\CodemirrorAsset;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 use yii\helpers\Url;
@@ -83,6 +84,11 @@ use kartik\select2\Select2;
                 'options' => [
                     'rows' => 15,
                     'style' => 'width: 100%',
+                ],
+                'assets' => [
+                    CodemirrorAsset::ADDON_DIALOG,
+                    CodemirrorAsset::ADDON_SEARCHCURSOR,
+                    CodemirrorAsset::ADDON_SEARCH,
                 ],
             ]);?>
         <?php } ?>
