@@ -33,6 +33,10 @@ RDS components:
  * Run ```composer install```
  * Create database at postgres
  * Create user and vhost at RabbitMq
+ * Set up configuration at rds/src/config/main.php and rds-build-agent/src/config/console.php
+ * Set up cron jobs as in rds/install/vagrant/cron.d
+ * Set up your web server to web/index.php (the same as for yii2)
+ * Enjoy 
  
 ## Contributing
 You are able to create any pull request and ask for merging it
