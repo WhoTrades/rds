@@ -31,8 +31,9 @@ RDS components:
 # Installation manually
  * Clone project
  * Run ```composer install```
- * Create database at postgres
- * Create user and vhost at RabbitMq
+ * Create database at postgres, load data from dump.sql
+ * Create database user
+ * Create user and vhost at RabbitMq (by default: user: rds, pass: rds)
  * Set up configuration at rds/src/config/main.php and rds-build-agent/src/config/console.php
  * Set up cron jobs as in rds/install/vagrant/cron.d
  * Set up your web server to web/index.php (the same as for yii2)
