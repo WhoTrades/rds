@@ -52,7 +52,10 @@ foreach (\Yii::$app->modules as $module) {
 
     $modulesNav = ArrayHelper::merge($modulesNav, $module::getNav($controllerId, $actionId));
 }
-NavBar::begin(['brandLabel' => 'RDS']);
+NavBar::begin([
+    'brandLabel' => 'RDS',
+    'innerContainerOptions' => ['class' => 'container-fluid'],
+]);
 echo Nav::widget(
     [
         'options' => ['class' => 'navbar-nav navbar-left'],
