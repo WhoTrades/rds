@@ -33,9 +33,10 @@ return array(
             if (Yii::$app->hasModule('Wtflow')) {
                 if ($releaseRequest->isInstalledStatus()) {
                     $result .= "<a href='" . yii\helpers\Url::to(['/Wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id]) .
-                        "' target='_blank'>Тикеты</a><br />";
+                        "' target='_blank'>Тикеты<img src='/images/open_new_window.png' alt='Open new window' style='margin-left:5px; margin-bottom:3px; width:13px;height:13px;'></a><br />";
                 }
-                $result .= "<a href='/Wtflow/git/commits/?id=$releaseRequest->obj_id' onclick=\"popup('Комиты', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>";
+                $result .= "<a href='/Wtflow/git/commits/?id=$releaseRequest->obj_id' onclick=\"popup('Комиты', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>" .
+                    "<img src='/images/open_popup_window.jpeg' alt='Open popup window' style='margin-left:5px; margin-bottom:3px; width:13px;height:13px;'>";
             }
 
             return $result;
