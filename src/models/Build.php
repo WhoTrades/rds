@@ -156,8 +156,8 @@ class Build extends ActiveRecord
      */
     public function determineHumanReadableError()
     {
-        $sentry = \Yii::$app->components['sentry'];
-        $sentryProjectName = $sentry['projectNameMap'][$this->project->project_name] ?? $this->project->project_name;
+        $sentryParams = \Yii::$app->params['sentry'];
+        $sentryProjectName = $sentryParams['projectNameMap'][$this->project->project_name] ?? $this->project->project_name;
 
         $regexes = [
             '~Execution of target "merge-(?:(?:js)|(?:css))" failed for the following reason: Task exited with code 10~' => "Ошибка в MergeJS/CSS, обращайтесь к фронтдендщикам",
@@ -167,7 +167,7 @@ class Build extends ActiveRecord
             => "На сервере администратор что-то устанавливает. Пересоберите позже",
             '~ssh: connect to host ([\w-]+.whotrades.net) port 22: Connection timed out~' => "Сервер $1 не отвечает. Обратитесь к администратору<br />$0",
             '~([\w-]+.whotrades.net):.*No space left on device~' => "Закончилось место на <b>$1</b>. Обратитесь к администратору",
-            '~ target=sentry, target=raven, event_id=(\w+)~' => "Sentry <a href='{$sentry['baseUrl']}{$sentryProjectName}/?query=$1'><b>$1</b></a>.",
+            '~ target=sentry, target=raven, event_id=(\w+)~' => "Sentry <a href='{$sentryParams['baseUrl']}{$sentryProjectName}/?query=$1'><b>$1</b></a>.",
         ];
 
         foreach ($regexes as $regex => $text) {
