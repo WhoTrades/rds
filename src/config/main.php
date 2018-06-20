@@ -79,6 +79,8 @@ $config = array(
             'enabled' => false,
             'class' => mito\sentry\Component::class,
             'dsn' => 'https://36096034f31943d5e183555b2de11221:431c23f004608d05993c8df0ef54e096@sentry.com/1', // private DSN
+            'baseUrl' => 'https://sentry.com/sentry/',
+            'projectNameMap' => [], // ag: Mapping of RDS project name to Sentry project name
         ],
         'diffStat' => array(
             'class' => whotrades\rds\components\DiffStat::class,
