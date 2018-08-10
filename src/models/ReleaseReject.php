@@ -90,7 +90,7 @@ class ReleaseReject extends ActiveRecord
      */
     public function getProject()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'rr_project_obj_id']);
+        return $this->hasOne(Project::class, ['obj_id' => 'rr_project_obj_id']);
     }
 
     /**
@@ -98,6 +98,6 @@ class ReleaseReject extends ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'rr_user_id']);
+        return $this->hasOne(User::class, ['id' => 'rr_user_id']);
     }
 }

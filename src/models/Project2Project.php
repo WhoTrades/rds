@@ -47,7 +47,7 @@ class Project2Project extends ActiveRecord
      */
     public function getParent()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'parent_project_obj_id']);
+        return $this->hasOne(Project::class, ['obj_id' => 'parent_project_obj_id']);
     }
 
     /**
@@ -55,7 +55,7 @@ class Project2Project extends ActiveRecord
      */
     public function getChild()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'child_project_obj_id']);
+        return $this->hasOne(Project::class, ['obj_id' => 'child_project_obj_id']);
     }
 
     /**

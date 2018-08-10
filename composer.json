@@ -14,7 +14,7 @@
         "react/zmq": "~0.3",
         "php-amqplib/php-amqplib": "~2.6",
         "whotrades/rds-system": "dev-master",
-        "yiisoft/yii2": "2.0.13",
+        "yiisoft/yii2": "2.0.15.1",
         "yiisoft/yii2-bootstrap": "~2.0",
         "yiisoft/yii2-gii": "~2.0.0",
         "php": ">=7.0",

@@ -34,7 +34,7 @@ use kartik\select2\Select2;
         <?= $form->field($model, 'project_notification_email') ?>
         <?= $form->field($model, 'project_notification_subject') ?>
 
-        <?= $form->field($model, 'projectserversarray')->widget(Select2::classname(), [
+        <?= $form->field($model, 'projectserversarray')->widget(Select2::class, [
             'data' => $model->getKnownServers(),
             'options' => ['placeholder' => 'Select a servers ...', 'multiple' => true],
             'pluginOptions' => [

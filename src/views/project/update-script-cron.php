@@ -17,7 +17,7 @@ $project->script_cron = $project->script_cron ?: "#!/bin/bash -e\n";
 <div class="row">
     <div class="col-md-6 col-sm-9">
         <?= $form->field($project, 'script_cron')->widget(
-            CodemirrorWidget::className(),
+            CodemirrorWidget::class,
             [
                 'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',

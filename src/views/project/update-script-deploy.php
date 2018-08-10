@@ -24,7 +24,7 @@ $project->script_use = $project->script_use ?: "#!/bin/bash -e\n";
             'body' => "F11 - полноэкранный режим редактора, Esc - выход",
         ])?>
         <?= $form->field($project, 'script_deploy')->widget(
-            CodemirrorWidget::className(),
+            CodemirrorWidget::class,
             [
                 'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',
@@ -62,7 +62,7 @@ $project->script_use = $project->script_use ?: "#!/bin/bash -e\n";
             'body' => "F11 - полноэкранный режим редактора, Esc - выход",
         ])?>
         <?= $form->field($project, 'script_use')->widget(
-            CodemirrorWidget::className(),
+            CodemirrorWidget::class,
             [
                 'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',

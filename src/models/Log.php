@@ -108,6 +108,6 @@ class Log extends ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'log_user_id']);
+        return $this->hasOne(User::class, ['id' => 'log_user_id']);
     }
 }

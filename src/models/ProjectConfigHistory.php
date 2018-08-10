@@ -53,7 +53,7 @@ class ProjectConfigHistory extends ActiveRecord
      */
     public function getProject()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'pch_project_obj_id']);
+        return $this->hasOne(Project::class, ['obj_id' => 'pch_project_obj_id']);
     }
 
     /**
@@ -96,6 +96,6 @@ class ProjectConfigHistory extends ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'pch_user_id']);
+        return $this->hasOne(User::class, ['id' => 'pch_user_id']);
     }
 }

@@ -48,7 +48,7 @@ class ProjectConfig extends ActiveRecord
      */
     public function getProject()
     {
-        return $this->hasOne(Project::className(), ['obj_id' => 'pc_project_obj_id']);
+        return $this->hasOne(Project::class, ['obj_id' => 'pc_project_obj_id']);
     }
 
     /**

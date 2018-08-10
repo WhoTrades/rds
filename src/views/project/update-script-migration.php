@@ -18,7 +18,7 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
 <div class="row">
     <div class="col-md-6 col-sm-9">
         <?= $form->field($project, 'script_migration_up')->widget(
-            CodemirrorWidget::className(),
+            CodemirrorWidget::class,
             [
                 'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',
@@ -56,7 +56,7 @@ $project->script_migration_new = $project->script_migration_new ?: "#!/bin/bash 
             'body' => "F11 - полноэкранный режим редактора, Esc - выход",
         ])?>
         <?= $form->field($project, 'script_migration_new')->widget(
-            CodemirrorWidget::className(),
+            CodemirrorWidget::class,
             [
                 'presetsDir' => __DIR__ . '/../../assets/preset',
                 'preset' => 'bash',
