@@ -3,7 +3,7 @@ namespace whotrades\rds\components;
 
 use Yii;
 
-class NotifierEmail extends \yii\base\Object
+class NotifierEmail extends \yii\base\BaseObject
 {
     public $releaseRequestedEmail;
     public $releaseRejectedEmail;

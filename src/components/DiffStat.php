@@ -2,7 +2,7 @@
 
 namespace whotrades\rds\components;
 
-final class DiffStat extends \yii\base\Object
+final class DiffStat extends \yii\base\BaseObject
 {
     /**
      * @param string $text1
