@@ -66,13 +66,6 @@ class SiteController extends Controller
         ));
     }
 
-    /**
-     */
-    public function actionCreateReleaseRequest()
-    {
-        echo $this->render('createReleaseRequest', $this->createReleaseRequest());
-    }
-
     private function createReleaseRequest()
     {
         $model = new ReleaseRequest();

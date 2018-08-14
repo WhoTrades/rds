@@ -41,10 +41,13 @@ class JsonController extends Controller
         }
 
         if ($format === null) {
-            echo json_encode($result, JSON_PRETTY_PRINT);
-        } else {
-            echo implode(" ", $result);
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+            \Yii::$app->response->headers->set('Content-type', 'application/javascript; charset=utf-8');
+
+            return json_encode($result, JSON_PRETTY_PRINT);
         }
+
+        return implode(" ", $result);
     }
 
     /**
@@ -56,6 +59,9 @@ class JsonController extends Controller
         /** @var $project Project */
         $project = Project::findByAttributes(['project_name' => $projectName]);
 
-        echo $project ? $project->project_current_version : null;
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
+        \Yii::$app->response->headers->set('Content-type', 'application/javascript; charset=utf-8');
+
+        return $project ? $project->project_current_version : null;
     }
 }
