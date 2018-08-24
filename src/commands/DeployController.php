@@ -6,6 +6,7 @@ use app\modules\Whotrades\models\ToolJob;
 use whotrades\rds\components\Status;
 use whotrades\rds\models\JiraUse;
 use whotrades\rds\models\Log;
+use whotrades\rds\models\PostMigration;
 use whotrades\RdsSystem\Cron\RabbitListener;
 use Yii;
 use yii\helpers\Url;
@@ -60,7 +61,7 @@ class DeployController extends RabbitListener
             $this->actionRemoveReleaseRequest($message);
         });
 
-        $model->readMigrationStatus(false, function (Message\ReleaseRequestMigrationStatus $message) use ($model) {
+        $model->readMigrationStatus(false, function (Message\MigrationStatus $message) use ($model) {
             Yii::info("env={$model->getEnv()}, Received request of release request status: " . json_encode($message));
             $this->actionSetMigrationStatus($message);
         });
@@ -205,11 +206,32 @@ class DeployController extends RabbitListener
 
             return;
         }
+
         if ($message->type == 'pre') {
             $releaseRequest->rr_new_migration_count = count($message->migrations);
             $releaseRequest->rr_new_migrations = json_encode($message->migrations);
         } elseif ($message->type == 'post') {
-            $releaseRequest->rr_new_post_migrations = json_encode($message->migrations);
+            foreach ($message->migrations as $postMigrationName) {
+                $postMigrationName = str_replace('/', '\\', $postMigrationName);
+
+                $postMigration = PostMigration::findByAttributes([
+                    'pm_project_obj_id' => $project->obj_id,
+                    'pm_name' => $postMigrationName,
+                ]);
+
+                if ($postMigration) {
+                    Yii::info("Post-migration {$postMigrationName} of project {$project->project_name} already exists in DB");
+                    continue;
+                }
+
+                $postMigration = new PostMigration();
+
+                $postMigration->pm_project_obj_id = $project->obj_id;
+                $postMigration->pm_release_request_obj_id = $releaseRequest->obj_id;
+                $postMigration->pm_name = $postMigrationName;
+
+                $postMigration->save();
+            }
         } else {
             foreach ($message->migrations as $migration) {
                 list($migration, $ticket) = preg_split('~\s+~', $migration);
@@ -505,9 +527,9 @@ class DeployController extends RabbitListener
     }
 
     /**
-     * @param Message\ReleaseRequestMigrationStatus $message
+     * @param Message\MigrationStatus $message
      */
-    private function actionSetMigrationStatus(Message\ReleaseRequestMigrationStatus $message)
+    private function actionSetMigrationStatus(Message\MigrationStatus $message)
     {
         $projectObj = Project::findByAttributes(array('project_name' => $message->project));
 
@@ -517,21 +539,26 @@ class DeployController extends RabbitListener
 
             return;
         }
-        $releaseRequest = ReleaseRequest::findByAttributes(array('rr_build_version' => $message->version, 'rr_project_obj_id' => $projectObj->obj_id));
-
-        if (!$releaseRequest) {
-            Yii::error('unknown release request: project=' . $message->project . ", build_version=" . $message->version);
-            $message->accepted();
-
-            return;
-        }
 
         $transaction = \Yii::$app->db->beginTransaction();
-        if ($message->type == 'pre') {
-            $releaseRequest->rr_migration_status = $message->status;
-            $releaseRequest->rr_migration_error = $message->errorText;
 
-            if ($message->status == ReleaseRequest::MIGRATION_STATUS_UP) {
+        if ($message->type === 'pre') {
+            $releaseRequest = ReleaseRequest::findByAttributes(array('rr_build_version' => $message->version, 'rr_project_obj_id' => $projectObj->obj_id));
+
+            if (!$releaseRequest) {
+                Yii::error('unknown release request: project=' . $message->project . ", build_version=" . $message->version);
+                $message->accepted();
+
+                return;
+            }
+
+            $releaseRequest->rr_migration_status = $message->status;
+
+            if ($message->status === Message\MigrationStatus::STATUS_FAILED) {
+                $releaseRequest->rr_migration_error = $message->result;
+            }
+
+            if ($message->status === Message\MigrationStatus::STATUS_UP) {
                 $releaseRequest->rr_new_migration_count = 0;
 
                 ReleaseRequest::updateAll(['rr_migration_status' => $message->status, 'rr_new_migration_count' => 0], 'rr_build_version <= :version AND rr_project_obj_id = :id', [
@@ -539,18 +566,31 @@ class DeployController extends RabbitListener
                     ':id'       => $projectObj->obj_id,
                 ]);
             }
-        } else {
-            $releaseRequest->rr_post_migration_status = $message->status;
 
-            if ($message->status == ReleaseRequest::MIGRATION_STATUS_UP) {
-                ReleaseRequest::updateAll(['rr_migration_status' => $message->status], 'rr_build_version <= :version AND rr_project_obj_id = :id', [
-                    ':version'  => $message->version,
-                    ':id'       => $projectObj->obj_id,
-                ]);
+            $releaseRequest->save();
+        } else {
+            $postMigration = PostMigration::findByAttributes(['pm_name' => $message->migrationName, 'pm_project_obj_id' => $projectObj->obj_id]);
+
+            if (!$postMigration) {
+                Yii::error('unknown post-migration: project=' . $message->project . ", migration_name=" . $message->migrationName);
+                $message->accepted();
+
+                return;
             }
+
+            switch ($message->status) {
+                case Message\MigrationStatus::STATUS_UP:
+                    $postMigration->pm_status = PostMigration::STATUS_APPLIED;
+                    break;
+                case Message\MigrationStatus::STATUS_FAILED:
+                    $postMigration->pm_status = PostMigration::STATUS_FAILED;
+                    break;
+            }
+            $postMigration->pm_log = $message->result;
+
+            $postMigration->save();
         }
 
-        $releaseRequest->save();
         $transaction->commit();
 
         static::sendReleaseRequestUpdated($releaseRequest->obj_id);

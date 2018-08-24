@@ -215,6 +215,7 @@ $config = array(
             'baseUrl' => 'https://sentry.com/sentry/',
             'projectNameMap' => [], // ag: Mapping of RDS project name to Sentry project name
         ],
+        'postMigrationStabilizeDelay' => '1 week',
     ),
 );
 

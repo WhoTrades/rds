@@ -1,29 +1,13 @@
 <?php /** @var $this whotrades\rds\components\View */
-use whotrades\rds\models\ReleaseRequest;
+
+use yii\helpers\Html;
 use yii\helpers\Url;
+
 ?>
-<?php /** @var $releaseRequests ReleaseRequest[]*/ ?>
-<?php if ($releaseRequests) {?>
-    <div style="float: right; ">
-        <h4>POST миграции</h4>
-        <?php foreach ($releaseRequests as $rr) {?>
-            <?php if (!$rr->rr_new_post_migrations || !json_encode($rr->rr_new_post_migrations)) {?>
-                <?php continue; ?>
-            <?php }?>
-            <h5 style="float: left; margin: 0 20px 0 0"><?=$rr->project->project_name?> :: <?=$rr->rr_build_version?> (<?=count(json_decode($rr->rr_new_post_migrations))?>)</h5>
-            <?php if ($rr->rr_post_migration_status == ReleaseRequest::MIGRATION_STATUS_UPDATING) {?>
-                Updating migrations
-            <?php } elseif ($rr->rr_post_migration_status == ReleaseRequest::MIGRATION_STATUS_FAILED) {?>
-                Migrations failed
-            <?php } elseif ($rr->rr_post_migration_status == ReleaseRequest::MIGRATION_STATUS_NONE) {?>
-                <a href="<?=Url::to(["/use/migrate/", "id" => $rr->obj_id, "type" => "post"])?>">Накатить</a>
-                <div style="clear: both"></div>
-                <?php foreach (json_decode($rr->rr_new_post_migrations) as $migration) {?>
-                    <a href='<?=$rr->project->getMigrationUrl($migration, 'post', $rr->rr_build_version)?>'>
-                        <?=$migration?>
-                    </a><br />
-                <?php }?>
-            <?php }?>
-        <?php }?>
+
+<?php /** @var $readyPostMigrationsCount */ ?>
+<?php if ($readyPostMigrationsCount) {?>
+    <div style="border: solid 2px #f4bb51; background: #ffcccc; font-weight: bold; padding: 5px; margin: 5px;">
+        There are <?= $readyPostMigrationsCount ?> <?= Html::a('post migrations', Url::to('/postMigration/index')) ?> to start
     </div>
 <?php }
