@@ -28,7 +28,7 @@ class m180821_121728_add_post_migrations_table extends Migration
         ');
 
         $this->execute('ALTER TABLE rds.post_migration ADD PRIMARY KEY (obj_id)');
-        $this->execute('CREATE UNIQUE INDEX u_pm_name ON rds.post_migration (pm_name)');
+        $this->execute('CREATE UNIQUE INDEX u_pm_name_and_project ON rds.post_migration (pm_name, pm_project_obj_id)');
         $this->execute("COMMENT ON COLUMN rds.post_migration.pm_status IS 'ag: @see \\whotrades\\rds\\models\\PostMigration::STATUS_*'");
     }
 

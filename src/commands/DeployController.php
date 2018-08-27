@@ -207,10 +207,10 @@ class DeployController extends RabbitListener
             return;
         }
 
-        if ($message->type == 'pre') {
+        if ($message->type === 'pre') {
             $releaseRequest->rr_new_migration_count = count($message->migrations);
             $releaseRequest->rr_new_migrations = json_encode($message->migrations);
-        } elseif ($message->type == 'post') {
+        } elseif ($message->type === 'post') {
             foreach ($message->migrations as $postMigrationName) {
                 $postMigrationName = str_replace('/', '\\', $postMigrationName);
 
