@@ -67,7 +67,7 @@ class PostMigration extends ActiveRecord
      */
     public function search($params)
     {
-        $dataProvider = new ActiveDataProvider(['query' => self::find()->orderBy(['obj_created' => SORT_DESC])]);
+        $dataProvider = new ActiveDataProvider(['query' => self::find()->orderBy(['obj_created' => SORT_DESC, 'pm_name' => SORT_DESC])]);
         $this->load($params, 'search');
 
         return $dataProvider;
