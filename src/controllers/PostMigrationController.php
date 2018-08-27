@@ -1,4 +1,7 @@
 <?php
+/**
+ * @author Anton Gorlanov <antonxacc@gmail.com>
+ */
 namespace whotrades\rds\controllers;
 
 use whotrades\rds\models\PostMigration;
@@ -7,8 +10,25 @@ use whotrades\rds\models\ReleaseRequest;
 
 class PostMigrationController extends Controller
 {
+    public $pageTitle = 'Post Migrations';
+
     /**
-     * Lists all models.
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    ['allow' => true, 'roles' => ['@']],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return string
      */
     public function actionIndex()
     {
@@ -21,7 +41,7 @@ class PostMigrationController extends Controller
 
         return $this->render('admin', array(
             'model' => $model,
-            'postMigrationAllowTimestamp' => $postMigrationAllowTimestamp
+            'postMigrationAllowTimestamp' => $postMigrationAllowTimestamp,
         ));
     }
 
