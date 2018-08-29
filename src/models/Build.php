@@ -110,6 +110,7 @@ class Build extends ActiveRecord
      */
     public function getProgressBarInfo()
     {
+        /** @var Build $prev */
         $prev = self::find()->where([
             'build_status' => [Build::STATUS_INSTALLED, Build::STATUS_USED],
             'build_project_obj_id' => $this->build_project_obj_id,
@@ -120,26 +121,31 @@ class Build extends ActiveRecord
             return null;
         }
 
-        $dataCurrent = array_reverse(array_keys(json_decode($this->build_time_log, true)));
+        $currentActions = array_reverse(array_keys(json_decode($this->build_time_log, true)));
 
-        $data = json_decode($prev->build_time_log, true);
-        if (!$data) {
+        $timeLogPrev = json_decode($prev->build_time_log, true);
+        if (!$timeLogPrev) {
             return null;
         }
-        $lastPrev = end($data);
+        $buildTimePrev = strtotime($prev->releaseRequest->rr_built_time) - strtotime($prev->releaseRequest->obj_created);
 
         $currentTime = 0;
-        $currentKey = '';
-        foreach ($dataCurrent as $currentKey) {
-            if (isset($data[$currentKey])) {
-                $currentTime = $data[$currentKey];
+        $action = '';
+        foreach ($currentActions as $action) {
+            if (isset($timeLogPrev[$action])) {
+                // ag: Backward compatibility with old build_time_log #WTA-1754
+                if (reset($timeLogPrev) < strtotime($prev->releaseRequest->obj_created)) {
+                    $currentTime = $timeLogPrev[$action];
+                } else {
+                    $currentTime = strtotime($prev->releaseRequest->obj_created) - $timeLogPrev[$action];
+                }
                 break;
             }
         }
 
-        $percent = 100 * $currentTime / $lastPrev;
+        $percent = 100 * $currentTime / $buildTimePrev;
 
-        return [$percent, $currentKey];
+        return [$percent, $action];
     }
 
     /**

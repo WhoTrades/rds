@@ -17,20 +17,37 @@ echo yii\widgets\DetailView::widget([
         [
             'attribute' => 'build_time_log',
             'format' => 'raw',
-            'value' => function ($model) {
-                $data   = json_decode($model->build_time_log, true);
-                if (empty($data)) {
+            'value' => function (\whotrades\rds\models\Build $model) {
+                $timeLogRaw   = json_decode($model->build_time_log, true);
+                if (empty($timeLogRaw)) {
                     return '';
                 }
-                $max    = $prev = 0;
 
-                foreach ($data as $val) {
-                    $max = max($max, $val - $prev);
-                    $prev = $val;
+                // ag: Backward compatibility with old build_time_log #WTA-1754
+                if (reset($timeLogRaw) < strtotime($model->releaseRequest->obj_created)) {
+                    $prevAction = 'init';
+                    $prevTime = 0;
+                    foreach ($timeLogRaw as $action => $time) {
+                        $timeLogPrepared[$prevAction] = $time - $prevTime;
+                        $prevAction = $action;
+                        $prevTime = $time;
+                    }
+                    $timeLogPrepared[$prevAction] = 0;
+                    $timeLogPrepared['pre/post build'] = strtotime($model->releaseRequest->rr_built_time) - strtotime($model->releaseRequest->obj_created) - $prevTime;
+                } else {
+                    $timeLogPrepared = [];
+                    $prevTime = strtotime($model->releaseRequest->obj_created);
+                    $prevAction = 'init';
+                    foreach ($timeLogRaw as $action => $time) {
+                        $timeLogPrepared[$prevAction] = $time - $prevTime;
+                        $prevAction = $action;
+                        $prevTime = $time;
+                    }
+                    $timeLogPrepared[$prevAction] = strtotime($model->releaseRequest->rr_built_time) - $prevTime;
                 }
 
-                $prevName = 'init';
-                $prev = 0;
+                $maxTime = max($timeLogPrepared);
+
 
                 $content = '';
                 $content .= '<table>';
@@ -39,20 +56,19 @@ echo yii\widgets\DetailView::widget([
                 $content .=             '<td>Название действия</td><td>Затраченное время</td><td>Временная шкала</td>';
                 $content .=         '</tr>';
                 $content .=     '</thead>';
-                foreach ($data as $name => $time) {
-                    $with = 100 * ($time - $prev) / $max;
+                $progressTime = 0;
+                foreach ($timeLogPrepared as $action => $time) {
+                    $progressTime += $time;
+                    $percent = 100 * $time / $maxTime;
                     $content .= '<tr>';
-                    $content .=     '<td>' . $prevName . '</td>';
+                    $content .=     '<td>' . $action . '</td>';
                     $content .=     '<td>';
                     $content .=         '<div class="progress" style="margin: 0">';
-                    $content .=             '<div class="progress-bar" style="color: black; width:' . $with . '%">' . sprintf("%.2f", $time - $prev) . '</div>';
+                    $content .=             '<div class="progress-bar" style="color: black; width:' . $percent . '%">' . sprintf("%.2f", $time) . '</div>';
                     $content .=         '</div>';
                     $content .=     '</td>';
-                    $content .=     '<td>' . sprintf("%.2f", $time) . '</td>';
+                    $content .=     '<td>' . sprintf("%.2f", $progressTime) . '</td>';
                     $content .= '</tr>';
-
-                    $prev = $time;
-                    $prevName = $name;
                 }
                 $content .= '</table>';
 
