@@ -124,9 +124,20 @@ return array(
         'attribute' => 'rr_build_version',
         'value' => function (ReleaseRequest $r) {
             if ($r->rr_built_time) {
-                $time = strtotime($r->rr_built_time) - strtotime($r->obj_created);
+                $buildTimeLog = json_decode((reset($r->builds))->build_time_log, true);
+                $buildTime = round(end($buildTimeLog) - reset($buildTimeLog));
+                // ag: Backward compatibility with old build_time_log #WTA-1754
+                if (reset($buildTimeLog) < strtotime($r->obj_created)) {
+                    $timeFull = round(strtotime($r->rr_built_time) - strtotime($r->obj_created));
+                    $timeAdditional = $timeFull - $buildTime;
+                    $additionalText = "Очередь+раскладка: <b>$timeAdditional</b> сек.";
+                } else {
+                    $timeQueueing = round(reset($buildTimeLog) - strtotime($r->obj_created));
+                    $timeDeploying = round(strtotime($r->rr_built_time) - end($buildTimeLog));
+                    $additionalText = "Очередь: <b>$timeQueueing</b> сек. Раскладка: <b>$timeDeploying</b> сек.";
+                }
 
-                return $r->rr_build_version . "<br /><br />Собрано за <b>$time</b> сек.";
+                return $r->rr_build_version . "<br />Сборка: <b>$buildTime</b>  сек.<br />" . $additionalText;
             } else {
                 return $r->rr_build_version;
             }

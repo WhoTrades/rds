@@ -32,18 +32,19 @@ echo yii\widgets\DetailView::widget([
                         $prevAction = $action;
                         $prevTime = $time;
                     }
-                    $timeLogPrepared[$prevAction] = 0;
-                    $timeLogPrepared['pre/post build'] = strtotime($model->releaseRequest->rr_built_time) - strtotime($model->releaseRequest->obj_created) - $prevTime;
+                    $timeLogPrepared[$prevAction . ' + queueing + deploy'] = strtotime($model->releaseRequest->rr_built_time) - strtotime($model->releaseRequest->obj_created) - $prevTime;
                 } else {
                     $timeLogPrepared = [];
                     $prevTime = strtotime($model->releaseRequest->obj_created);
-                    $prevAction = 'init';
+                    $prevAction = 'queueing';
                     foreach ($timeLogRaw as $action => $time) {
                         $timeLogPrepared[$prevAction] = $time - $prevTime;
                         $prevAction = $action;
                         $prevTime = $time;
                     }
-                    $timeLogPrepared[$prevAction] = strtotime($model->releaseRequest->rr_built_time) - $prevTime;
+                    if ($model->releaseRequest->rr_built_time) {
+                        $timeLogPrepared[$prevAction . ' + deploy'] = strtotime($model->releaseRequest->rr_built_time) - $prevTime;
+                    }
                 }
 
                 $maxTime = max($timeLogPrepared);
