@@ -127,7 +127,10 @@ class Build extends ActiveRecord
         if (!$timeLogPrev) {
             return null;
         }
-        $buildTimePrev = strtotime(end($timeLogPrev)) - strtotime(reset($timeLogPrev));
+        $buildTimePrev = strtotime($prev->releaseRequest->rr_built_time) - reset($timeLogPrev);
+        if (!$buildTimePrev) {
+            return null;
+        }
 
         $currentTime = 0;
         $action = '';
@@ -137,7 +140,7 @@ class Build extends ActiveRecord
                 if (reset($timeLogPrev) < strtotime($prev->releaseRequest->obj_created)) {
                     $currentTime = $timeLogPrev[$action];
                 } else {
-                    $currentTime = $timeLogPrev[$action] - strtotime(reset($timeLogPrev));
+                    $currentTime = $timeLogPrev[$action] - reset($timeLogPrev);
                 }
                 break;
             }
