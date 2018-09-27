@@ -1,11 +1,9 @@
 <?php
 
-use yii\db\Migration;
-
 /**
  * Class m180927_073202_alter_table_rds_project_config_history
  */
-class m180927_073202_alter_table_rds_project_config_history extends Migration
+class m180927_073202_alter_table_rds_project_config_history extends base
 {
     /**
      * {@inheritdoc}

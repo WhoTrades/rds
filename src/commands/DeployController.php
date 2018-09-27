@@ -388,6 +388,13 @@ class DeployController extends RabbitListener
             'rr_project_obj_id' => $project->obj_id,
         ));
 
+        foreach ($releaseRequest->builds as $build) {
+            $build->build_attach .= "\n\n=== Begin Use Log ===\n\n";
+            $build->build_attach .= $message->text;
+            $build->build_attach .= "\n\n=== End Use Log ===";
+            $build->save();
+        }
+
         $builds = Build::findAllByAttributes(array(
             'build_project_obj_id' => $project->obj_id,
             'build_worker_obj_id' => $worker->obj_id,
@@ -397,9 +404,6 @@ class DeployController extends RabbitListener
         foreach ($builds as $build) {
             /** @var $build Build */
             $build->build_status = Build::STATUS_INSTALLED;
-            $build->build_attach .= "\n\n=== Begin Use Log ===\n\n";
-            $build->build_attach .= $message->text;
-            $build->build_attach .= "\n\n=== End Use Log ===";
             $build->save();
         }
 

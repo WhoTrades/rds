@@ -219,6 +219,9 @@ $config = array(
     ),
 );
 
+// ag: db_admin - DB role for migrations
+$config['components']['db_admin'] = $config['components']['db'];
+
 if (file_exists(__DIR__ . "/../../config.local.php")) {
     require(__DIR__ . "/../../config.local.php");
 }
