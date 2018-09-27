@@ -7,6 +7,8 @@
 /** @var $currentText string */
 /** @var $currentTtitle string */
 
+/** @var $log string */
+
 \Yii::$app->jsdifflib->register($this);
 
 $this->title = "$projectName/$filename";
@@ -48,6 +50,9 @@ $this->title = "$projectName/$filename";
 <div id="baseText" style="display: none"><?= htmlspecialchars($currentText) ?></div>
 <div id="newText" style="display: none"><?= htmlspecialchars($newText) ?></div>
 <div id="diffoutput"></div>
+
+<h1>Log</h1>
+<pre><?= htmlspecialchars($log) ?></pre>
 
 <script>
     function togglePanelMode() {

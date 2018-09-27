@@ -18,6 +18,7 @@ use yii\db\ActiveQuery;
  * @property int $pch_user_id
  * @property string $pch_config
  * @property string $pch_filename
+ * @property string $pch_log
  *
  * The followings are the available model relations:
  * @property Project $project
@@ -44,7 +45,7 @@ class ProjectConfigHistory extends ActiveRecord
             array(['pch_project_obj_id', 'pch_user_id'], 'required'),
             array(['obj_status_did', 'pch_user_id'], 'number'),
             array(['pch_config'], 'safe'),
-            array(['obj_created'], 'datetime'),
+            array(['pch_log'], 'safe'),
         );
     }
 

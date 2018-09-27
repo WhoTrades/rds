@@ -181,9 +181,12 @@ class Project extends ActiveRecord
 
     /**
      * Отправляет с service-deploy всю новую локальную конфигурацию
+     *
+     * @param int | null $projectConfigHistoryId
+     *
      * @void
      */
-    public function sendNewProjectConfigTasks()
+    public function sendNewProjectConfigTasks($projectConfigHistoryId = null)
     {
         $configs = [];
         foreach ($this->projectConfigs as $projectConfig) {
@@ -197,7 +200,8 @@ class Project extends ActiveRecord
                     $this->project_name,
                     $configs,
                     $this->script_config_local,
-                    $this->getProjectServersArray()
+                    $this->getProjectServersArray(),
+                    $projectConfigHistoryId
                 )
             );
         }

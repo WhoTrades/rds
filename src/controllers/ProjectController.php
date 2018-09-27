@@ -199,7 +199,7 @@ $diffStat<br />
                 }
 
                 if ($needUpdateConfigs) {
-                    $model->sendNewProjectConfigTasks();
+                    $model->sendNewProjectConfigTasks($projectHistoryItem->obj_id ?? null);
                 }
 
                 if (!$model->hasErrors()) {

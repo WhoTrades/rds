@@ -51,6 +51,7 @@ class DiffController extends Controller
             'newTitle' => "Новая версия: " . date('d.m.Y H:i:s', strtotime($rr1->obj_created)) . " " . $rr1->user->email,
             'currentText' => $rr2 ? $rr2->pch_config : "",
             'currentTitle' => "Старая версия: " . ($rr2 ? date('d.m.Y H:i:s', strtotime($rr2->obj_created)) . " " . $rr2->user->email : ""),
+            'log' => $rr1->pch_log,
         ));
     }
 }

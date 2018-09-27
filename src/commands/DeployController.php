@@ -7,6 +7,7 @@ use whotrades\rds\components\Status;
 use whotrades\rds\models\JiraUse;
 use whotrades\rds\models\Log;
 use whotrades\rds\models\PostMigration;
+use whotrades\rds\models\ProjectConfigHistory;
 use whotrades\RdsSystem\Cron\RabbitListener;
 use Yii;
 use yii\helpers\Url;
@@ -54,6 +55,11 @@ class DeployController extends RabbitListener
         $model->readUsedVersion(false, function (Message\ReleaseRequestUsedVersion $message) use ($model) {
             Yii::info("Received used version message: " . json_encode($message));
             $this->actionSetUsedVersion($message);
+        });
+
+        $model->readProjectConfigResult(false, function (Message\ProjectConfigResult $message) use ($model) {
+            Yii::info("Received project config result message: " . json_encode($message));
+            $this->actionSetProjectConfigResult($message);
         });
 
         $model->readRemoveReleaseRequest(false, function (Message\RemoveReleaseRequest $message) use ($model) {
@@ -333,6 +339,14 @@ class DeployController extends RabbitListener
 
             return;
         }
+
+        foreach ($releaseRequest->builds as $build) {
+            $build->build_attach .= "\n\n=== Begin Use Error Log ===\n\n";
+            $build->build_attach .= $message->text;
+            $build->build_attach .= "\n\n=== End Use Error Log ===";
+            $build->save();
+        }
+
         $releaseRequest->rr_use_text = $message->text;
         $releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLED;
         $releaseRequest->save();
@@ -383,6 +397,9 @@ class DeployController extends RabbitListener
         foreach ($builds as $build) {
             /** @var $build Build */
             $build->build_status = Build::STATUS_INSTALLED;
+            $build->build_attach .= "\n\n=== Begin Use Log ===\n\n";
+            $build->build_attach .= $message->text;
+            $build->build_attach .= "\n\n=== End Use Log ===";
             $build->save();
         }
 
@@ -495,6 +512,33 @@ class DeployController extends RabbitListener
         $transaction->commit();
 
         Yii::$app->webSockets->send('updateAllReleaseRequests', []);
+
+        $message->accepted();
+    }
+
+    /**
+     * @param Message\ProjectConfigResult $message
+     */
+    private function actionSetProjectConfigResult(Message\ProjectConfigResult $message)
+    {
+        if (!isset($message->projectConfigHistoryId)) {
+            Yii::warning('Skip processing message with NULL projectConfigHistoryId');
+            $message->accepted();
+
+            return;
+        }
+
+        $projectConfigHistory = ProjectConfigHistory::findByPk($message->projectConfigHistoryId);
+
+        if (!$projectConfigHistory) {
+            Yii::warning("Skip processing message. ProjectConfigHistory with id={$message->projectConfigHistoryId} doesn't exist");
+            $message->accepted();
+
+            return;
+        }
+
+        $projectConfigHistory->pch_log .= $message->log;
+        $projectConfigHistory->save();
 
         $message->accepted();
     }
