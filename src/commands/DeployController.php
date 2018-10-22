@@ -353,7 +353,21 @@ class DeployController extends RabbitListener
 
         Log::createLogMessage("Use error at release request {$releaseRequest->getTitle()}: " . $message->text, $message->initiatorUserName);
 
-        self::sendReleaseRequestUpdated($releaseRequest->obj_id);
+        if ($releaseRequest->isChild()) {
+            $mainReleaseRequest = ReleaseRequest::findByPk($releaseRequest->rr_leading_id);
+        } else {
+            $mainReleaseRequest = $releaseRequest;
+        }
+
+        if ($mainReleaseRequest) {
+            $oldMainReleaseRequest = $mainReleaseRequest->getOldReleaseRequest();
+        }
+
+        if ($oldMainReleaseRequest && $oldMainReleaseRequest->canBeUsed()) {
+            $oldMainReleaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
+        }
+
+        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $message->accepted();
     }

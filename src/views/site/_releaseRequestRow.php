@@ -149,13 +149,16 @@ return array(
             if ($releaseRequest->isDeleted()) {
                 return 'Сборка удалена';
             }
+
             $result = "";
-            if ($releaseRequest->canBeUsed()) {
+            if ($releaseRequest->showCronDiff()) {
                 /** @var $currentUsed ReleaseRequest */
-                $currentUsed = ReleaseRequest::find()->where([
-                    'rr_status' => ReleaseRequest::getUsedStatuses(),
-                    'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
-                ])->one();
+                $currentUsed = ReleaseRequest::find()->where(
+                    [
+                        'rr_status' => ReleaseRequest::getUsedStatuses(),
+                        'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
+                    ]
+                )->one();
 
                 if ($currentUsed && $currentUsed->getCronConfigCleaned() != $releaseRequest->getCronConfigCleaned()) {
                     $diffStat = \Yii::$app->diffStat->getDiffStat($currentUsed->getCronConfigCleaned(), $releaseRequest->getCronConfigCleaned());
@@ -164,73 +167,89 @@ return array(
                     $result .= "<a href='" . yii\helpers\Url::to(['/diff/index/', 'id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id]) .
                         "'>CRON изменен<br />$diffStat</a><br />";
                 }
+            }
 
-                if ($releaseRequest->rr_new_migration_count) {
-                    if ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_UPDATING) {
-                        return "updating migrations";
-                    } elseif ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_FAILED) {
-                        $result .= "updating migrations failed<br />";
-                        Modal::begin([
+            if ($releaseRequest->shouldBeMigrated()) {
+                if ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_UP) {
+                    return "Wrong migration status";
+                } elseif ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_UPDATING) {
+                    return "Updating migrations...";
+                } elseif ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_FAILED) {
+                    $result .= "updating migrations failed<br />";
+                    Modal::begin(
+                        [
                             'id' => 'release-request-migration-error-' . $releaseRequest->obj_id,
                             'header' => 'Errors of migration applying',
                             'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
-                        ]);
-                        echo "<pre>$releaseRequest->rr_migration_error</pre>";
-                        Modal::end();
+                        ]
+                    );
+                    echo "<pre>$releaseRequest->rr_migration_error</pre>";
+                    Modal::end();
 
-                        $result .= Html::a('view error', '#', [
-                            'style' => 'info',
-                            'data' => ['toggle' => 'modal', 'target' => '#release-request-migration-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
-                        ]);
-                        $result .= ' | ';
-                        $result .= Html::a('Retry', ['/use/migrate', 'id' => $releaseRequest->obj_id, 'type' => 'pre'], ['class' => 'ajax-url']);
-                        $result .= "<br />";
+                    $result .= Html::a(
+                        'view error', '#', [
+                                        'style' => 'info',
+                                        'data' => ['toggle' => 'modal', 'target' => '#release-request-migration-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
+                                    ]
+                    );
+                    $result .= ' | ';
+                    $result .= Html::a('Retry', ['/use/migrate', 'id' => $releaseRequest->obj_id, 'type' => 'pre'], ['class' => 'ajax-url']);
+                    $result .= "<br />";
 
-                        return $result;
-                    } else {
-                        $result .=
-                            "<a href='" . yii\helpers\Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id, 'type' => 'pre']) .
-                                "' class='ajax-url'>Запустить pre-миграции</a><br />" .
-                                "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">Показать pre миграции</a>
-                                <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
-                        foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                            $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, 'pre', $releaseRequest->rr_build_version) . ">";
-                            $result .= "$migration";
-                            $result .= "</a><br />";
-                        }
-                        $result .= "</div>";
-
-                        return $result;
-                    }
+                    return $result;
                 } else {
-                    if ($releaseRequest->rr_use_text) {
-                        Modal::begin([
-                            'id' => 'release-request-use-error-' . $releaseRequest->obj_id,
-                            'header' => 'Ошибка активации сборки',
-                            'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
-                        ]);
-                        echo "<pre>$releaseRequest->rr_use_text</pre>";
-                        Modal::end();
-
-                        $result .= Html::a('Ошибка активации', '#', [
-                            'style' => 'info',
-                            'data' => ['toggle' => 'modal', 'target' => '#release-request-use-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
-                        ]) . "<br />";
+                    $result .=
+                        "<a href='" . yii\helpers\Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id, 'type' => 'pre']) .
+                        "' class='ajax-url'>Запустить pre-миграции</a><br />" .
+                        "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">Показать pre миграции</a>
+                                <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
+                    foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
+                        $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, 'pre', $releaseRequest->rr_build_version) . ">";
+                        $result .= "$migration";
+                        $result .= "</a><br />";
                     }
-                    $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
-                        "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
+                    $result .= "</div>";
 
                     return $result;
                 }
-            } elseif ($releaseRequest->rr_status == ReleaseRequest::STATUS_USED && $releaseRequest->rr_old_version) {
-                if ($oldReleaseRequest = $releaseRequest->getOldReleaseRequest()) {
-                    if ($oldReleaseRequest->canBeUsed()) {
-                        $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $oldReleaseRequest->obj_id]) .
-                            "' --data-id='$oldReleaseRequest->obj_id' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
+            }
 
-                        return $result;
-                    }
+            if ($releaseRequest->isChild()) {
+                return '';
+            }
+
+            if ($releaseRequest->canBeUsed()) {
+                if ($releaseRequest->rr_use_text) {
+                    Modal::begin([
+                        'id' => 'release-request-use-error-' . $releaseRequest->obj_id,
+                        'header' => 'Ошибка активации сборки',
+                        'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
+                    ]);
+                    echo "<pre>$releaseRequest->rr_use_text</pre>";
+                    Modal::end();
+
+                    $result .= Html::a('Ошибка активации', '#', [
+                        'style' => 'info',
+                        'data' => ['toggle' => 'modal', 'target' => '#release-request-use-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
+                    ]) . "<br />";
                 }
+                $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
+                    "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
+
+                return $result;
+            }
+
+            if ($releaseRequest->canBeReversed()) {
+                $oldReleaseRequestId = $releaseRequest->getOldReleaseRequest()->obj_id;
+
+                $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $oldReleaseRequestId]) .
+                    "' --data-id='$oldReleaseRequestId' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
+
+                return $result;
+            }
+
+            if (!$releaseRequest->canBeUsedChildren()) {
+                return 'Waiting for children...';
             }
 
             return "";
@@ -241,16 +260,22 @@ return array(
         'class' => yii\grid\ActionColumn::class,
         'template' => '{deleteReleaseRequest}',
         'buttons' => [
-            'deleteReleaseRequest' => function ($url, $model, $key) {
-                $options = array_merge([
-                    'title' => Yii::t('yii', 'Delete'),
-                    'aria-label' => Yii::t('yii', 'Delete'),
-                    'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
-                    'data-method' => 'post',
-                    'data-pjax' => '1',
-                ]);
+            'deleteReleaseRequest' => function ($url, ReleaseRequest $model, $key) {
+                if ($model->isChild() || $model->isDeleted()) {
+                    return '';
+                } else {
+                    $options = array_merge(
+                        [
+                            'title' => Yii::t('yii', 'Delete'),
+                            'aria-label' => Yii::t('yii', 'Delete'),
+                            'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                            'data-method' => 'post',
+                            'data-pjax' => '1',
+                        ]
+                    );
 
-                return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                    return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
+                }
             },
             'urlCreator' => function (string $action, ReleaseRequest $model) {
                 return Url::to(["/site/$action", 'id' => $model->obj_id, 'returnUrl' => Yii::$app->request->getUrl()]);

@@ -43,15 +43,7 @@ class UseController extends Controller
             throw new HttpException(500, 'Deployment disabled');
         }
 
-        $slaveList = ReleaseRequest::findAllByAttributes([
-            'rr_leading_id' => $releaseRequest->obj_id,
-            'rr_status' => [ReleaseRequest::STATUS_INSTALLED, ReleaseRequest::STATUS_OLD],
-        ]);
         $releaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
-        foreach ($slaveList as $slave) {
-            /** @var $slave ReleaseRequest */
-            $slave->sendUseTasks(\Yii::$app->user->getIdentity()->username);
-        }
 
         \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
@@ -72,7 +64,7 @@ class UseController extends Controller
     public function actionMigrate($id, $type)
     {
         $releaseRequest = $this->loadModel($id);
-        if (!$releaseRequest->canBeUsed()) {
+        if (!$releaseRequest->shouldBeMigrated()) {
             $this->redirect('/');
         }
 

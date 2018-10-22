@@ -246,9 +246,68 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @return bool
      */
+    public function isChild()
+    {
+        return (bool) $this->rr_leading_id;
+    }
+
+    /**
+     * @return bool
+     */
+    public function showCronDiff()
+    {
+        return $this->rr_status === self::STATUS_INSTALLED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldBeMigrated()
+    {
+        return (($this->rr_status === self::STATUS_OLD) && $this->rr_new_migration_count);
+    }
+
+    /**
+     * @return bool
+     */
     public function canBeUsed()
     {
-        return !$this->isDeleted() && in_array($this->rr_status, array(self::STATUS_INSTALLED, self::STATUS_OLD));
+        if ($this->isDeleted() ||
+            !in_array($this->rr_status, array(self::STATUS_INSTALLED, self::STATUS_OLD)) ||
+            $this->shouldBeMigrated() ||
+            !$this->canBeUsedChildren()
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBeUsedChildren()
+    {
+        /** @var ReleaseRequest $childReleaseRequest */
+        foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
+            if (!$childReleaseRequest->canBeUsed()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBeReversed()
+    {
+        if ($this->rr_status == ReleaseRequest::STATUS_USED && ($oldReleaseRequest = $this->getOldReleaseRequest()) && $oldReleaseRequest->canBeUsed()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -410,6 +469,11 @@ class ReleaseRequest extends ActiveRecord
         }
 
         $this->save();
+
+        /** @var ReleaseRequest $childReleaseRequest */
+        foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
+            $childReleaseRequest->sendUseTasks($initiatorUserName);
+        }
     }
 
     /**

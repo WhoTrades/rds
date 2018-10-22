@@ -191,26 +191,32 @@ class SiteController extends Controller
         $messageModel = (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel();
 
         $transaction = $model->getDbConnection()->beginTransaction();
-        /** @var $model ReleaseRequest*/
-        $stopped = false;
-        foreach ($model->builds as $build) {
-            if (in_array($build->build_status, Build::getInstallingStatuses())) {
-                $model->rr_status = ReleaseRequest::STATUS_CANCELLING;
-                $model->save();
 
-                $messageModel->sendKillTask($build->worker->worker_name, new \whotrades\RdsSystem\Message\KillTask(
-                    $model->project->project_name,
-                    $build->obj_id
-                ));
+        /** @var ReleaseRequest $releaseRequest */
+        foreach (array_merge($model->getReleaseRequests()->all(), [$model]) as $releaseRequest) {
+            $stopped = false;
+            foreach ($releaseRequest->builds as $build) {
+                if (in_array($build->build_status, Build::getInstallingStatuses())) {
+                    $releaseRequest->rr_status = ReleaseRequest::STATUS_CANCELLING;
+                    $releaseRequest->save();
 
-                Log::createLogMessage("Отменен {$model->getTitle()} на {$build->worker->worker_name}");
-                $stopped = true;
+                    $messageModel->sendKillTask(
+                        $build->worker->worker_name,
+                        new \whotrades\RdsSystem\Message\KillTask(
+                            $releaseRequest->project->project_name,
+                            $build->obj_id
+                        )
+                    );
+
+                    Log::createLogMessage("Отменен {$releaseRequest->getTitle()} на {$build->worker->worker_name}");
+                    $stopped = true;
+                }
             }
-        }
 
-        if (!$stopped) {
-            Log::createLogMessage("Удален {$model->getTitle()}");
-            $model->delete();
+            if (!$stopped) {
+                Log::createLogMessage("Удален {$releaseRequest->getTitle()}");
+                $releaseRequest->delete();
+            }
         }
 
         \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
