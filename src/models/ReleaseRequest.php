@@ -262,6 +262,14 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @return bool
      */
+    public function showActivationErrors()
+    {
+        return (bool) $this->rr_use_text;
+    }
+
+    /**
+     * @return bool
+     */
     public function shouldBeMigrated()
     {
         return (($this->rr_status === self::STATUS_INSTALLED) && $this->rr_new_migration_count);
@@ -301,7 +309,7 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @return bool
      */
-    public function canBeReversed()
+    public function canBeReverted()
     {
         if ($this->rr_status == ReleaseRequest::STATUS_USED && ($oldReleaseRequest = $this->getOldReleaseRequest()) && $oldReleaseRequest->canBeUsed()) {
             return true;
@@ -443,11 +451,14 @@ class ReleaseRequest extends ActiveRecord
     /**
      * Отправляет задачи на переключение на сборку
      * @param string $initiatorUserName
+     * @param bool $withChildren
      *
      * @throws \Exception
      */
-    public function sendUseTasks($initiatorUserName)
+    public function sendUseTasks($initiatorUserName, $withChildren = null)
     {
+        $withChildren = $withChildren ?? true;
+
         $this->rr_status = ReleaseRequest::STATUS_USING;
         $this->rr_revert_after_time = date("r", time() + self::USE_ATTEMPT_TIME);
         $this->rr_old_version = $this->project->project_current_version;
@@ -470,9 +481,11 @@ class ReleaseRequest extends ActiveRecord
 
         $this->save();
 
-        /** @var ReleaseRequest $childReleaseRequest */
-        foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
-            $childReleaseRequest->sendUseTasks($initiatorUserName);
+        if ($withChildren) {
+            /** @var ReleaseRequest $childReleaseRequest */
+            foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
+                $childReleaseRequest->sendUseTasks($initiatorUserName);
+            }
         }
     }
 

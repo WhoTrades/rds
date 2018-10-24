@@ -56,6 +56,30 @@ class UseController extends Controller
 
     /**
      * @param int $id
+     *
+     * @return string
+     */
+    public function actionRevert($id)
+    {
+        $releaseRequest = $this->loadModel($id);
+        $releaseRequest->getOldReleaseRequest()->sendUseTasks(\Yii::$app->user->getIdentity()->username, false);
+
+        /** @var ReleaseRequest $childReleaseRequest */
+        foreach ($releaseRequest->getReleaseRequests()->all() as $childReleaseRequest) {
+            $childReleaseRequest->getOldReleaseRequest()->sendUseTasks(\Yii::$app->user->getIdentity()->username, false);
+        }
+
+        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
+
+        if (!empty($_GET['ajax'])) {
+            return "using";
+        } else {
+            $this->redirect('/');
+        }
+    }
+
+    /**
+     * @param int $id
      * @param string $type
      *
      * @throws HttpException

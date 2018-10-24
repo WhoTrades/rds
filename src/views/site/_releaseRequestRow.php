@@ -169,6 +169,23 @@ return array(
                 }
             }
 
+            if ($releaseRequest->showActivationErrors()) {
+                Modal::begin(
+                    [
+                        'id' => 'release-request-use-error-' . $releaseRequest->obj_id,
+                        'header' => 'Ошибка активации сборки',
+                        'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
+                    ]
+                );
+                echo "<pre>$releaseRequest->rr_use_text</pre>";
+                Modal::end();
+
+                $result .= Html::a('Ошибка активации', '#', [
+                        'style' => 'info',
+                        'data' => ['toggle' => 'modal', 'target' => '#release-request-use-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
+                    ]) . "<br />";
+            }
+
             if ($releaseRequest->shouldBeMigrated()) {
                 if ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_UP) {
                     return "Wrong migration status";
@@ -216,44 +233,34 @@ return array(
 
             if ($releaseRequest->canBeUsed()) {
                 if ($releaseRequest->isChild()) {
-                    return 'It is a child';
+                    $result .= 'It is a child';
+
+                    return $result;
                 }
 
-                if ($releaseRequest->rr_use_text) {
-                    Modal::begin([
-                        'id' => 'release-request-use-error-' . $releaseRequest->obj_id,
-                        'header' => 'Ошибка активации сборки',
-                        'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
-                    ]);
-                    echo "<pre>$releaseRequest->rr_use_text</pre>";
-                    Modal::end();
-
-                    $result .= Html::a('Ошибка активации', '#', [
-                        'style' => 'info',
-                        'data' => ['toggle' => 'modal', 'target' => '#release-request-use-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
-                    ]) . "<br />";
-                }
                 $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
                     "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
 
                 return $result;
             }
 
-            if ($releaseRequest->canBeReversed()) {
+            if ($releaseRequest->canBeReverted()) {
                 if ($releaseRequest->isChild()) {
-                    return "Prev version is {$releaseRequest->rr_old_version}";
+                    $result .= "Prev version is {$releaseRequest->rr_old_version}";
+
+                    return $result;
                 }
 
-                $oldReleaseRequestId = $releaseRequest->getOldReleaseRequest()->obj_id;
-
-                $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $oldReleaseRequestId]) .
-                    "' --data-id='$oldReleaseRequestId' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
+                $result .= "<a href='" . yii\helpers\Url::to(['/use/revert', 'id' => $releaseRequest->obj_id]) .
+                    "' --data-id='$releaseRequest->obj_id' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
 
                 return $result;
             }
 
             if (!$releaseRequest->canBeUsedChildren()) {
-                return 'Waiting for children...';
+                $result .= 'Waiting for children...';
+
+                return $result;
             }
 
             return "";
