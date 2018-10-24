@@ -264,7 +264,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function shouldBeMigrated()
     {
-        return (($this->rr_status === self::STATUS_OLD) && $this->rr_new_migration_count);
+        return (($this->rr_status === self::STATUS_INSTALLED) && $this->rr_new_migration_count);
     }
 
     /**
