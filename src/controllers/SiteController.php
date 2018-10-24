@@ -88,7 +88,7 @@ class SiteController extends Controller
                         $childReleaseRequest->rr_user_id = $model->rr_user_id;
                         $childReleaseRequest->rr_project_obj_id = $childProject->obj_id;
                         $childReleaseRequest->rr_comment =
-                            $model->rr_comment . " [slave for " . $model->project->project_name . "-$model->rr_build_version]";
+                            $model->rr_comment . " [child of " . $model->project->project_name . "-$model->rr_build_version]";
                         $childReleaseRequest->rr_release_version = $model->rr_release_version;
                         $childReleaseRequest->rr_build_version = $childProject->getNextVersion($childReleaseRequest->rr_release_version);
                         $childReleaseRequest->rr_leading_id = $model->obj_id;

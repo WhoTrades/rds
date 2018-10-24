@@ -214,11 +214,11 @@ return array(
                 }
             }
 
-            if ($releaseRequest->isChild()) {
-                return '';
-            }
-
             if ($releaseRequest->canBeUsed()) {
+                if ($releaseRequest->isChild()) {
+                    return 'It is a child';
+                }
+
                 if ($releaseRequest->rr_use_text) {
                     Modal::begin([
                         'id' => 'release-request-use-error-' . $releaseRequest->obj_id,
@@ -240,6 +240,10 @@ return array(
             }
 
             if ($releaseRequest->canBeReversed()) {
+                if ($releaseRequest->isChild()) {
+                    return "Prev version is {$releaseRequest->rr_old_version}";
+                }
+
                 $oldReleaseRequestId = $releaseRequest->getOldReleaseRequest()->obj_id;
 
                 $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $oldReleaseRequestId]) .
