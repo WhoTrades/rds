@@ -144,6 +144,16 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * @param int $id
+     *
+     * @return ReleaseRequest
+     */
+    public static function findByPkAllStatuses($id)
+    {
+        return parent::find()->andWhere(['obj_id' => $id])->one();
+    }
+
+    /**
      * @return array customized attribute labels (name=>label)
      */
     public function attributeLabels()
@@ -193,7 +203,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function isDeleted()
     {
-        return $this->obj_status_did == Status::DELETED;
+        return $this->obj_status_did == Status::DELETED || $this->obj_status_did == Status::DESTROYED;
     }
 
     /**
