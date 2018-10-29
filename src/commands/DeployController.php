@@ -120,7 +120,7 @@ class DeployController extends RabbitListener
                     $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
                     foreach ($builds as $val) {
                         $text .= "<a href='" .
-                            Url::to(['build/view', 'id' => $val->obj_id]) .
+                            Url::to(['build/view', 'id' => $val->obj_id], 'https') .
                             "'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
                     }
 
@@ -136,7 +136,7 @@ class DeployController extends RabbitListener
             case Build::STATUS_FAILED:
                 $title = "Failed to install $project->project_name";
                 $text = "Проект $project->project_name не удалось собрать. <a href='" .
-                    Url::to(['build/view', 'id' => $build->obj_id]) .
+                    Url::to(['build/view', 'id' => $build->obj_id], 'https') .
                     "'>Подробнее</a>";
 
                 Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
@@ -161,7 +161,7 @@ class DeployController extends RabbitListener
             case Build::STATUS_CANCELLED:
                 $title = "Cancelled installation of $project->project_name";
                 $text = "Сборка $project->project_name отменена. <a href='" .
-                    Url::to(['build/view', 'id' => $build->obj_id]) .
+                    Url::to(['build/view', 'id' => $build->obj_id], 'https') .
                     "'>Подробнее</a>";
 
                 $releaseRequest = $build->releaseRequest;
