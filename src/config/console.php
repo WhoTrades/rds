@@ -14,4 +14,10 @@ $config['components']['errorHandler'] = array(
     'discardExistingOutput' => false,
 );
 
+$config['components']['urlManager']['hostInfo'] = 'https://rds.myhost.com';
+
+if (file_exists(__DIR__ . "/../../config.local.php")) {
+    require(__DIR__ . "/../../config.local.php");
+}
+
 return $config;
