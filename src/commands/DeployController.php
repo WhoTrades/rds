@@ -220,13 +220,18 @@ class DeployController extends RabbitListener
             foreach ($message->migrations as $postMigrationName) {
                 $postMigrationName = str_replace('/', '\\', $postMigrationName);
 
+                if (!preg_match('/^[\w\/\\\_\-]+$/', $postMigrationName)) {
+                    Yii::info("Skip processing of post-migration {$postMigrationName} of project {$project->project_name}. Malformed name.");
+                    continue;
+                }
+
                 $postMigration = PostMigration::findByAttributes([
                     'pm_project_obj_id' => $project->obj_id,
                     'pm_name' => $postMigrationName,
                 ]);
 
                 if ($postMigration) {
-                    Yii::info("Post-migration {$postMigrationName} of project {$project->project_name} already exists in DB");
+                    Yii::info("Skip processing of post-migration {$postMigrationName} of project {$project->project_name}. Already exists in DB");
                     continue;
                 }
 
