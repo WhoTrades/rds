@@ -41,10 +41,7 @@ class JsonController extends Controller
         }
 
         if ($format === null) {
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
-            \Yii::$app->response->headers->set('Content-type', 'application/javascript; charset=utf-8');
-
-            return json_encode($result, JSON_PRETTY_PRINT);
+            return $this->asJson($result);
         }
 
         return implode(" ", $result);
@@ -59,9 +56,6 @@ class JsonController extends Controller
         /** @var $project Project */
         $project = Project::findByAttributes(['project_name' => $projectName]);
 
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_RAW;
-        \Yii::$app->response->headers->set('Content-type', 'application/javascript; charset=utf-8');
-
-        return $project ? $project->project_current_version : null;
+        $this->asJson($project ? $project->project_current_version : null);
     }
 }
