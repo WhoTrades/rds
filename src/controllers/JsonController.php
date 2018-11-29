@@ -7,6 +7,9 @@ use whotrades\rds\models\ReleaseRequest;
 
 class JsonController extends Controller
 {
+    // ag: Disable debugModule for API controllers
+    protected $disableDebugModule = true;
+
     public $enableCsrfValidation = false;
 
     /**

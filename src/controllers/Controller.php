@@ -12,6 +12,21 @@ use yii\web\Controller as ControllerBase;
 
 class Controller extends ControllerBase
 {
+    // ag: Disable debugModule for API controllers
+    protected $disableDebugModule = false;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function beforeAction($action)
+    {
+        if ($this->disableDebugModule) {
+            unset(Yii::$app->log->targets['debug']);
+        }
+
+        return parent::beforeAction($action);
+    }
+
     /**
      * @var string the default layout for the controller view. Defaults to '//layouts/column1',
      * meaning using a single column layout. See 'protected/views/layouts/column1.php'.
