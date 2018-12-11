@@ -1,5 +1,7 @@
 <?php
 
+use \whotrades\rds\migrations\base;
+
 /**
  * Class m180927_073202_alter_table_rds_project_config_history
  */

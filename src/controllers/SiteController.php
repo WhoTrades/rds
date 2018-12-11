@@ -8,7 +8,7 @@ use whotrades\rds\models\Project;
 use whotrades\rds\models\Log;
 use whotrades\rds\models\Build;
 
-class SiteController extends Controller
+class SiteController extends ControllerRestrictedBase
 {
     public $pageTitle = 'Релизы и запреты';
 
@@ -33,6 +33,10 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
+        if (!\Yii::$app->user->can('developer')) {
+            return $this->render('index-restricted');
+        }
+
         $releaseRequestSearchModel = new ReleaseRequest();
         if (isset($_GET['ReleaseRequest'])) {
             $releaseRequestSearchModel->attributes = $_GET['ReleaseRequest'];

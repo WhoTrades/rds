@@ -61,12 +61,18 @@ $config = array(
                 'recoverySubject'       => '[RDS] Восстановление пароля',
             ],
         ],
+        'rbac' => dektrium\rbac\RbacWebModule::class,
     ),
 
     // application components
     'components' => array(
         'view' => [
             'class' => 'whotrades\rds\components\View',
+            'theme' => [
+                'pathMap' => [
+                    '@dektrium/user/views' => '@app/views/dektrium-user',
+                ],
+            ],
         ],
         'request' => [
             'cookieValidationKey' => '873gl09glkdgtoGL',
@@ -176,6 +182,13 @@ $config = array(
             'class' => WebErrorHandler::class,
             'discardExistingOutput' => false,
         ),
+        'authManager' => [
+            'class' => dektrium\rbac\components\DbManager::class,
+            'itemTable' => 'rds.user_rbac_item',
+            'itemChildTable' => 'rds.user_rbac_item_child',
+            'assignmentTable' => 'rds.user_rbac_assignment',
+            'ruleTable' => 'rds.user_rbac_rule',
+        ],
     ),
 
     'params' => array(

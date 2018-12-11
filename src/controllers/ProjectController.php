@@ -11,24 +11,9 @@ use whotrades\rds\models\Project2worker;
 use whotrades\rds\models\Project2Project;
 use whotrades\rds\models\ProjectConfigHistory;
 
-class ProjectController extends Controller
+class ProjectController extends ControllerRestrictedBase
 {
     public $pageTitle = 'Проекты';
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    ['allow' => true, 'roles' => ['@']],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Displays a particular model.

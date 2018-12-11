@@ -6,39 +6,9 @@ use whotrades\rds\models\Worker;
 use yii\web\HttpException;
 use yii\data\ActiveDataProvider;
 
-class WorkerController extends Controller
+class WorkerController extends ControllerRestrictedBase
 {
     public $pageTitle = 'Сборщики';
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                    /*[
-                        'allow' => true,
-                        'actions' => ['index', 'admin'],
-                        'roles' => ['@'],
-                        //'roles' => ['*'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['create', 'update'],
-                        'roles' => ['@'],
-                        'roles' => ['admin'],
-                    ],*/
-                ],
-            ],
-        ];
-    }
 
     /**
      * Displays a particular model.

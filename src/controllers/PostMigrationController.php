@@ -8,24 +8,9 @@ use whotrades\rds\models\PostMigration;
 use whotrades\rds\models\Project2worker;
 use whotrades\rds\models\ReleaseRequest;
 
-class PostMigrationController extends Controller
+class PostMigrationController extends ControllerRestrictedBase
 {
     public $pageTitle = 'Post Migrations';
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    ['allow' => true, 'roles' => ['@']],
-                ],
-            ],
-        ];
-    }
 
     /**
      * @return string

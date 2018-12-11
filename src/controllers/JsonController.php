@@ -5,7 +5,7 @@ use whotrades\rds\models\Project;
 use yii\web\HttpException;
 use whotrades\rds\models\ReleaseRequest;
 
-class JsonController extends Controller
+class JsonController extends ControllerApiBase
 {
     // ag: Disable debugModule for API controllers
     protected $disableDebugModule = true;

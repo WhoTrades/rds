@@ -5,7 +5,7 @@ use whotrades\rds\models\ProjectConfigHistory;
 use whotrades\rds\models\ReleaseRequest;
 use yii\web\NotFoundHttpException;
 
-class DiffController extends Controller
+class DiffController extends ControllerApiBase
 {
     public $pageTitle = 'Различия';
 

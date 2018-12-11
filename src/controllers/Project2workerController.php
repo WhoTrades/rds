@@ -6,42 +6,21 @@ use yii\web\HttpException;
 use whotrades\rds\models\Project2worker;
 use yii\data\ActiveDataProvider;
 
-class Project2workerController extends Controller
+class Project2workerController extends ControllerRestrictedBase
 {
     /**
      * @return array
      */
     public function behaviors()
     {
-        return [
+        return array_merge(parent::behaviors(), [
             'verbs' => [
                 'class' => \yii\filters\VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'view'],
-                        'roles' => ['*'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['create', 'update'],
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['admin', 'delete'],
-                        'roles' => ['@'],
-                        //'roles' => ['admin'],
-                    ],
-                ],
-            ],
-        ];
+        ]);
     }
 
     /**

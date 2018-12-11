@@ -13,21 +13,21 @@ use yii\filters\VerbFilter;
 /**
  * ProjectConfigController implements the CRUD actions for ProjectConfig model.
  */
-class ProjectConfigController extends Controller
+class ProjectConfigController extends ControllerRestrictedBase
 {
     /**
      * {@inheritdoc}
      */
     public function behaviors()
     {
-        return [
+        return array_merge(parent::behaviors(), [
             'verbs' => [
-                'class' => VerbFilter::class,
+                'class' => \yii\filters\VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
-        ];
+        ]);
     }
 
     /**

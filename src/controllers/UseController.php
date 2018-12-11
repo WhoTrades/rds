@@ -9,23 +9,8 @@ use yii\web\HttpException;
 use whotrades\rds\models\RdsDbConfig;
 use whotrades\rds\models\ReleaseRequest;
 
-class UseController extends Controller
+class UseController extends ControllerRestrictedBase
 {
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    ['allow' => true, 'roles' => ['@']],
-                ],
-            ],
-        ];
-    }
-
     /**
      * @param int $id
      * Lists all models.

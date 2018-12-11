@@ -4,24 +4,9 @@ namespace whotrades\rds\controllers;
 use whotrades\rds\models\Log;
 use yii\web\HttpException;
 
-class LogController extends Controller
+class LogController extends ControllerRestrictedBase
 {
     public $pageTitle = 'Журнал';
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    ['allow' => true, 'roles' => ['@']],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Displays a particular model.

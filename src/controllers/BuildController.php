@@ -4,35 +4,21 @@ namespace whotrades\rds\controllers;
 use whotrades\rds\models\Build;
 use yii\web\HttpException;
 
-class BuildController extends Controller
+class BuildController extends ControllerRestrictedBase
 {
     /**
      * @return array
      */
     public function behaviors()
     {
-        return [
+        return array_merge(parent::behaviors(), [
             'verbs' => [
                 'class' => \yii\filters\VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'view'],
-                        'roles' => ['*'],
-                    ],
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-        ];
+        ]);
     }
 
     /**

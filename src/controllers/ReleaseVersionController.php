@@ -5,24 +5,9 @@ namespace whotrades\rds\controllers;
 use yii\web\HttpException;
 use whotrades\rds\models\ReleaseVersion;
 
-class ReleaseVersionController extends Controller
+class ReleaseVersionController extends ControllerRestrictedBase
 {
     public $pageTitle = 'Версии';
-
-    /**
-     * @return array
-     */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    ['allow' => true, 'roles' => ['@']],
-                ],
-            ],
-        ];
-    }
 
     /**
      * Displays a particular model.

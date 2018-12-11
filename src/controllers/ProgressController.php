@@ -6,7 +6,7 @@ use whotrades\rds\models\Project;
 use whotrades\rds\models\ReleaseRequest;
 use yii\web\HttpException;
 
-class ProgressController extends Controller
+class ProgressController extends ControllerApiBase
 {
     /**
      * @param string $action

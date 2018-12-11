@@ -70,7 +70,7 @@ echo Nav::widget(
                 'releases' => [
                     'label' => 'Настройка сборки',
                     'url' => ['/project/admin'],
-                    'visible' => !\Yii::$app->user->isGuest,
+                    'visible' => \Yii::$app->user->can('developer'),
                     'items' => [
                         ['label' => 'Проекты', 'url' => ['/project/admin'], 'active' => $controllerId == 'project'],
                         ['label' => 'Сборщики', 'url' => ['/worker/admin'], 'active' => $controllerId == 'worker'],
@@ -84,7 +84,7 @@ echo Nav::widget(
                 'journal' => [
                     'label' => 'Журнал',
                     'url' => ['/log/index'],
-                    'visible' => !\Yii::$app->user->isGuest,
+                    'visible' => \Yii::$app->user->can('developer'),
                 ],
                 'users' => [
                     'label' => 'Пользователи',

@@ -5,7 +5,7 @@ use whotrades\rds\models\Project;
 use yii\web\HttpException;
 use whotrades\rds\models\ReleaseRequest;
 
-class StatisticController extends Controller
+class StatisticController extends ControllerApiBase
 {
     /**
      * @param string $projectName
