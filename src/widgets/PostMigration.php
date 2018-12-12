@@ -13,7 +13,7 @@ class PostMigration extends \yii\base\Widget
      */
     public function run()
     {
-        if (\Yii::$app->user->isGuest) {
+        if (!\Yii::$app->user->can('developer')) {
             return "";
         }
 
