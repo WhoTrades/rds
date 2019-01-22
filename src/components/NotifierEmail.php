@@ -60,7 +60,7 @@ here;
         $mail = $this->getMailer($text);
         $mail->setFrom([$this->mergeConflictEmail => 'releases']);
         $mail->setTo($developerEmail);
-        $mail->setCC([$developerGroupEmail, "anaumenko@corp.finam.ru"]);
+        $mail->setCC($developerGroupEmail);
         $mail->setSubject("[RDS] Достигнут лимит максимального количества открытых задач на разработчика");
 
         return $mail->send();
