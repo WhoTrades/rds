@@ -62,7 +62,7 @@ class RemovePackagesController extends SingleInstanceController
                     Yii::info("DRY RUN - skip sending packet");
                     continue;
                 }
-                foreach ($this->builds as $build) {
+                foreach ($releaseRequest->builds as $build) {
                     $model->sendDropReleaseRequest(
                         $build->worker->worker_name,
                         new DropReleaseRequest(
