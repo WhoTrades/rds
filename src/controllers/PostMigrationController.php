@@ -5,8 +5,8 @@
 namespace whotrades\rds\controllers;
 
 use whotrades\rds\models\PostMigration;
-use whotrades\rds\models\Project2worker;
 use whotrades\rds\models\ReleaseRequest;
+use whotrades\rds\models\Build;
 
 class PostMigrationController extends ControllerRestrictedBase
 {
@@ -61,15 +61,14 @@ class PostMigrationController extends ControllerRestrictedBase
             orderBy('obj_id desc')->
             one();
 
-        foreach ($postMigration->project->project2workers as $p2w) {
-            /** @var Project2worker $p2w */
-            $worker = $p2w->worker;
+        /** @var Build $build */
+        foreach ($releaseRequestCurrent->builds as $build) {
             (new \whotrades\RdsSystem\Factory())->
             getMessagingRdsMsModel()->
             sendMigrationTask(
-                $worker->worker_name,
+                $build->worker->worker_name,
                 new \whotrades\RdsSystem\Message\MigrationTask(
-                    $postMigration->project->project_name,
+                    $releaseRequestCurrent->project->project_name,
                     $releaseRequestCurrent->rr_build_version,
                     'post',
                     $postMigration->project->script_migration_up,
