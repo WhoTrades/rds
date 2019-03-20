@@ -32,11 +32,21 @@ return array(
 
             if (Yii::$app->hasModule('Wtflow')) {
                 if ($releaseRequest->isInstalledStatus()) {
-                    $result .= "<a href='" . yii\helpers\Url::to(['/Wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id]) .
-                        "' target='_blank' onclick=\"window.open(this.href,'_blank');return false;\">Тикеты<img src='/images/open_new_window.png' alt='Open new window' style='margin-left:5px; margin-bottom:3px; width:13px;height:13px;'></a><br />";
+                    $result .= 'Jira Tickets: ';
+                    if (!$releaseRequest->isUsedStatus()) {
+                        $result .= "<a href='" . yii\helpers\Url::to(['/Wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id, 'toType' => \app\modules\Wtflow\Jira\CommitHelper::RR_TYPE_USED]) .
+                            "' target='_blank' onclick=\"window.open(this.href,'_blank');return false;\">To Used<img src='/images/open_new_window.png' alt='Open new window' style='margin-left:5px; margin-bottom:3px; width:13px;height:13px;'></a> ";
+                    }
+                    $result .= "<a href='" . yii\helpers\Url::to(['/Wtflow/jira/goto-jira-tickets-by-release-request', 'id' => $releaseRequest->obj_id, 'toType' => \app\modules\Wtflow\Jira\CommitHelper::RR_TYPE_OLD]) .
+                        "' target='_blank' onclick=\"window.open(this.href,'_blank');return false;\">To Prev<img src='/images/open_new_window.png' alt='Open new window' style='margin-left:5px; margin-bottom:3px; width:13px;height:13px;'></a> ";
+                    $result .= '<br />';
                 }
-                $result .= "<a href='/Wtflow/git/commits/?id=$releaseRequest->obj_id' onclick=\"popup('Комиты', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Комиты</button>" .
-                    "<img src='/images/open_popup_window.jpeg' alt='Open popup window' style='margin-left:5px; margin-bottom:3px; width:13px;height:13px;'>";
+                if (\app\modules\Wtflow\Jira\CommitHelper::getCommitsOfReleaseRequest($releaseRequest, \app\modules\Wtflow\Jira\CommitHelper::RR_TYPE_CURRENT)) {
+                    $result .= "<a href='/Wtflow/git/commits/?id=$releaseRequest->obj_id' onclick=\"popup('Commits', this.href, {id: {$releaseRequest->obj_id}}); return false;\">Commits to prev</button>" .
+                        "<img src='/images/open_popup_window.jpeg' alt='Open popup window' style='margin-left:5px; margin-bottom:3px; width:13px;height:13px;'>";
+                } else {
+                    $result .= 'No commits';
+                }
             }
 
             return $result;
