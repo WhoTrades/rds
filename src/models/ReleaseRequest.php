@@ -98,6 +98,58 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * @param int $projectObjId
+     * @param int $userId
+     * @param string $comment
+     *
+     * @return self[]
+     *
+     * @throws \Exception
+     */
+    public static function create($projectObjId, $releaseVersion, $userId, $comment)
+    {
+        $model = new self();
+
+        $model->rr_project_obj_id = $projectObjId;
+        $model->rr_release_version = $releaseVersion;
+        $model->rr_comment = $comment;
+        $model->rr_user_id = $userId;
+        if ($model->rr_project_obj_id) {
+            $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
+        }
+        if ($model->save()) {
+            $childModels = [];
+            foreach ($model->project->project2ProjectList as $project2ProjectObject) {
+                /** @var Project $childProject */
+                $childProject = $project2ProjectObject->child;
+
+                $childReleaseRequest = new self();
+                $childReleaseRequest->rr_user_id = $model->rr_user_id;
+                $childReleaseRequest->rr_project_obj_id = $childProject->obj_id;
+                $childReleaseRequest->rr_comment =
+                    $model->rr_comment . " [child of " . $model->project->project_name . "-$model->rr_build_version]";
+                $childReleaseRequest->rr_release_version = $model->rr_release_version;
+                $childReleaseRequest->rr_build_version = $childProject->getNextVersion($childReleaseRequest->rr_release_version);
+                $childReleaseRequest->rr_leading_id = $model->obj_id;
+                $childReleaseRequest->save();
+
+                $childReleaseRequest->createBuildTasks();
+
+                $childModels[] = $childReleaseRequest;
+            }
+
+            $model->rr_comment = "$model->rr_comment";
+            $model->save();
+
+            $model->createBuildTasks();
+
+            return array_merge([$model], $childModels);
+        }
+
+        return [];
+    }
+
+    /**
      * @param string $attribute
      */
     public function checkForReleaseReject($attribute)

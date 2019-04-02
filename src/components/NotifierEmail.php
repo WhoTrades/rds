@@ -2,6 +2,7 @@
 namespace whotrades\rds\components;
 
 use Yii;
+use yii\helpers\Url;
 
 class NotifierEmail extends \yii\base\BaseObject
 {
@@ -34,6 +35,32 @@ class NotifierEmail extends \yii\base\BaseObject
         $mail->setSubject("[RDS] $title");
 
         return $mail->send();
+    }
+
+
+    /**
+     * @param string $projectName
+     * @param string $version
+     * @param array $buildIdList
+     */
+    public function sendReleaseRequestDeployNotification($projectName, $version, array $buildIdList)
+    {
+        $title = "Success installed $projectName v.$version";
+        $text = "Проект $projectName был собран и разложен по серверам.<br />";
+        foreach ($buildIdList as $buildId) {
+            $text .= "<a href='" .
+                Url::to(['build/view', 'id' => $buildId], 'https') .
+                "'>Подробнее {$projectName} v.{$version}</a><br />";
+        }
+
+        $this->sendReleaseRejectCustomNotification($title, $text);
+
+        foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
+            if (!$phone) {
+                continue;
+            }
+            Yii::$app->smsSender->sendSms($phone, $title);
+        }
     }
 
     /**

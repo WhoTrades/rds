@@ -77,47 +77,23 @@ class SiteController extends ControllerRestrictedBase
         $transaction = $model->getDbConnection()->beginTransaction();
         try {
             if (isset($_POST['ReleaseRequest'])) {
-                $model->attributes = $_POST['ReleaseRequest'];
-                $model->rr_user_id = \Yii::$app->user->id;
-                if ($model->rr_project_obj_id) {
-                    $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
+                $releaseRequestList = ReleaseRequest::create(
+                    $_POST['ReleaseRequest']['rr_project_obj_id'],
+                    $_POST['ReleaseRequest']['rr_release_version'],
+                    \Yii::$app->user->id,
+                    $_POST['ReleaseRequest']['rr_comment']
+                );
+
+                $transaction->commit();
+
+                /** @var ReleaseRequest $releaseRequest */
+                foreach ($releaseRequestList as $releaseRequest) {
+                    $releaseRequest->sendBuildTasks();
                 }
-                if ($model->save()) {
-                    $childModels = [];
-                    foreach ($model->project->project2ProjectList as $project2ProjectObject) {
-                        /** @var Project $childProject */
-                        $childProject = $project2ProjectObject->child;
 
-                        $childReleaseRequest = new ReleaseRequest();
-                        $childReleaseRequest->rr_user_id = $model->rr_user_id;
-                        $childReleaseRequest->rr_project_obj_id = $childProject->obj_id;
-                        $childReleaseRequest->rr_comment =
-                            $model->rr_comment . " [child of " . $model->project->project_name . "-$model->rr_build_version]";
-                        $childReleaseRequest->rr_release_version = $model->rr_release_version;
-                        $childReleaseRequest->rr_build_version = $childProject->getNextVersion($childReleaseRequest->rr_release_version);
-                        $childReleaseRequest->rr_leading_id = $model->obj_id;
-                        $childReleaseRequest->save();
+                \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
-                        $childReleaseRequest->createBuildTasks();
-
-                        $childModels[] = $childReleaseRequest;
-                    }
-
-                    $model->rr_comment = "$model->rr_comment";
-                    $model->save();
-
-                    $model->createBuildTasks();
-                    $transaction->commit();
-
-                    $model->sendBuildTasks();
-                    foreach ($childModels as $releaseRequest) {
-                        $releaseRequest->sendBuildTasks();
-                    }
-
-                    \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
-
-                    $this->redirect(array('index'));
-                }
+                $this->redirect(array('index'));
             }
         } catch (\Exception $e) {
             if ($transaction->isActive) {

@@ -112,24 +112,19 @@ class DeployController extends RabbitListener
         switch ($status) {
             case Build::STATUS_INSTALLED:
                 if ($build->releaseRequest && $build->releaseRequest->countNotFinishedBuilds() == 0) {
-                    $builds = $build->releaseRequest->builds;
                     $build->releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLED;
                     $build->releaseRequest->rr_built_time = date("r");
                     $build->releaseRequest->save();
-                    $title = "Success installed $project->project_name v.$version";
-                    $text = "Проект $project->project_name был собран и разложен по серверам.<br />";
-                    foreach ($builds as $val) {
-                        $text .= "<a href='" .
-                            Url::to(['build/view', 'id' => $val->obj_id], 'https') .
-                            "'>Подробнее {$val->worker->worker_name} v.{$val->build_version}</a><br />";
-                    }
 
-                    Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
-                    foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
-                        if (!$phone) {
-                            continue;
-                        }
-                        Yii::$app->smsSender->sendSms($phone, $title);
+                    if (!$build->releaseRequest->isChild()) {
+                        $buildIdList = array_map(
+                            function ($build) {
+                                return $build->obj_id;
+                            },
+                            $build->releaseRequest->builds
+                        );
+
+                        Yii::$app->EmailNotifier->sendReleaseRequestDeployNotification($project->project_name, $version, $buildIdList);
                     }
                 }
                 break;
@@ -138,6 +133,13 @@ class DeployController extends RabbitListener
                 $text = "Проект $project->project_name не удалось собрать. <a href='" .
                     Url::to(['build/view', 'id' => $build->obj_id], 'https') .
                     "'>Подробнее</a>";
+
+                $buildIdList = array_map(
+                    function ($build) {
+                        return $build->obj_id;
+                    },
+                    $build->releaseRequest->builds
+                );
 
                 Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                 foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
