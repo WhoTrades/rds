@@ -136,21 +136,23 @@ return array(
             if ($r->rr_built_time) {
                 $buildFinishTime = strtotime($r->rr_built_time);
                 $buildTimeLog = json_decode((reset($r->builds))->build_time_log, true);
-                $buildTime = round(end($buildTimeLog) - reset($buildTimeLog));
                 $activationText = '';
                 // ag: Backward compatibility with old build_time_log #WTA-1754
                 if (reset($buildTimeLog) < strtotime($r->obj_created)) {
+                    $buildTime = round(end($buildTimeLog) - reset($buildTimeLog));
                     $timeFull = round($buildFinishTime - strtotime($r->obj_created));
                     $timeAdditional = $timeFull - $buildTime;
                     $additionalText = "Очередь+раскладка: <b>$timeAdditional</b> сек.";
                 } else {
-                    $timeQueueing = round(reset($buildTimeLog) - strtotime($r->obj_created));
+                    $buildStartTime = reset($buildTimeLog);
+                    $timeQueueing = round($buildStartTime - strtotime($r->obj_created));
                     $timeDeploying = 0;
                     foreach ($buildTimeLog as $action => $time) {
                         if ($buildFinishTime < $time) {
                             break;
                         }
                         $timeDeploying = round($buildFinishTime - $time);
+                        $buildTime = round($time - $buildStartTime);
                     }
                     if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]) && isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS])) {
                         $timeActivating = round($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS] - $buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]);
