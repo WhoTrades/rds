@@ -67,6 +67,10 @@ class ReleaseRequest extends ActiveRecord
     const MIGRATION_STATUS_FAILED    = 'failed';
     const MIGRATION_STATUS_UP        = 'up';
 
+    const BUILD_LOG_USING_START = 'using start';
+    const BUILD_LOG_USING_ERROR = 'using error';
+    const BUILD_LOG_USING_SUCCESS = 'using success';
+
     /**
      * @return string the associated database table name
      */
@@ -543,6 +547,8 @@ class ReleaseRequest extends ActiveRecord
 
         $this->save();
 
+        $this->addBuildTimeLog(self::BUILD_LOG_USING_START);
+
         if ($withChildren) {
             /** @var ReleaseRequest $childReleaseRequest */
             foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
@@ -566,7 +572,7 @@ class ReleaseRequest extends ActiveRecord
 
 
     /**
-     * @return ActiveQuery
+     * @return ActiveQuery | Build[]
      */
     public function getBuilds()
     {
@@ -595,5 +601,25 @@ class ReleaseRequest extends ActiveRecord
     public function getReleaseRequests()
     {
         return $this->hasMany(releaseRequest::class, ['rr_leading_id' => 'obj_id']);
+    }
+
+    /**
+     * @param string $action
+     * @param float | null $time
+     *
+     * @throws \Exception
+     */
+    public function addBuildTimeLog($action, $time = null)
+    {
+        $time = $time ?? microtime(true);
+
+        foreach ($this->builds as $build) {
+            $data = json_decode($build->build_time_log, true);
+            $data[$action] = (float) $time;
+
+            asort($data);
+            $build->build_time_log = json_encode($data);
+            $build->save();
+        }
     }
 }

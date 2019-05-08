@@ -31,30 +31,21 @@ class ProgressController extends ControllerApiBase
             throw new HttpException(404, 'Release request not found');
         }
 
-        /** @var $build Build */
-        $build = Build::find()->where(['build_release_request_obj_id' => $rr->obj_id])->one();
-        if (!$build) {
-            throw new HttpException(404, 'Build not found');
-        }
+        $rr->addBuildTimeLog($action, $time);
 
-        $data = json_decode($build->build_time_log, true);
-        $data[$action] = (float) $time;
-
-        asort($data);
-        $build->build_time_log = json_encode($data);
-        $build->save();
-
-        $this->sendProgressbarChanged($build);
+        $this->sendProgressbarChanged($rr);
 
         return json_encode(['ok' => true]);
     }
 
-    private function sendProgressbarChanged(Build $build)
+    /**
+     * @param ReleaseRequest $rr
+     */
+    private function sendProgressbarChanged(ReleaseRequest $rr)
     {
-        $info = $build->getProgressbarInfo();
-        if ($info) {
+        if ($rr->builds && isset($rr->builds[0]) && ($info = $rr->builds[0]->getProgressbarInfo())) {
             list($percent, $key) = $info;
-            \Yii::$app->webSockets->send('progressbarChanged', ['build_id' => $build->obj_id, 'percent' => $percent, 'key' => $key]);
+            \Yii::$app->webSockets->send('progressbarChanged', ['build_id' => $rr->builds[0]->obj_id, 'percent' => $percent, 'key' => $key]);
         }
     }
 }

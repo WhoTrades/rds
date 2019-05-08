@@ -1,5 +1,8 @@
 <?php
 /** @var $model whotrades\rds\models\Build */
+
+use whotrades\rds\models\ReleaseRequest;
+
 ?>
 
     <h1>Сборка #<?php echo $model->obj_id; ?> (<?= $model->project->project_name ?>
@@ -34,16 +37,26 @@ echo yii\widgets\DetailView::widget([
                     }
                     $timeLogPrepared[$prevAction . ' + queueing + deploy'] = strtotime($model->releaseRequest->rr_built_time) - strtotime($model->releaseRequest->obj_created) - $prevTime;
                 } else {
+                    $buildFinishTime = $model->releaseRequest->rr_built_time ? strtotime($model->releaseRequest->rr_built_time) : null;
                     $timeLogPrepared = [];
                     $prevTime = strtotime($model->releaseRequest->obj_created);
                     $prevAction = 'queueing';
                     foreach ($timeLogRaw as $action => $time) {
+                        if ($buildFinishTime && $buildFinishTime < $time) {
+                            break;
+                        }
+
                         $timeLogPrepared[$prevAction] = $time - $prevTime;
                         $prevAction = $action;
                         $prevTime = $time;
                     }
-                    if ($model->releaseRequest->rr_built_time) {
-                        $timeLogPrepared[$prevAction . ' + deploy'] = strtotime($model->releaseRequest->rr_built_time) - $prevTime;
+
+                    if ($buildFinishTime) {
+                        $timeLogPrepared[$prevAction . ' + deploy'] = $buildFinishTime - $prevTime;
+                    }
+
+                    if (isset($timeLogRaw[ReleaseRequest::BUILD_LOG_USING_START]) && isset($timeLogRaw[ReleaseRequest::BUILD_LOG_USING_SUCCESS])) {
+                        $timeLogPrepared['activating'] = round($timeLogRaw[ReleaseRequest::BUILD_LOG_USING_SUCCESS] - $timeLogRaw[ReleaseRequest::BUILD_LOG_USING_START]);
                     }
                 }
 

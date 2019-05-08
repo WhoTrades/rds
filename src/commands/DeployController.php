@@ -134,13 +134,6 @@ class DeployController extends RabbitListener
                     Url::to(['build/view', 'id' => $build->obj_id], 'https') .
                     "'>Подробнее</a>";
 
-                $buildIdList = array_map(
-                    function ($build) {
-                        return $build->obj_id;
-                    },
-                    $build->releaseRequest->builds
-                );
-
                 Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
                 foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
                     if (!$phone) {
@@ -374,6 +367,8 @@ class DeployController extends RabbitListener
             $oldMainReleaseRequest->sendUseTasks(\Yii::$app->user->getIdentity()->username);
         }
 
+        $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_ERROR);
+
         \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $message->accepted();
@@ -533,6 +528,8 @@ class DeployController extends RabbitListener
                 }
             }
         }
+
+        $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_SUCCESS);
 
         $transaction->commit();
 

@@ -134,20 +134,32 @@ return array(
         'attribute' => 'rr_build_version',
         'value' => function (ReleaseRequest $r) {
             if ($r->rr_built_time) {
+                $buildFinishTime = strtotime($r->rr_built_time);
                 $buildTimeLog = json_decode((reset($r->builds))->build_time_log, true);
                 $buildTime = round(end($buildTimeLog) - reset($buildTimeLog));
+                $activationText = '';
                 // ag: Backward compatibility with old build_time_log #WTA-1754
                 if (reset($buildTimeLog) < strtotime($r->obj_created)) {
-                    $timeFull = round(strtotime($r->rr_built_time) - strtotime($r->obj_created));
+                    $timeFull = round($buildFinishTime - strtotime($r->obj_created));
                     $timeAdditional = $timeFull - $buildTime;
                     $additionalText = "Очередь+раскладка: <b>$timeAdditional</b> сек.";
                 } else {
                     $timeQueueing = round(reset($buildTimeLog) - strtotime($r->obj_created));
-                    $timeDeploying = round(strtotime($r->rr_built_time) - end($buildTimeLog));
+                    $timeDeploying = 0;
+                    foreach ($buildTimeLog as $action => $time) {
+                        if ($buildFinishTime < $time) {
+                            break;
+                        }
+                        $timeDeploying = round($buildFinishTime - $time);
+                    }
+                    if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]) && isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS])) {
+                        $timeActivating = round($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS] - $buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]);
+                        $activationText = "Активация: <b>$timeActivating</b> сек.";
+                    }
                     $additionalText = "Очередь: <b>$timeQueueing</b> сек. Раскладка: <b>$timeDeploying</b> сек.";
                 }
 
-                return $r->rr_build_version . "<br />Сборка: <b>$buildTime</b>  сек.<br />" . $additionalText;
+                return $r->rr_build_version . "<br />Сборка: <b>$buildTime</b>  сек. " . ($activationText ?? '') . "<br />" . $additionalText;
             } else {
                 return $r->rr_build_version;
             }
