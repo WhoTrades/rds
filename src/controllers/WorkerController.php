@@ -88,6 +88,8 @@ class WorkerController extends ControllerRestrictedBase
     {
         $dataProvider = new ActiveDataProvider(['query' => Worker::find()]);
 
+        $dataProvider->sort->defaultOrder = ['worker_name' => SORT_ASC];
+
         return $this->render('index', array(
             'dataProvider' => $dataProvider,
         ));

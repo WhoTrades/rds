@@ -248,6 +248,8 @@ class Project extends ActiveRecord
         $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 100]]);
         $this->load($params, 'search');
 
+        $dataProvider->sort->defaultOrder = ['project_name' => SORT_ASC];
+
         return $dataProvider;
     }
 
