@@ -92,3 +92,16 @@
     color: #FF8888;
 }
 
+.disabled-container {
+    text-align: center;
+    padding-bottom: 15px;
+}
+
+.disabled {
+    display: inline-block;
+    color: black;
+    background-color: orange;
+    font-size: 25px;
+    padding: 5px 15px;
+}
+

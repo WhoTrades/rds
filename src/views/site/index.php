@@ -200,17 +200,4 @@ echo $this->render('_releaseRequestGrid', [
     body table.table tr.release-request-deleted {
         background: rgba(248, 215, 218, 0.3);
     }
-
-    .disabled-container {
-        text-align: center;
-        padding-bottom: 15px;
-    }
-
-    .disabled {
-        display: inline-block;
-        color: black;
-        background-color: orange;
-        font-size: 25px;
-        padding: 5px 15px;
-    }
 </style>
