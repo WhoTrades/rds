@@ -10,6 +10,10 @@ use yii\widgets\Pjax;
 /** @var $releaseRejectSearchModel ReleaseReject */
 /** @var $releaseRequestSearchModel ReleaseRequest */
 /** @var $mainProjects Project[] */
+
+/**
+ * @var $deploymentEnabled bool
+ */
 ?>
 
 <h1>
@@ -53,7 +57,15 @@ echo GridView::widget(array(
 Pjax::end();
 ?>
 <hr />
+
+<? if (! $deploymentEnabled) { ?>
+    <div class="disabled-container">
+        <div class="disabled">Deployment disabled</div>
+    </div>
+<? } ?>
+
 <div class="row">
+
     <div class="col-md-4">
         <?php
         yii\bootstrap\Modal::begin(array(
@@ -66,11 +78,14 @@ Pjax::end();
         ?>
         <h2 style="margin:0;">
             Запрос релиза
-            <button type="button" accesskey="`" class="btn btn-primary" data-toggle="modal" data-target="#release-request-form-modal"
-                onclick="refreshCreateReleaseRequestDialog(0)"
-            >
-                Собрать проект
-            </button>
+
+            <? if ($deploymentEnabled) { ?>
+                <button type="button" accesskey="`" class="btn btn-primary" data-toggle="modal" data-target="#release-request-form-modal"
+                    onclick="refreshCreateReleaseRequestDialog(0)"
+                >
+                    Собрать проект
+                </button>
+            <? } ?>
         </h2>
     </div>
     <div class="col-md-8" style="float: right">
@@ -184,5 +199,18 @@ echo $this->render('_releaseRequestGrid', [
     }
     body table.table tr.release-request-deleted {
         background: rgba(248, 215, 218, 0.3);
+    }
+
+    .disabled-container {
+        text-align: center;
+        padding-bottom: 15px;
+    }
+
+    .disabled {
+        display: inline-block;
+        color: black;
+        background-color: orange;
+        font-size: 25px;
+        padding: 5px 15px;
     }
 </style>

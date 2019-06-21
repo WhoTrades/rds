@@ -29,6 +29,7 @@ $this->registerJs('
     <?php
         $form = yii\bootstrap\ActiveForm::begin(array(
             'id' => 'release-request-form',
+            'action' => \yii\helpers\Url::toRoute('site/create-release')
         ));
     ?>
 

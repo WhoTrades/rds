@@ -24,7 +24,8 @@ class StopDeploymentForm extends \yii\base\Model
     public function rules()
     {
         return [
-            ['reason', 'check'],
+            [['status'], 'required'],
+            ['reason', 'check', 'skipOnEmpty' => false],
         ];
     }
 
@@ -33,7 +34,7 @@ class StopDeploymentForm extends \yii\base\Model
      */
     public function check()
     {
-        if (!$this->status && !$this->reason) {
+        if (! $this->status && ! $this->reason) {
             $this->addError('reason', 'Укажите причину и время отключения сервиса');
         }
     }

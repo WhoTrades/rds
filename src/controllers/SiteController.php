@@ -1,7 +1,9 @@
 <?php
 namespace whotrades\rds\controllers;
 
+use whotrades\rds\components\ActiveRecord;
 use whotrades\rds\components\Status;
+use whotrades\rds\models\RdsDbConfig;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\ReleaseReject;
 use whotrades\rds\models\Project;
@@ -66,17 +68,28 @@ class SiteController extends ControllerRestrictedBase
             'releaseRequestSearchModel' => $releaseRequestSearchModel,
             'releaseRejectSearchModel' => $releaseRejectSearchModel,
             'mainProjects' => $mainProjects,
-            'releaseRequest' => $this->createReleaseRequest(),
+            'deploymentEnabled' => RdsDbConfig::get()->deployment_enabled,
+            'releaseRequest' => [
+                'model' => new ReleaseRequest(),
+            ],
         ));
     }
 
-    private function createReleaseRequest()
+    /**
+     * @return string
+     *
+     * @throws \yii\db\Exception
+     */
+    public function actionCreateRelease()
     {
-        $model = new ReleaseRequest();
+        if (! \Yii::$app->user->can('developer')) {
+            return $this->render('index-restricted');
+        }
 
-        $transaction = $model->getDbConnection()->beginTransaction();
-        try {
-            if (isset($_POST['ReleaseRequest'])) {
+        if (isset($_POST['ReleaseRequest']) && RdsDbConfig::get()->deployment_enabled) {
+            try {
+                $transaction = ActiveRecord::getDb()->beginTransaction();
+
                 $releaseRequestList = ReleaseRequest::create(
                     $_POST['ReleaseRequest']['rr_project_obj_id'],
                     $_POST['ReleaseRequest']['rr_release_version'],
@@ -92,17 +105,16 @@ class SiteController extends ControllerRestrictedBase
                 }
 
                 \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
+            } catch (\Exception $e) {
+                if ($transaction->isActive) {
+                    $transaction->rollBack();
+                }
 
-                $this->redirect(array('index'));
+                throw $e;
             }
-        } catch (\Exception $e) {
-            if ($transaction->isActive) {
-                $transaction->rollBack();
-            }
-            throw $e;
         }
 
-        return ['model' => $model];
+        $this->redirect(['index']);
     }
 
     /**
