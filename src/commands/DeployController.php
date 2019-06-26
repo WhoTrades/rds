@@ -134,7 +134,8 @@ class DeployController extends RabbitListener
                     Url::to(['build/view', 'id' => $build->obj_id], 'https') .
                     "'>Подробнее</a>";
 
-                Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
+                Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
+
                 foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
                     if (!$phone) {
                         continue;

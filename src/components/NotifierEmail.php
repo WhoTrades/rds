@@ -21,6 +21,7 @@ class NotifierEmail extends \yii\base\BaseObject
 
         return $mailer;
     }
+
     /**
      * @param string $title
      * @param string $text
@@ -37,6 +38,19 @@ class NotifierEmail extends \yii\base\BaseObject
         return $mail->send();
     }
 
+    /**
+     * Дает взможность проксировать и расширять логику обработки уведомлений о падение сборки
+     *
+     * @param $projectName
+     * @param $title
+     * @param $text
+     *
+     * @return bool
+     */
+    public function sendReleaseRequestFailedNotification($projectName, $title, $text)
+    {
+        return $this->sendReleaseRejectCustomNotification($title, $text);
+    }
 
     /**
      * @param string $projectName
