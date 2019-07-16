@@ -97,7 +97,6 @@ class RemovePackagesController extends SingleInstanceController
             ->andWhere("string_to_array(rr_build_version, '.')::int[] >= string_to_array('" . addslashes($startVersion) . "', '.')::int[]")
             ->andWhere("string_to_array(rr_build_version, '.')::int[] <= string_to_array('" . addslashes($endVersion) . "', '.')::int[]")
             ->andWhere(['in', 'rr_status', ReleaseRequest::getInstalledStatuses()])
-            ->andWhere('release_request.obj_status_did <> ' . Status::DESTROYED) // ag: exclude destroyed manually releases in the middle
             ->count();
 
         return $count;
