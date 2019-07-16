@@ -34,6 +34,7 @@ class RemovePackagesController extends SingleInstanceController
 
         $maxDate = date('Y-m-d H:i:s', strtotime("-" . $minTimeAtProd));
 
+        // ag: Find old releases
         $releaseRequestsQuery = ReleaseRequest::find()->joinWith(['project'])->where(['<=', 'release_request.obj_created', $maxDate]);
         $releaseRequestsQuery->andWhere('rr_build_version <> project_current_version');
         $releaseRequestsQuery->andWhere('release_request.obj_status_did <> ' . Status::DESTROYED);
@@ -43,6 +44,11 @@ class RemovePackagesController extends SingleInstanceController
         $releaseRequestsQuery->limit($this->limit);
         $releaseRequestsQuery->orderBy('obj_created asc');
         $releaseRequests = $releaseRequestsQuery->all();
+
+        // ag: Find manually deleted releases
+        $releaseRequestsQuery = ReleaseRequest::find()->joinWith(['project'])->where('release_request.obj_status_did = ' . Status::DELETED);
+        $releaseRequestsQuery->andWhere('rr_build_version <> project_current_version');
+        $releaseRequests = array_merge($releaseRequests, $releaseRequestsQuery->all());
 
         foreach ($releaseRequests as $releaseRequest) {
             /** @var $releaseRequest ReleaseRequest */
@@ -56,7 +62,8 @@ class RemovePackagesController extends SingleInstanceController
 
             $count = $this->countInstalledBuildsBetweenVersions($project->obj_id, $releaseRequest->rr_build_version, $project->project_current_version);
 
-            if ($count > $minBuildsCountBeforeActive) {
+            // ag: Destroy old or manually deleted releases
+            if ($count > $minBuildsCountBeforeActive || $releaseRequest->obj_status_did == Status::DELETED) {
                 Yii::info("Sending delete message for release_request={$releaseRequest->getBuildTag()}, created=$releaseRequest->obj_created");
                 if ($this->dryRun) {
                     Yii::info("DRY RUN - skip sending packet");
@@ -87,9 +94,10 @@ class RemovePackagesController extends SingleInstanceController
     {
         $count = ReleaseRequest::find()
             ->andWhere(['rr_project_obj_id' => $projectId])
-            ->andWhere("string_to_array(rr_build_version, '.')::int[] > string_to_array('" . addslashes($startVersion) . "', '.')::int[]")
-            ->andWhere("string_to_array(rr_build_version, '.')::int[] < string_to_array('" . addslashes($endVersion) . "', '.')::int[]")
+            ->andWhere("string_to_array(rr_build_version, '.')::int[] >= string_to_array('" . addslashes($startVersion) . "', '.')::int[]")
+            ->andWhere("string_to_array(rr_build_version, '.')::int[] <= string_to_array('" . addslashes($endVersion) . "', '.')::int[]")
             ->andWhere(['in', 'rr_status', ReleaseRequest::getInstalledStatuses()])
+            ->andWhere('release_request.obj_status_did <> ' . Status::DESTROYED) // ag: exclude destroyed manually releases in the middle
             ->count();
 
         return $count;
