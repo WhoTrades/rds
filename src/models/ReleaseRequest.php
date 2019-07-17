@@ -449,6 +449,34 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * @param string $tag
+     *
+     * @return string | null
+     */
+    public static function getProjectNameByBuildTag($tag)
+    {
+        if (preg_match('~^([\w-]+)-[\d.]+$~', $tag, $ans)) {
+            return $ans[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $tag
+     *
+     * @return string | null
+     */
+    public static function getBuildVersionByBuildTag($tag)
+    {
+        if (preg_match('~^[\w-]+-([\d.]+)$~', $tag, $ans)) {
+            return $ans[1];
+        }
+
+        return null;
+    }
+
+    /**
      * @throws \Exception
      */
     public function createBuildTasks()
