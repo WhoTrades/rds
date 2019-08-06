@@ -171,6 +171,35 @@ class SiteController extends ControllerRestrictedBase
     /**
      * @param int $id
      *
+     * @return string | null
+     */
+    public function actionInstallRelease($id)
+    {
+        /** @var ReleaseRequest $releaseRequest */
+        $releaseRequest = ReleaseRequest::findByPk($id);
+        if (!$releaseRequest->shouldBeInstalled()) {
+            throw new HttpException(500, 'Wrong release request status');
+        }
+
+        $deployment_enabled = RdsDbConfig::get()->deployment_enabled;
+        if (!$deployment_enabled) {
+            throw new HttpException(500, 'Deployment disabled');
+        }
+
+        $releaseRequest->sendInstallTask();
+
+        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
+
+        if (!empty($_GET['ajax'])) {
+            return "using";
+        }
+
+        $this->redirect('/');
+    }
+
+    /**
+     * @param int $id
+     *
      * @throws \Exception
      */
     public function actionDeleteReleaseRequest($id)

@@ -99,6 +99,7 @@ class DeployController extends RabbitListener
 
         $project = $build->project;
 
+        $buildPrevStatus = $build->build_status;
         $build->build_status = $status;
         if ($attach) {
             $build->build_attach .= $attach;
@@ -110,11 +111,42 @@ class DeployController extends RabbitListener
         $build->save();
 
         switch ($status) {
+            case Build::STATUS_BUILDING:
+                if (!empty($build->releaseRequest) && empty($build->releaseRequest->rr_build_started)) {
+                    $build->releaseRequest->rr_status = ReleaseRequest::STATUS_BUILDING;
+                    $build->releaseRequest->rr_build_started = date("Y-m-d H:i:s");
+                    $build->releaseRequest->save();
+                }
+
+                break;
+            case Build::STATUS_BUILT:
+                if ($build->releaseRequest && $build->releaseRequest->countNotBuiltBuilds() == 0) {
+                    $build->releaseRequest->rr_status = ReleaseRequest::STATUS_BUILT;
+                    $build->releaseRequest->save();
+
+                    $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_BUILD_SUCCESS);
+
+                    $build->releaseRequest->sendInstallTask();
+                }
+
+                break;
+            case Build::STATUS_INSTALLING:
+                if ($build->releaseRequest->rr_status !== ReleaseRequest::STATUS_INSTALLING) {
+                    $build->releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLING;
+                    $build->releaseRequest->save();
+                }
+
+                $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_INSTALL_START);
+
+                break;
             case Build::STATUS_INSTALLED:
-                if ($build->releaseRequest && $build->releaseRequest->countNotFinishedBuilds() == 0) {
+                if ($build->releaseRequest && $build->releaseRequest->countNotInstalledBuilds() == 0) {
                     $build->releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLED;
+                    $build->releaseRequest->rr_last_error_text = null;
                     $build->releaseRequest->rr_built_time = date("r");
                     $build->releaseRequest->save();
+
+                    $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS);
 
                     if (!$build->releaseRequest->isChild()) {
                         $buildIdList = array_map(
@@ -129,29 +161,48 @@ class DeployController extends RabbitListener
                 }
                 break;
             case Build::STATUS_FAILED:
-                $title = "Failed to install $project->project_name";
-                $text = "Проект $project->project_name не удалось собрать. <a href='" .
-                    Url::to(['build/view', 'id' => $build->obj_id], 'https') .
-                    "'>Подробнее</a>";
+                switch ($buildPrevStatus) {
+                    case Build::STATUS_BUILDING:
+                        $title = "Failed to build $project->project_name";
+                        $text = "Проект $project->project_name не удалось собрать. <a href='" .
+                            Url::to(['build/view', 'id' => $build->obj_id], 'https') .
+                            "'>Подробнее</a>";
 
-                Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
+                        Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
 
-                foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
-                    if (!$phone) {
-                        continue;
-                    }
-                    Yii::$app->smsSender->sendSms($phone, $title);
-                }
-                $releaseRequest = $build->releaseRequest;
-                if (!empty($releaseRequest)) {
-                    $releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
-                    $releaseRequest->save();
-                }
-                break;
-            case Build::STATUS_BUILDING:
-                if (!empty($build->releaseRequest) && empty($build->releaseRequest->rr_build_started)) {
-                    $build->releaseRequest->rr_build_started = date("Y-m-d H:i:s");
-                    $build->releaseRequest->save();
+                        foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
+                            if (!$phone) {
+                                continue;
+                            }
+                            Yii::$app->smsSender->sendSms($phone, $title);
+                        }
+
+                        if ($build->releaseRequest) {
+                            $build->releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
+                            $build->releaseRequest->save();
+
+                            $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_BUILD_ERROR);
+                        }
+
+                        break;
+                    case Build::STATUS_INSTALLING:
+                        $title = "Failed to install $project->project_name";
+                        $text = "Проект $project->project_name не удалось разложить по серверам. <a href='" .
+                            Url::to(['build/view', 'id' => $build->obj_id], 'https') .
+                            "'>Подробнее</a>";
+
+                        Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
+
+                        // ag: Revert to status BUILT and add error description
+                        if ($build->releaseRequest) {
+                            $build->releaseRequest->rr_status = ReleaseRequest::STATUS_BUILT;
+                            $build->releaseRequest->rr_last_error_text = $attach;
+                            $build->releaseRequest->save();
+
+                            $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_INSTALL_ERROR);
+                        }
+
+                        break;
                 }
                 break;
             case Build::STATUS_CANCELLED:
@@ -348,7 +399,7 @@ class DeployController extends RabbitListener
             $build->save();
         }
 
-        $releaseRequest->rr_use_text = $message->text;
+        $releaseRequest->rr_last_error_text = $message->text;
         $releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLED;
         $releaseRequest->save();
 
@@ -484,7 +535,7 @@ class DeployController extends RabbitListener
             }
 
             if ($releaseRequest) {
-                $releaseRequest->rr_use_text = null;
+                $releaseRequest->rr_last_error_text = null;
                 $releaseRequest->rr_status = ReleaseRequest::STATUS_USED;
                 $releaseRequest->save(false);
 

@@ -57,7 +57,7 @@ class PostMigrationController extends ControllerRestrictedBase
 
         $releaseRequestCurrent = ReleaseRequest::find()->
             andWhere(['rr_project_obj_id' => $postMigration->project->obj_id])->
-            andWhere(['rr_status' => 'used'])->
+            andWhere(['rr_status' => ReleaseRequest::STATUS_USED])->
             orderBy('obj_id desc')->
             one();
 

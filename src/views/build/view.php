@@ -35,14 +35,24 @@ echo yii\widgets\DetailView::widget([
                         $prevAction = $action;
                         $prevTime = $time;
                     }
-                    $timeLogPrepared[$prevAction . ' + queueing + deploy'] = strtotime($model->releaseRequest->rr_built_time) - strtotime($model->releaseRequest->obj_created) - $prevTime;
+                    $timeLogPrepared[$prevAction . ' + queueing + install'] = strtotime($model->releaseRequest->rr_built_time) - strtotime($model->releaseRequest->obj_created) - $prevTime;
                 } else {
-                    $buildFinishTime = $model->releaseRequest->rr_built_time ? strtotime($model->releaseRequest->rr_built_time) : null;
+                    $buildFinishTime = 0;
+                    if (isset($timeLogRaw[ReleaseRequest::BUILD_LOG_BUILD_SUCCESS])) {
+                        $buildFinishTime = $timeLogRaw[ReleaseRequest::BUILD_LOG_BUILD_SUCCESS];
+                    } elseif (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_ERROR])) {
+                        $buildFinishTime = $timeLogRaw[ReleaseRequest::BUILD_LOG_BUILD_ERROR];
+                    }
+
+                    $installFinishTime = $model->releaseRequest->rr_built_time ? strtotime($model->releaseRequest->rr_built_time) : null;
+
+                    $stopProcessLogTime = $buildFinishTime ?: $installFinishTime;
+
                     $timeLogPrepared = [];
                     $prevTime = strtotime($model->releaseRequest->obj_created);
-                    $prevAction = 'queueing';
+                    $prevAction = 'pre build queueing';
                     foreach ($timeLogRaw as $action => $time) {
-                        if ($buildFinishTime && $buildFinishTime < $time) {
+                        if ($stopProcessLogTime && $stopProcessLogTime <= $time) {
                             break;
                         }
 
@@ -52,7 +62,25 @@ echo yii\widgets\DetailView::widget([
                     }
 
                     if ($buildFinishTime) {
-                        $timeLogPrepared[$prevAction . ' + deploy'] = $buildFinishTime - $prevTime;
+                        if ($installFinishTime) {
+                            $timeLogPrepared[$prevAction] = $buildFinishTime - $prevTime;
+                        }
+                    } else {
+                        if ($installFinishTime) {
+                            $timeLogPrepared[$prevAction . ' + install'] = $installFinishTime - $prevTime;
+                        }
+                    }
+
+                    if (isset($timeLogRaw[ReleaseRequest::BUILD_LOG_INSTALL_START])) {
+                        if ($buildFinishTime) {
+                            $timeLogPrepared['pre install queueing'] = $timeLogRaw[ReleaseRequest::BUILD_LOG_INSTALL_START] - $buildFinishTime;
+                        }
+
+                        if (isset($timeLogRaw[ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS])) {
+                            $timeLogPrepared['install'] = $timeLogRaw[ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS] - $timeLogRaw[ReleaseRequest::BUILD_LOG_INSTALL_START];
+                        } elseif (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_ERROR])) {
+                            $timeLogPrepared['install'] = $timeLogRaw[ReleaseRequest::BUILD_LOG_INSTALL_ERROR] - $timeLogRaw[ReleaseRequest::BUILD_LOG_INSTALL_START];
+                        }
                     }
 
                     if (isset($timeLogRaw[ReleaseRequest::BUILD_LOG_USING_START]) && isset($timeLogRaw[ReleaseRequest::BUILD_LOG_USING_SUCCESS])) {

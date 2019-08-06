@@ -3,6 +3,7 @@ namespace whotrades\rds\models;
 
 use whotrades\rds\components\Status;
 use whotrades\RdsSystem\Message\BuildTask;
+use whotrades\RdsSystem\Message\InstallTask;
 use whotrades\RdsSystem\Message\UseTask;
 use whotrades\rds\models\User\User;
 use yii\data\Sort;
@@ -24,6 +25,7 @@ use yii\db\ActiveQuery;
  * @property integer $rr_leading_id
  * @property string $rr_status
  * @property string $rr_use_text
+ * @property string $rr_last_error_text
  * @property string $rr_old_version
  * @property string $rr_build_version
  * @property string $rr_project_owner_code
@@ -55,6 +57,9 @@ class ReleaseRequest extends ActiveRecord
 
     const STATUS_NEW                 = 'new';
     const STATUS_FAILED              = 'failed';
+    const STATUS_BUILDING            = 'building';
+    const STATUS_BUILT               = 'built';
+    const STATUS_INSTALLING          = 'installing';
     const STATUS_INSTALLED           = 'installed';
     const STATUS_USING               = 'using';
     const STATUS_USED                = 'used';
@@ -67,9 +72,16 @@ class ReleaseRequest extends ActiveRecord
     const MIGRATION_STATUS_FAILED    = 'failed';
     const MIGRATION_STATUS_UP        = 'up';
 
-    const BUILD_LOG_USING_START = 'using start';
-    const BUILD_LOG_USING_ERROR = 'using error';
-    const BUILD_LOG_USING_SUCCESS = 'using success';
+    const BUILD_LOG_BUILD_ERROR      = 'build error';
+    const BUILD_LOG_BUILD_SUCCESS    = 'build success';
+
+    const BUILD_LOG_INSTALL_START    = 'install start';
+    const BUILD_LOG_INSTALL_ERROR    = 'install error';
+    const BUILD_LOG_INSTALL_SUCCESS  = 'install success';
+
+    const BUILD_LOG_USING_START      = 'using start';
+    const BUILD_LOG_USING_ERROR      = 'using error';
+    const BUILD_LOG_USING_SUCCESS    = 'using success';
 
     /**
      * @return string the associated database table name
@@ -286,7 +298,15 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @return int
      */
-    public function countNotFinishedBuilds()
+    public function countNotBuiltBuilds()
+    {
+        return Build::find()->where(['build_release_request_obj_id' => $this->obj_id])->andWhere(['<>', 'build_status', Build::STATUS_BUILT])->count();
+    }
+
+    /**
+     * @return int
+     */
+    public function countNotInstalledBuilds()
     {
         return Build::find()->where(['build_release_request_obj_id' => $this->obj_id])->andWhere(['<>', 'build_status', Build::STATUS_INSTALLED])->count();
     }
@@ -322,7 +342,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function showCronDiff()
     {
-        return $this->rr_status === self::STATUS_INSTALLED;
+        return in_array($this->rr_status, [self::STATUS_INSTALLED, self::STATUS_BUILT]);
     }
 
     /**
@@ -330,7 +350,25 @@ class ReleaseRequest extends ActiveRecord
      */
     public function showActivationErrors()
     {
-        return (bool) $this->rr_use_text;
+        return (bool) $this->rr_last_error_text && $this->rr_status === self::STATUS_INSTALLED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function showInstallationErrors()
+    {
+        return $this->shouldBeInstalled();
+    }
+
+    /**
+     * Give ability to deploy manually if automated deploy is failed and there are errors
+     *
+     * @return bool
+     */
+    public function shouldBeInstalled()
+    {
+        return $this->rr_status === self::STATUS_BUILT && $this->rr_last_error_text;
     }
 
     /**
@@ -449,34 +487,6 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @param string $tag
-     *
-     * @return string | null
-     */
-    public static function getProjectNameByBuildTag($tag)
-    {
-        if (preg_match('~^([\w-]+)-[\d.]+$~', $tag, $ans)) {
-            return $ans[1];
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $tag
-     *
-     * @return string | null
-     */
-    public static function getBuildVersionByBuildTag($tag)
-    {
-        if (preg_match('~^[\w-]+-([\d.]+)$~', $tag, $ans)) {
-            return $ans[1];
-        }
-
-        return null;
-    }
-
-    /**
      * @throws \Exception
      */
     public function createBuildTasks()
@@ -516,13 +526,6 @@ class ReleaseRequest extends ActiveRecord
     public function sendBuildTasks()
     {
         foreach ($this->builds as $build) {
-            /** @var $lastSuccess ReleaseRequest | null */
-            $lastSuccess = static::find()->where([
-                'rr_status' => ReleaseRequest::getInstalledStatuses(),
-                'rr_project_obj_id' => $build->releaseRequest->rr_project_obj_id,
-            ])->andWhere(['<', 'rr_build_version', $build->releaseRequest->rr_build_version])->
-            orderBy('rr_build_version desc')->one();
-
             // an: Отправляем задачу в Rabbit на сборку
             (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel()->sendBuildTask(
                 $build->worker->worker_name,
@@ -531,11 +534,29 @@ class ReleaseRequest extends ActiveRecord
                     $build->project->project_name,
                     $build->releaseRequest->rr_build_version,
                     $build->releaseRequest->rr_release_version,
-                    $lastSuccess ? $lastSuccess->getBuildTag() : null,
                     $build->releaseRequest->project->script_migration_new,
                     $build->releaseRequest->project->script_build,
-                    $build->releaseRequest->project->script_deploy,
                     $build->releaseRequest->project->script_cron,
+                    $build->project->getProjectServersArray()
+                )
+            );
+        }
+    }
+
+    /**
+     */
+    public function sendInstallTask()
+    {
+        foreach ($this->builds as $build) {
+            // an: Отправляем задачу в Rabbit на раскладку кода по серверам
+            (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel()->sendInstallTask(
+                $build->worker->worker_name,
+                new InstallTask(
+                    $build->obj_id,
+                    $build->project->project_name,
+                    $build->releaseRequest->rr_build_version,
+                    $build->releaseRequest->rr_release_version,
+                    $build->releaseRequest->project->script_deploy,
                     $build->project->getProjectServersArray()
                 )
             );
@@ -643,9 +664,24 @@ class ReleaseRequest extends ActiveRecord
 
         foreach ($this->builds as $build) {
             $data = json_decode($build->build_time_log, true);
-            $data[$action] = (float) $time;
 
+            // ag: Starting new action remove results of previous same actions
+            switch ($action) {
+                case self::BUILD_LOG_INSTALL_START:
+                    unset($data[self::BUILD_LOG_INSTALL_ERROR]);
+                    unset($data[self::BUILD_LOG_INSTALL_SUCCESS]);
+
+                    break;
+                case self::BUILD_LOG_USING_START:
+                    unset($data[self::BUILD_LOG_USING_ERROR]);
+                    unset($data[self::BUILD_LOG_USING_SUCCESS]);
+
+                    break;
+            }
+
+            $data[$action] = (float) $time;
             asort($data);
+
             $build->build_time_log = json_encode($data);
             $build->save();
         }

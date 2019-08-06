@@ -58,8 +58,11 @@ return array(
             $map = array(
                 ReleaseRequest::STATUS_NEW          => array('time', 'Ожидает сборки', 'black'),
                 ReleaseRequest::STATUS_FAILED       => array('remove', 'Не собралось', 'red'),
+                ReleaseRequest::STATUS_BUILDING     => array('ok', 'Собирается...', 'orange'),
+                ReleaseRequest::STATUS_BUILT        => array('ok', 'Собрано', 'black'),
+                ReleaseRequest::STATUS_INSTALLING   => array('ok', 'Устанавливается...', 'orange'),
                 ReleaseRequest::STATUS_INSTALLED    => array('ok', 'Установлено', 'black'),
-                ReleaseRequest::STATUS_USING        => array('refresh', 'Активируем', 'orange'),
+                ReleaseRequest::STATUS_USING        => array('refresh', 'Активируем...', 'orange'),
                 ReleaseRequest::STATUS_USED         => array('ok', 'Активная версия', '#32cd32'),
                 ReleaseRequest::STATUS_OLD          => array('time', 'Старая версия', 'grey'),
                 ReleaseRequest::STATUS_CANCELLING   => array('refresh', 'Отменяем...', 'orange'),
@@ -71,10 +74,11 @@ return array(
             foreach ($releaseRequest->builds as $val) {
                 /** @var $val Build */
                 $map = array(
+                    Build::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
                     Build::STATUS_FAILED => array('exclamation-sign', 'Не собралось', 'red'),
                     Build::STATUS_BUILDING => array('refresh', 'Собирается', 'orange'),
-                    Build::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
                     Build::STATUS_BUILT => array('upload', 'Раскладывается по серверам', 'orange'),
+                    Build::STATUS_INSTALLING => array('ok', 'Копируется на сервер...', 'black'),
                     Build::STATUS_INSTALLED => array('ok', 'Скопировано на сервер', 'black'),
                     Build::STATUS_USED => array('ok', 'Установлено', '#32cd32'),
                     Build::STATUS_CANCELLED => array('ban-circle', 'Отменено', 'red'),
@@ -114,6 +118,9 @@ return array(
         'filter' => array(
             ReleaseRequest::STATUS_NEW => ReleaseRequest::STATUS_NEW,
             ReleaseRequest::STATUS_FAILED => ReleaseRequest::STATUS_FAILED,
+            ReleaseRequest::STATUS_BUILDING => ReleaseRequest::STATUS_BUILDING,
+            ReleaseRequest::STATUS_BUILT => ReleaseRequest::STATUS_BUILT,
+            ReleaseRequest::STATUS_INSTALLING => ReleaseRequest::STATUS_INSTALLING,
             ReleaseRequest::STATUS_INSTALLED => ReleaseRequest::STATUS_INSTALLED,
             ReleaseRequest::STATUS_USING => ReleaseRequest::STATUS_USING,
             ReleaseRequest::STATUS_USED => ReleaseRequest::STATUS_USED,
@@ -134,32 +141,71 @@ return array(
         'attribute' => 'rr_build_version',
         'value' => function (ReleaseRequest $r) {
             if ($r->rr_built_time) {
-                $buildFinishTime = strtotime($r->rr_built_time);
+                $installFinishTime = strtotime($r->rr_built_time);
                 $buildTimeLog = json_decode((reset($r->builds))->build_time_log, true);
                 $activationText = '';
                 // ag: Backward compatibility with old build_time_log #WTA-1754
                 if (reset($buildTimeLog) < strtotime($r->obj_created)) {
-                    $buildTime = round(end($buildTimeLog) - reset($buildTimeLog));
-                    $timeFull = round($buildFinishTime - strtotime($r->obj_created));
-                    $timeAdditional = $timeFull - $buildTime;
+                    $buildTime = end($buildTimeLog) - reset($buildTimeLog);
+                    $timeFull = $installFinishTime - strtotime($r->obj_created);
+                    $timeAdditional = round($timeFull - $buildTime);
                     $additionalText = "Очередь+раскладка: <b>$timeAdditional</b> сек.";
                 } else {
                     $buildStartTime = reset($buildTimeLog);
-                    $timeQueueing = round($buildStartTime - strtotime($r->obj_created));
-                    $timeDeploying = 0;
+                    $buildTime = 0;
+                    $installTime = 0;
+
+                    if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_SUCCESS])) {
+                        $buildFinishTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_SUCCESS];
+                    } elseif (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_ERROR])) {
+                        $buildFinishTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_ERROR];
+                    }
+
+                    if ($buildFinishTime) {
+                        $buildTime = $buildFinishTime - $buildStartTime;
+                    }
+
+                    $installStartTime = 0;
+                    if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START])) {
+                        $installStartTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
+                        if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS])) {
+                            $installTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS] - $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
+                        } elseif (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_ERROR])) {
+                            $installTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_ERROR] - $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
+                        }
+                    }
+
+                    $buildFinishRoughTime = 0;
+
                     foreach ($buildTimeLog as $action => $time) {
-                        if ($buildFinishTime < $time) {
+                        if ($installFinishTime < $time) {
                             break;
                         }
-                        $timeDeploying = round($buildFinishTime - $time);
-                        $buildTime = round($time - $buildStartTime);
+                        $buildFinishRoughTime = $time;
                     }
+
+                    if ($buildFinishRoughTime) {
+                        $buildTime = $buildTime ?: $buildFinishRoughTime - $buildStartTime;
+                        $installTime = $installTime ?: $installFinishTime - $buildFinishRoughTime;
+                    }
+
                     if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]) && isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS])) {
                         $timeActivating = round($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS] - $buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]);
                         $activationText = "Активация: <b>$timeActivating</b> сек.";
                     }
-                    $additionalText = "Очередь: <b>$timeQueueing</b> сек. Раскладка: <b>$timeDeploying</b> сек.";
+
+                    $timeQueueing = $buildStartTime - strtotime($r->obj_created);
+                    if ($buildFinishTime && $installStartTime) {
+                        $timeQueueing = $timeQueueing + ($installStartTime - $buildFinishTime);
+                    }
+
+                    $timeQueueing = round($timeQueueing);
+                    $installTime = round($installTime);
+
+                    $additionalText = "Очередь: <b>$timeQueueing</b> сек. Раскладка: <b>$installTime</b> сек.";
                 }
+
+                $buildTime = round($buildTime);
 
                 return $r->rr_build_version . "<br />Сборка: <b>$buildTime</b>  сек. " . ($activationText ?? '') . "<br />" . $additionalText;
             } else {
@@ -193,6 +239,23 @@ return array(
                 }
             }
 
+            if ($releaseRequest->showInstallationErrors()) {
+                Modal::begin(
+                    [
+                        'id' => 'release-request-install-error-' . $releaseRequest->obj_id,
+                        'header' => 'Ошибка раскладки сборки',
+                        'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
+                    ]
+                );
+                echo "<pre>$releaseRequest->rr_last_error_text</pre>";
+                Modal::end();
+
+                $result .= Html::a('Ошибка раскладки', '#', [
+                        'style' => 'info',
+                        'data' => ['toggle' => 'modal', 'target' => '#release-request-install-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
+                    ]) . "<br />";
+            }
+
             if ($releaseRequest->showActivationErrors()) {
                 Modal::begin(
                     [
@@ -201,13 +264,20 @@ return array(
                         'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
                     ]
                 );
-                echo "<pre>$releaseRequest->rr_use_text</pre>";
+                echo "<pre>$releaseRequest->rr_last_error_text</pre>";
                 Modal::end();
 
                 $result .= Html::a('Ошибка активации', '#', [
                         'style' => 'info',
                         'data' => ['toggle' => 'modal', 'target' => '#release-request-use-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
                     ]) . "<br />";
+            }
+
+            if ($releaseRequest->shouldBeInstalled()) {
+                $result .= "<a href='" . yii\helpers\Url::to(['/site/install-release', 'id' => $releaseRequest->obj_id]) .
+                    "' --data-id='$releaseRequest->obj_id' class='install-button'>Разложить</a>";
+
+                return $result;
             }
 
             if ($releaseRequest->shouldBeMigrated()) {
