@@ -9,6 +9,7 @@ use whotrades\rds\models\ReleaseReject;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\Log;
 use whotrades\rds\models\Build;
+use yii\web\HttpException;
 
 class SiteController extends ControllerRestrictedBase
 {
