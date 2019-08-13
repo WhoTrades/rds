@@ -109,6 +109,7 @@ $config = array(
                     'identity' => 'yii-service-rds',
                     'levels' => ['info', 'warning', 'error'],
                     'except' => ['yii\db\Command::query'],
+                    'logVars' => [],
                     'facility' => LOG_LOCAL4,
                     'options' => 0,
                 ],
