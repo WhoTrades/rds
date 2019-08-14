@@ -80,6 +80,8 @@ $config = array(
         'commandInstanceMutex' => [
             'class' => 'yii\mutex\FileMutex',
             'mutexPath' => '/tmp/rds/mutex',
+            'fileMode' => 0777,
+            'dirMode' => 0777,
         ],
         'sentry' => [
             'enabled' => false,
