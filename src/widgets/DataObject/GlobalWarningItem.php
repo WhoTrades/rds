@@ -1,4 +1,6 @@
 <?php
+namespace whotrades\rds\widgets\DataObject;
+
 class GlobalWarningItem
 {
     public $message;

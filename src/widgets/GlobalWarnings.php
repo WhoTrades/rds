@@ -1,7 +1,7 @@
 <?php
 namespace whotrades\rds\widgets;
 
-use GlobalWarningItem;
+use whotrades\rds\widgets\DataObject\GlobalWarningItem;
 
 class GlobalWarnings extends \yii\base\Widget
 {

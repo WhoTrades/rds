@@ -83,7 +83,7 @@ class SiteController extends ControllerRestrictedBase
      */
     public function actionCreateRelease()
     {
-        if (! \Yii::$app->user->can('developer')) {
+        if (!\Yii::$app->user->can('developer')) {
             return $this->render('index-restricted');
         }
 
@@ -113,6 +113,54 @@ class SiteController extends ControllerRestrictedBase
 
                 throw $e;
             }
+        }
+
+        $this->redirect(['index']);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return string
+     *
+     * @throws HttpException
+     * @throws \yii\db\Exception
+     */
+    public function actionRecreateRelease($id)
+    {
+        if (!\Yii::$app->user->can('developer')) {
+            return $this->render('index-restricted');
+        }
+
+        /** @var ReleaseRequest $releaseRequest */
+        $releaseRequest = ReleaseRequest::findByPk($id);
+        if (!$releaseRequest->canBeRecreated()) {
+            throw new HttpException(500, 'Release request can not be recreated');
+        }
+
+        if (!RdsDbConfig::get()->deployment_enabled) {
+            throw new HttpException(500, 'Deployment disabled');
+        }
+
+        try {
+            $transaction = ActiveRecord::getDb()->beginTransaction();
+
+            $releaseRequestList = $releaseRequest->recreate(\Yii::$app->user->id);
+
+            $transaction->commit();
+
+            /** @var ReleaseRequest $releaseRequest */
+            foreach ($releaseRequestList as $releaseRequest) {
+                $releaseRequest->sendBuildTasks();
+            }
+
+            \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
+        } catch (\Exception $e) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $e;
         }
 
         $this->redirect(['index']);

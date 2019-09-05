@@ -294,6 +294,16 @@ class DeployController extends RabbitListener
             foreach ($message->migrations as $migration) {
                 list($migration, $ticket) = preg_split('~\s+~', $migration);
 
+                $postMigration = HardMigration::findByAttributes([
+                    'migration_project_obj_id' => $project->obj_id,
+                    'migration_name' => $migration,
+                ]);
+
+                if ($postMigration) {
+                    Yii::info("Skip processing of hard-migration {$migration} of project {$project->project_name}. Already exists in DB");
+                    continue;
+                }
+
                 $hm = new HardMigration();
                 $hm->attributes = [
                     'migration_release_request_obj_id' => $releaseRequest->obj_id,
@@ -354,6 +364,15 @@ class DeployController extends RabbitListener
             $releaseRequest->save(false);
 
             if (class_exists(DevParseCronConfigController::class)) {
+                // ag: Delete existed ToolJob for this build_version. It is needed when we recreate ReleaseRequest
+                ToolJob::deleteAll(
+                    'project_obj_id=:id AND "version"=:version',
+                    [
+                        ':id' => $releaseRequest->rr_project_obj_id,
+                        ':version' => $releaseRequest->rr_build_version,
+                    ]
+                );
+
                 DevParseCronConfigController::parseCronConfig($releaseRequest);
 
                 ToolJob::updateAll(

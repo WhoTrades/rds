@@ -166,6 +166,52 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * @param int $userId
+     * @param string | null $comment
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
+    public function recreate($userId, $comment = null)
+    {
+        if (!$this->canBeRecreated()) {
+            return [];
+        }
+
+        $this->rr_status = self::STATUS_NEW;
+        $this->rr_user_id = $userId;
+        if ($comment) {
+            $this->rr_comment = $comment;
+        }
+        $this->rr_build_started = null;
+        $this->rr_last_error_text = null;
+        $this->rr_built_time = null;
+        $this->rr_new_migration_count = null;
+        $this->rr_new_migrations = null;
+        $this->rr_migration_status = null;
+        $this->rr_migration_error = null;
+        $this->rr_cron_config = null;
+        $this->save();
+
+        /** @var Build $build */
+        foreach ($this->builds as $build) {
+            $build->build_status = Build::STATUS_NEW;
+            $build->build_attach = '';
+            $build->build_time_log = json_encode([]);
+
+            $build->save();
+        }
+
+        /** @var ReleaseRequest $childReleaseRequest */
+        foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
+            $childReleaseRequest->recreate($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null);
+        }
+
+        return array_merge([$this], $this->getReleaseRequests()->all());
+    }
+
+    /**
      * @param string $attribute
      */
     public function checkForReleaseReject($attribute)
@@ -362,6 +408,16 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * @return bool
+     */
+    public function canBeRecreated()
+    {
+        return (in_array($this->rr_status, [self::STATUS_INSTALLED, self::STATUS_FAILED])) &&
+            (!in_array($this->rr_migration_status, [self::MIGRATION_STATUS_UPDATING, self::MIGRATION_STATUS_UP])) &&
+            $this->isLastReleaseRequest();
+    }
+
+    /**
      * Give ability to deploy manually if automated deploy is failed and there are errors
      *
      * @return bool
@@ -440,6 +496,30 @@ class ReleaseRequest extends ActiveRecord
     public function getTitle()
     {
         return "Запрос релиза #$this->obj_id {$this->project->project_name}::{$this->rr_build_version} ($this->rr_comment)";
+    }
+
+    /**
+     * @param $projectId
+     *
+     * @return ReleaseRequest
+     */
+    public static function getLastReleaseRequestByProjectId($projectId)
+    {
+        $project = Project::findByPk($projectId);
+        $releaseVersionList = ReleaseVersion::forList();
+        $releaseVersion = key($releaseVersionList);
+
+        $lastBuildVersion = $project->getLastVersion($releaseVersion);
+
+        return self::find()->where(['rr_build_version' => $lastBuildVersion])->one();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLastReleaseRequest()
+    {
+        return $this->rr_build_version === $this->project->getLastVersion($this->rr_release_version);
     }
 
     /**

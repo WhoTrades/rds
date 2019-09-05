@@ -79,6 +79,26 @@ class Project extends ActiveRecord
     }
 
     /**
+     * @param string $releaseVersion
+     *
+     * @return string
+     */
+    public function getLastVersion($releaseVersion)
+    {
+        $code = '00';
+        $buildNumber = isset($this->projectBuildSubversionArray[$releaseVersion]) ? $this->projectBuildSubversionArray[$releaseVersion] : 1;
+
+        // an: Сделал вывод с ведущими нулями что бы лексикографическая вортировка валидно работала для наших версий
+        // (предполагаем что внутри одноо релиза не будет более 1000 билдов)
+        return implode(".", [
+            $releaseVersion,
+            $code,
+            sprintf('%03d', ($buildNumber - 1)),
+            ($this->project_build_version - 1),
+        ]);
+    }
+
+    /**
      * Возвращает новую версию билда для проекта
      *
      * @see http://jira/browse/WTS-376

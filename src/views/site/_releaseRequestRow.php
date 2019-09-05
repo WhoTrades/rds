@@ -273,6 +273,11 @@ return array(
                     ]) . "<br />";
             }
 
+            if ($releaseRequest->canBeRecreated()) {
+                $result .= "<a href='" . yii\helpers\Url::to(['/site/recreate-release', 'id' => $releaseRequest->obj_id]) .
+                    "' --data-id='$releaseRequest->obj_id' class='install-button'>Пересобрать</a><br />";
+            }
+
             if ($releaseRequest->shouldBeInstalled()) {
                 $result .= "<a href='" . yii\helpers\Url::to(['/site/install-release', 'id' => $releaseRequest->obj_id]) .
                     "' --data-id='$releaseRequest->obj_id' class='install-button'>Разложить</a>";
