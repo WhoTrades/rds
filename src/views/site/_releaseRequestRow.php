@@ -274,8 +274,12 @@ return array(
             }
 
             if ($releaseRequest->canBeRecreated()) {
-                $result .= "<a href='" . yii\helpers\Url::to(['/site/recreate-release', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='install-button'>Пересобрать</a><br />";
+                $result = "<a href='" . yii\helpers\Url::to(['/site/recreate-release', 'id' => $releaseRequest->obj_id]) .
+                    "' class='ajax-url'>Пересобрать</a><br />";
+
+                if ($releaseRequest->rr_status === ReleaseRequest::STATUS_FAILED) {
+                    return $result;
+                }
             }
 
             if ($releaseRequest->shouldBeInstalled()) {

@@ -135,7 +135,14 @@ class SiteController extends ControllerRestrictedBase
         /** @var ReleaseRequest $releaseRequest */
         $releaseRequest = ReleaseRequest::findByPk($id);
         if (!$releaseRequest->canBeRecreated()) {
-            throw new HttpException(500, 'Release request can not be recreated');
+            $status = $releaseRequest->rr_status;
+            $buildVersion = $releaseRequest->rr_build_version;
+            $lastBuildVersion = $releaseRequest->project->getLastVersion($releaseRequest->rr_release_version);
+
+            throw new HttpException(
+                500,
+                "Release request can not be recreated, status={$status}, build_version={$buildVersion}, last_build_version={$lastBuildVersion}"
+            );
         }
 
         if (!RdsDbConfig::get()->deployment_enabled) {
