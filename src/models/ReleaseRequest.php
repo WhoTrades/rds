@@ -187,9 +187,9 @@ class ReleaseRequest extends ActiveRecord
         $this->rr_build_started = null;
         $this->rr_last_error_text = null;
         $this->rr_built_time = null;
-        $this->rr_new_migration_count = null;
+        $this->rr_new_migration_count = 0;
         $this->rr_new_migrations = null;
-        $this->rr_migration_status = null;
+        $this->rr_migration_status = 'none';
         $this->rr_migration_error = null;
         $this->rr_cron_config = null;
         $this->save();
