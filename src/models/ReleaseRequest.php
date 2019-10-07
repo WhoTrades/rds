@@ -179,6 +179,7 @@ class ReleaseRequest extends ActiveRecord
             return [];
         }
 
+        $this->obj_created = date('c');
         $this->rr_status = self::STATUS_NEW;
         $this->rr_user_id = $userId;
         if ($comment) {
