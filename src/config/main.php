@@ -28,6 +28,8 @@ $config = array(
         'debug' => [
             'class' => yii\debug\Module::class,
             'allowedIPs' => ['10.0.2.2', '::1'],
+            'fileMode' => 0777,
+            'dirMode' => 0777,
         ],
         'gridview' =>  [
             'class' => \kartik\grid\Module::class,
