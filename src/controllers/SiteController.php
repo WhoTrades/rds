@@ -88,31 +88,14 @@ class SiteController extends ControllerRestrictedBase
         }
 
         if (isset($_POST['ReleaseRequest']) && RdsDbConfig::get()->deployment_enabled) {
-            try {
-                $transaction = ActiveRecord::getDb()->beginTransaction();
+            ReleaseRequest::create(
+                $_POST['ReleaseRequest']['rr_project_obj_id'],
+                $_POST['ReleaseRequest']['rr_release_version'],
+                \Yii::$app->user->id,
+                $_POST['ReleaseRequest']['rr_comment']
+            );
 
-                $releaseRequestList = ReleaseRequest::create(
-                    $_POST['ReleaseRequest']['rr_project_obj_id'],
-                    $_POST['ReleaseRequest']['rr_release_version'],
-                    \Yii::$app->user->id,
-                    $_POST['ReleaseRequest']['rr_comment']
-                );
-
-                $transaction->commit();
-
-                /** @var ReleaseRequest $releaseRequest */
-                foreach ($releaseRequestList as $releaseRequest) {
-                    $releaseRequest->sendBuildTasks();
-                }
-
-                \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
-            } catch (\Exception $e) {
-                if ($transaction->isActive) {
-                    $transaction->rollBack();
-                }
-
-                throw $e;
-            }
+            \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
         }
 
         $this->redirect(['index']);
@@ -149,26 +132,9 @@ class SiteController extends ControllerRestrictedBase
             throw new HttpException(500, 'Deployment disabled');
         }
 
-        try {
-            $transaction = ActiveRecord::getDb()->beginTransaction();
+        $releaseRequest->recreate(\Yii::$app->user->id);
 
-            $releaseRequestList = $releaseRequest->recreate(\Yii::$app->user->id);
-
-            $transaction->commit();
-
-            /** @var ReleaseRequest $releaseRequest */
-            foreach ($releaseRequestList as $releaseRequest) {
-                $releaseRequest->sendBuildTasks();
-            }
-
-            \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
-        } catch (\Exception $e) {
-            if ($transaction->isActive) {
-                $transaction->rollBack();
-            }
-
-            throw $e;
-        }
+        \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $this->redirect(['index']);
     }

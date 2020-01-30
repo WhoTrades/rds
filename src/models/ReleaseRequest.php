@@ -54,6 +54,8 @@ class ReleaseRequest extends ActiveRecord
 {
     const USE_ATTEMPT_TIME = 40;
     const IMMEDIATELY_TIME = 900;
+    const FAIL_BUILD_COUNT_THRESHOLD = 3;
+    const FAIL_INSTALL_COUNT_THRESHOLD = 3;
 
     const STATUS_NEW                 = 'new';
     const STATUS_FAILED              = 'failed';
@@ -82,6 +84,9 @@ class ReleaseRequest extends ActiveRecord
     const BUILD_LOG_USING_START      = 'using start';
     const BUILD_LOG_USING_ERROR      = 'using error';
     const BUILD_LOG_USING_SUCCESS    = 'using success';
+
+    const REDIS_KEY_FAIL_BUILD_COUNT = 'FailBuildCount:ReleaseRequestId:';
+    const REDIS_KEY_FAIL_INSTALL_COUNT = 'FailInstallCount:ReleaseRequestId:';
 
     /**
      * @return string the associated database table name
@@ -124,45 +129,62 @@ class ReleaseRequest extends ActiveRecord
      */
     public static function create($projectObjId, $releaseVersion, $userId, $comment)
     {
-        $model = new self();
+        try {
+            $transaction = ActiveRecord::getDb()->beginTransaction();
 
-        $model->rr_project_obj_id = $projectObjId;
-        $model->rr_release_version = $releaseVersion;
-        $model->rr_comment = $comment;
-        $model->rr_user_id = $userId;
-        if ($model->rr_project_obj_id) {
-            $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
-        }
-        if ($model->save()) {
-            $childModels = [];
-            foreach ($model->project->project2ProjectList as $project2ProjectObject) {
-                /** @var Project $childProject */
-                $childProject = $project2ProjectObject->child;
+            $model = new self();
 
-                $childReleaseRequest = new self();
-                $childReleaseRequest->rr_user_id = $model->rr_user_id;
-                $childReleaseRequest->rr_project_obj_id = $childProject->obj_id;
-                $childReleaseRequest->rr_comment =
-                    $model->rr_comment . " [child of " . $model->project->project_name . "-$model->rr_build_version]";
-                $childReleaseRequest->rr_release_version = $model->rr_release_version;
-                $childReleaseRequest->rr_build_version = $childProject->getNextVersion($childReleaseRequest->rr_release_version);
-                $childReleaseRequest->rr_leading_id = $model->obj_id;
-                $childReleaseRequest->save();
+            $model->rr_project_obj_id = $projectObjId;
+            $model->rr_release_version = $releaseVersion;
+            $model->rr_comment = $comment;
+            $model->rr_user_id = $userId;
+            if ($model->rr_project_obj_id) {
+                $model->rr_build_version = $model->project->getNextVersion($model->rr_release_version);
+            }
+            if ($model->save()) {
+                $childModels = [];
+                foreach ($model->project->project2ProjectList as $project2ProjectObject) {
+                    /** @var Project $childProject */
+                    $childProject = $project2ProjectObject->child;
 
-                $childReleaseRequest->createBuildTasks();
+                    $childReleaseRequest = new self();
+                    $childReleaseRequest->rr_user_id = $model->rr_user_id;
+                    $childReleaseRequest->rr_project_obj_id = $childProject->obj_id;
+                    $childReleaseRequest->rr_comment =
+                        $model->rr_comment . " [child of " . $model->project->project_name . "-$model->rr_build_version]";
+                    $childReleaseRequest->rr_release_version = $model->rr_release_version;
+                    $childReleaseRequest->rr_build_version = $childProject->getNextVersion($childReleaseRequest->rr_release_version);
+                    $childReleaseRequest->rr_leading_id = $model->obj_id;
+                    $childReleaseRequest->save();
 
-                $childModels[] = $childReleaseRequest;
+                    $childReleaseRequest->createBuildTasks();
+
+                    $childModels[] = $childReleaseRequest;
+                }
+
+                $model->rr_comment = "$model->rr_comment";
+                $model->save();
+
+                $model->createBuildTasks();
+
+                $transaction->commit();
+
+                $releaseRequestList = array_merge([$model], $childModels);
+
+                /** @var self $releaseRequest */
+                foreach ($releaseRequestList as $releaseRequest) {
+                    $releaseRequest->sendBuildTasks();
+                }
+            } else {
+                $transaction->rollBack();
+            }
+        } catch (\Exception $e) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
             }
 
-            $model->rr_comment = "$model->rr_comment";
-            $model->save();
-
-            $model->createBuildTasks();
-
-            return array_merge([$model], $childModels);
+            throw $e;
         }
-
-        return [];
     }
 
     /**
@@ -179,37 +201,54 @@ class ReleaseRequest extends ActiveRecord
             return [];
         }
 
-        $this->obj_created = date('c');
-        $this->rr_status = self::STATUS_NEW;
-        $this->rr_user_id = $userId;
-        if ($comment) {
-            $this->rr_comment = $comment;
+        try {
+            $transaction = ActiveRecord::getDb()->beginTransaction();
+
+            $this->obj_created = date('c');
+            $this->rr_status = self::STATUS_NEW;
+            $this->rr_user_id = $userId;
+            if ($comment) {
+                $this->rr_comment = $comment;
+            }
+            $this->rr_build_started = null;
+            $this->rr_last_error_text = null;
+            $this->rr_built_time = null;
+            $this->rr_new_migration_count = 0;
+            $this->rr_new_migrations = null;
+            $this->rr_migration_status = 'none';
+            $this->rr_migration_error = null;
+            $this->rr_cron_config = null;
+            $this->save();
+
+            /** @var Build $build */
+            foreach ($this->builds as $build) {
+                $build->build_status = Build::STATUS_NEW;
+                $build->build_attach = '';
+                $build->build_time_log = json_encode([]);
+
+                $build->save();
+            }
+
+            /** @var ReleaseRequest $childReleaseRequest */
+            foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
+                $childReleaseRequest->recreate($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null);
+            }
+
+            $transaction->commit();
+
+            $releaseRequestList = array_merge([$this], $this->getReleaseRequests()->all());
+
+            /** @var self $releaseRequest */
+            foreach ($releaseRequestList as $releaseRequest) {
+                $releaseRequest->sendBuildTasks();
+            }
+        } catch (\Exception $e) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $e;
         }
-        $this->rr_build_started = null;
-        $this->rr_last_error_text = null;
-        $this->rr_built_time = null;
-        $this->rr_new_migration_count = 0;
-        $this->rr_new_migrations = null;
-        $this->rr_migration_status = 'none';
-        $this->rr_migration_error = null;
-        $this->rr_cron_config = null;
-        $this->save();
-
-        /** @var Build $build */
-        foreach ($this->builds as $build) {
-            $build->build_status = Build::STATUS_NEW;
-            $build->build_attach = '';
-            $build->build_time_log = json_encode([]);
-
-            $build->save();
-        }
-
-        /** @var ReleaseRequest $childReleaseRequest */
-        foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
-            $childReleaseRequest->recreate($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null);
-        }
-
-        return array_merge([$this], $this->getReleaseRequests()->all());
     }
 
     /**
@@ -419,13 +458,31 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * Give ability to deploy manually if automated deploy is failed and there are errors
+     * @return bool
+     */
+    public function canBeRecreatedAuto()
+    {
+        return $this->canBeRecreated() && ($this->getFailBuildCount() < self::FAIL_BUILD_COUNT_THRESHOLD);
+    }
+
+    /**
+     * Give ability to install manually if automated deploy is failed and there are errors
      *
      * @return bool
      */
     public function shouldBeInstalled()
     {
         return $this->rr_status === self::STATUS_BUILT && $this->rr_last_error_text;
+    }
+
+    /**
+     * Give ability to install automatically
+     *
+     * @return bool
+     */
+    public function canBeInstalledAuto()
+    {
+        return $this->shouldBeInstalled() && ($this->getFailInstallCount() < self::FAIL_INSTALL_COUNT_THRESHOLD);
     }
 
     /**
@@ -794,5 +851,35 @@ class ReleaseRequest extends ActiveRecord
             $build->build_time_log = json_encode($data);
             $build->save();
         }
+    }
+
+    public function increaseFailBuildCount()
+    {
+        \Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
+    }
+
+    public function getFailBuildCount()
+    {
+        return (int) \Yii::$app->redis->get($this->getRedisKeyFailBuildCount());
+    }
+
+    public function increaseFailInstallCount()
+    {
+        \Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
+    }
+
+    public function getFailInstallCount()
+    {
+        return (int) \Yii::$app->redis->get($this->getRedisKeyFailBuildCount());
+    }
+
+    protected function getRedisKeyFailBuildCount()
+    {
+        return self::REDIS_KEY_FAIL_BUILD_COUNT . $this->obj_id;
+    }
+
+    protected function getRedisKeyFailInstallCount()
+    {
+        return self::REDIS_KEY_FAIL_INSTALL_COUNT . $this->obj_id;
     }
 }

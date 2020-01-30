@@ -163,20 +163,6 @@ class DeployController extends RabbitListener
             case Build::STATUS_FAILED:
                 switch ($buildPrevStatus) {
                     case Build::STATUS_BUILDING:
-                        $title = "Failed to build $project->project_name";
-                        $text = "Проект $project->project_name не удалось собрать. <a href='" .
-                            Url::to(['build/view', 'id' => $build->obj_id], 'https') .
-                            "'>Подробнее</a>";
-
-                        Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
-
-                        foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
-                            if (!$phone) {
-                                continue;
-                            }
-                            Yii::$app->smsSender->sendSms($phone, $title);
-                        }
-
                         if ($build->releaseRequest) {
                             $build->releaseRequest->rr_status = ReleaseRequest::STATUS_FAILED;
                             $build->releaseRequest->save();
@@ -184,15 +170,27 @@ class DeployController extends RabbitListener
                             $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_BUILD_ERROR);
                         }
 
+                        $build->releaseRequest->increaseFailBuildCount();
+                        if ($build->releaseRequest->canBeRecreatedAuto()) {
+                            $build->releaseRequest->recreate(Yii::$app->params['autoReleaseRequestUserId']);
+                        } else {
+                            $title = "Failed to build $project->project_name";
+                            $text = "Проект $project->project_name не удалось собрать. <a href='" .
+                                Url::to(['build/view', 'id' => $build->obj_id], 'https') .
+                                "'>Подробнее</a>";
+
+                            Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
+
+                            foreach (explode(",", \Yii::$app->params['notify']['status']['phones']) as $phone) {
+                                if (!$phone) {
+                                    continue;
+                                }
+                                Yii::$app->smsSender->sendSms($phone, $title);
+                            }
+                        }
+
                         break;
                     case Build::STATUS_INSTALLING:
-                        $title = "Failed to install $project->project_name";
-                        $text = "Проект $project->project_name не удалось разложить по серверам. <a href='" .
-                            Url::to(['build/view', 'id' => $build->obj_id], 'https') .
-                            "'>Подробнее</a>";
-
-                        Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
-
                         // ag: Revert to status BUILT and add error description
                         if ($build->releaseRequest) {
                             $build->releaseRequest->rr_status = ReleaseRequest::STATUS_BUILT;
@@ -200,6 +198,18 @@ class DeployController extends RabbitListener
                             $build->releaseRequest->save();
 
                             $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_INSTALL_ERROR);
+                        }
+
+                        $build->releaseRequest->increaseFailInstallCount();
+                        if ($build->releaseRequest->canBeInstalledAuto()) {
+                            $build->releaseRequest->sendInstallTask();
+                        } else {
+                            $title = "Failed to install $project->project_name";
+                            $text = "Проект $project->project_name не удалось разложить по серверам. <a href='" .
+                                Url::to(['build/view', 'id' => $build->obj_id], 'https') .
+                                "'>Подробнее</a>";
+
+                            Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
                         }
 
                         break;
