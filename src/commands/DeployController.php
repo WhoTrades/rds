@@ -181,8 +181,7 @@ class DeployController extends RabbitListener
                         if ($build->releaseRequest->canBeRecreatedAuto()) {
                             $build->releaseRequest->recreate(Yii::$app->params['autoReleaseRequestUserId']);
                         } else {
-                            $failBuildCountThreshold = ReleaseRequest::FAIL_BUILD_COUNT_THRESHOLD;
-                            $title = "Failed to build $project->project_name $failBuildCountThreshold times";
+                            $title = "Failed to build $project->project_name {$build->releaseRequest->getFailBuildCount()} times";
                             $text = "Проект $project->project_name не удалось собрать. <a href='" .
                                 Url::to(['build/view', 'id' => $build->obj_id], 'https') .
                                 "'>Подробнее</a>";
@@ -212,8 +211,7 @@ class DeployController extends RabbitListener
                         if ($build->releaseRequest->canBeInstalledAuto()) {
                             $build->releaseRequest->sendInstallTask();
                         } else {
-                            $failInstallCountThreshold = ReleaseRequest::FAIL_INSTALL_COUNT_THRESHOLD;
-                            $title = "Failed to install $project->project_name $failInstallCountThreshold times";
+                            $title = "Failed to install $project->project_name {$build->releaseRequest->getFailInstallCount()} times";
                             $text = "Проект $project->project_name не удалось разложить по серверам. <a href='" .
                                 Url::to(['build/view', 'id' => $build->obj_id], 'https') .
                                 "'>Подробнее</a>";
