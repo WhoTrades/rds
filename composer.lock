@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "96978c1512dec40ecb99da62b02145ff",
+    "content-hash": "3e39a18686a17f9609194ec8c69b7d07",
     "packages": [
         {
             "name": "bazilio/yii2-stubs-generator",
@@ -1566,12 +1566,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/rds-system.git",
-                "reference": "e57f7d7de465ba9ac32b26a918e092893c7fb3ee"
+                "reference": "1260123f268ac9a12dcb68012c5da1ccb9df0251"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/e57f7d7de465ba9ac32b26a918e092893c7fb3ee",
-                "reference": "e57f7d7de465ba9ac32b26a918e092893c7fb3ee",
+                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/1260123f268ac9a12dcb68012c5da1ccb9df0251",
+                "reference": "1260123f268ac9a12dcb68012c5da1ccb9df0251",
                 "shasum": ""
             },
             "type": "library",
@@ -1582,7 +1582,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "Core part of RDS service",
-            "time": "2019-12-11T08:48:26+00:00"
+            "time": "2020-02-13T09:48:58+00:00"
         },
         {
             "name": "yiisoft/yii2",
