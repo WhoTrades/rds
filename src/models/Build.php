@@ -34,6 +34,7 @@ class Build extends ActiveRecord
     const STATUS_BUILT = 'built';
     const STATUS_INSTALLING = 'installing';
     const STATUS_INSTALLED = 'installed';
+    const STATUS_POST_INSTALLED = 'post_installed';
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_USED = 'used';

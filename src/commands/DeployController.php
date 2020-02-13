@@ -100,7 +100,10 @@ class DeployController extends RabbitListener
         $project = $build->project;
 
         $buildPrevStatus = $build->build_status;
-        $build->build_status = $status;
+        // ag: Build::STATUS_POST_INSTALLED is a technical status
+        if (!in_array($status, [Build::STATUS_POST_INSTALLED])) {
+            $build->build_status = $status;
+        }
         if ($attach) {
             $build->build_attach .= $attach;
         }
@@ -159,6 +162,10 @@ class DeployController extends RabbitListener
                         Yii::$app->EmailNotifier->sendReleaseRequestDeployNotification($project->project_name, $version, $buildIdList);
                     }
                 }
+                break;
+            case Build::STATUS_POST_INSTALLED:
+                // ag: Do nothing. It is a technical status
+                Yii::info('Post install script success');
                 break;
             case Build::STATUS_FAILED:
                 switch ($buildPrevStatus) {

@@ -723,6 +723,7 @@ class ReleaseRequest extends ActiveRecord
                     $build->releaseRequest->rr_build_version,
                     $build->releaseRequest->rr_release_version,
                     $build->releaseRequest->project->script_deploy,
+                    $build->releaseRequest->project->script_post_deploy,
                     $build->project->getProjectServersArray()
                 )
             );
