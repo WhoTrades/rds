@@ -453,6 +453,7 @@ class ReleaseRequest extends ActiveRecord
     public function canBeRecreated()
     {
         return (in_array($this->rr_status, [self::STATUS_INSTALLED, self::STATUS_FAILED])) &&
+            $this->obj_status_did === Status::ACTIVE &&
             (!in_array($this->rr_migration_status, [self::MIGRATION_STATUS_UPDATING, self::MIGRATION_STATUS_UP])) &&
             $this->isLastReleaseRequest();
     }
