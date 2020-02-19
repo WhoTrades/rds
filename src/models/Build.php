@@ -87,7 +87,7 @@ class Build extends ActiveRecord
      */
     public function getReleaseRequest()
     {
-        return $this->hasOne(ReleaseRequest::class, ['obj_id' => 'build_release_request_obj_id']);
+        return $this->hasOne(ReleaseRequest::class, ['obj_id' => 'build_release_request_obj_id'])->orWhere(['IS NOT', 'obj_status_did', null]);
     }
 
     /**
