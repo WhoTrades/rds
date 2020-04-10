@@ -278,18 +278,17 @@ class Project extends ActiveRecord
      * Возвращает ссылку в stash на исходный код миграции
      *
      * @param string $migration
-     * @param string $type - pre|post|hard
-     * @param string $buildVersion
+     * @param string $type // ag: @see Migration::TYPE_*
      *
      * @return string
      */
-    public function getMigrationUrl($migration, $type, $buildVersion)
+    public function getMigrationUrl($migration, $type)
     {
         $config = \Yii::$app->params['projectMigrationUrlMask'] ?? [];
         if (isset($config[$this->project_name])) {
-            return $config[$this->project_name]($migration, $this->project_name, $type, $buildVersion);
+            return $config[$this->project_name]($migration, $this->project_name, $type, Yii::$app->params['projectMigrationBitBucketBranch']);
         } else {
-            return $config['*']($migration, $this->project_name, $type, $buildVersion);
+            return $config['*']($migration, $this->project_name, $type, Yii::$app->params['projectMigrationBitBucketBranch']);
         }
     }
 

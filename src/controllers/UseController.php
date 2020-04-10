@@ -1,8 +1,9 @@
 <?php
 namespace whotrades\rds\controllers;
 
-use whotrades\rds\commands\DeployController;
 use Yii;
+use whotrades\rds\commands\DeployController;
+use whotrades\rds\models\Migration;
 use whotrades\rds\models\Log;
 use whotrades\rds\models\Project2worker;
 use yii\web\HttpException;
@@ -65,25 +66,19 @@ class UseController extends ControllerRestrictedBase
 
     /**
      * @param int $id
-     * @param string $type
      *
      * @throws HttpException
      * @throws \Exception
      */
-    public function actionMigrate($id, $type)
+    public function actionMigrate($id)
     {
         $releaseRequest = $this->loadModel($id);
         if (!$releaseRequest->shouldBeMigrated()) {
             $this->redirect('/');
         }
 
-        if ($type == 'pre') {
-            $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_UPDATING;
-            $logMessage = "Запущены pre миграции {$releaseRequest->getTitle()}";
-        } else {
-            $releaseRequest->rr_post_migration_status = ReleaseRequest::MIGRATION_STATUS_UPDATING;
-            $logMessage = "Запущены post миграции {$releaseRequest->getTitle()}";
-        }
+        $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_UPDATING;
+        $logMessage = "Запущены pre миграции {$releaseRequest->getTitle()}";
 
         foreach ($releaseRequest->project->project2workers as $p2w) {
             /** @var Project2worker $p2w */
@@ -95,7 +90,7 @@ class UseController extends ControllerRestrictedBase
                     new \whotrades\RdsSystem\Message\MigrationTask(
                         $releaseRequest->project->project_name,
                         $releaseRequest->rr_build_version,
-                        $type,
+                        Migration::TYPE_PRE,
                         $releaseRequest->project->script_migration_up
                     )
                 );

@@ -77,6 +77,14 @@ echo Nav::widget(
                         ['label' => 'Версии', 'url' => ['/release-version/admin'], 'active' => $controllerId == 'release-version'],
                     ],
                 ],
+                'migrations' => [
+                    'label' => 'Миграции',
+                    'url' => ['/migration/index'],
+                    'visible' => \Yii::$app->user->can('developer'),
+                    'items' => [
+                        ['label' => 'Миграции PRE/POST', 'url' => ['/migration/index'], 'active' => $controllerId == 'migration'],
+                    ],
+                ]
             ],
             $modulesNav,
             [

@@ -7,6 +7,8 @@ use whotrades\rds\components\ActiveRecord;
 use yii\db\ActiveQuery;
 
 /**
+ * @deprecated since #WTA-2267
+ *
  * This is the model class for table "rds.post_migration".
  *
  * The followings are the available columns in table 'rds.post_migration':

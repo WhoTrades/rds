@@ -8,6 +8,14 @@ use yii\helpers\Console;
 
 class MigrateController extends BaseMigrateController
 {
+    const MIGRATION_COMMAND_NEW      = 'new';
+    const MIGRATION_COMMAND_NEW_ALL  = 'new all';
+    const MIGRATION_COMMAND_HISTORY  = 'history';
+    const MIGRATION_COMMAND_UP       = 'up';
+    const MIGRATION_COMMAND_UP_ONE   = 'up-one';
+    const MIGRATION_COMMAND_DOWN     = 'down';
+    const MIGRATION_COMMAND_DOWN_ONE = 'down-one';
+
     /**
      * {@inheritdoc}
      */

@@ -313,18 +313,18 @@ return array(
                                     ]
                     );
                     $result .= ' | ';
-                    $result .= Html::a('Retry', ['/use/migrate', 'id' => $releaseRequest->obj_id, 'type' => 'pre'], ['class' => 'ajax-url']);
+                    $result .= Html::a('Retry', ['/use/migrate', 'id' => $releaseRequest->obj_id], ['class' => 'ajax-url']);
                     $result .= "<br />";
 
                     return $result;
                 } else {
                     $result .=
-                        "<a href='" . yii\helpers\Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id, 'type' => 'pre']) .
+                        "<a href='" . yii\helpers\Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id]) .
                         "' class='ajax-url'>Запустить pre-миграции</a><br />" .
                         "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">Показать pre миграции</a>
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                     foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                        $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, 'pre', $releaseRequest->rr_build_version) . ">";
+                        $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, \whotrades\rds\models\Migration::TYPE_PRE) . ">";
                         $result .= "$migration";
                         $result .= "</a><br />";
                     }

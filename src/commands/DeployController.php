@@ -6,7 +6,7 @@ use app\modules\Whotrades\models\ToolJob;
 use whotrades\rds\components\Status;
 use whotrades\rds\models\JiraUse;
 use whotrades\rds\models\Log;
-use whotrades\rds\models\PostMigration;
+use whotrades\rds\models\Migration;
 use whotrades\rds\models\ProjectConfigHistory;
 use whotrades\RdsSystem\Cron\RabbitListener;
 use Yii;
@@ -277,74 +277,185 @@ class DeployController extends RabbitListener
             return;
         }
 
-        if ($message->type === 'pre') {
-            $releaseRequest->rr_new_migration_count = count($message->migrations);
-            $releaseRequest->rr_new_migrations = json_encode($message->migrations);
-        } elseif ($message->type === 'post') {
-            foreach ($message->migrations as $postMigrationName) {
-                $postMigrationName = str_replace('/', '\\', $postMigrationName);
+        switch ($message->type) {
+            case Migration::TYPE_PRE:
+            case Migration::TYPE_POST:
+                foreach ($message->migrations as $migrationName) {
+                    $migrationName = str_replace('/', '\\', $migrationName);
 
-                if (!preg_match('/^[\w\/\\\_\-]+$/', $postMigrationName)) {
-                    Yii::info("Skip processing of post-migration {$postMigrationName} of project {$project->project_name}. Malformed name.");
-                    continue;
-                }
+                    if (!preg_match('/^[\w\/\\\_\-]+$/', $migrationName)) {
+                        Yii::info("Skip processing of post-migration {$migrationName} of project {$project->project_name}. Malformed name.");
+                        continue;
+                    }
 
-                $postMigration = PostMigration::findByAttributes([
-                    'pm_project_obj_id' => $project->obj_id,
-                    'pm_name' => $postMigrationName,
-                ]);
+                    $migrationTypeId = Migration::getTypeIdByName($message->type);
+                    $migration = Migration::findByAttributes(
+                        [
+                            'migration_type' => $migrationTypeId,
+                            'migration_name' => $migrationName,
+                            'migration_project_obj_id' => $project->obj_id,
+                        ]
+                    );
 
-                if ($postMigration) {
-                    Yii::info("Skip processing of post-migration {$postMigrationName} of project {$project->project_name}. Already exists in DB");
-                    continue;
-                }
-
-                $postMigration = new PostMigration();
-
-                $postMigration->pm_project_obj_id = $project->obj_id;
-                $postMigration->pm_release_request_obj_id = $releaseRequest->obj_id;
-                $postMigration->pm_name = $postMigrationName;
-
-                $postMigration->save();
-            }
-        } else {
-            foreach ($message->migrations as $migration) {
-                list($migration, $ticket) = preg_split('~\s+~', $migration);
-
-                $postMigration = HardMigration::findByAttributes([
-                    'migration_project_obj_id' => $project->obj_id,
-                    'migration_name' => $migration,
-                ]);
-
-                if ($postMigration) {
-                    Yii::info("Skip processing of hard-migration {$migration} of project {$project->project_name}. Already exists in DB");
-                    continue;
-                }
-
-                $hm = new HardMigration();
-                $hm->attributes = [
-                    'migration_release_request_obj_id' => $releaseRequest->obj_id,
-                    'migration_project_obj_id' => $releaseRequest->rr_project_obj_id,
-                    'migration_type' => 'hard',
-                    'migration_name' => $migration,
-                    'migration_ticket' => str_replace('#', '', $ticket),
-                    'migration_status' => HardMigration::MIGRATION_STATUS_NEW,
-                    'migration_environment' => 'main',
-                ];
-
-                if (!$hm->save()) {
-                    if (count($hm->errors) != 1 || !isset($hm->errors["migration_name"])) {
-                        Yii::error("Can't save HardMigration: " . json_encode($hm->errors));
+                    if ($migration) {
+                        Yii::info("Skip creating {$message->type} migration {$migrationName} of project {$project->project_name}. Already exists in DB");
                     } else {
-                        Yii::info("Skip migration $migration as already exists in DB (" . json_encode($hm->errors) . ")");
+                        $migration = new Migration();
+                        $migration->loadDefaultValues();
+                        $migration->migration_type = $migrationTypeId;
+                        $migration->migration_name = $migrationName;
+                        $migration->migration_project_obj_id = $project->obj_id;
+                        $migration->migration_release_request_obj_id = $releaseRequest->obj_id;
+
+                        $migration->save();
+                    }
+
+                    if ($message->command === MigrateController::MIGRATION_COMMAND_HISTORY) {
+                        $migration->tryUpdateStatus(Migration::STATUS_APPLIED);
+                    } else {
+                        $migration->tryUpdateStatus(Migration::STATUS_PENDING);
+                    }
+
+                    if (!$migration->migration_ticket) {
+                        $migration->fillFromGit();
                     }
                 }
-            }
+                break;
+            case Migration::TYPE_HARD:
+                if (Yii::$app->hasModule('Wtflow')) {
+                    foreach ($message->migrations as $migrationName) {
+                        list($migrationName, $ticket) = preg_split('~\s+~', $migrationName);
+
+                        $migration = HardMigration::findByAttributes(
+                            [
+                                'migration_project_obj_id' => $project->obj_id,
+                                'migration_name' => $migrationName,
+                            ]
+                        );
+
+                        if ($migration) {
+                            Yii::info("Skip creating hard-migration {$migrationName} of project {$project->project_name}. Already exists in DB");
+                        } else {
+
+                            $migration = new HardMigration();
+                            $migration->loadDefaultValues();
+                            $migration->attributes = [
+                                'migration_release_request_obj_id' => $releaseRequest->obj_id,
+                                'migration_project_obj_id' => $releaseRequest->rr_project_obj_id,
+                                'migration_type' => 'hard',
+                                'migration_name' => $migrationName,
+                                'migration_ticket' => str_replace('#', '', $ticket),
+                                'migration_status' => HardMigration::MIGRATION_STATUS_NEW,
+                                'migration_environment' => 'main',
+                            ];
+
+                            if (!$migration->save()) {
+                                if (count($migration->errors) != 1 || !isset($migration->errors["migration_name"])) {
+                                    Yii::error("Can't save HardMigration: " . json_encode($migration->errors));
+                                } else {
+                                    Yii::info("Skip migration $migrationName as already exists in DB (" . json_encode($migration->errors) . ")");
+                                }
+                            }
+                        }
+
+                        if ($message->command === MigrateController::MIGRATION_COMMAND_HISTORY) {
+                            $migration->tryUpdateStatus(HardMigration::MIGRATION_STATUS_DONE);
+                        } else {
+                            $migration->tryUpdateStatus(HardMigration::MIGRATION_STATUS_NEW);
+                        }
+
+                        if (!$migration->migration_ticket) {
+                            $migration->fillFromGit();
+                        }
+                    }
+                }
         }
 
-        $releaseRequest->save(false);
+        // ag: For backward compatibility after #WTA-2267
+        if ($message->type === Migration::TYPE_PRE && $message->command === MigrateController::MIGRATION_COMMAND_NEW) {
+            $releaseRequest->rr_new_migration_count = count($message->migrations);
+            $releaseRequest->rr_new_migrations = json_encode($message->migrations);
+            $releaseRequest->save(false);
+        }
 
         self::sendReleaseRequestUpdated($releaseRequest->obj_id);
+
+        $message->accepted();
+    }
+
+    /**
+     * @param Message\MigrationStatus $message
+     */
+    private function actionSetMigrationStatus(Message\MigrationStatus $message)
+    {
+        $projectObj = Project::findByAttributes(array('project_name' => $message->project));
+        if (!$projectObj) {
+            Yii::error('unknown project ' . $message->project);
+            $message->accepted();
+
+            return;
+        }
+
+        $releaseRequest = ReleaseRequest::findByAttributes(array('rr_build_version' => $message->version, 'rr_project_obj_id' => $projectObj->obj_id));
+        if (!$releaseRequest) {
+            Yii::error('unknown release request: project=' . $message->project . ", build_version=" . $message->version);
+            $message->accepted();
+
+            return;
+        }
+
+        $transaction = \Yii::$app->db->beginTransaction();
+
+        $migrationTypeId = Migration::getTypeIdByName($message->type);
+        $migration = Migration::findByAttributes(
+            [
+                'migration_type' => $migrationTypeId,
+                'migration_name' => $message->migrationName,
+                'migration_project_obj_id' => $projectObj->obj_id
+            ]
+        );
+
+        if (!$migration) {
+            Yii::error("Skip unknown post {$message->type} migration: project={$message->project}, migration_name={$message->migrationName}");
+            $message->accepted();
+
+            return;
+        }
+
+        switch ($message->status) {
+            case Message\MigrationStatus::STATUS_SUCCESS:
+                $migration->succeed();
+                break;
+            case Message\MigrationStatus::STATUS_FAILED:
+                $migration->failed();
+                break;
+        }
+        $migration->updateLog($message->result);
+
+        $this->sendMigrationUpdated($migration->obj_id);
+
+        // ag: For backward compatibility after #WTA-2267
+        if ($message->type === Migration::TYPE_PRE) {
+            $releaseRequest->rr_migration_status = $message->status;
+
+            if ($message->status === Message\MigrationStatus::STATUS_FAILED) {
+                $releaseRequest->rr_migration_error = $message->result;
+            }
+
+            if ($message->status === Message\MigrationStatus::STATUS_SUCCESS) {
+                $releaseRequest->rr_new_migration_count = 0;
+
+                ReleaseRequest::updateAll(['rr_migration_status' => $message->status, 'rr_new_migration_count' => 0], 'rr_build_version <= :version AND rr_project_obj_id = :id', [
+                    ':version'  => $message->version,
+                    ':id'       => $projectObj->obj_id,
+                ]);
+            }
+
+            $releaseRequest->save();
+        }
+        $transaction->commit();
+
+        static::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();
     }
@@ -556,10 +667,7 @@ class DeployController extends RabbitListener
             $project->project_current_version = $message->version;
             $project->save(false);
 
-            $oldUsed = ReleaseRequest::findByAttributes(array(
-                'rr_status' => ReleaseRequest::STATUS_USED,
-                'rr_project_obj_id' => $project->obj_id,
-            ));
+            $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
 
             if ($oldUsed) {
                 $oldUsed->rr_status = ReleaseRequest::STATUS_OLD;
@@ -681,78 +789,6 @@ class DeployController extends RabbitListener
     }
 
     /**
-     * @param Message\MigrationStatus $message
-     */
-    private function actionSetMigrationStatus(Message\MigrationStatus $message)
-    {
-        $projectObj = Project::findByAttributes(array('project_name' => $message->project));
-
-        if (!$projectObj) {
-            Yii::error('unknown project ' . $message->project);
-            $message->accepted();
-
-            return;
-        }
-
-        $transaction = \Yii::$app->db->beginTransaction();
-
-        if ($message->type === 'pre') {
-            $releaseRequest = ReleaseRequest::findByAttributes(array('rr_build_version' => $message->version, 'rr_project_obj_id' => $projectObj->obj_id));
-
-            if (!$releaseRequest) {
-                Yii::error('unknown release request: project=' . $message->project . ", build_version=" . $message->version);
-                $message->accepted();
-
-                return;
-            }
-
-            $releaseRequest->rr_migration_status = $message->status;
-
-            if ($message->status === Message\MigrationStatus::STATUS_FAILED) {
-                $releaseRequest->rr_migration_error = $message->result;
-            }
-
-            if ($message->status === Message\MigrationStatus::STATUS_UP) {
-                $releaseRequest->rr_new_migration_count = 0;
-
-                ReleaseRequest::updateAll(['rr_migration_status' => $message->status, 'rr_new_migration_count' => 0], 'rr_build_version <= :version AND rr_project_obj_id = :id', [
-                    ':version'  => $message->version,
-                    ':id'       => $projectObj->obj_id,
-                ]);
-            }
-
-            $releaseRequest->save();
-        } else {
-            $postMigration = PostMigration::findByAttributes(['pm_name' => $message->migrationName, 'pm_project_obj_id' => $projectObj->obj_id]);
-
-            if (!$postMigration) {
-                Yii::error('unknown post-migration: project=' . $message->project . ", migration_name=" . $message->migrationName);
-                $message->accepted();
-
-                return;
-            }
-
-            switch ($message->status) {
-                case Message\MigrationStatus::STATUS_UP:
-                    $postMigration->pm_status = PostMigration::STATUS_APPLIED;
-                    break;
-                case Message\MigrationStatus::STATUS_FAILED:
-                    $postMigration->pm_status = PostMigration::STATUS_FAILED;
-                    break;
-            }
-            $postMigration->pm_log = $message->result;
-
-            $postMigration->save();
-        }
-
-        $transaction->commit();
-
-        static::sendReleaseRequestUpdated($releaseRequest->obj_id);
-
-        $message->accepted();
-    }
-
-    /**
      * @param int $id
      */
     public static function sendReleaseRequestUpdated($id)
@@ -784,5 +820,24 @@ class DeployController extends RabbitListener
         array_unshift($params, $route);
 
         return Url::to($params, true);
+    }
+
+    /**
+     * @param int $migrationId
+     */
+    protected function sendMigrationUpdated($migrationId)
+    {
+        Yii::info("Sending to comet new data of migration #$migrationId");
+
+        $model = Migration::findByPk($migrationId);
+
+        $html = \Yii::$app->view->renderFile(__DIR__ . '/../views/migration/_migrationGrid.php', [
+            'dataProvider' => $model->search(['obj_id' => $migrationId]),
+            'model' => $model,
+        ]);
+
+        Yii::info("html code generated");
+
+        Yii::$app->webSockets->send('migrationUpdated', ['rr_id' => str_replace("\\", "", $model->migration_name), 'html' => $html]);
     }
 }

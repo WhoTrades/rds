@@ -6,6 +6,7 @@
  */
 
 use whotrades\RdsSystem\lib\WebErrorHandler;
+use whotrades\rds\helpers\Migration as MigrationHelper;
 
 $config = array(
     'id' => 'RDS',
@@ -203,11 +204,14 @@ $config = array(
     ),
 
     'params' => array(
+        'migrationHelperClass' => MigrationHelper::class,
+        'postMigrationStabilizeDelay' => '1 week',
         'projectMigrationUrlMask' => [
-                '*' => function ($migration, $projectName, $type, $buildVersion) {
-                    return "https://github.com/WhoTrades/rds/blob/master/src/migrations/$migration.php?at=refs/tags/$projectName-$buildVersion";
+                '*' => function ($migration, $projectName, $type, $branch) {
+                    return "https://github.com/WhoTrades/rds/blob/master/src/migrations/$migration.php?at=refs/heads/$branch";
                 }
         ],
+        'projectMigrationBitBucketBranch' => 'master',
         'messaging' => [
             'host'  => 'localhost',
             'port'  => 5672,
@@ -239,7 +243,6 @@ $config = array(
             'baseUrl' => 'https://sentry.com/sentry/',
             'projectNameMap' => [], // ag: Mapping of RDS project name to Sentry project name
         ],
-        'postMigrationStabilizeDelay' => '1 week',
     ),
 );
 

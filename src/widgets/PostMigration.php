@@ -1,12 +1,10 @@
 <?php
 namespace whotrades\rds\widgets;
 
-use whotrades\rds\components\Status;
-use whotrades\rds\models\ReleaseRequest;
-use whotrades\rds\models\PostMigration as PostMigrationModel;
-use Yii;
+use yii\base\Widget;
+use whotrades\rds\models\Migration;
 
-class PostMigration extends \yii\base\Widget
+class PostMigration extends Widget
 {
     /**
      * @return string
@@ -19,8 +17,9 @@ class PostMigration extends \yii\base\Widget
 
         $postMigrationAllowTimestamp = date('c', strtotime("-" . \Yii::$app->params['postMigrationStabilizeDelay']));
 
-        $readyPostMigrationsCount = PostMigrationModel::find()->
-            andWhere(['IN', 'pm_status', [PostMigrationModel::STATUS_PENDING, PostMigrationModel::STATUS_FAILED]])->
+        $readyPostMigrationsCount = Migration::find()->
+            andWhere(['migration_type' => Migration::TYPE_ID_POST])->
+            andWhere(['IN', 'obj_status_did', [Migration::STATUS_PENDING, Migration::STATUS_FAILED_APPLICATION]])->
             andWhere(['<', 'obj_created', $postMigrationAllowTimestamp])->
             count();
 

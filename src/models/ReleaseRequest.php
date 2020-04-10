@@ -39,8 +39,6 @@ use yii\db\ActiveQuery;
  * @property string $rr_new_migrations
  * @property string $rr_migration_status
  * @property string $rr_migration_error
- * @property string $rr_new_post_migrations
- * @property string $rr_post_migration_status
  * @property string $rr_built_time
  * @property string $rr_cron_config
  * @property string $rr_build_started
@@ -558,7 +556,7 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @param $projectId
+     * @param int $projectId
      *
      * @return ReleaseRequest
      */
@@ -571,6 +569,20 @@ class ReleaseRequest extends ActiveRecord
         $lastBuildVersion = $project->getLastVersion($releaseVersion);
 
         return self::find()->where(['rr_build_version' => $lastBuildVersion])->one();
+    }
+
+    /**
+     * @param int $projectId
+     *
+     * @return ReleaseRequest
+     */
+    public static function getUsedReleaseByProjectId($projectId)
+    {
+        return self::find()->
+            andWhere(['rr_project_obj_id' => $projectId])->
+            andWhere(['rr_status' => self::STATUS_USED])->
+            orderBy('obj_id desc')->
+            one();
     }
 
     /**
