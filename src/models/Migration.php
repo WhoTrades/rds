@@ -130,7 +130,8 @@ class Migration extends MigrationBase
                         )
                     )
                     ->andFilterWhere(['like', 'migration_name', $params['migration_name'] ?? ''])
-                    ->orderBy(['obj_created' => SORT_DESC, 'migration_name' => SORT_DESC])
+                    ->orderBy(['obj_created' => SORT_DESC, 'migration_name' => SORT_DESC]),
+                'pagination' => ['pageSize' => 15],
             ]
         );
         $this->load($params, 'search');

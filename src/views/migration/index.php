@@ -5,13 +5,13 @@ use whotrades\rds\models\Migration;
 
 ?>
 
+<h1>Управление PRE/POST миграциями</h1>
 
 <?php
 \yii\widgets\Pjax::begin(['id' => 'migration-grid-pjax-container']);
 echo $this->render('_migrationGrid', ['dataProvider' => $model->search($model->attributes), 'filterModel' => $model, 'model' => $model]);
 \yii\widgets\Pjax::end();
 ?>
-
 
 <script type="text/javascript">
     //an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
