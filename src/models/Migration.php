@@ -188,7 +188,7 @@ class Migration extends MigrationBase
      */
     public function getWaitingDays()
     {
-        if ($this->migration_type === self::TYPE_POST) {
+        if ($this->migration_type === self::TYPE_ID_POST) {
             return $this->getMigrationHelper()->getWaitingDays($this);
         }
 
