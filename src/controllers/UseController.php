@@ -9,6 +9,7 @@ use whotrades\rds\models\Project2worker;
 use yii\web\HttpException;
 use whotrades\rds\models\RdsDbConfig;
 use whotrades\rds\models\ReleaseRequest;
+use whotrades\rds\commands\MigrateController;
 
 class UseController extends ControllerRestrictedBase
 {
@@ -91,7 +92,8 @@ class UseController extends ControllerRestrictedBase
                         $releaseRequest->project->project_name,
                         $releaseRequest->rr_build_version,
                         Migration::TYPE_PRE,
-                        $releaseRequest->project->script_migration_up
+                        $releaseRequest->project->script_migration_up,
+                        MigrateController::MIGRATION_COMMAND_UP
                     )
                 );
         }

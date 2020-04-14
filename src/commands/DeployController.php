@@ -406,36 +406,8 @@ class DeployController extends RabbitListener
 
         $transaction = \Yii::$app->db->beginTransaction();
 
-        $migrationTypeId = Migration::getTypeIdByName($message->type);
-        $migration = Migration::findByAttributes(
-            [
-                'migration_type' => $migrationTypeId,
-                'migration_name' => $message->migrationName,
-                'migration_project_obj_id' => $projectObj->obj_id
-            ]
-        );
-
-        if (!$migration) {
-            Yii::error("Skip unknown post {$message->type} migration: project={$message->project}, migration_name={$message->migrationName}");
-            $message->accepted();
-
-            return;
-        }
-
-        switch ($message->status) {
-            case Message\MigrationStatus::STATUS_SUCCESS:
-                $migration->succeed();
-                break;
-            case Message\MigrationStatus::STATUS_FAILED:
-                $migration->failed();
-                break;
-        }
-        $migration->updateLog($message->result);
-
-        $this->sendMigrationUpdated($migration->obj_id);
-
         // ag: For backward compatibility after #WTA-2267
-        if ($message->type === Migration::TYPE_PRE) {
+        if (!$message->migrationName && $message->type === Migration::TYPE_PRE) {
             $releaseRequest->rr_migration_status = $message->status;
 
             if ($message->status === Message\MigrationStatus::STATUS_FAILED) {
@@ -453,6 +425,39 @@ class DeployController extends RabbitListener
 
             $releaseRequest->save();
         }
+
+        $transaction->commit();
+
+        $migrationTypeId = Migration::getTypeIdByName($message->type);
+        $migration = Migration::findByAttributes(
+            [
+                'migration_type' => $migrationTypeId,
+                'migration_name' => $message->migrationName,
+                'migration_project_obj_id' => $projectObj->obj_id
+            ]
+        );
+
+        if (!$migration) {
+            Yii::error("Skip unknown {$message->type} migration: project={$message->project}, migration_name={$message->migrationName}");
+            $message->accepted();
+
+            return;
+        }
+
+        $transaction = \Yii::$app->db->beginTransaction();
+
+        switch ($message->status) {
+            case Message\MigrationStatus::STATUS_SUCCESS:
+                $migration->succeed();
+                break;
+            case Message\MigrationStatus::STATUS_FAILED:
+                $migration->failed();
+                break;
+        }
+        $migration->updateLog($message->result);
+
+        $this->sendMigrationUpdated($migration->obj_id);
+
         $transaction->commit();
 
         static::sendReleaseRequestUpdated($releaseRequest->obj_id);
