@@ -372,7 +372,7 @@ class DeployController extends RabbitListener
         }
 
         // ag: For backward compatibility after #WTA-2267
-        if ($message->type === Migration::TYPE_PRE && $message->command === MigrateController::MIGRATION_COMMAND_NEW) {
+        if ($message->type === Migration::TYPE_PRE && in_array($message->command, [MigrateController::MIGRATION_COMMAND_NEW, MigrateController::MIGRATION_COMMAND_NEW_ALL])) {
             $releaseRequest->rr_new_migration_count = count($message->migrations);
             $releaseRequest->rr_new_migrations = json_encode($message->migrations);
             $releaseRequest->save(false);
