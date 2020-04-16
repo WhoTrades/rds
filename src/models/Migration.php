@@ -93,6 +93,46 @@ class Migration extends MigrationBase
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public static function createOrUpdate($migrationName, $typeName, $statusId, Project $project, ReleaseRequest $releaseRequest)
+    {
+        if (!preg_match('/^[\w\/\\\_\-]+$/', $migrationName)) {
+            Yii::info("Skip processing {$typeName} migration {$migrationName} of project {$project->project_name}. Malformed name.");
+
+            return;
+        }
+
+        $migrationTypeId = Migration::getTypeIdByName($typeName);
+        $migration = Migration::findByAttributes(
+            [
+                'migration_type' => $migrationTypeId,
+                'migration_name' => $migrationName,
+                'migration_project_obj_id' => $project->obj_id,
+            ]
+        );
+
+        if ($migration) {
+            Yii::info("Skip creating {$typeName} migration {$migrationName} of project {$project->project_name}. Already exists in DB");
+        } else {
+            $migration = new Migration();
+            $migration->loadDefaultValues();
+            $migration->migration_type = $migrationTypeId;
+            $migration->migration_name = $migrationName;
+            $migration->migration_project_obj_id = $project->obj_id;
+            $migration->migration_release_request_obj_id = $releaseRequest->obj_id;
+
+            $migration->save();
+        }
+
+        $migration->tryUpdateStatus($statusId);
+
+        if (!$migration->migration_ticket) {
+            $migration->fillFromGit();
+        }
+    }
+
+    /**
      * @return array validation rules for model attributes.
      */
     public function rules()

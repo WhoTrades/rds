@@ -73,6 +73,33 @@ abstract class MigrationBase extends ActiveRecord
     }
 
     /**
+     * @param string[] $migrationNameList
+     * @param string $typeName
+     * @param int $statusId
+     * @param Project $project
+     * @param ReleaseRequest $releaseRequest
+     *
+     * @return void
+     */
+    public static function createOrUpdateList(array $migrationNameList, $typeName, $statusId, Project $project, ReleaseRequest $releaseRequest)
+    {
+        foreach ($migrationNameList as $migrationName) {
+            static::createOrUpdate($migrationName, $typeName, $statusId, $project, $releaseRequest);
+        }
+    }
+
+    /**
+     * @param string $migrationName
+     * @param string $typeName
+     * @param int $statusId
+     * @param Project $project
+     * @param ReleaseRequest $releaseRequest
+     *
+     * @return void
+     */
+    abstract public static function createOrUpdate($migrationName, $typeName, $statusId, Project $project, ReleaseRequest $releaseRequest);
+
+    /**
      * @return string
      */
     abstract public function getStatusName();
