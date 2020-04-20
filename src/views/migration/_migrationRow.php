@@ -50,6 +50,31 @@ return [
         'format' => 'raw',
     ],
     [
+        'header' => 'Auto Apply',
+        'class' => 'yii\grid\ActionColumn',
+        'template' => '{disable} {enable}',
+        'visibleButtons' => [
+            'disable' => function (Migration $migration) {
+                return $migration->migration_auto_apply;
+            },
+            'enable' => function (Migration $migration) {
+                return !$migration->migration_auto_apply;
+            },
+        ],
+        'buttons' => [
+            'disable' => function ($url, Migration $migration) {
+                $url    = Url::to(['/migration/auto-apply-disable', 'migrationId' => $migration->obj_id]);
+
+                return '<span class="glyphicon glyphicon-ok" style="color: green">' . Html::a(' Disable', $url);
+            },
+            'enable' => function ($url, Migration $migration) {
+                $url    = Url::to(['/migration/auto-apply-enable', 'migrationId' => $migration->obj_id]);
+
+                return '<span class="glyphicon glyphicon-remove" style="color: red">' . Html::a(' Enable', $url);
+            },
+        ],
+    ],
+    [
         'attribute' => 'obj_status_did',
         'value' => function(Migration $migration) {
             $statusLine = $migration->getStatusName();
@@ -72,15 +97,15 @@ return [
             }
 
             if ($migration->canBeApplied()) {
-                $lines[] = Html::a('Apply', Url::to("/migration/apply?migrationId={$migration->obj_id}"), ['class' => 'ajax-url']);
+                $lines[] = Html::a('Apply', Url::to(['/migration/apply', 'migrationId' => $migration->obj_id]), ['class' => 'ajax-url']);
             }
 
             if ($migration->canBeRolledBack()) {
-                $lines[] = Html::a('RollBack', Url::to("/migration/roll-back?migrationId={$migration->obj_id}"), ['class' => 'ajax-url']);
+                $lines[] = Html::a('RollBack', Url::to(['/migration/roll-back', 'migrationId' => $migration->obj_id]), ['class' => 'ajax-url']);
             }
 
             if ($migration->migration_log) {
-                $lines[] = Html::aTargetBlank(Url::to("/migration/view-log?migrationId={$migration->obj_id}"), 'View log');
+                $lines[] = Html::aTargetBlank(Url::to(['/migration/view-log', 'migrationId' => $migration->obj_id]), 'View log');
             }
 
             return implode("<br />", $lines);

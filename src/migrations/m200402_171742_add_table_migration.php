@@ -1,11 +1,11 @@
 <?php
 
-use yii\db\Migration;
+use \whotrades\rds\migrations\base;
 
 /**
  * Class m200402_171742_add_table_migration
  */
-class m200402_171742_add_table_migration extends Migration
+class m200402_171742_add_table_migration extends base
 {
     /**
      * {@inheritdoc}

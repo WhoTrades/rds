@@ -17,6 +17,7 @@ use DateTime;
  * The followings are the available columns in table 'rds.migration':
  *
  * {@inheritDoc}
+ * @property bool $migration_auto_apply
  */
 class Migration extends MigrationBase
 {
@@ -128,6 +129,16 @@ class Migration extends MigrationBase
     }
 
     /**
+     * @return array customized attribute labels (name=>label)
+     */
+    public function attributeLabels()
+    {
+        return array_merge(parent::attributeLabels(), [
+            'migration_auto_apply' => 'Auto Apply',
+        ]);
+    }
+
+    /**
      * Creates data provider instance with search query applied
      *
      * @param array $params
@@ -163,7 +174,11 @@ class Migration extends MigrationBase
      */
     protected static function getMigrationReadyBeAutoAppliedList()
     {
-        return self::getPreMigrationCanBeAppliedList();
+        $migrationCanBeAppliedList = self::getPreMigrationCanBeAppliedList();
+
+        return array_filter($migrationCanBeAppliedList, function (self $migration) {
+            return $migration->canBeAutoApplied()();
+        });
     }
 
     /**
@@ -277,6 +292,14 @@ class Migration extends MigrationBase
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function canBeAutoApplied()
+    {
+        return $this->migration_auto_apply;
+    }
+
+    /**
      * @return bool
      */
     public function canBeRolledBack()
@@ -315,6 +338,24 @@ class Migration extends MigrationBase
     public function failed()
     {
         $this->getStateObject()->failed();
+    }
+
+    /**
+     * @return void
+     */
+    public function autoApplyDisable()
+    {
+        $this->migration_auto_apply = false;
+        $this->save();
+    }
+
+    /**
+     * @return void
+     */
+    public function autoApplyEnable()
+    {
+        $this->migration_auto_apply = true;
+        $this->save();
     }
 
     /**

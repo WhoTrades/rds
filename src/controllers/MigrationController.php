@@ -68,6 +68,34 @@ class MigrationController extends ControllerRestrictedBase
     }
 
     /**
+     * @param int $migrationId
+     *
+     * @throws HttpException
+     */
+    public function actionAutoApplyDisable($migrationId)
+    {
+        /** @var Migration $migration */
+        $migration = $this->loadModel($migrationId);
+        $migration->autoApplyDisable();
+
+        $this->redirect('/migration/index');
+    }
+
+    /**
+     * @param int $migrationId
+     *
+     * @throws HttpException
+     */
+    public function actionAutoApplyEnable($migrationId)
+    {
+        /** @var Migration $migration */
+        $migration = $this->loadModel($migrationId);
+        $migration->autoApplyEnable();
+
+        $this->redirect('/migration/index');
+    }
+
+    /**
      * @param int $id
      *
      * @return Migration

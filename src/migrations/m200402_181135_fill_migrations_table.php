@@ -1,6 +1,6 @@
 <?php
 
-use yii\db\Migration as YiiDbMigration;
+use \whotrades\rds\migrations\base;
 use whotrades\rds\models\PostMigration;
 use whotrades\rds\models\Migration;
 use whotrades\rds\models\ReleaseRequest;
@@ -8,7 +8,7 @@ use whotrades\rds\models\ReleaseRequest;
 /**
  * Class m200402_181135_fill_migrations_table
  */
-class m200402_181135_fill_migrations_table extends YiiDbMigration
+class m200402_181135_fill_migrations_table extends base
 {
     /**
      * {@inheritdoc}
