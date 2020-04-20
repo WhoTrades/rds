@@ -177,7 +177,7 @@ class Migration extends MigrationBase
         $migrationCanBeAppliedList = self::getPreMigrationCanBeAppliedList();
 
         return array_filter($migrationCanBeAppliedList, function (self $migration) {
-            return $migration->canBeAutoApplied()();
+            return $migration->canBeAutoApplied();
         });
     }
 
@@ -348,6 +348,7 @@ class Migration extends MigrationBase
         $this->migration_auto_apply = false;
         $this->save();
     }
+
 
     /**
      * @return void

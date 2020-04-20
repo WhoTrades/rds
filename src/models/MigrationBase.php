@@ -135,6 +135,11 @@ abstract class MigrationBase extends ActiveRecord
     abstract public function canBeApplied();
 
     /**
+     * @return bool
+     */
+    abstract public function canBeAutoApplied();
+
+    /**
      * @return void
      */
     abstract public function apply();
