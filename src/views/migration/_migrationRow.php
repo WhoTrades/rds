@@ -65,12 +65,12 @@ return [
             'disable' => function ($url, Migration $migration) {
                 $url    = Url::to(['/migration/auto-apply-disable', 'migrationId' => $migration->obj_id]);
 
-                return '<span class="glyphicon glyphicon-ok" style="color: green">' . Html::a(' Disable', $url);
+                return '<span class="glyphicon glyphicon-ok" style="color: green" ></span>' . Html::a(' Disable', $url);
             },
             'enable' => function ($url, Migration $migration) {
                 $url    = Url::to(['/migration/auto-apply-enable', 'migrationId' => $migration->obj_id]);
 
-                return '<span class="glyphicon glyphicon-remove" style="color: red">' . Html::a(' Enable', $url);
+                return '<span class="glyphicon glyphicon-remove" style="color: red" ></span>' . Html::a(' Enable', $url);
             },
         ],
     ],
