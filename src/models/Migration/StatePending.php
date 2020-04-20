@@ -4,7 +4,6 @@
  */
 namespace whotrades\rds\models\Migration;
 
-use whotrades\rds\commands\MigrateController;
 use whotrades\rds\models\Migration;
 
 class StatePending extends StateBase
@@ -40,7 +39,7 @@ class StatePending extends StateBase
             return;
         }
 
-        $this->sendCommand(MigrateController::MIGRATION_COMMAND_UP_ONE);
+        $this->migrationService->sendApplyCommand($this->migration);
 
         $this->migration->obj_status_did = Migration::STATUS_STARTED_APPLICATION;
         $this->migration->save();

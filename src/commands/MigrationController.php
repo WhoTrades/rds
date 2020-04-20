@@ -1,5 +1,13 @@
 <?php
 /**
+ * Tool updates migrations:
+ *  - add new migrations if they exist
+ *  - fill created date and jira ticket from git
+ *  - update status of existed migrations if they've been executed manually
+ *  - send commands fo executing migrations which are ready to be executed
+ *
+ * @author Anton Gorlanov <antonxacc@gmail.com>
+ *
  * @example php yii.php migration/update
  */
 namespace whotrades\rds\commands;
@@ -10,7 +18,6 @@ use whotrades\RdsSystem\lib\CommandExecutor;
 use whotrades\rds\models\Migration;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\ReleaseRequest;
-use whotrades\rds\helpers\Migration as MigrationHelper;
 
 class MigrationController extends SingleInstanceController
 {
@@ -44,10 +51,12 @@ class MigrationController extends SingleInstanceController
                     $migrationNameList = array_filter($lines);
                     $migrationNameList = array_map('trim', $migrationNameList);
 
-                    MigrationHelper::createOrUpdateListByCommand($migrationNameList, $typeName, $migrationCommand, $project, $releaseRequest);
+                    Yii::$app->migrationService->createOrUpdateListByCommand($migrationNameList, $typeName, $migrationCommand, $project, $releaseRequest);
                 }
             }
         }
+
+        Yii::$app->migrationService->applyCanBeAutoAppliedMigrations();
     }
 
     /**

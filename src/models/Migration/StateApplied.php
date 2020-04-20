@@ -5,7 +5,6 @@
 namespace whotrades\rds\models\Migration;
 
 use whotrades\rds\models\Migration;
-use whotrades\rds\commands\MigrateController;
 
 class StateApplied extends StateBase
 {
@@ -38,7 +37,7 @@ class StateApplied extends StateBase
      */
     public function rollBack()
     {
-        $this->sendCommand(MigrateController::MIGRATION_COMMAND_DOWN_ONE);
+        $this->migrationService->sendRollBackCommand($this->migration);
 
         $this->migration->obj_status_did = Migration::STATUS_STARTED_ROLLBACK;
         $this->migration->save();

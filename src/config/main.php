@@ -6,7 +6,7 @@
  */
 
 use whotrades\RdsSystem\lib\WebErrorHandler;
-use whotrades\rds\helpers\Migration as MigrationHelper;
+use whotrades\rds\services\MigrationService;
 
 $config = array(
     'id' => 'RDS',
@@ -201,11 +201,12 @@ $config = array(
             'port' => 6379,
             'database' => 0,
         ],
+        'migrationService' => [
+            'class' => MigrationService::class,
+        ]
     ),
 
     'params' => array(
-        'migrationHelperClass' => MigrationHelper::class,
-        'postMigrationStabilizeDelay' => '1 week',
         'projectMigrationUrlMask' => [
                 '*' => function ($migration, $projectName, $type, $branch) {
                     return "https://github.com/WhoTrades/rds/blob/master/src/migrations/$migration.php?at=refs/heads/$branch";

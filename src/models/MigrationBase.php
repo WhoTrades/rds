@@ -1,13 +1,13 @@
 <?php
 /**
+ * Base class for migration models
+ *
  * @author Anton Gorlanov <antonxacc@gmail.com>
  */
 namespace whotrades\rds\models;
 
-use Yii;
 use yii\db\ActiveQuery;
 use whotrades\rds\components\ActiveRecord;
-use whotrades\rds\helpers\MigrationInterface as MigrationHelperInterface;
 
 /**
  * This is the model class for migrations in general.
@@ -28,6 +28,26 @@ use whotrades\rds\helpers\MigrationInterface as MigrationHelperInterface;
  */
 abstract class MigrationBase extends ActiveRecord
 {
+    const TYPE_ID_PRE  = 1;
+    const TYPE_ID_POST = 2;
+    const TYPE_ID_HARD = 3;
+
+    const TYPE_PRE  = 'pre';
+    const TYPE_POST = 'post';
+    const TYPE_HARD = 'hard';
+
+    /**
+     * @return string[]
+     */
+    public static function getTypeIdToNameMap()
+    {
+        return [
+            self::TYPE_ID_PRE  => self::TYPE_PRE,
+            self::TYPE_ID_POST => self::TYPE_POST,
+            self::TYPE_ID_HARD => self::TYPE_HARD,
+        ];
+    }
+
     /**
      * @return array customized attribute labels (name=>label)
      */
@@ -73,31 +93,14 @@ abstract class MigrationBase extends ActiveRecord
     }
 
     /**
-     * @param string[] $migrationNameList
-     * @param string $typeName
-     * @param int $statusId
-     * @param Project $project
-     * @param ReleaseRequest $releaseRequest
-     *
-     * @return void
-     */
-    public static function createOrUpdateList(array $migrationNameList, $typeName, $statusId, Project $project, ReleaseRequest $releaseRequest)
-    {
-        foreach ($migrationNameList as $migrationName) {
-            static::createOrUpdate($migrationName, $typeName, $statusId, $project, $releaseRequest);
-        }
-    }
-
-    /**
      * @param string $migrationName
      * @param string $typeName
-     * @param int $statusId
      * @param Project $project
      * @param ReleaseRequest $releaseRequest
      *
-     * @return void
+     * @return static
      */
-    abstract public static function createOrUpdate($migrationName, $typeName, $statusId, Project $project, ReleaseRequest $releaseRequest);
+    abstract public static function upsert($migrationName, $typeName, Project $project, ReleaseRequest $releaseRequest);
 
     /**
      * @return string
@@ -110,14 +113,31 @@ abstract class MigrationBase extends ActiveRecord
     abstract public function getTypeName();
 
     /**
-     * @return void
-     *
-     * @throws \Exception
+     * @return self[]
      */
-    public function fillFromGit()
+    abstract protected static function getMigrationReadyBeAutoAppliedList();
+
+    /**
+     * @return static[]
+     */
+    public static function getMigrationCanBeAutoAppliedList()
     {
-        $this->getMigrationHelper()->fillFromGit($this);
+        $migrationListForApplying = static::getMigrationReadyBeAutoAppliedList();
+
+        return array_filter($migrationListForApplying, function (self $migration) {
+            return $migration->canBeApplied();
+        });
     }
+
+    /**
+     * @return bool
+     */
+    abstract public function canBeApplied();
+
+    /**
+     * @return void
+     */
+    abstract public function apply();
 
     /**
      * @param int | string $status
@@ -153,13 +173,5 @@ abstract class MigrationBase extends ActiveRecord
     {
         $this->migration_log .= $log;
         $this->save();
-    }
-
-    /**
-     * @return MigrationHelperInterface
-     */
-    private function getMigrationHelper()
-    {
-        return new Yii::$app->params['migrationHelperClass'];
     }
 }

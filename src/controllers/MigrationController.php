@@ -5,6 +5,7 @@
 namespace whotrades\rds\controllers;
 
 use whotrades\rds\models\Migration;
+use yii\web\HttpException;
 
 class MigrationController extends ControllerRestrictedBase
 {
@@ -31,7 +32,7 @@ class MigrationController extends ControllerRestrictedBase
     public function actionApply($migrationId)
     {
         /** @var Migration $migration */
-        $migration = Migration::findByPk($migrationId);
+        $migration = $this->loadModel($migrationId);
         $migration->apply();
 
         $this->redirect('/migration/index');
@@ -43,7 +44,7 @@ class MigrationController extends ControllerRestrictedBase
     public function actionRollBack($migrationId)
     {
         /** @var Migration $migration */
-        $migration = Migration::findByPk($migrationId);
+        $migration = $this->loadModel($migrationId);
         $migration->rollBack();
 
         $this->redirect('/migration/index');
@@ -57,12 +58,29 @@ class MigrationController extends ControllerRestrictedBase
     public function actionViewLog($migrationId)
     {
         /** @var Migration $migration */
-        $migration = Migration::findByPk($migrationId);
+        $migration = $this->loadModel($migrationId);
 
         if (!$migration) {
             return 'There is not migration with id ' . $migrationId;
         }
 
         return $migration->migration_log;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return Migration
+     *
+     * @throws HttpException
+     */
+    public function loadModel($id)
+    {
+        $model = Migration::findByPk($id);
+        if ($model === null) {
+            throw new HttpException(404, 'The requested page does not exist.');
+        }
+
+        return $model;
     }
 }

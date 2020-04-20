@@ -1,6 +1,6 @@
 <?php
 /**
- * Controller for processing migration messages witch was sent via RabbitMQ from service-deploy
+ * Tool processes migration messages witch was sent via RabbitMQ from service-deploy
  *
  * @example php yii.php migration-rabbit/index
  */
@@ -13,7 +13,6 @@ use whotrades\rds\models\Project;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Migration;
 use whotrades\rds\helpers\WebSockets as WebSocketsHelper;
-use whotrades\rds\helpers\Migration as MigrationHelper;
 
 class MigrationRabbitController extends RabbitListener
 {
@@ -68,7 +67,7 @@ class MigrationRabbitController extends RabbitListener
             return;
         }
 
-        MigrationHelper::createOrUpdateListByCommand($message->migrations, $message->type, $message->command, $project, $releaseRequest);
+        Yii::$app->migrationService->createOrUpdateListByCommand($message->migrations, $message->type, $message->command, $project, $releaseRequest);
 
         // ag: For backward compatibility after #WTA-2267
         if ($message->type === Migration::TYPE_PRE && in_array($message->command, [MigrateController::MIGRATION_COMMAND_NEW, MigrateController::MIGRATION_COMMAND_NEW_ALL])) {

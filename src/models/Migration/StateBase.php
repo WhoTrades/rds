@@ -4,11 +4,9 @@
  */
 namespace whotrades\rds\models\Migration;
 
+use Yii;
 use whotrades\rds\models\Migration;
-use whotrades\rds\models\ReleaseRequest;
-use whotrades\rds\models\Build;
-use whotrades\RdsSystem\Message;
-use whotrades\RdsSystem\Factory as RdsSystemFactory;
+use whotrades\rds\services\MigrationService;
 
 abstract class StateBase
 {
@@ -18,11 +16,17 @@ abstract class StateBase
     protected $migration;
 
     /**
+     * @var MigrationService
+     */
+    protected $migrationService;
+
+    /**
      * @param Migration $migration
      */
     public function __construct(Migration $migration)
     {
         $this->migration = $migration;
+        $this->migrationService = Yii::$app->migrationService;
     }
 
     /**
@@ -80,34 +84,5 @@ abstract class StateBase
     public function failed()
     {
         \Yii::error("Can't be failed. Migration {$this->migration->migration_name} is in status '{$this->migration->getStatusName()}'");
-    }
-
-    /**
-     * @param string $migrationCommand // ag: @see \whotrades\rds\commands\MigrateController::MIGRATION_COMMAND_*
-     */
-    protected function sendCommand($migrationCommand)
-    {
-        if ($this->migration->migration_type === Migration::TYPE_ID_PRE) {
-            $releaseRequest = $this->migration->releaseRequest;
-        } else {
-            $releaseRequest = ReleaseRequest::getUsedReleaseByProjectId($this->migration->project->obj_id);
-        }
-
-        $messagingModel = (new RdsSystemFactory())->getMessagingRdsMsModel();
-
-        /** @var Build $build */
-        foreach ($releaseRequest->builds as $build) {
-            $messagingModel->sendMigrationTask(
-                $build->worker->worker_name,
-                new Message\MigrationTask(
-                    $releaseRequest->project->project_name,
-                    $releaseRequest->rr_build_version,
-                    $this->migration->getTypeName(),
-                    $this->migration->project->script_migration_up,
-                    $migrationCommand,
-                    $this->migration->migration_name
-                )
-            );
-        }
     }
 }

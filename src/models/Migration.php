@@ -1,13 +1,15 @@
 <?php
 /**
+ * Default migration model class. It supports PRE and POST migrations
+ *
  * @author Anton Gorlanov <antonxacc@gmail.com>
  */
 namespace whotrades\rds\models;
 
 use Yii;
-use whotrades\rds\helpers\MigrationInterface as MigrationHelperInterface;
 use yii\data\ActiveDataProvider;
 use whotrades\rds\models\Migration\Exception\UndefinedClassForState;
+use DateTime;
 
 /**
  * This is the model class for table "rds.migration".
@@ -18,13 +20,7 @@ use whotrades\rds\models\Migration\Exception\UndefinedClassForState;
  */
 class Migration extends MigrationBase
 {
-    const TYPE_ID_PRE  = 1;
-    const TYPE_ID_POST = 2;
-    const TYPE_ID_HARD = 3;
-
-    const TYPE_PRE  = 'pre';
-    const TYPE_POST = 'post';
-    const TYPE_HARD = 'hard';
+    const POST_MIGRATION_STABILIZE_DELAY = '1 week';
 
     const STATUS_APPLIED = 1;
     const STATUS_STARTED_ROLLBACK = 3;
@@ -46,18 +42,6 @@ class Migration extends MigrationBase
         self::STATUS_FAILED_APPLICATION  => Migration\StateFailedApplication::class,
         self::STATUS_FAILED_ROLLBACK  => Migration\StateFailedRollBack::class,
     ];
-
-    /**
-     * @return string[]
-     */
-    public static function getTypeIdToNameMap()
-    {
-        return [
-            self::TYPE_ID_PRE  => self::TYPE_PRE,
-            self::TYPE_ID_POST => self::TYPE_POST,
-            self::TYPE_ID_HARD => self::TYPE_HARD,
-        ];
-    }
 
     /**
      * @param string $typeName
@@ -95,12 +79,11 @@ class Migration extends MigrationBase
     /**
      * {@inheritDoc}
      */
-    public static function createOrUpdate($migrationName, $typeName, $statusId, Project $project, ReleaseRequest $releaseRequest)
+    public static function upsert($migrationName, $typeName, Project $project, ReleaseRequest $releaseRequest)
     {
         if (!preg_match('/^[\w\/\\\_\-]+$/', $migrationName)) {
-            Yii::info("Skip processing {$typeName} migration {$migrationName} of project {$project->project_name}. Malformed name.");
+            throw new \Exception("Skip processing {$typeName} migration {$migrationName} of project {$project->project_name}. Malformed name.");
 
-            return;
         }
 
         $migrationTypeId = Migration::getTypeIdByName($typeName);
@@ -125,11 +108,7 @@ class Migration extends MigrationBase
             $migration->save();
         }
 
-        $migration->tryUpdateStatus($statusId);
-
-        if (!$migration->migration_ticket) {
-            $migration->fillFromGit();
-        }
+        return $migration;
     }
 
     /**
@@ -182,6 +161,52 @@ class Migration extends MigrationBase
     /**
      * {@inheritDoc}
      */
+    protected static function getMigrationReadyBeAutoAppliedList()
+    {
+        return self::getPreMigrationCanBeAppliedList();
+    }
+
+    /**
+     * @return static[]
+     */
+    public static function getPreMigrationCanBeAppliedList()
+    {
+        $preMigrationPendingList = self::find()
+            ->andWhere(['migration_type' => self::TYPE_ID_PRE])
+            ->andWhere(['IN', 'obj_status_did', [self::STATUS_PENDING, self::STATUS_FAILED_APPLICATION]])
+            ->all();
+
+        return array_filter($preMigrationPendingList, function (self $migration) {
+            return $migration->canBeApplied();
+        });
+    }
+
+    /**
+     * @return static[]
+     */
+    public static function getPostMigrationCanBeAppliedList()
+    {
+        $postMigrationPendingList = self::find()
+            ->andWhere(['migration_type' => self::TYPE_ID_POST])
+            ->andWhere(['IN', 'obj_status_did', [self::STATUS_PENDING, self::STATUS_FAILED_APPLICATION]])
+            ->all();
+
+        return array_filter($postMigrationPendingList, function (self $migration) {
+            return $migration->canBeApplied();
+        });
+    }
+
+    /**
+     * @return int
+     */
+    public static function getPostMigrationCanBeAppliedCount()
+    {
+        return count(self::getPostMigrationCanBeAppliedList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStatusName()
     {
         return self::getStatusIdToNameMap()[$this->obj_status_did] ?? "Unknown status: {$this->obj_status_did}";
@@ -229,15 +254,22 @@ class Migration extends MigrationBase
      */
     public function getWaitingDays()
     {
-        if ($this->migration_type === self::TYPE_ID_POST) {
-            return $this->getMigrationHelper()->getWaitingDays($this);
+        if ($this->migration_type !== self::TYPE_ID_POST) {
+            return 0;
         }
 
-        return 0;
+        $postMigrationAllowTimestamp = strtotime("-" . self::POST_MIGRATION_STABILIZE_DELAY);
+        $waitingTime = (new DateTime($this->obj_created))->getTimestamp() - $postMigrationAllowTimestamp;
+
+        if ($waitingTime <= 0) {
+            return 0;
+        }
+
+        return ceil($waitingTime / (24 * 60 * 60));
     }
 
     /**
-     * @return bool
+     * {@inheritDoc}
      */
     public function canBeApplied()
     {
@@ -253,13 +285,12 @@ class Migration extends MigrationBase
     }
 
     /**
-     * @return void
+     * {@inheritDoc}
      */
     public function apply()
     {
         $this->getStateObject()->apply();
     }
-
 
     /**
      * @return void
@@ -303,13 +334,5 @@ class Migration extends MigrationBase
         }
 
         return $this->stateObject;
-    }
-
-    /**
-     * @return MigrationHelperInterface
-     */
-    private function getMigrationHelper()
-    {
-        return new Yii::$app->params['migrationHelperClass'];
     }
 }
