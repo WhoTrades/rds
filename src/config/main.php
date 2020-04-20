@@ -207,6 +207,7 @@ $config = array(
     ),
 
     'params' => array(
+        'migrationAutoApplicationEnabled' => true,
         'projectMigrationUrlMask' => [
                 '*' => function ($migration, $projectName, $type, $branch) {
                     return "https://github.com/WhoTrades/rds/blob/master/src/migrations/$migration.php?at=refs/heads/$branch";

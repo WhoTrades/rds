@@ -56,6 +56,13 @@ class MigrationController extends SingleInstanceController
             }
         }
 
+        if (!Yii::$app->params['migrationAutoApplicationEnabled']) {
+            Yii::info('Skip auto application. Disabled in config.');
+
+            return;
+        }
+
+        Yii::info('Start auto application of migrations');
         Yii::$app->migrationService->applyCanBeAutoAppliedMigrations();
     }
 
