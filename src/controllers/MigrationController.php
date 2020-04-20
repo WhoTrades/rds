@@ -5,6 +5,7 @@
 namespace whotrades\rds\controllers;
 
 use whotrades\rds\models\Migration;
+use whotrades\rds\models\Log;
 use yii\web\HttpException;
 
 class MigrationController extends ControllerRestrictedBase
@@ -33,6 +34,7 @@ class MigrationController extends ControllerRestrictedBase
     {
         /** @var Migration $migration */
         $migration = $this->loadModel($migrationId);
+        Log::createLogMessage("Выполнена миграция '{$migration->migration_name}' проекта '{$migration->project->project_name}'");
         $migration->apply();
 
         $this->redirect('/migration/index');
@@ -45,6 +47,7 @@ class MigrationController extends ControllerRestrictedBase
     {
         /** @var Migration $migration */
         $migration = $this->loadModel($migrationId);
+        Log::createLogMessage("Откачена миграция '{$migration->migration_name}' проекта '{$migration->project->project_name}'");
         $migration->rollBack();
 
         $this->redirect('/migration/index');
@@ -76,6 +79,7 @@ class MigrationController extends ControllerRestrictedBase
     {
         /** @var Migration $migration */
         $migration = $this->loadModel($migrationId);
+        Log::createLogMessage("Деактивировано авто выполнение миграции '{$migration->migration_name}' проекта '{$migration->project->project_name}'");
         $migration->autoApplyDisable();
 
         $this->redirect('/migration/index');
@@ -90,6 +94,7 @@ class MigrationController extends ControllerRestrictedBase
     {
         /** @var Migration $migration */
         $migration = $this->loadModel($migrationId);
+        Log::createLogMessage("Активировано авто выполнение миграции 'э'{$migration->migration_name}' проекта '{$migration->project->project_name}'");
         $migration->autoApplyEnable();
 
         $this->redirect('/migration/index');
