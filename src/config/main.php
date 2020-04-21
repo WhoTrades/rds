@@ -223,6 +223,11 @@ $config = array(
         ],
         'garbageCollector' => [
             'minTimeAtProd' => '1 week',
+            'minBuildsCountBeforeActive' => 15,
+            'exampleProjectName' => [
+                'minTimeAtProd' => '0 week',
+                'minBuildsCountBeforeActive' => 7,
+            ],
         ],
         'notify' => array(
             'releaseEngineers' => array(

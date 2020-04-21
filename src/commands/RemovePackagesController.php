@@ -1,4 +1,7 @@
 <?php
+/**
+ * @example php yii.php remove-packages/index
+ */
 namespace whotrades\rds\commands;
 
 use whotrades\rds\components\Status;
@@ -32,11 +35,9 @@ class RemovePackagesController extends SingleInstanceController
         $minBuildsCountBeforeActive = Yii::$app->params['garbageCollector']['minBuildsCountBeforeActive'];
         $model = (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel();
 
-        $maxDate = date('Y-m-d H:i:s', strtotime("-" . $minTimeAtProd));
-
         // ag: Find old releases
-        $releaseRequestsQuery = ReleaseRequest::find()->joinWith(['project'])->where(['<=', 'release_request.obj_created', $maxDate]);
-        $releaseRequestsQuery->andWhere('rr_build_version <> project_current_version');
+        $releaseRequestsQuery = ReleaseRequest::find()->joinWith(['project']);
+        $releaseRequestsQuery->where('rr_build_version <> project_current_version');
         $releaseRequestsQuery->andWhere('release_request.obj_status_did <> ' . Status::DESTROYED);
         if ($this->projectName) {
             $releaseRequestsQuery->andWhere(['project_name' => $this->projectName]);
@@ -50,20 +51,31 @@ class RemovePackagesController extends SingleInstanceController
         $releaseRequestsQuery->andWhere('rr_build_version <> project_current_version');
         $releaseRequests = array_merge($releaseRequests, $releaseRequestsQuery->all());
 
+        /** @var $releaseRequest ReleaseRequest */
         foreach ($releaseRequests as $releaseRequest) {
-            /** @var $releaseRequest ReleaseRequest */
             $project = $releaseRequest->project;
+
+            $minTimeAtProdLocal = Yii::$app->params['garbageCollector'][$project->project_name]['minBuildsCountBeforeActive'] ?? $minTimeAtProd;
+            $thresholdDateTime = new \DateTime("-{$minTimeAtProdLocal}");
+            $releaseRequestDateTime = new \DateTime($releaseRequest->obj_created);
+            $diffDateInterval = $thresholdDateTime->diff($releaseRequestDateTime);
+            if ($diffDateInterval->invert === 0) {
+                Yii::info("Skip destroying release request. Waiting for {$diffDateInterval->format("%d days %h hours")} (release_request={$releaseRequest->getBuildTag()})");
+                die;
+                continue;
+            }
 
             if ($releaseRequest->rr_build_version == $project->project_current_version) {
                 // an: Ну никак нельзя удалять ту версию, что сейчас зарелижена
-                Yii::info("Active project and version (build={$releaseRequest->getBuildTag()})");
+                Yii::info("Skip destroying release request. It is active. (release_request={$releaseRequest->getBuildTag()})");
                 continue;
             }
 
             $count = $this->countInstalledBuildsBetweenVersions($project->obj_id, $releaseRequest->rr_build_version, $project->project_current_version);
 
             // ag: Destroy old or manually deleted releases
-            if ($count > $minBuildsCountBeforeActive || $releaseRequest->obj_status_did == Status::DELETED) {
+            $minBuildsCountBeforeActiveProject = Yii::$app->params['garbageCollector'][$project->project_name]['minBuildsCountBeforeActive'] ?? $minBuildsCountBeforeActive;
+            if ($count > $minBuildsCountBeforeActiveProject || $releaseRequest->obj_status_did == Status::DELETED) {
                 Yii::info("Sending delete message for release_request={$releaseRequest->getBuildTag()}, created=$releaseRequest->obj_created");
                 if ($this->dryRun) {
                     Yii::info("DRY RUN - skip sending packet");
