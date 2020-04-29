@@ -125,7 +125,7 @@ abstract class MigrationBase extends ActiveRecord
         $migrationListForApplying = static::getMigrationReadyBeAutoAppliedList();
 
         return array_filter($migrationListForApplying, function (self $migration) {
-            return $migration->canBeApplied();
+            return $migration->canBeAutoApplied();
         });
     }
 
