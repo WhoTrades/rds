@@ -40,8 +40,9 @@ return [
                 return null;
             }
 
-            if (Yii::$app->hasModule('Wtflow')) {
-                $jiraTicketUrl = \app\modules\Wtflow\helpers\Jira::getJiraTicketUrl($migration->migration_ticket);
+            if (Yii::$container->has('jiraUrl')) {
+                $jiraTicketUrl = Yii::$container->get('jiraUrl')->getTicketUrl($migration->migration_ticket);
+
                 return Html::aTargetBlank($jiraTicketUrl, $migration->migration_ticket);
             }
 
