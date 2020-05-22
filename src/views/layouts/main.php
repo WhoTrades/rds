@@ -73,7 +73,7 @@ echo Nav::widget(
                     'visible' => \Yii::$app->user->can('developer'),
                     'items' => [
                         ['label' => 'Проекты', 'url' => ['/project/admin'], 'active' => $controllerId == 'project'],
-                        ['label' => 'Сборщики', 'url' => ['/worker/admin'], 'active' => $controllerId == 'worker'],
+                        'workers' => ['label' => 'Сборщики', 'url' => ['/worker/admin'], 'active' => $controllerId == 'worker'],
                         ['label' => 'Версии', 'url' => ['/release-version/admin'], 'active' => $controllerId == 'release-version'],
                     ],
                 ],
