@@ -6,7 +6,7 @@
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\Build;
-use yii\bootstrap\Html;
+use \whotrades\rds\helpers\Html;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
@@ -144,7 +144,7 @@ return array(
                 return $worker->worker_name;
             }
 
-            return \whotrades\rds\helpers\Html::aTargetBlank(call_user_func($workerUrlGenerator, $worker), $worker->worker_name);
+            return Html::aTargetBlank(call_user_func($workerUrlGenerator, $worker), $worker->worker_name);
         },
         'format' => 'html',
     ),
