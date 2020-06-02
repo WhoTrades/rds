@@ -83,7 +83,6 @@ class Worker extends ActiveRecord
 
         $dataProvider->sort->defaultOrder = ['worker_name' => SORT_ASC];
 
-
         if (!$this->validate()) {
             return $dataProvider;
         }
