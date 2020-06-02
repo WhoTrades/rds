@@ -6,7 +6,7 @@
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\Build;
-use yii\bootstrap\Html;
+use \whotrades\rds\helpers\Html;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
@@ -128,6 +128,24 @@ return array(
             ReleaseRequest::STATUS_CANCELLING => ReleaseRequest::STATUS_CANCELLING,
             ReleaseRequest::STATUS_CANCELLED => ReleaseRequest::STATUS_CANCELLED,
         ),
+        'format' => 'html',
+    ),
+    array(
+        'attribute' => 'builds.worker.worker_name',
+        'value' => function (ReleaseRequest $releaseRequest) {
+            $buildList = $releaseRequest->builds;
+            
+            if (empty($buildList[0]) || empty($worker = $buildList[0]->worker)) {
+                return '';
+            }
+
+            $workerUrlGenerator = Yii::$app->params['workerUrlGenerator'] ?? '';
+            if (empty($workerUrlGenerator) || !is_callable($workerUrlGenerator)) {
+                return $worker->worker_name;
+            }
+
+            return Html::aTargetBlank(call_user_func($workerUrlGenerator, $worker), $worker->worker_name);
+        },
         'format' => 'html',
     ),
     array(

@@ -73,6 +73,9 @@ class Worker extends ActiveRecord
     public function search($params)
     {
         $query = self::find();
+
+        $query->andFilterWhere(['in', 'obj_id', $params['obj_id'] ?? '']);
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
