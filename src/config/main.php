@@ -250,6 +250,9 @@ $config = array(
             'baseUrl' => 'https://sentry.com/sentry/',
             'projectNameMap' => [], // ag: Mapping of RDS project name to Sentry project name
         ],
+        'workerUrlGenerator' => function (\whotrades\rds\models\Worker $worker) {
+            return \yii\helpers\Url::to(['/worker/admin']);
+        },
     ),
 );
 
