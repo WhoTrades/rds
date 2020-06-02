@@ -139,12 +139,12 @@ return array(
                 return '';
             }
 
-            $urlMask = Yii::$app->params['workerUrlGenerator'] ?? '';
-            if (empty($urlMask) || !is_callable($urlMask)) {
+            $workerUrlGenerator = Yii::$app->params['workerUrlGenerator'] ?? '';
+            if (empty($workerUrlGenerator) || !is_callable($workerUrlGenerator)) {
                 return $worker->worker_name;
             }
 
-            return \whotrades\rds\helpers\Html::aTargetBlank(call_user_func($urlMask, $worker), $worker->worker_name);
+            return \whotrades\rds\helpers\Html::aTargetBlank(call_user_func($workerUrlGenerator, $worker), $worker->worker_name);
         },
         'format' => 'html',
     ),

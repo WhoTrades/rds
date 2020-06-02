@@ -7,6 +7,8 @@
 
 use whotrades\RdsSystem\lib\WebErrorHandler;
 use whotrades\rds\services\MigrationService;
+use \whotrades\rds\models\Worker;
+use \yii\helpers\Url;
 
 $config = array(
     'id' => 'RDS',
@@ -250,8 +252,8 @@ $config = array(
             'baseUrl' => 'https://sentry.com/sentry/',
             'projectNameMap' => [], // ag: Mapping of RDS project name to Sentry project name
         ],
-        'workerUrlGenerator' => function (\whotrades\rds\models\Worker $worker) {
-            return \yii\helpers\Url::to(['/worker/admin']);
+        'workerUrlGenerator' => function (Worker $worker) {
+            return Url::to(['/worker/admin']);
         },
     ),
 );
