@@ -131,6 +131,26 @@ return array(
         'format' => 'html',
     ),
     array(
+        'attribute' => 'builds.worker.worker_name',
+        'value' => function (ReleaseRequest $releaseRequest) {
+            $buildList = $releaseRequest->builds;
+
+            $workerName = '';
+            if ( !empty($buildList[0]) && $buildList[0]->worker ) {
+                $worker = $buildList[0] ? $buildList[0]->worker : \whotrades\rds\models\Worker::instance();
+                $urlMask = Yii::$app->params['workerUrlMask'] ?? '';
+                if ( !empty($urlMask) && is_callable($urlMask) ) {
+                    $workerName = Html::a($worker->worker_name, call_user_func($urlMask, $worker));
+                } else {
+                    $workerName = $worker->worker_name;
+                }
+            }
+
+            return $workerName;
+        },
+        'format' => 'html',
+    ),
+    array(
         'attribute' => 'rr_project_obj_id',
         'value' => function (ReleaseRequest $r) {
             return $r->project->project_name;

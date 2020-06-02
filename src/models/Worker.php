@@ -73,12 +73,16 @@ class Worker extends ActiveRecord
     public function search($params)
     {
         $query = self::find();
+
+        $query->andFilterWhere(['in', 'obj_id', $params['obj_id'] ?? '']);
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
         $this->load($params);
 
         $dataProvider->sort->defaultOrder = ['worker_name' => SORT_ASC];
+
 
         if (!$this->validate()) {
             return $dataProvider;
