@@ -146,7 +146,7 @@ return array(
 
             return Html::aTargetBlank(call_user_func($workerUrlGenerator, $worker), $worker->worker_name);
         },
-        'format' => 'html',
+        'format' => 'raw',
     ),
     array(
         'attribute' => 'rr_project_obj_id',
