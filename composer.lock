@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3e39a18686a17f9609194ec8c69b7d07",
+    "content-hash": "5e5749cadc954e27e1f0ca3d5fe2d7a5",
     "packages": [
         {
             "name": "bazilio/yii2-stubs-generator",
@@ -1562,16 +1562,16 @@
         },
         {
             "name": "whotrades/rds-system",
-            "version": "dev-master",
+            "version": "v1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/rds-system.git",
-                "reference": "1260123f268ac9a12dcb68012c5da1ccb9df0251"
+                "reference": "5099916d7a84bc9d909973d98442e55008794421"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/1260123f268ac9a12dcb68012c5da1ccb9df0251",
-                "reference": "1260123f268ac9a12dcb68012c5da1ccb9df0251",
+                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/5099916d7a84bc9d909973d98442e55008794421",
+                "reference": "5099916d7a84bc9d909973d98442e55008794421",
                 "shasum": ""
             },
             "type": "library",
@@ -1582,7 +1582,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "Core part of RDS service",
-            "time": "2020-02-13T09:48:58+00:00"
+            "time": "2020-06-09T12:07:22+00:00"
         },
         {
             "name": "yiisoft/yii2",
@@ -2086,13 +2086,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "whotrades/rds-system": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.0"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }
