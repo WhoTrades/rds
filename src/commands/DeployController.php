@@ -241,7 +241,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
 
         $message->accepted();
         $event->build = $build;
-        $this->trigger(DeployEventInterface::EVENT_TASK_STATUS_CHANGED_AFTER);
+        $this->trigger(DeployEventInterface::EVENT_TASK_STATUS_CHANGED_AFTER, $event);
     }
 
     /**
@@ -250,7 +250,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
     private function actionSetCronConfig(Message\ReleaseRequestCronConfig $message)
     {
         $event = $this->createEvent($message);
-        $this->trigger(DeployEventInterface::EVENT_CRON_CONFIG_BEFORE, $message);
+        $this->trigger(DeployEventInterface::EVENT_CRON_CONFIG_BEFORE, $event);
         $transaction = Yii::$app->db->beginTransaction();
         try {
             /** @var $build Build */
@@ -319,7 +319,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
     private function actionSetUseError(Message\ReleaseRequestUseError $message)
     {
         $event = $this->createEvent($message);
-        $this->trigger(DeployEventInterface::EVENT_TASK_USE_ERROR_BEFORE, $message);
+        $this->trigger(DeployEventInterface::EVENT_TASK_USE_ERROR_BEFORE, $event);
         $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
         if (!$releaseRequest) {
             Yii::error("Release Request #$message->releaseRequestId not found");
@@ -370,7 +370,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
     private function actionSetUsedVersion(Message\ReleaseRequestUsedVersion $message)
     {
         $event = $this->createEvent($message);
-        $this->trigger(DeployEventInterface::EVENT_USED_VERSION_BEFORE);
+        $this->trigger(DeployEventInterface::EVENT_USED_VERSION_BEFORE, $event);
         $worker = Worker::findByAttributes(array('worker_name' => $message->worker));
         if (!$worker) {
             Yii::error("Worker $message->worker not found");
@@ -525,7 +525,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
     private function actionSetProjectConfigResult(Message\ProjectConfigResult $message)
     {
         $event = $this->createEvent($message);
-        $this->trigger(DeployEventInterface::EVENT_PROJECT_CONFIG_RESULT_BEFORE);
+        $this->trigger(DeployEventInterface::EVENT_PROJECT_CONFIG_RESULT_BEFORE, $event);
         if (!isset($message->projectConfigHistoryId)) {
             Yii::warning('Skip processing message with NULL projectConfigHistoryId');
             $message->accepted();
