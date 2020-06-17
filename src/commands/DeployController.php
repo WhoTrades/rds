@@ -360,7 +360,6 @@ class DeployController extends RabbitListener implements DeployEventInterface
         Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $message->accepted();
-        $event->build = $build;
         $this->trigger(DeployEventInterface::EVENT_TASK_USE_ERROR_AFTER, $event);
     }
 
