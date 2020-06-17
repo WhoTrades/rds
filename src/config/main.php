@@ -8,6 +8,7 @@
 use whotrades\RdsSystem\lib\WebErrorHandler;
 use whotrades\rds\services\MigrationService;
 use \whotrades\rds\models\Worker;
+use \whotrades\rds\models\ReleaseRequest;
 use \yii\helpers\Url;
 
 $config = array(
@@ -254,6 +255,9 @@ $config = array(
         ],
         'workerUrlGenerator' => function (Worker $worker) {
             return Url::to(['/worker/admin']);
+        },
+        'releaseRequestCommentGenerator' => function (ReleaseRequest $releaseRequest) {
+            return strip_tags($releaseRequest->rr_comment) . "<br />";
         },
     ),
 );

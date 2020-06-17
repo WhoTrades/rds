@@ -1,6 +1,8 @@
 <?php
 namespace whotrades\rds\commands;
 
+use whotrades\rds\components\Deploy\DeployEventInterface;
+use whotrades\rds\components\Deploy\GenericEvent;
 use Yii;
 use app\modules\Whotrades\commands\DevParseCronConfigController;
 use app\modules\Whotrades\models\ToolJob;
@@ -16,14 +18,13 @@ use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\Worker;
 use whotrades\rds\models\Project2worker;
-use app\modules\Wtflow\models\JiraNotificationQueue;
 use whotrades\rds\helpers\WebSockets as WebSocketsHelper;
 use Exception;
 
 /**
  * @example php yii.php deploy/index
  */
-class DeployController extends RabbitListener
+class DeployController extends RabbitListener implements DeployEventInterface
 {
     /**
      * @return void
@@ -74,6 +75,8 @@ class DeployController extends RabbitListener
      */
     private function actionSetStatus(Message\TaskStatusChanged $message)
     {
+        $event = $this->createEvent($message);
+        $this->trigger(DeployEventInterface::EVENT_TASK_STATUS_CHANGED_BEFORE, $event);
         $status = $message->status;
         $version = $message->version;
         $attach = $message->attach;
@@ -237,6 +240,8 @@ class DeployController extends RabbitListener
         WebSocketsHelper::sendReleaseRequestUpdated($build->build_release_request_obj_id);
 
         $message->accepted();
+        $event->build = $build;
+        $this->trigger(DeployEventInterface::EVENT_TASK_STATUS_CHANGED_AFTER, $event);
     }
 
     /**
@@ -244,6 +249,8 @@ class DeployController extends RabbitListener
      */
     private function actionSetCronConfig(Message\ReleaseRequestCronConfig $message)
     {
+        $event = $this->createEvent($message);
+        $this->trigger(DeployEventInterface::EVENT_CRON_CONFIG_BEFORE, $event);
         $transaction = Yii::$app->db->beginTransaction();
         try {
             /** @var $build Build */
@@ -299,6 +306,7 @@ class DeployController extends RabbitListener
             $transaction->commit();
 
             $message->accepted();
+            $this->trigger(DeployEventInterface::EVENT_CRON_CONFIG_AFTER, $event);
         } catch (Exception $e) {
             $transaction->rollBack();
             throw $e;
@@ -310,6 +318,8 @@ class DeployController extends RabbitListener
      */
     private function actionSetUseError(Message\ReleaseRequestUseError $message)
     {
+        $event = $this->createEvent($message);
+        $this->trigger(DeployEventInterface::EVENT_TASK_USE_ERROR_BEFORE, $event);
         $releaseRequest = ReleaseRequest::findByPk($message->releaseRequestId);
         if (!$releaseRequest) {
             Yii::error("Release Request #$message->releaseRequestId not found");
@@ -350,6 +360,7 @@ class DeployController extends RabbitListener
         Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $message->accepted();
+        $this->trigger(DeployEventInterface::EVENT_TASK_USE_ERROR_AFTER, $event);
     }
 
     /**
@@ -357,6 +368,8 @@ class DeployController extends RabbitListener
      */
     private function actionSetUsedVersion(Message\ReleaseRequestUsedVersion $message)
     {
+        $event = $this->createEvent($message);
+        $this->trigger(DeployEventInterface::EVENT_USED_VERSION_BEFORE, $event);
         $worker = Worker::findByAttributes(array('worker_name' => $message->worker));
         if (!$worker) {
             Yii::error("Worker $message->worker not found");
@@ -443,8 +456,6 @@ class DeployController extends RabbitListener
         if ($ok) {
             $oldVersion = $project->project_current_version;
             $project->updateCurrentVersion($message->version);
-            $project->project_current_version = $message->version;
-            $project->save(false);
 
             $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
 
@@ -492,16 +503,7 @@ class DeployController extends RabbitListener
                 ]
             );
 
-            if (Yii::$app->hasModule('Wtflow')) {
-                // an: Асинхронная задача на email/sms/... оповещение
-                $notificationItem = new JiraNotificationQueue();
-                $notificationItem->jnq_project_obj_id = $project->obj_id;
-                $notificationItem->jnq_old_version = $oldVersion;
-                $notificationItem->jnq_new_version = $message->version;
-                if (!$notificationItem->save()) {
-                    Yii::error("Can't send notification task: " . json_encode($notificationItem->errors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-                }
-            }
+            $event->projectOldVersion = $oldVersion;
         }
 
         $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_SUCCESS);
@@ -511,6 +513,9 @@ class DeployController extends RabbitListener
         Yii::$app->webSockets->send('updateAllReleaseRequests', []);
 
         $message->accepted();
+        $event->build = $build;
+        $event->project = $project;
+        $this->trigger(DeployEventInterface::EVENT_USED_VERSION_AFTER, $event);
     }
 
     /**
@@ -518,6 +523,8 @@ class DeployController extends RabbitListener
      */
     private function actionSetProjectConfigResult(Message\ProjectConfigResult $message)
     {
+        $event = $this->createEvent($message);
+        $this->trigger(DeployEventInterface::EVENT_PROJECT_CONFIG_RESULT_BEFORE, $event);
         if (!isset($message->projectConfigHistoryId)) {
             Yii::warning('Skip processing message with NULL projectConfigHistoryId');
             $message->accepted();
@@ -538,6 +545,7 @@ class DeployController extends RabbitListener
         $projectConfigHistory->save();
 
         $message->accepted();
+        $this->trigger(DeployEventInterface::EVENT_PROJECT_CONFIG_RESULT_AFTER, $event);
     }
 
     /**
@@ -545,6 +553,8 @@ class DeployController extends RabbitListener
      */
     private function actionRemoveReleaseRequest(Message\RemoveReleaseRequest $message)
     {
+        $event = $this->createEvent($message);
+        $this->trigger(DeployEventInterface::EVENT_REMOVE_RELEASE_REQUEST_BEFORE, $event);
         $project = Project::findByAttributes(['project_name' => $message->projectName]);
         if (!$project) {
             $message->accepted();
@@ -565,6 +575,7 @@ class DeployController extends RabbitListener
         Yii::info("Skipped removing release request $message->projectName-$message->version as not exists");
 
         $message->accepted();
+        $this->trigger(DeployEventInterface::EVENT_REMOVE_RELEASE_REQUEST_AFTER, $event);
     }
 
     /**
@@ -579,5 +590,17 @@ class DeployController extends RabbitListener
         array_unshift($params, $route);
 
         return Url::to($params, true);
+    }
+
+    /**
+     * @param Message\Base $message
+     *
+     * @return GenericEvent
+     */
+    protected function createEvent(Message\Base $message): GenericEvent
+    {
+        $event = new GenericEvent();
+        $event->message = $message;
+        return $event;
     }
 }
