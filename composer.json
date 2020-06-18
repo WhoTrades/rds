@@ -27,7 +27,8 @@
         "bazilio/yii2-stubs-generator": "~1",
         "mito/yii2-sentry": "~1.0.0",
         "dektrium/yii2-rbac": "^1.0",
-        "yiisoft/yii2-redis": "~2.0.0"
+        "yiisoft/yii2-redis": "~2.0.0",
+        "tuyakhov/yii2-notifications": "^1.2"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "2.0.9"

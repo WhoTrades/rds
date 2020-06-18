@@ -10,6 +10,11 @@ use whotrades\rds\services\MigrationService;
 use \whotrades\rds\models\Worker;
 use \whotrades\rds\models\ReleaseRequest;
 use \yii\helpers\Url;
+use tuyakhov\notifications\Notifier;
+use tuyakhov\notifications\channels\MailChannel;
+use whotrades\rds\events\NotificationEventHandler;
+use whotrades\rds\services\NotificationService;
+use whotrades\rds\services\NotificationServiceInterface;
 
 $config = array(
     'id' => 'RDS',
@@ -97,6 +102,7 @@ $config = array(
         'diffStat' => array(
             'class' => whotrades\rds\components\DiffStat::class,
         ),
+        // ag: TODO Remove after WTA-1977
         'smsSender' => [
             'class' => whotrades\rds\components\Sms\Sender::class,
         ],
@@ -154,6 +160,7 @@ $config = array(
                 $event->sender->createCommand("SET TIME ZONE 'UTC'")->execute();
             },
         ),
+        // ag: TODO Remove after WTA-1977
         'EmailNotifier' => array(
             'class' => whotrades\rds\components\NotifierEmail::class,
             'releaseRequestedEmail' => 'noreply@example.com',
@@ -260,6 +267,27 @@ $config = array(
             return strip_tags($releaseRequest->rr_comment) . "<br />";
         },
     ),
+    'container' => [
+        'singletons' => [
+            Notifier::class => [
+                'class' => Notifier::class,
+                'channels' => [
+                    'mail' => [
+                        'class' => MailChannel::class,
+                        'from' => 'noreply@example.com',
+                    ],
+                ],
+                'on afterSend' => [NotificationEventHandler::class, 'afterSend']
+            ],
+            'notificationService' => NotificationServiceInterface::class,
+            NotificationServiceInterface::class =>[
+                'class' => NotificationService::class,
+                'releaseRequestEmail'           => 'noreply@example.com',
+                'releaseRequestForbiddenEmail'  => 'noreply@example.com',
+                'usingSucceedEmail'             => 'noreply@example.com',
+            ]
+        ],
+    ]
 );
 
 // ag: db_admin - DB role for migrations

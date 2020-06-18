@@ -9,11 +9,17 @@ use whotrades\rds\models\ReleaseReject;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\Log;
 use whotrades\rds\models\Build;
+use whotrades\rds\services\NotificationServiceInterface;
 use yii\web\HttpException;
 
 class SiteController extends ControllerRestrictedBase
 {
     public $pageTitle = 'Релизы и запреты';
+
+    /**
+     * @var NotificationServiceInterface
+     */
+    private $notificationService;
 
     /**
      * @return array
@@ -29,6 +35,18 @@ class SiteController extends ControllerRestrictedBase
                 ],
             ],
         ];
+    }
+
+    /**
+     * {@inheritDoc}
+     * @param NotificationServiceInterface $notificationService
+     */
+    public function __construct($id, $module, NotificationServiceInterface $notificationService, $config = null)
+    {
+        $this->notificationService = $notificationService;
+
+        $config = $config ?? [];
+        parent::__construct($id, $module, $config);
     }
 
     /**
@@ -88,12 +106,18 @@ class SiteController extends ControllerRestrictedBase
         }
 
         if (isset($_POST['ReleaseRequest']) && RdsDbConfig::get()->deployment_enabled) {
+            $user = \Yii::$app->user;
+            $projectId = $_POST['ReleaseRequest']['rr_project_obj_id'];
+            $comment = $_POST['ReleaseRequest']['rr_comment'];
             ReleaseRequest::create(
-                $_POST['ReleaseRequest']['rr_project_obj_id'],
+                $projectId,
                 $_POST['ReleaseRequest']['rr_release_version'],
-                \Yii::$app->user->id,
-                $_POST['ReleaseRequest']['rr_comment']
+                $user->id,
+                $comment
             );
+
+            $project = Project::findByPk($projectId);
+            $this->notificationService->sendBuildStarted($project->project_name, $user->identity->username, $comment);
 
             \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
         }
@@ -167,18 +191,8 @@ class SiteController extends ControllerRestrictedBase
             }
             $projects = implode(", ", $projectNames);
             Log::createLogMessage("Создан запрет релизов $projects");
-            foreach (explode(",", \Yii::$app->params['notify']['releaseReject']['phones']) as $phone) {
-                if (!$phone) {
-                    continue;
-                }
-                $text = "{$model->user->email} rejected $projects. {$model->rr_comment}";
-                \Yii::$app->smsSender->sendSms($phone, $text);
-            }
-            \Yii::$app->EmailNotifier->sendRdsReleaseRejectNotification(
-                $model->user->email,
-                $projects,
-                $model->rr_comment
-            );
+
+            $this->notificationService->sendReleaseRequestForbidden($projects, $model->user->email, $model->rr_comment);
 
             \Yii::$app->webSockets->send('updateAllReleaseRejects', []);
 

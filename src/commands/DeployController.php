@@ -19,6 +19,7 @@ use whotrades\rds\models\Project;
 use whotrades\rds\models\Worker;
 use whotrades\rds\models\Project2worker;
 use whotrades\rds\helpers\WebSockets as WebSocketsHelper;
+use whotrades\rds\services\NotificationServiceInterface;
 use Exception;
 
 /**
@@ -26,6 +27,23 @@ use Exception;
  */
 class DeployController extends RabbitListener implements DeployEventInterface
 {
+    /**
+     * @var NotificationServiceInterface
+     */
+    private $notificationService;
+
+    /**
+     * {@inheritDoc}
+     * @param NotificationServiceInterface $notificationService
+     */
+    public function __construct($id, $module, NotificationServiceInterface $notificationService, $config = null)
+    {
+        $this->notificationService = $notificationService;
+
+        $config = $config ?? [];
+        parent::__construct($id, $module, $config);
+    }
+
     /**
      * @return void
      */
@@ -152,7 +170,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
                             $build->releaseRequest->builds
                         );
 
-                        Yii::$app->EmailNotifier->sendReleaseRequestDeployNotification($project->project_name, $version, $buildIdList);
+                        $this->notificationService->sendInstallationSucceed($project->project_name, $version, $buildIdList);
                     }
                 }
                 break;
@@ -174,19 +192,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
                         if ($build->releaseRequest->canBeRecreatedAuto()) {
                             $build->releaseRequest->recreate(Yii::$app->params['autoReleaseRequestUserId']);
                         } else {
-                            $title = "Failed to build $project->project_name {$build->releaseRequest->getFailBuildCount()} times";
-                            $text = "Проект $project->project_name не удалось собрать. <a href='" .
-                                Url::to(['build/view', 'id' => $build->obj_id], 'https') .
-                                "'>Подробнее</a>";
-
-                            Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
-
-                            foreach (explode(",", Yii::$app->params['notify']['status']['phones']) as $phone) {
-                                if (!$phone) {
-                                    continue;
-                                }
-                                Yii::$app->smsSender->sendSms($phone, $title);
-                            }
+                            $this->notificationService->sendBuildFailed($project->project_name, $build->obj_id, $build->releaseRequest->getFailBuildCount());
                         }
 
                         break;
@@ -204,35 +210,19 @@ class DeployController extends RabbitListener implements DeployEventInterface
                         if ($build->releaseRequest->canBeInstalledAuto()) {
                             $build->releaseRequest->sendInstallTask();
                         } else {
-                            $title = "Failed to install $project->project_name {$build->releaseRequest->getFailInstallCount()} times";
-                            $text = "Проект $project->project_name не удалось разложить по серверам. <a href='" .
-                                Url::to(['build/view', 'id' => $build->obj_id], 'https') .
-                                "'>Подробнее</a>";
-
-                            Yii::$app->EmailNotifier->sendReleaseRequestFailedNotification($project->project_name, $title, $text);
+                            $this->notificationService->sendInstallationFailed($project->project_name, $build->obj_id, $build->releaseRequest->getFailInstallCount());
                         }
 
                         break;
                 }
                 break;
             case Build::STATUS_CANCELLED:
-                $title = "Cancelled installation of $project->project_name";
-                $text = "Сборка $project->project_name отменена. <a href='" .
-                    Url::to(['build/view', 'id' => $build->obj_id], 'https') .
-                    "'>Подробнее</a>";
-
                 $releaseRequest = $build->releaseRequest;
                 if (!empty($releaseRequest)) {
                     $releaseRequest->rr_status = ReleaseRequest::STATUS_CANCELLED;
                     $releaseRequest->save();
 
-                    Yii::$app->EmailNotifier->sendReleaseRejectCustomNotification($title, $text);
-                    foreach (explode(",", Yii::$app->params['notify']['status']['phones']) as $phone) {
-                        if (!$phone) {
-                            continue;
-                        }
-                        Yii::$app->smsSender->sendSms($phone, $title);
-                    }
+                    $this->notificationService->sendInstallationCanceled($project->project_name, $build->obj_id);
                 }
                 break;
         }
@@ -504,6 +494,11 @@ class DeployController extends RabbitListener implements DeployEventInterface
             );
 
             $event->projectOldVersion = $oldVersion;
+
+            // dg: Не отправляем уведомления о дочерних релизах. Как правило там те же задачи
+            if (!$releaseRequest->isChild()) {
+                $this->notificationService->sendUsingSucceed($project, $releaseRequest, $oldUsed);
+            }
         }
 
         $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_SUCCESS);
