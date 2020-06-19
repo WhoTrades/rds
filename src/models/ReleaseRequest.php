@@ -687,15 +687,6 @@ class ReleaseRequest extends ActiveRecord
             $tasks[] = $task;
         }
 
-        \Yii::$app->EmailNotifier->sendRdsReleaseRequestNotification($this->user->email, $this->project->project_name, $this->rr_comment);
-        $text = "{$this->user->email} requested {$this->project->project_name}. {$this->rr_comment}";
-        foreach (explode(",", \Yii::$app->params['notify']['releaseRequest']['phones']) as $phone) {
-            if (!$phone) {
-                continue;
-            }
-            \Yii::$app->smsSender->sendSms($phone, $text);
-        }
-
         Log::createLogMessage("Создан {$this->getTitle()}");
     }
 

@@ -1561,6 +1561,60 @@
             "time": "2017-09-30T22:39:41+00:00"
         },
         {
+            "name": "tuyakhov/yii2-notifications",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tuyakhov/yii2-notifications.git",
+                "reference": "2d3aa82550afa76124742f77595023ad4e2da961"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tuyakhov/yii2-notifications/zipball/2d3aa82550afa76124742f77595023ad4e2da961",
+                "reference": "2d3aa82550afa76124742f77595023ad4e2da961",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "yiisoft/yii2": "~2.0.13",
+                "yiisoft/yii2-httpclient": "^2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "tuyakhov\\notifications\\": "src/",
+                    "tuyakhov\\notifications\\tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anton Tuyakhov",
+                    "email": "atuyakhov@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The extension provides support for sending notifications across a variety of delivery channels, including mail, SMS, Slack etc. Notifications may also be stored in a database so they may be displayed in your web interface.",
+            "homepage": "https://github.com/tuyakhov/yii2-notifications",
+            "keywords": [
+                "email",
+                "notifications",
+                "slack",
+                "sms",
+                "tamarin",
+                "transactional messages",
+                "yii",
+                "yii2"
+            ],
+            "time": "2016-09-08T00:00:00+00:00"
+        },
+        {
             "name": "whotrades/rds-system",
             "version": "v1.0",
             "source": {
