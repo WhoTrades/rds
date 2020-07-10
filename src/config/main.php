@@ -266,6 +266,24 @@ $config = array(
         'releaseRequestCommentGenerator' => function (ReleaseRequest $releaseRequest) {
             return strip_tags($releaseRequest->rr_comment) . "<br />";
         },
+        'buildVersionMetricsGenerator' => function (ReleaseRequest $releaseRequest) {
+            if (!$releaseRequest->rr_built_time) {
+                return $releaseRequest->rr_build_version;
+            }
+            $metrics = $releaseRequest->getBuildMetrics();
+
+            $metricsHtml = $releaseRequest->rr_build_version . "<br />Build: <b>{$metrics['time_build']}</b>  s. ";
+            if (!empty($metrics['time_activation'])) {
+                $metricsHtml .= "Activation: <b>{$metrics['time_activation']}</b> s. <br/>";
+            }
+            if (!empty($metrics['time_additional'])) {
+                $metricsHtml .= "Queue + Install: <b>{$metrics['time_additional']}}</b> s.";
+            } elseif (!empty($metrics['time_queueing']) && !empty($metrics['time_install'])) {
+                $metricsHtml .= "Queue: <b>{$metrics['time_queueing']}</b> s. Install: <b>{$metrics['time_install']}</b> s.";
+            }
+
+            return $metricsHtml;
+        }
     ),
     'container' => [
         'singletons' => [

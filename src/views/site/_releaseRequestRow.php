@@ -142,77 +142,12 @@ return array(
     array(
         'attribute' => 'rr_build_version',
         'value' => function (ReleaseRequest $r) {
-            if ($r->rr_built_time) {
-                $installFinishTime = strtotime($r->rr_built_time);
-                $buildTimeLog = json_decode((reset($r->builds))->build_time_log, true);
-                $activationText = '';
-                // ag: Backward compatibility with old build_time_log #WTA-1754
-                if (reset($buildTimeLog) < strtotime($r->obj_created)) {
-                    $buildTime = end($buildTimeLog) - reset($buildTimeLog);
-                    $timeFull = $installFinishTime - strtotime($r->obj_created);
-                    $timeAdditional = round($timeFull - $buildTime);
-                    $additionalText = "Очередь+раскладка: <b>$timeAdditional</b> сек.";
-                } else {
-                    $buildStartTime = reset($buildTimeLog);
-                    $buildTime = 0;
-                    $installTime = 0;
-
-                    if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_SUCCESS])) {
-                        $buildFinishTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_SUCCESS];
-                    } elseif (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_ERROR])) {
-                        $buildFinishTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_ERROR];
-                    }
-
-                    if ($buildFinishTime) {
-                        $buildTime = $buildFinishTime - $buildStartTime;
-                    }
-
-                    $installStartTime = 0;
-                    if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START])) {
-                        $installStartTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
-                        if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS])) {
-                            $installTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS] - $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
-                        } elseif (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_ERROR])) {
-                            $installTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_ERROR] - $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
-                        }
-                    }
-
-                    $buildFinishRoughTime = 0;
-
-                    foreach ($buildTimeLog as $action => $time) {
-                        if ($installFinishTime < $time) {
-                            break;
-                        }
-                        $buildFinishRoughTime = $time;
-                    }
-
-                    if ($buildFinishRoughTime) {
-                        $buildTime = $buildTime ?: $buildFinishRoughTime - $buildStartTime;
-                        $installTime = $installTime ?: $installFinishTime - $buildFinishRoughTime;
-                    }
-
-                    if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]) && isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS])) {
-                        $timeActivating = round($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS] - $buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]);
-                        $activationText = "Активация: <b>$timeActivating</b> сек.";
-                    }
-
-                    $timeQueueing = $buildStartTime - strtotime($r->obj_created);
-                    if ($buildFinishTime && $installStartTime) {
-                        $timeQueueing = $timeQueueing + ($installStartTime - $buildFinishTime);
-                    }
-
-                    $timeQueueing = round($timeQueueing);
-                    $installTime = round($installTime);
-
-                    $additionalText = "Очередь: <b>$timeQueueing</b> сек. Раскладка: <b>$installTime</b> сек.";
-                }
-
-                $buildTime = round($buildTime);
-
-                return $r->rr_build_version . "<br />Сборка: <b>$buildTime</b>  сек. " . ($activationText ?? '') . "<br />" . $additionalText;
-            } else {
+            $buildVersionMetricsGenerator = Yii::$app->params['buildVersionMetricsGenerator'] ?? '';
+            if (empty($buildVersionMetricsGenerator) || !is_callable($buildVersionMetricsGenerator)) {
                 return $r->rr_build_version;
             }
+
+            return call_user_func($buildVersionMetricsGenerator, $r);
         },
         'format' => 'html',
     ),
