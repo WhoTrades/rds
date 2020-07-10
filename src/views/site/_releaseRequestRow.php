@@ -149,7 +149,7 @@ return array(
 
             return call_user_func($buildVersionMetricsGenerator, $r);
         },
-        'format' => 'html',
+        'format' => 'raw',
     ),
     array(
         'value' => function (ReleaseRequest $releaseRequest) {
