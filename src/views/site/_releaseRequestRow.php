@@ -142,12 +142,12 @@ return array(
     array(
         'attribute' => 'rr_build_version',
         'value' => function (ReleaseRequest $r) {
-            $buildVersionMetricsGenerator = Yii::$app->params['buildVersionMetricsGenerator'] ?? '';
-            if (empty($buildVersionMetricsGenerator) || !is_callable($buildVersionMetricsGenerator)) {
-                return $r->rr_build_version;
+            $buildVersionMetricsGenerator = Yii::$app->params['buildVersionMetricsGenerator'];
+            if ($buildVersionMetricsGenerator && is_callable($buildVersionMetricsGenerator)) {
+                return call_user_func($buildVersionMetricsGenerator, $r);
             }
 
-            return call_user_func($buildVersionMetricsGenerator, $r);
+            return $r->rr_build_version;
         },
         'format' => 'raw',
     ),
