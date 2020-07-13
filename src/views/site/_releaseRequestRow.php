@@ -142,7 +142,7 @@ return array(
     array(
         'attribute' => 'rr_build_version',
         'value' => function (ReleaseRequest $r) {
-            $buildVersionMetricsGenerator = Yii::$app->params['buildVersionMetricsGenerator'];
+            $buildVersionMetricsGenerator = Yii::$app->params['buildVersionMetricsGenerator'] ?? null;
             if ($buildVersionMetricsGenerator && is_callable($buildVersionMetricsGenerator)) {
                 return call_user_func($buildVersionMetricsGenerator, $r);
             }
