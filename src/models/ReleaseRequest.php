@@ -858,6 +858,77 @@ class ReleaseRequest extends ActiveRecord
         }
     }
 
+    /**
+     * @return array
+     */
+    public function getBuildMetrics()
+    {
+        $metrics = [];
+
+        $installFinishTime = strtotime($this->rr_built_time);
+        $buildTimeLog = json_decode((reset($this->builds))->build_time_log, true);
+        // ag: Backward compatibility with old build_time_log #WTA-1754
+        if (reset($buildTimeLog) < strtotime($this->obj_created)) {
+            $buildTime = end($buildTimeLog) - reset($buildTimeLog);
+            $timeFull = $installFinishTime - strtotime($this->obj_created);
+            $metrics['time_additional'] = round($timeFull - $buildTime);
+        } else {
+            $buildStartTime = reset($buildTimeLog);
+            $buildTime = 0;
+            $installTime = 0;
+            $buildFinishTime = 0;
+
+            if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_SUCCESS])) {
+                $buildFinishTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_SUCCESS];
+            } elseif (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_ERROR])) {
+                $buildFinishTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_BUILD_ERROR];
+            }
+
+            if ($buildFinishTime) {
+                $buildTime = $buildFinishTime - $buildStartTime;
+            }
+
+            $installStartTime = 0;
+            if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START])) {
+                $installStartTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
+                if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS])) {
+                    $installTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS] - $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
+                } elseif (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_ERROR])) {
+                    $installTime = $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_ERROR] - $buildTimeLog[ReleaseRequest::BUILD_LOG_INSTALL_START];
+                }
+            }
+
+            $buildFinishRoughTime = 0;
+
+            foreach ($buildTimeLog as $action => $time) {
+                if ($installFinishTime < $time) {
+                    break;
+                }
+                $buildFinishRoughTime = $time;
+            }
+
+            if ($buildFinishRoughTime) {
+                $buildTime = $buildTime ?: $buildFinishRoughTime - $buildStartTime;
+                $installTime = $installTime ?: $installFinishTime - $buildFinishRoughTime;
+            }
+
+            if (isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]) && isset($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS])) {
+                $metrics['time_activation'] = round($buildTimeLog[ReleaseRequest::BUILD_LOG_USING_SUCCESS] - $buildTimeLog[ReleaseRequest::BUILD_LOG_USING_START]);
+            }
+
+            $timeQueueing = $buildStartTime - strtotime($this->obj_created);
+            if ($buildFinishTime && $installStartTime) {
+                $timeQueueing = $timeQueueing + ($installStartTime - $buildFinishTime);
+            }
+
+            $metrics['time_queueing'] = round($timeQueueing);
+            $metrics['time_install'] = round($installTime);
+        }
+        $metrics['time_build'] = round($buildTime);
+
+        return $metrics;
+    }
+
     public function increaseFailBuildCount()
     {
         \Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
