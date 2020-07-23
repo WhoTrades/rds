@@ -448,14 +448,11 @@ class DeployController extends RabbitListener implements DeployEventInterface
             $project->updateCurrentVersion($message->version);
 
             $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
-
             if ($oldUsed) {
                 $oldUsed->rr_status = ReleaseRequest::STATUS_OLD;
                 $oldUsed->rr_last_time_on_prod = date("r");
                 $oldUsed->rr_revert_after_time = null;
                 $oldUsed->save(false);
-
-                //WebSocketsHelper::sendReleaseRequestUpdated($oldUsed->obj_id);
             }
 
             if ($releaseRequest) {
@@ -497,7 +494,8 @@ class DeployController extends RabbitListener implements DeployEventInterface
 
             // dg: Не отправляем уведомления о дочерних релизах. Как правило там те же задачи
             if (!$releaseRequest->isChild()) {
-                $this->notificationService->sendUsingSucceed($project, $releaseRequest, $oldUsed);
+                // ag: Pass $releaseRequest as an old release request if $oldUsed doesn't exist
+                $this->notificationService->sendUsingSucceed($project, $releaseRequest, $oldUsed ?? $releaseRequest);
             }
         }
 
