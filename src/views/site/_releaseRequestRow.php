@@ -12,7 +12,17 @@ use yii\bootstrap\Modal;
 use yii\helpers\Url;
 
 return array(
-    'obj_created:datetime',
+    [
+        'attribute' => 'obj_created',
+        'value' => function (ReleaseRequest $releaseRequest) {
+            $dateTime = new DateTime($releaseRequest->obj_created);
+            if (!$dateTime) {
+                return '';
+            }
+            return Html::tag("div", $dateTime->format('c'), ['data-datetime' => $dateTime->format('c')]);
+        },
+        'format' => 'raw',
+    ],
     [
         'value' => function (ReleaseRequest $releaseRequest) {
             $url = $releaseRequest->user->profile->getAvatarUrl(64);

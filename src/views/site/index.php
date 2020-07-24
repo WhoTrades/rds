@@ -5,6 +5,7 @@ use whotrades\rds\models\Project;
 use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
+use \whotrades\rds\assets\TimeJsAsset;
 
 /** @var $this yii\web\View */
 /** @var $releaseRejectSearchModel ReleaseReject */
@@ -14,6 +15,8 @@ use yii\widgets\Pjax;
 /**
  * @var $deploymentEnabled bool
  */
+/** @var TimeJsAsset $timejs */
+$timejs = TimeJsAsset::register($this);
 ?>
 
 <h1>
@@ -111,15 +114,39 @@ echo $this->render('_releaseRequestGrid', [
     'filterModel'   => $releaseRequestSearchModel,
 ]);
 \yii\widgets\Pjax::end();
+$userTimeZone = Yii::$app->getUser()->identity->profile->timezone ?? 'UTC';
+$userUTCOffset = (new DateTimeZone($userTimeZone))->getOffset(new DateTime('now', new DateTimeZone('UTC')));
 ?>
 
+<script>
+    document.onload.push(function(){
+        dayjs.extend(window.dayjs_plugin_localizedFormat);
+        dayjs.extend(window.dayjs_plugin_utc);
+        dayjs.locale('<?=$timejs->locale?>');
+    });
+
+    var defaultOffset = <?=$userUTCOffset/60?>;
+    function formatDateTimeToTimezone (target) {
+        $(target).find('[data-datetime]').each(function (index, node) {
+            node = $(node);
+            var dateTime = dayjs(node.data('datetime'));
+            node.text(dateTime.utcOffset(defaultOffset).format('ll LTS'));
+        });
+    }
+</script>
+
 <script type="text/javascript">
+    var rrContainer = '#release-request-grid-container';
     // an: Если не сделать обновление грида после загрузки страницы, но мы потеряем события, которые произошли после генерации страницы и до подписки на websockets.
     // А такое случается часто, когда мы заказываем сборку
     // ar: 2 pjax одновременно не выполняются, один из них всегда возвращает "canceled", добавил таймаут - сожалею
     document.onload.push(function(){
-        $.pjax.reload('#release-request-grid-container', {timeout: 10000});
+        $(rrContainer).on('pjax:success', function () {
+            formatDateTimeToTimezone(rrContainer);
+        });
+        $.pjax.reload(rrContainer, {timeout: 10000});
         $('[data-toggle="tooltip"]').tooltip();
+        formatDateTimeToTimezone(rrContainer);
     });
     function refreshCreateReleaseRequestDialog(projectObjId)
     {
@@ -138,9 +165,8 @@ echo $this->render('_releaseRequestGrid', [
 
             var trId = '.release-request-' + event.rr_id,
                 html = $(event.html).find(trId).html();
-
             $(trId).html(html);
-
+            formatDateTimeToTimezone(rrContainer);
             console.log('Release request '+ event.rr_id + ' updated');
         });
         webSocketSubscribe('progressbarChanged', function(event){
@@ -157,7 +183,7 @@ echo $this->render('_releaseRequestGrid', [
         });
         webSocketSubscribe('updateAllReleaseRequests', function(event){
             console.log("websocket event received", event);
-            $.pjax.reload('#release-request-grid-container', {timeout: 10000});
+            $.pjax.reload(rrContainer, {timeout: 10000});
             //$.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
             console.log('got update all release requests event');
         });
