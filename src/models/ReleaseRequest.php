@@ -750,10 +750,9 @@ class ReleaseRequest extends ActiveRecord
         $this->rr_old_version = $this->project->project_current_version;
         Log::createLogMessage("USE {$this->getTitle()}");
 
-        foreach ($this->project->project2workers as $p2w) {
-            /** @var Project2worker $p2w */
+        foreach ($this->builds as $build) {
             (new \whotrades\RdsSystem\Factory())->getMessagingRdsMsModel()->sendUseTask(
-                $p2w->worker->worker_name,
+                $build->worker->worker_name,
                 new UseTask(
                     $this->project->project_name,
                     $this->obj_id,
