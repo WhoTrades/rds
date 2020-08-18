@@ -3,6 +3,7 @@ namespace whotrades\rds\controllers;
 
 use whotrades\rds\models\Project;
 use yii\web\HttpException;
+use yii\web\Response;
 use whotrades\rds\models\ReleaseRequest;
 
 class JsonController extends ControllerApiBase
@@ -16,10 +17,12 @@ class JsonController extends ControllerApiBase
      * Возвращает список пакетов, установленных на PROD сервера
      * @param string $project название проекта (Поле в БД project.project_name)
      * @param int    $limit   максимальное количество результатов. Работает только если $project указан
-     * @param string $format  формат ответа. null (json) или не null (plain text)
+     *
+     * @return Response
+     *
      * @throws HttpException
      */
-    public function actionGetInstalledPackages($project = null, $limit = null, $format = null)
+    public function actionGetInstalledPackages($project = null, $limit = null)
     {
         $limit = $limit ?: 5;
         $result = [];
@@ -43,22 +46,20 @@ class JsonController extends ControllerApiBase
             $result[] = $releaseRequest->getBuildTag();
         }
 
-        if ($format === null) {
-            return $this->asJson($result);
-        }
-
-        return implode(" ", $result);
+        return $this->asJson($result);
     }
 
     /**
      * Метод используется git хуком update.php, который проверяет можно ли команде CRM пушить в хотрелизную ветку после кодфриза и до релиза
      * @param string $projectName
+     *
+     * @return Response
      */
     public function actionGetProjectCurrentVersion($projectName)
     {
         /** @var $project Project */
         $project = Project::findByAttributes(['project_name' => $projectName]);
 
-        $this->asJson($project ? $project->project_current_version : null);
+        return $this->asJson($project ? $project->project_current_version : null);
     }
 }
