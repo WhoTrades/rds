@@ -155,6 +155,7 @@ class ReleaseRequest extends ActiveRecord
                     $childReleaseRequest->rr_leading_id = $model->obj_id;
                     $childReleaseRequest->save();
 
+                    $childReleaseRequest->incrementProjectBuildVersion();
                     $childReleaseRequest->createBuildTasks();
 
                     $childModels[] = $childReleaseRequest;
@@ -163,6 +164,7 @@ class ReleaseRequest extends ActiveRecord
                 $model->rr_comment = "$model->rr_comment";
                 $model->save();
 
+                $model->incrementProjectBuildVersion();
                 $model->createBuildTasks();
 
                 $transaction->commit();
@@ -218,14 +220,8 @@ class ReleaseRequest extends ActiveRecord
             $this->rr_cron_config = null;
             $this->save();
 
-            /** @var Build $build */
-            foreach ($this->builds as $build) {
-                $build->build_status = Build::STATUS_NEW;
-                $build->build_attach = '';
-                $build->build_time_log = json_encode([]);
-
-                $build->save();
-            }
+            $this->deleteBuildTasks();
+            $this->createBuildTasks();
 
             /** @var ReleaseRequest $childReleaseRequest */
             foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
@@ -666,28 +662,42 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * @return void
+     */
+    public function incrementProjectBuildVersion(): void
+    {
+        $this->project->incrementBuildVersion($this->rr_release_version);
+    }
+
+    /**
      * @throws \Exception
      */
     public function createBuildTasks()
     {
-        $this->project->incrementBuildVersion($this->rr_release_version);
-        $list = Project2worker::findAllByAttributes(array(
+        $project2workerList = Project2worker::findAllByAttributes(array(
             'project_obj_id' => $this->rr_project_obj_id,
         ));
 
-        $tasks = [];
-        foreach ($list as $val) {
-            /** @var $val Project2worker */
+        /** @var $project2worker Project2worker */
+        foreach ($project2workerList as $project2worker) {
             $task = new Build();
             $task->build_release_request_obj_id = $this->obj_id;
-            $task->build_worker_obj_id = $val->worker_obj_id;
-            $task->build_project_obj_id = $val->project_obj_id;
+            $task->build_worker_obj_id = $project2worker->worker_obj_id;
+            $task->build_project_obj_id = $project2worker->project_obj_id;
             $task->save();
-
-            $tasks[] = $task;
         }
 
         Log::createLogMessage("Создан {$this->getTitle()}");
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function deleteBuildTasks()
+    {
+        foreach ($this->builds as $build) {
+            $build->delete();
+        }
     }
 
     /**
