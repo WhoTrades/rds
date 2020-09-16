@@ -698,6 +698,7 @@ class ReleaseRequest extends ActiveRecord
         foreach ($this->builds as $build) {
             $build->delete();
         }
+        unset($this->builds);
     }
 
     /**
