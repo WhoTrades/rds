@@ -190,13 +190,12 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @param int $userId
      * @param string | null $comment
-     * @param int $level
      *
      * @return array
      *
      * @throws \yii\db\Exception
      */
-    public function recreate($userId, $comment = null, $level = 0)
+    public function recreate($userId, $comment = null)
     {
         if (!$this->canBeRecreated()) {
             return [];
@@ -226,12 +225,12 @@ class ReleaseRequest extends ActiveRecord
 
             /** @var ReleaseRequest $childReleaseRequest */
             foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
-                $childReleaseRequest->recreate($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null, $level+1);
+                $childReleaseRequest->recreate($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null);
             }
 
             $transaction->commit();
 
-            if (0 == $level) {
+            if (!$this->isChild()) {
                 $releaseRequestList = array_merge([$this], $this->getReleaseRequests()->all());
 
                 /** @var self $releaseRequest */
