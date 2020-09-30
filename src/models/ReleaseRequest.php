@@ -190,12 +190,13 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @param int $userId
      * @param string | null $comment
+     * @param int $level
      *
      * @return array
      *
-     * @throws \Exception
+     * @throws \yii\db\Exception
      */
-    public function recreate($userId, $comment = null)
+    public function recreate($userId, $comment = null, $level = 0)
     {
         if (!$this->canBeRecreated()) {
             return [];
@@ -225,17 +226,20 @@ class ReleaseRequest extends ActiveRecord
 
             /** @var ReleaseRequest $childReleaseRequest */
             foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
-                $childReleaseRequest->recreate($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null);
+                $childReleaseRequest->recreate($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null, $level+1);
             }
 
             $transaction->commit();
 
-            $releaseRequestList = array_merge([$this], $this->getReleaseRequests()->all());
+            if (0 == $level) {
+                $releaseRequestList = array_merge([$this], $this->getReleaseRequests()->all());
 
-            /** @var self $releaseRequest */
-            foreach ($releaseRequestList as $releaseRequest) {
-                $releaseRequest->sendBuildTasks();
+                /** @var self $releaseRequest */
+                foreach ($releaseRequestList as $releaseRequest) {
+                    $releaseRequest->sendBuildTasks();
+                }
             }
+
         } catch (\Exception $e) {
             if ($transaction->isActive) {
                 $transaction->rollBack();
