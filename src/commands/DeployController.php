@@ -182,7 +182,9 @@ class DeployController extends RabbitListener implements DeployEventInterface
                         }
                     }
 
-                    $this->notificationService->sendInstallationSucceed($project->project_name, $version, array_map(
+                    $this->notificationService->sendInstallationSucceed(
+                        $parentReleaseRequest->project->project_name,
+                        $parentReleaseRequest->rr_build_version, array_map(
                         function (Build $build) {
                             return $build->obj_id;
                         },
