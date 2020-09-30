@@ -174,7 +174,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
                     foreach ($childReleaseRequests as $childReleaseRequest) {
                         // Break after 1st not installed build status to not iterate through all set
                         if (0 != $childReleaseRequest->countNotInstalledBuilds()) {
-                            break;
+                            break 2; // break foreach & switch
                         }
                     }
 
