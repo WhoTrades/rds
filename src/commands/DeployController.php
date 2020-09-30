@@ -162,16 +162,32 @@ class DeployController extends RabbitListener implements DeployEventInterface
 
                     $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS);
 
-                    if (!$build->releaseRequest->isChild()) {
-                        $buildIdList = array_map(
-                            function ($build) {
-                                return $build->obj_id;
-                            },
-                            $build->releaseRequest->builds
-                        );
+                    // Notify only if all parent and child release requests builds are installed
+                    $filterBuildsNotInstalled = function (Build $build) {
+                        return in_array($build->build_status, [Build::STATUS_INSTALLED, Build::STATUS_POST_INSTALLED, Build::STATUS_USED]);
+                    };
 
-                        $this->notificationService->sendInstallationSucceed($project->project_name, $version, $buildIdList);
+                    $parentReleaseRequest = ReleaseRequest::findByPk($build->releaseRequest->isChild() ? $build->releaseRequest->rr_leading_id : $build->releaseRequest->obj_id);
+
+                    // Break early if we have any not installed builds
+                    if (0 != count(array_filter($parentReleaseRequest->builds, $filterBuildsNotInstalled))) {
+                        break;
                     }
+
+                    $childReleaseRequests = ReleaseRequest::findAllByAttributes(['rr_leading_id' => $parentReleaseRequest->obj_id]);
+                    foreach ($childReleaseRequests as $childReleaseRequest) {
+                        // Break after 1st not installed build status to not iterate through all set
+                        if (0 != count(array_filter($childReleaseRequest->builds, $filterBuildsNotInstalled))) {
+                            break;
+                        }
+                    }
+
+                    $this->notificationService->sendInstallationSucceed($project->project_name, $version, array_map(
+                        function (Build $build) {
+                            return $build->obj_id;
+                        },
+                        $parentReleaseRequest->builds
+                    ));
                 }
                 break;
             case Build::STATUS_POST_INSTALLED:
