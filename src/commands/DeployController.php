@@ -168,7 +168,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
                         $parentReleaseRequest = $build->releaseRequest;
                     }
 
-                    $releaseRequestGroupList = array_merge([$parentReleaseRequest], $parentReleaseRequest->getReleaseRequests());
+                    $releaseRequestGroupList = array_merge([$parentReleaseRequest], $parentReleaseRequest->getReleaseRequests()->all());
                     foreach ($releaseRequestGroupList as $releaseRequest) {
                         // Break after 1st not installed build status to not iterate through all set
                         if ($releaseRequest->countNotInstalledBuilds() !== 0) {
