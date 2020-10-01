@@ -162,18 +162,16 @@ class DeployController extends RabbitListener implements DeployEventInterface
 
                     $build->releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_INSTALL_SUCCESS);
 
-                    // Notify only if all parent and child release requests builds are installed
-                    $parentReleaseRequest = ReleaseRequest::findByPk($build->releaseRequest->isChild() ? $build->releaseRequest->rr_leading_id : $build->releaseRequest->obj_id);
-
-                    // Break early if we have any not installed builds
-                    if (0 != $parentReleaseRequest->countNotInstalledBuilds()) {
-                        break;
+                    if ($build->releaseRequest->isChild()) {
+                        $parentReleaseRequest = ReleaseRequest::findByPk($build->releaseRequest->rr_leading_id);
+                    } else {
+                        $parentReleaseRequest = $build->releaseRequest;
                     }
 
-                    $childReleaseRequests = ReleaseRequest::findAllByAttributes(['rr_leading_id' => $parentReleaseRequest->obj_id]);
-                    foreach ($childReleaseRequests as $childReleaseRequest) {
+                    $releaseRequestGroupList = array_merge([$parentReleaseRequest], $parentReleaseRequest->getReleaseRequests());
+                    foreach ($releaseRequestGroupList as $releaseRequest) {
                         // Break after 1st not installed build status to not iterate through all set
-                        if (0 != $childReleaseRequest->countNotInstalledBuilds()) {
+                        if ($releaseRequest->countNotInstalledBuilds() !== 0) {
                             break 2; // break foreach & switch
                         }
                     }
