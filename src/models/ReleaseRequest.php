@@ -193,7 +193,7 @@ class ReleaseRequest extends ActiveRecord
      *
      * @return array
      *
-     * @throws \Exception
+     * @throws \yii\db\Exception
      */
     public function recreate($userId, $comment = null)
     {
@@ -230,12 +230,15 @@ class ReleaseRequest extends ActiveRecord
 
             $transaction->commit();
 
-            $releaseRequestList = array_merge([$this], $this->getReleaseRequests()->all());
+            if (!$this->isChild()) {
+                $releaseRequestList = array_merge([$this], $this->getReleaseRequests()->all());
 
-            /** @var self $releaseRequest */
-            foreach ($releaseRequestList as $releaseRequest) {
-                $releaseRequest->sendBuildTasks();
+                /** @var self $releaseRequest */
+                foreach ($releaseRequestList as $releaseRequest) {
+                    $releaseRequest->sendBuildTasks();
+                }
             }
+
         } catch (\Exception $e) {
             if ($transaction->isActive) {
                 $transaction->rollBack();
