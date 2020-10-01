@@ -240,6 +240,9 @@ class DeployController extends RabbitListener implements DeployEventInterface
         }
 
         WebSocketsHelper::sendReleaseRequestUpdated($build->build_release_request_obj_id);
+        if ($build->releaseRequest->isChild()) {
+            WebSocketsHelper::sendReleaseRequestUpdated($build->releaseRequest->rr_leading_id);
+        }
 
         $message->accepted();
         $event->build = $build;
