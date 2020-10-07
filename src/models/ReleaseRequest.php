@@ -230,15 +230,8 @@ class ReleaseRequest extends ActiveRecord
 
             $transaction->commit();
 
-            if (!$this->isChild()) {
-                $releaseRequestList = array_merge([$this], $this->getReleaseRequests()->all());
-
-                /** @var self $releaseRequest */
-                foreach ($releaseRequestList as $releaseRequest) {
-                    $releaseRequest->sendBuildTasks();
-                }
-            }
-
+            // ag: Send tasks for this releaseRequest. Tasks for all children releaseRequests was sent in their recreate methods
+            $this->sendBuildTasks();
         } catch (\Exception $e) {
             if ($transaction->isActive) {
                 $transaction->rollBack();
