@@ -17,7 +17,6 @@ use whotrades\rds\models\Build;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\Worker;
-use whotrades\rds\models\Project2worker;
 use whotrades\rds\helpers\WebSockets as WebSocketsHelper;
 use whotrades\rds\services\NotificationServiceInterface;
 use Exception;
@@ -377,7 +376,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
         $this->trigger(DeployEventInterface::EVENT_USED_VERSION_BEFORE, $event);
         $worker = Worker::findByAttributes(array('worker_name' => $message->worker));
         if (!$worker) {
-            Yii::error("Worker $message->worker not found");
+            Yii::error("Skip message. Worker $message->worker not found");
             $message->accepted();
 
             return;
@@ -386,7 +385,39 @@ class DeployController extends RabbitListener implements DeployEventInterface
         /** @var $project Project */
         $project = Project::findByAttributes(array('project_name' => $message->project));
         if (!$project) {
-            Yii::error("Project $message->project not found");
+            Yii::error("Skip message. Project $message->project not found");
+            $message->accepted();
+
+            return;
+        }
+
+        /** @var $releaseRequest ReleaseRequest */
+        $releaseRequest = ReleaseRequest::findByAttributes([
+            'rr_build_version' => $message->version,
+            'rr_project_obj_id' => $project->obj_id,
+        ]);
+
+        if (!$releaseRequest) {
+            Yii::error("Skip message. ReleaseRequest {$project->project_name}-{$message->version} not found");
+            $message->accepted();
+
+            return;
+        }
+
+        $build = Build::findByAttributes([
+            'build_project_obj_id' => $project->obj_id,
+            'build_worker_obj_id' => $worker->obj_id,
+            'build_release_request_obj_id' => $releaseRequest->obj_id,
+        ]);
+
+        if (!$build) {
+            Yii::error("Skip message. Build of releaseRequest {$project->project_name}-{$message->version} for worker {$worker->worker_name} not found");
+            Yii::$app->sentry->captureMessage('unknown_build_info', [
+                'build_project_obj_id' => $project->obj_id,
+                'build_worker_obj_id' => $worker->obj_id,
+                'build_release_request_obj_id' => $releaseRequest->obj_id,
+                'message' => $message,
+            ]);
             $message->accepted();
 
             return;
@@ -394,136 +425,91 @@ class DeployController extends RabbitListener implements DeployEventInterface
 
         $transaction = $project->getDbConnection()->beginTransaction();
 
-        /** @var $releaseRequest ReleaseRequest */
-        $releaseRequest = ReleaseRequest::findByAttributes(array(
-            'rr_build_version' => $message->version,
-            'rr_project_obj_id' => $project->obj_id,
-        ));
+        $build->build_status = Build::STATUS_USED;
+        $build->build_attach .= "\n\n=== Begin Use Log ===\n\n";
+        $build->build_attach .= $message->text;
+        $build->build_attach .= "\n\n=== End Use Log ===";
+        $build->save();
 
         foreach ($releaseRequest->builds as $build) {
-            $build->build_attach .= "\n\n=== Begin Use Log ===\n\n";
-            $build->build_attach .= $message->text;
-            $build->build_attach .= "\n\n=== End Use Log ===";
-            $build->save();
+            if ($build->build_status != Build::STATUS_USED) {
+                Yii::info("Some builds of releaseRequest {$project->project_name}-{$message->version} are not in USED status");
+                Yii::info("Waiting for them...");
+
+                $transaction->commit();
+                $message->accepted();
+
+                return;
+            }
         }
 
-        $builds = Build::findAllByAttributes(array(
-            'build_project_obj_id' => $project->obj_id,
-            'build_worker_obj_id' => $worker->obj_id,
-            'build_status' => Build::STATUS_USED,
-        ));
+        $oldVersion = $project->project_current_version;
+        $project->updateCurrentVersion($message->version);
 
-        foreach ($builds as $build) {
-            /** @var $build Build */
-            $build->build_status = Build::STATUS_INSTALLED;
-            $build->save();
-        }
+        $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
+        if ($oldUsed) {
+            $oldUsed->rr_status = ReleaseRequest::STATUS_OLD;
+            $oldUsed->rr_last_time_on_prod = date("r");
+            $oldUsed->rr_revert_after_time = null;
+            $oldUsed->save(false);
 
-        if ($releaseRequest) {
-            $build = Build::findByAttributes(array(
-                'build_project_obj_id' => $project->obj_id,
-                'build_worker_obj_id' => $worker->obj_id,
-                'build_release_request_obj_id' => $releaseRequest->obj_id,
-            ));
-            if ($build) {
-                $build->build_status = Build::STATUS_USED;
+            foreach ($oldUsed->builds as $build) {
+                /** @var $build Build */
+                $build->build_status = Build::STATUS_INSTALLED;
                 $build->save();
-            } else {
-                Yii::$app->sentry->captureMessage('unknown_build_info', [
-                    'build_project_obj_id' => $project->obj_id,
-                    'build_worker_obj_id' => $worker->obj_id,
-                    'build_release_request_obj_id' => $releaseRequest->obj_id,
-                    'message' => $message,
-                ]);
             }
         }
 
-        /** @var $p2w Project2worker */
-        $p2w = Project2worker::findByAttributes(array(
-            'worker_obj_id' => $worker->obj_id,
-            'project_obj_id' => $project->obj_id,
-        ));
-        if ($p2w) {
-            $p2w->p2w_current_version = $message->version;
-            $p2w->save();
-        }
-        $list = Project2worker::findAllByAttributes(array(
-            'project_obj_id' => $project->obj_id,
-        ));
-        $ok = true;
-        foreach ($list as $p2w) {
-            if ($p2w->p2w_current_version != $message->version) {
-                $ok = false;
-                break;
-            }
-        }
+        $releaseRequest->rr_last_error_text = null;
+        $releaseRequest->rr_status = ReleaseRequest::STATUS_USED;
+        $releaseRequest->save(false);
 
-        if ($ok) {
-            $oldVersion = $project->project_current_version;
-            $project->updateCurrentVersion($message->version);
+        $jiraUse = new JiraUse();
+        $jiraUse->attributes = [
+            'jira_use_from_build_tag' => $project->project_name . '-' . $oldVersion,
+            'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
+            'jira_use_initiator_user_name' => $message->initiatorUserName,
+        ];
+        $jiraUse->save();
 
-            $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
-            if ($oldUsed) {
-                $oldUsed->rr_status = ReleaseRequest::STATUS_OLD;
-                $oldUsed->rr_last_time_on_prod = date("r");
-                $oldUsed->rr_revert_after_time = null;
-                $oldUsed->save(false);
-            }
+        ToolJob::updateAll(
+            [
+                'obj_status_did' => Status::DELETED,
+            ],
+            "project_obj_id=:id",
+            [
+                ':id' => $releaseRequest->rr_project_obj_id,
+            ]
+        );
 
-            if ($releaseRequest) {
-                $releaseRequest->rr_last_error_text = null;
-                $releaseRequest->rr_status = ReleaseRequest::STATUS_USED;
-                $releaseRequest->save(false);
-
-                $jiraUse = new JiraUse();
-                $jiraUse->attributes = [
-                    'jira_use_from_build_tag' => $project->project_name . '-' . $oldVersion,
-                    'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
-                    'jira_use_initiator_user_name' => $message->initiatorUserName,
-                ];
-                $jiraUse->save();
-            }
-
-            ToolJob::updateAll(
-                [
-                    'obj_status_did' => Status::DELETED,
-                ],
-                "project_obj_id=:id",
-                [
-                    ':id' => $releaseRequest->rr_project_obj_id,
-                ]
-            );
-
-            ToolJob::updateAll(
-                [
-                    'obj_status_did' => Status::ACTIVE,
-                ],
-                'project_obj_id=:id AND "version"=:version',
-                [
-                    ':id' => $releaseRequest->rr_project_obj_id,
-                    ':version' => $releaseRequest->rr_build_version,
-                ]
-            );
-
-            $event->projectOldVersion = $oldVersion;
-
-            // dg: Не отправляем уведомления о дочерних релизах. Как правило там те же задачи
-            if (!$releaseRequest->isChild()) {
-                // ag: Pass $releaseRequest as an old release request if $oldUsed doesn't exist
-                $this->notificationService->sendUsingSucceed($project, $releaseRequest, $oldUsed ?? $releaseRequest);
-            }
-        }
+        ToolJob::updateAll(
+            [
+                'obj_status_did' => Status::ACTIVE,
+            ],
+            'project_obj_id=:id AND "version"=:version',
+            [
+                ':id' => $releaseRequest->rr_project_obj_id,
+                ':version' => $releaseRequest->rr_build_version,
+            ]
+        );
 
         $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_SUCCESS);
 
-        $transaction->commit();
-
-        Yii::$app->webSockets->send('updateAllReleaseRequests', []);
-
-        $message->accepted();
+        $event->projectOldVersion = $oldVersion;
         $event->build = $build;
         $event->project = $project;
         $this->trigger(DeployEventInterface::EVENT_USED_VERSION_AFTER, $event);
+
+        $transaction->commit();
+        $message->accepted();
+
+        // dg: Не отправляем уведомления о дочерних релизах. Как правило там те же задачи
+        if (!$releaseRequest->isChild()) {
+            // ag: Pass $releaseRequest as an old release request if $oldUsed doesn't exist
+            $this->notificationService->sendUsingSucceed($project, $releaseRequest, $oldUsed ?? $releaseRequest);
+        }
+
+        Yii::$app->webSockets->send('updateAllReleaseRequests', []);
     }
 
     /**
