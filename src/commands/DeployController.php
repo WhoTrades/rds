@@ -476,9 +476,10 @@ class DeployController extends RabbitListener implements DeployEventInterface
             [
                 'obj_status_did' => Status::DELETED,
             ],
-            "project_obj_id=:id",
+            "project_obj_id=:id AND obj_status_did!=:did",
             [
                 ':id' => $releaseRequest->rr_project_obj_id,
+                ':did' => Status::DELETED,
             ]
         );
 
