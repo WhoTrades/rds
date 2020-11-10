@@ -5,6 +5,8 @@
  * Что бы его переопределить для себя используйте protected/config/config.local.php
  */
 
+use whotrades\rds\services\DeployService;
+use whotrades\rds\services\DeployServiceInterface;
 use whotrades\RdsSystem\lib\WebErrorHandler;
 use whotrades\rds\services\MigrationService;
 use \whotrades\rds\models\Worker;
@@ -303,7 +305,10 @@ $config = array(
                 'releaseRequestEmail'           => 'noreply@example.com',
                 'releaseRequestForbiddenEmail'  => 'noreply@example.com',
                 'usingSucceedEmail'             => 'noreply@example.com',
-            ]
+            ],
+            DeployServiceInterface::class => [
+                'class' => DeployService::class,
+            ],
         ],
     ]
 );
