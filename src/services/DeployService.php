@@ -20,7 +20,7 @@ use Yii;
 use yii\base\Event;
 use yii\db\Connection;
 
-class DeployService implements DeployEventInterface
+class DeployService implements DeployServiceInterface
 {
 
     public function setCronConfig(ReleaseRequestCronConfig $message): void
