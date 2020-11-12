@@ -31,7 +31,8 @@
         "tuyakhov/yii2-notifications": "^1.2"
     },
     "require-dev": {
-        "yiisoft/yii2-debug": "2.0.9"
+        "yiisoft/yii2-debug": "2.0.9",
+        "phpunit/phpunit": "~9.3.0"
     },
     "extra": {
         "asset-installer-paths": {

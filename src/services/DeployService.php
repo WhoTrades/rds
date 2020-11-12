@@ -3,24 +3,22 @@ declare(strict_types=1);
 
 namespace whotrades\rds\services;
 
-
 use whotrades\rds\components\Deploy\DeployEventInterface;
 use whotrades\rds\components\Deploy\GenericEvent;
-use whotrades\rds\components\Status;
-use whotrades\rds\helpers\WebSockets as WebSocketsHelper;
 use whotrades\rds\models\Build;
 use whotrades\rds\models\JiraUse;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Worker;
-use whotrades\RdsBuildAgent\services\DeployService\Event\DeployStatusEvent;
 use whotrades\RdsSystem\Message\Base;
 use whotrades\RdsSystem\Message\ReleaseRequestCronConfig;
 use whotrades\RdsSystem\Message\ReleaseRequestUsedVersion;
 
-use app\modules\Whotrades\commands\DevParseCronConfigController;
-use app\modules\Whotrades\models\ToolJob;
+//use app\modules\Whotrades\commands\DevParseCronConfigController;
+//use app\modules\Whotrades\models\ToolJob;
+use Yii;
 use yii\base\Event;
+use yii\db\Connection;
 
 class DeployService implements DeployEventInterface
 {
@@ -31,13 +29,14 @@ class DeployService implements DeployEventInterface
 
         Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_BEFORE, $event);
 
-        $transaction = Yii::$app->db->beginTransaction();
+        $connection = $this->getDatabaseConnection();
+        $transaction = $connection->beginTransaction();
         try {
             /** @var $build Build */
             $build = Build::findByPk($message->taskId);
 
             if (!$build) {
-                \Yii::error("Build #$message->taskId not found");
+                Yii::error("Build #$message->taskId not found");
                 $message->accepted();
                 $transaction->rollBack();
 
@@ -46,7 +45,7 @@ class DeployService implements DeployEventInterface
             $releaseRequest = $build->releaseRequest;
 
             if (!$releaseRequest) {
-                \Yii::error("Build #$message->taskId has no release request");
+                Yii::error("Build #$message->taskId has no release request");
                 $message->accepted();
                 $transaction->rollBack();
 
@@ -102,7 +101,7 @@ class DeployService implements DeployEventInterface
 
         $worker = Worker::findByAttributes(array('worker_name' => $message->worker));
         if (!$worker) {
-            \Yii::error("Skip message. Worker $message->worker not found");
+            Yii::error("Skip message. Worker $message->worker not found");
             $message->accepted();
 
             return;
@@ -111,7 +110,7 @@ class DeployService implements DeployEventInterface
         /** @var $project Project */
         $project = Project::findByAttributes(array('project_name' => $message->project));
         if (!$project) {
-            \Yii::error("Skip message. Project $message->project not found");
+            Yii::error("Skip message. Project $message->project not found");
             $message->accepted();
 
             return;
@@ -124,7 +123,7 @@ class DeployService implements DeployEventInterface
         ]);
 
         if (!$releaseRequest) {
-            \Yii::error("Skip message. ReleaseRequest {$project->project_name}-{$message->version} not found");
+            Yii::error("Skip message. ReleaseRequest {$project->project_name}-{$message->version} not found");
             $message->accepted();
 
             return;
@@ -137,8 +136,8 @@ class DeployService implements DeployEventInterface
         ]);
 
         if (!$build) {
-            \Yii::error("Skip message. Build of releaseRequest {$project->project_name}-{$message->version} for worker {$worker->worker_name} not found");
-            \Yii::$app->sentry->captureMessage('unknown_build_info', [
+            Yii::error("Skip message. Build of releaseRequest {$project->project_name}-{$message->version} for worker {$worker->worker_name} not found");
+            Yii::$app->sentry->captureMessage('unknown_build_info', [
                 'build_project_obj_id' => $project->obj_id,
                 'build_worker_obj_id' => $worker->obj_id,
                 'build_release_request_obj_id' => $releaseRequest->obj_id,
@@ -149,7 +148,8 @@ class DeployService implements DeployEventInterface
             return;
         }
 
-        $transaction = $project->getDbConnection()->beginTransaction();
+        $connection = $this->getDatabaseConnection();
+        $transaction = $connection->beginTransaction();
 
         $build->build_status = Build::STATUS_USED;
         $build->build_attach .= "\n\n=== Begin Use Log ===\n\n";
@@ -159,8 +159,8 @@ class DeployService implements DeployEventInterface
 
         foreach ($releaseRequest->builds as $build) {
             if ($build->build_status != Build::STATUS_USED) {
-                \Yii::info("Some builds of releaseRequest {$project->project_name}-{$message->version} are not in USED status");
-                \Yii::info("Waiting for them...");
+                Yii::info("Some builds of releaseRequest {$project->project_name}-{$message->version} are not in USED status");
+                Yii::info("Waiting for them...");
 
                 $transaction->commit();
                 $message->accepted();
@@ -234,6 +234,16 @@ class DeployService implements DeployEventInterface
         $message->accepted();
 
         Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_AFTER, $event);
+    }
+
+    /**
+     * TODO: accept connection as DI
+     *
+     * @return Connection
+     */
+    public function getDatabaseConnection(): Connection
+    {
+        return Yii::$app->db;
     }
 
     /**
