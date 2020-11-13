@@ -107,7 +107,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
             if (empty($event->releaseRequest)) {
                 return;
             }
-            WebSocketsHelper::sendReleaseRequestUpdated($$event->releaseRequest->obj_id);
+            WebSocketsHelper::sendReleaseRequestUpdated($event->releaseRequest->obj_id);
         });
 
     }
