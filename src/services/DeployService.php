@@ -53,33 +53,7 @@ class DeployService implements DeployServiceInterface
             }
 
             $releaseRequest->rr_cron_config = $message->text;
-
             $releaseRequest->save(false);
-            /**
-            if (class_exists(DevParseCronConfigController::class)) {
-                // ag: Delete existed ToolJob for this build_version. It is needed when we recreate ReleaseRequest
-                ToolJob::deleteAll(
-                    'project_obj_id=:id AND "version"=:version',
-                    [
-                        ':id' => $releaseRequest->rr_project_obj_id,
-                        ':version' => $releaseRequest->rr_build_version,
-                    ]
-                );
-
-                DevParseCronConfigController::parseCronConfig($releaseRequest);
-
-                ToolJob::updateAll(
-                    [
-                        'obj_status_did' => Status::DELETED,
-                    ],
-                    'project_obj_id=:id AND "version"=:version',
-                    [
-                        ':id' => $releaseRequest->rr_project_obj_id,
-                        ':version' => $releaseRequest->rr_build_version,
-                    ]
-                );
-            }
-            **/
 
             Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_PRE_COMMIT_HOOK, $event);
 
@@ -197,28 +171,6 @@ class DeployService implements DeployServiceInterface
             'jira_use_initiator_user_name' => $message->initiatorUserName,
         ];
         $jiraUse->save();
-
-        /**ToolJob::updateAll(
-            [
-                'obj_status_did' => Status::DELETED,
-            ],
-            "project_obj_id=:id AND obj_status_did!=:did",
-            [
-                ':id' => $releaseRequest->rr_project_obj_id,
-                ':did' => Status::DELETED,
-            ]
-        );
-
-        ToolJob::updateAll(
-            [
-                'obj_status_did' => Status::ACTIVE,
-            ],
-            'project_obj_id=:id AND "version"=:version',
-            [
-                ':id' => $releaseRequest->rr_project_obj_id,
-                ':version' => $releaseRequest->rr_build_version,
-            ]
-        );**/
 
         $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_SUCCESS);
 
