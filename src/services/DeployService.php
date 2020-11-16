@@ -55,6 +55,9 @@ class DeployService implements DeployServiceInterface
             $releaseRequest->rr_cron_config = $message->text;
             $releaseRequest->save(false);
 
+            $event->releaseRequest = $releaseRequest;
+            $event->build = $build;
+
             Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_PRE_COMMIT_HOOK, $event);
 
             $transaction->commit();
