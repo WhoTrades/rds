@@ -100,7 +100,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
                 $this->notificationService->sendUsingSucceed($event->project, $event->releaseRequest, $oldUsed ?? $event->releaseRequest);
             }
 
-            \Yii::$app->webSockets->send('updateAllReleaseRequests', []);
+            Yii::$app->webSockets->send('updateAllReleaseRequests', []);
         });
 
         Event::on(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_AFTER, function (GenericEvent $event) {

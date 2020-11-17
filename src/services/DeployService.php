@@ -13,16 +13,19 @@ use whotrades\rds\models\Worker;
 use whotrades\RdsSystem\Message\Base;
 use whotrades\RdsSystem\Message\ReleaseRequestCronConfig;
 use whotrades\RdsSystem\Message\ReleaseRequestUsedVersion;
-
-//use app\modules\Whotrades\commands\DevParseCronConfigController;
-//use app\modules\Whotrades\models\ToolJob;
 use Yii;
 use yii\base\Event;
 use yii\db\Connection;
+use yii\db\Exception;
 
 class DeployService implements DeployServiceInterface
 {
 
+    /**
+     * @param ReleaseRequestCronConfig $message
+     *
+     * @throws Exception
+     */
     public function setCronConfig(ReleaseRequestCronConfig $message): void
     {
         $event = $this->createEvent($message);
@@ -70,6 +73,11 @@ class DeployService implements DeployServiceInterface
         }
     }
 
+    /**
+     * @param ReleaseRequestUsedVersion $message
+     *
+     * @throws Exception
+     */
     public function setUsedVersion(ReleaseRequestUsedVersion $message): void
     {
         $event = $this->createEvent($message);
@@ -182,7 +190,6 @@ class DeployService implements DeployServiceInterface
         $event->project = $project;
         $event->releaseRequest = $releaseRequest;
 
-
         Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_PRE_COMMIT_HOOK, $event);
 
         $transaction->commit();
@@ -211,5 +218,4 @@ class DeployService implements DeployServiceInterface
         $event->message = $message;
         return $event;
     }
-
 }

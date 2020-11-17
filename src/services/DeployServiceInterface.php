@@ -17,5 +17,4 @@ interface DeployServiceInterface
      * @param ReleaseRequestUsedVersion $message
      */
     public function setUsedVersion(ReleaseRequestUsedVersion $message): void;
-
 }
