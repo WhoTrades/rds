@@ -17,7 +17,7 @@
         "yiisoft/yii2": "2.0.15.1",
         "yiisoft/yii2-bootstrap": "~2.0",
         "yiisoft/yii2-gii": "~2.0.0",
-        "php": ">=7.0",
+        "php": ">=7.2",
         "yiisoft/yii2-swiftmailer": "~2.0",
         "sentry/sentry": "1.6.2",
         "dektrium/yii2-user": "0.9.14",
@@ -31,7 +31,8 @@
         "tuyakhov/yii2-notifications": "^1.2"
     },
     "require-dev": {
-        "yiisoft/yii2-debug": "2.0.9"
+        "yiisoft/yii2-debug": "2.0.9",
+        "phpunit/phpunit": "~9.3.0"
     },
     "extra": {
         "asset-installer-paths": {

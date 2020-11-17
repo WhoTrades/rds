@@ -8,6 +8,7 @@ namespace whotrades\rds\components\Deploy;
 
 use whotrades\rds\models\Build;
 use whotrades\rds\models\Project;
+use whotrades\rds\models\ReleaseRequest;
 use whotrades\RdsSystem\Message\Base;
 use \yii\base\Event as EventBase;
 
@@ -24,4 +25,7 @@ class GenericEvent extends EventBase
 
     /** @var string */
     public $projectOldVersion;
+
+    /** @var ReleaseRequest */
+    public $releaseRequest;
 }

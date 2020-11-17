@@ -1,7 +1,16 @@
-<phpunit>
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="./tests/bootstrap.php" colors="true">
   <testsuites>
     <testsuite name="all">
       <directory>tests/unit/</directory>
     </testsuite>
   </testsuites>
+  <coverage>
+    <include>
+      <directory suffix="php">src</directory>
+    </include>
+    <exclude>
+      <directory suffix="php">config</directory>
+    </exclude>
+  </coverage>
 </phpunit>
