@@ -6,7 +6,6 @@ namespace whotrades\rds\services;
 use whotrades\rds\components\Deploy\DeployEventInterface;
 use whotrades\rds\components\Deploy\GenericEvent;
 use whotrades\rds\models\Build;
-use whotrades\rds\models\JiraUse;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Worker;
@@ -174,14 +173,6 @@ class DeployService implements DeployServiceInterface
         $releaseRequest->rr_last_error_text = null;
         $releaseRequest->rr_status = ReleaseRequest::STATUS_USED;
         $releaseRequest->save(false);
-
-        $jiraUse = new JiraUse();
-        $jiraUse->attributes = [
-            'jira_use_from_build_tag' => $project->project_name . '-' . $oldVersion,
-            'jira_use_to_build_tag' => $releaseRequest->getBuildTag(),
-            'jira_use_initiator_user_name' => $message->initiatorUserName,
-        ];
-        $jiraUse->save();
 
         $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_SUCCESS);
 
