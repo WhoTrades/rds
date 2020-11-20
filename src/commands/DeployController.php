@@ -3,6 +3,8 @@ namespace whotrades\rds\commands;
 
 use whotrades\rds\components\Deploy\DeployEventInterface;
 use whotrades\rds\components\Deploy\GenericEvent;
+use whotrades\rds\events\Deploy\CronConfigAfterEvent;
+use whotrades\rds\events\Deploy\UsedVersionAfterEvent;
 use yii\base\Event;
 use whotrades\rds\services\DeployServiceInterface;
 use Yii;
@@ -88,26 +90,18 @@ class DeployController extends RabbitListener implements DeployEventInterface
 
     private function attachEvents()
     {
-        Event::on(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_AFTER, function (GenericEvent $event) {
-            if (empty($event->releaseRequest) || empty($event->project)) {
-                return;
-            }
-
+        Event::on(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_AFTER, function (UsedVersionAfterEvent $event) {
             // dg: Don't send notifications about child releases
-            if (!$event->releaseRequest->isChild()) {
-                $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($event->project->obj_id);
+            if (!$event->getReleaseRequest()->isChild()) {
+                $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($event->getReleaseRequest()->project->obj_id);
                 // ag: Pass $releaseRequest as an old release request if $oldUsed doesn't exist
-                $this->notificationService->sendUsingSucceed($event->project, $event->releaseRequest, $oldUsed ?? $event->releaseRequest);
+                $this->notificationService->sendUsingSucceed($event->getReleaseRequest()->project, $event->getReleaseRequest(), $oldUsed ?? $event->getReleaseRequest());
             }
-
             Yii::$app->webSockets->send('updateAllReleaseRequests', []);
         });
 
-        Event::on(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_AFTER, function (GenericEvent $event) {
-            if (empty($event->releaseRequest)) {
-                return;
-            }
-            WebSocketsHelper::sendReleaseRequestUpdated($event->releaseRequest->obj_id);
+        Event::on(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_AFTER, function (CronConfigAfterEvent $event) {
+            WebSocketsHelper::sendReleaseRequestUpdated($event->getReleaseRequest()->obj_id);
         });
 
     }
