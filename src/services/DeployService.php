@@ -4,12 +4,16 @@ declare(strict_types=1);
 namespace whotrades\rds\services;
 
 use whotrades\rds\components\Deploy\DeployEventInterface;
-use whotrades\rds\components\Deploy\GenericEvent;
+use whotrades\rds\events\Deploy\CronConfigAfterEvent;
+use whotrades\rds\events\Deploy\CronConfigBeforeEvent;
+use whotrades\rds\events\Deploy\CronConfigPreCommitEvent;
+use whotrades\rds\events\Deploy\UsedVersionAfterEvent;
+use whotrades\rds\events\Deploy\UsedVersionBeforeEvent;
+use whotrades\rds\events\Deploy\UsedVersionPreCommitEvent;
 use whotrades\rds\models\Build;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Worker;
-use whotrades\RdsSystem\Message\Base;
 use whotrades\RdsSystem\Message\ReleaseRequestCronConfig;
 use whotrades\RdsSystem\Message\ReleaseRequestUsedVersion;
 use Yii;
@@ -27,9 +31,7 @@ class DeployService implements DeployServiceInterface
      */
     public function setCronConfig(ReleaseRequestCronConfig $message): void
     {
-        $event = $this->createEvent($message);
-
-        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_BEFORE, $event);
+        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_BEFORE, new CronConfigBeforeEvent($message));
 
         $connection = $this->getDatabaseConnection();
         $transaction = $connection->beginTransaction();
@@ -57,15 +59,12 @@ class DeployService implements DeployServiceInterface
             $releaseRequest->rr_cron_config = $message->text;
             $releaseRequest->save(false);
 
-            $event->releaseRequest = $releaseRequest;
-            $event->build = $build;
-
-            Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_PRE_COMMIT_HOOK, $event);
+            Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_PRE_COMMIT_HOOK, new CronConfigPreCommitEvent($message, $releaseRequest));
 
             $transaction->commit();
             $message->accepted();
 
-            Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_AFTER, $event);
+            Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_CRON_CONFIG_AFTER, new CronConfigAfterEvent($message, $releaseRequest));
         } catch (\Exception $e) {
             $transaction->rollBack();
             throw $e;
@@ -79,9 +78,7 @@ class DeployService implements DeployServiceInterface
      */
     public function setUsedVersion(ReleaseRequestUsedVersion $message): void
     {
-        $event = $this->createEvent($message);
-
-        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_BEFORE, $event);
+        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_BEFORE, new UsedVersionBeforeEvent($message));
 
         $worker = Worker::findByAttributes(array('worker_name' => $message->worker));
         if (!$worker) {
@@ -153,7 +150,7 @@ class DeployService implements DeployServiceInterface
             }
         }
 
-        $oldVersion = $project->project_current_version;
+        $oldVersion = (string) $project->project_current_version;
         $project->updateCurrentVersion($message->version);
 
         $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
@@ -176,37 +173,21 @@ class DeployService implements DeployServiceInterface
 
         $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_SUCCESS);
 
-        $event->projectOldVersion = $oldVersion;
-        $event->build = $build;
-        $event->project = $project;
-        $event->releaseRequest = $releaseRequest;
-
-        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_PRE_COMMIT_HOOK, $event);
+        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_PRE_COMMIT_HOOK, new UsedVersionPreCommitEvent($message, $releaseRequest, $oldVersion));
 
         $transaction->commit();
         $message->accepted();
 
-        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_AFTER, $event);
+        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_AFTER, new UsedVersionAfterEvent($message, $releaseRequest, $oldVersion));
     }
 
     /**
-     * TODO: accept connection as DI
+     * TODO: pass connection as DI
      *
      * @return Connection
      */
     public function getDatabaseConnection(): Connection
     {
         return Yii::$app->db;
-    }
-
-    /**
-     * @param Base $message
-     * @return GenericEvent
-     */
-    protected function createEvent(Base $message): GenericEvent
-    {
-        $event = new GenericEvent();
-        $event->message = $message;
-        return $event;
     }
 }

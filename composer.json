@@ -1,7 +1,23 @@
 {
     "name": "whotrades/rds",
     "type": "service",
-    "author": "Artem Naumenko (entsupml@gmail.com)",
+    "authors": [
+        {
+            "name": "Artem Naumenko",
+            "email": "entsupml@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Anton Gorlanov",
+            "email": "antonxacc@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Maksim Rodikov",
+            "email": "maxrodikov@gmail.com",
+            "role": "Developer"
+        }
+    ],
     "description": "WhoTrades release deployment service",
     "autoload": {
         "psr-4": {
