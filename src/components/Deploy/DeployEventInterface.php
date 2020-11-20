@@ -12,7 +12,7 @@ interface DeployEventInterface
     const EVENT_TASK_STATUS_CHANGED_AFTER       = 'deploy_task_status_changed_after';
     const EVENT_CRON_CONFIG_BEFORE              = 'deploy_cron_config_before';
     const EVENT_CRON_CONFIG_PRE_COMMIT_HOOK     = 'deploy_cron_config_pre_commit';
-    const EVENT_CRON_CONFIG_AFTER               = 'deploy_cron_config_before';
+    const EVENT_CRON_CONFIG_AFTER               = 'deploy_cron_config_after';
     const EVENT_TASK_USE_ERROR_BEFORE           = 'deploy_task_use_error_before';
     const EVENT_TASK_USE_ERROR_AFTER            = 'deploy_task_use_error_after';
     const EVENT_USED_VERSION_BEFORE             = 'deploy_used_version_before';
