@@ -67,7 +67,10 @@ class MigrationController extends ControllerRestrictedBase
             return 'There is not migration with id ' . $migrationId;
         }
 
-        return $migration->migration_log;
+        return $this->render('viewLog', array(
+            'migrationName' => $migration->migration_name,
+            'log' => $migration->migration_log,
+        ));
     }
 
     /**
