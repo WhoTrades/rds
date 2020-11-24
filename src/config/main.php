@@ -222,6 +222,7 @@ $config = array(
         'migrationAutoApplicationEnabled' => true,
         'projectMigrationUrlMask' => [
                 '*' => function ($migration, $projectName, $type, $branch) {
+                    /** @var string $migration - migration name with url slashes */
                     return "https://github.com/WhoTrades/rds/blob/master/src/migrations/$migration.php?at=refs/heads/$branch";
                 }
         ],

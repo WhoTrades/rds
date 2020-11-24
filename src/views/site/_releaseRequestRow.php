@@ -270,8 +270,12 @@ return array(
                         "' class='ajax-url'>Запустить pre-миграции</a><br />" .
                         "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">Показать pre миграции</a>
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
+                    // ag: @see whotrades\rds\models\MigrationBase::getNameForUrl()
+                    $getNameForUrl = function ($migrationName) {
+                        return str_replace('\\', '/', $migrationName);
+                    };
                     foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                        $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($migration, \whotrades\rds\models\Migration::TYPE_PRE) . ">";
+                        $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($getNameForUrl($migration), \whotrades\rds\models\Migration::TYPE_PRE) . ">";
                         $result .= "$migration";
                         $result .= "</a><br />";
                     }
