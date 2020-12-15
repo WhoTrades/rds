@@ -93,9 +93,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
         Event::on(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_AFTER, function (UsedVersionAfterEvent $event) {
             // dg: Don't send notifications about child releases
             if (!$event->getReleaseRequest()->isChild()) {
-                $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($event->getReleaseRequest()->project->obj_id);
-                // ag: Pass $releaseRequest as an old release request if $oldUsed doesn't exist
-                $this->notificationService->sendUsingSucceed($event->getReleaseRequest()->project, $event->getReleaseRequest(), $oldUsed ?? $event->getReleaseRequest());
+                $this->notificationService->sendUsingSucceed($event->getReleaseRequest()->project, $event->getReleaseRequest(), $event->getReleaseRequestOld());
             }
             Yii::$app->webSockets->send('updateAllReleaseRequests', []);
         });
