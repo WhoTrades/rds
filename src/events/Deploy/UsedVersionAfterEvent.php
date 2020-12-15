@@ -15,25 +15,25 @@ final class UsedVersionAfterEvent extends BaseEvent
     /** @var ReleaseRequest */
     private $releaseRequest;
 
-    /** @var string */
-    private $projectPreviousVersion;
+    /** @var ReleaseRequest */
+    private $releaseRequestOld;
 
     /**
      * UsedVersionAfterEvent constructor.
      *
      * @param ReleaseRequestUsedVersion $message
      * @param ReleaseRequest $releaseRequest
-     * @param string $projectPreviousVersion
+     * @param ReleaseRequest $releaseRequestOld
      * @param null $config
      */
-    public function __construct(ReleaseRequestUsedVersion $message, ReleaseRequest $releaseRequest, string $projectPreviousVersion, $config = null)
+    public function __construct(ReleaseRequestUsedVersion $message, ReleaseRequest $releaseRequest, ReleaseRequest $releaseRequestOld, $config = null)
     {
         $config = $config ?? [];
         parent::__construct($config);
 
         $this->message = $message;
         $this->releaseRequest = $releaseRequest;
-        $this->projectPreviousVersion = $projectPreviousVersion;
+        $this->releaseRequestOld = $releaseRequestOld;
     }
 
     /**
@@ -53,10 +53,10 @@ final class UsedVersionAfterEvent extends BaseEvent
     }
 
     /**
-     * @return string
+     * @return ReleaseRequest
      */
-    public function getProjectPreviousVersion(): string
+    public function getReleaseRequestOld(): ReleaseRequest
     {
-        return $this->projectPreviousVersion;
+        return $this->releaseRequestOld;
     }
 }

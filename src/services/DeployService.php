@@ -153,14 +153,14 @@ class DeployService implements DeployServiceInterface
         $oldVersion = (string) $project->project_current_version;
         $project->updateCurrentVersion($message->version);
 
-        $oldUsed = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
-        if ($oldUsed) {
-            $oldUsed->rr_status = ReleaseRequest::STATUS_OLD;
-            $oldUsed->rr_last_time_on_prod = date("r");
-            $oldUsed->rr_revert_after_time = null;
-            $oldUsed->save(false);
+        $releaseRequestOld = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
+        if ($releaseRequestOld) {
+            $releaseRequestOld->rr_status = ReleaseRequest::STATUS_OLD;
+            $releaseRequestOld->rr_last_time_on_prod = date("r");
+            $releaseRequestOld->rr_revert_after_time = null;
+            $releaseRequestOld->save(false);
 
-            foreach ($oldUsed->builds as $build) {
+            foreach ($releaseRequestOld->builds as $build) {
                 /** @var $build Build */
                 $build->build_status = Build::STATUS_INSTALLED;
                 $build->save();
@@ -173,12 +173,22 @@ class DeployService implements DeployServiceInterface
 
         $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_SUCCESS);
 
-        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_PRE_COMMIT_HOOK, new UsedVersionPreCommitEvent($message, $releaseRequest, $oldVersion));
+        Event::trigger(
+            DeployServiceInterface::class,
+            DeployEventInterface::EVENT_USED_VERSION_PRE_COMMIT_HOOK,
+            // ag: Pass $releaseRequest as an old release request if $releaseRequestOld doesn't exist
+            new UsedVersionPreCommitEvent($message, $releaseRequest, $releaseRequestOld ?? $releaseRequest)
+        );
 
         $transaction->commit();
         $message->accepted();
 
-        Event::trigger(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_AFTER, new UsedVersionAfterEvent($message, $releaseRequest, $oldVersion));
+        Event::trigger(
+            DeployServiceInterface::class,
+            DeployEventInterface::EVENT_USED_VERSION_AFTER,
+            // ag: Pass $releaseRequest as an old release request if $releaseRequestOld doesn't exist
+            new UsedVersionAfterEvent($message, $releaseRequest, $releaseRequestOld ?? $releaseRequest)
+        );
     }
 
     /**
