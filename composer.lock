@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1bad1d843f02e150edbf0ac6c3bc933b",
+    "content-hash": "8822b584afa32c3837fefc60a589389b",
     "packages": [
         {
             "name": "bazilio/yii2-stubs-generator",
@@ -1616,17 +1616,28 @@
         },
         {
             "name": "whotrades/rds-system",
-            "version": "v1.0",
+            "version": "v1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/rds-system.git",
-                "reference": "5099916d7a84bc9d909973d98442e55008794421"
+                "reference": "8622412ddae2407e57fcb8fcb243ba022d88db2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/5099916d7a84bc9d909973d98442e55008794421",
-                "reference": "5099916d7a84bc9d909973d98442e55008794421",
+                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/8622412ddae2407e57fcb8fcb243ba022d88db2f",
+                "reference": "8622412ddae2407e57fcb8fcb243ba022d88db2f",
                 "shasum": ""
+            },
+            "require": {
+                "ext-pcntl": "*",
+                "fxp/composer-asset-plugin": "~1.0",
+                "php": ">=7.3",
+                "php-amqplib/php-amqplib": "~2.6",
+                "yiisoft/yii2": "^2.0.39.3"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "~1.6.8",
+                "phpunit/phpunit": "~9.2.4"
             },
             "type": "library",
             "autoload": {
@@ -1635,8 +1646,14 @@
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Artem Naumenko",
+                    "email": "entsupml@gmail.com"
+                }
+            ],
             "description": "Core part of RDS service",
-            "time": "2020-06-09T12:07:22+00:00"
+            "time": "2020-12-18T09:19:39+00:00"
         },
         {
             "name": "yiisoft/yii2",

@@ -29,7 +29,7 @@
         "fxp/composer-asset-plugin": "~1.0",
         "react/zmq": "~0.3",
         "php-amqplib/php-amqplib": "~2.6",
-        "whotrades/rds-system": "~1.0.0",
+        "whotrades/rds-system": "^1.0.5",
         "yiisoft/yii2": "2.0.39.3",
         "yiisoft/yii2-bootstrap": "~2.0",
         "yiisoft/yii2-gii": "~2.0.0",
