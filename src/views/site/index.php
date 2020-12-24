@@ -183,12 +183,12 @@ $userUTCOffset = (new DateTimeZone($userTimeZone))->getOffset(new DateTime('now'
         });
         webSocketSubscribe('updateAllReleaseRequests', function(event){
             console.log("websocket event received", event);
-            $.pjax.reload(rrContainer, {timeout: 10000});
+            $.pjax.reload(rrContainer, {url: '/', timeout: 10000});
             //$.pjax.reload('#release-request-grid-pjax-container', {fragment: '#release-request-grid'});
             console.log('got update all release requests event');
         });
         webSocketSubscribe('updateAllReleaseRejects', function(event){
-            $.pjax.reload('#release-reject-grid-container', {timeout: 10000});
+            $.pjax.reload('#release-reject-grid-container', {url: '/', timeout: 10000});
             //$.pjax.reload('#release-reject-grid-pjax-container', {fragment: '#release-reject-grid'});
             console.log('got update all release rejects event');
         });
