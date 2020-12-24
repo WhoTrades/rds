@@ -28,7 +28,7 @@ $config = array(
     'language' => 'ru-RU',
     'controllerNamespace' => 'whotrades\rds\controllers',
 
-    'bootstrap' => array('log', 'debug', 'webSockets', 'dektrium\user\Bootstrap'),
+    'bootstrap' => array('log', 'webSockets', 'dektrium\user\Bootstrap'),
     'layout' => 'column1',
     'modules' => array(
         // uncomment the following to enable the Gii tool
@@ -36,12 +36,6 @@ $config = array(
             'class' => 'yii\gii\Module',
             'allowedIPs' => array('192.168.*', '10.0.2.2'),
         ),
-        'debug' => [
-            'class' => yii\debug\Module::class,
-            'allowedIPs' => ['10.0.2.2', '::1'],
-            'fileMode' => 0777,
-            'dirMode' => 0777,
-        ],
         'gridview' =>  [
             'class' => \kartik\grid\Module::class,
         ],
@@ -313,6 +307,16 @@ $config = array(
         ],
     ]
 );
+
+if (class_exists(\yii\debug\Module::class)) {
+    array_unshift($config['bootstrap'], 'debug');
+    $config['modules']['debug'] = [
+        'class' => yii\debug\Module::class,
+        'allowedIPs' => ['10.0.2.2', '::1'],
+        'fileMode' => 0777,
+        'dirMode' => 0777,
+    ];
+}
 
 // ag: db_admin - DB role for migrations
 $config['components']['db_admin'] = $config['components']['db'];
