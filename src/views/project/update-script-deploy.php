@@ -128,7 +128,7 @@ $project->script_use = $project->script_use ?: "#!/bin/bash -e\n";
         </div>
     </div>
 
-    <h1>Настройка активации CRON <?=$project->project_name?> на серверах</h1>
+    <h1>Скрипт отрабатывающий после активации проекта <?=$project->project_name?></h1>
     <div class="row">
         <div class="col-md-6 col-sm-9">
             <?=Alert::widget([
@@ -137,7 +137,7 @@ $project->script_use = $project->script_use ?: "#!/bin/bash -e\n";
                 ],
                 'body' => "F11 - полноэкранный режим редактора, Esc - выход",
             ])?>
-            <?= $form->field($project, 'script_use_cron')->widget(
+            <?= $form->field($project, 'script_post_use')->widget(
                 CodemirrorWidget::class,
                 [
                     'presetsDir' => __DIR__ . '/../../assets/preset',
