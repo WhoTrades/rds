@@ -127,6 +127,45 @@ $project->script_use = $project->script_use ?: "#!/bin/bash -e\n";
 
         </div>
     </div>
+
+    <h1>Настройка активации CRON <?=$project->project_name?> на серверах</h1>
+    <div class="row">
+        <div class="col-md-6 col-sm-9">
+            <?=Alert::widget([
+                'options' => [
+                    'class' => 'alert-info',
+                ],
+                'body' => "F11 - полноэкранный режим редактора, Esc - выход",
+            ])?>
+            <?= $form->field($project, 'script_use_cron')->widget(
+                CodemirrorWidget::class,
+                [
+                    'presetsDir' => __DIR__ . '/../../assets/preset',
+                    'preset' => 'bash',
+                    'options' => ['rows' => 15],
+                ]
+            ) ?>
+
+        </div>
+        <div class="col-md-6 col-sm-3">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Справка</h3>
+                </div>
+                <div class="panel-body">
+                    <h5>Доступные переменные окружения</h5>
+                    <ul>
+                        <li><strong>$projectName</strong> имя проекта</li>
+                        <li><strong>$version</strong> версия сборки</li>
+                        <li><strong>$servers</strong> список серверов через пробел, куда заливать проект</li>
+                        <li><strong>$cron</strong> содержимое CRON, которое нужно применить</li>
+                    </ul>
+                    <p><strong>Результат работы</strong>: Данный скрипт должен активировать CRON проекта на всех серверах. В случае ошибки - завершиться с exit-code != 0</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
 <?php
 echo Html::submitButton('Save', ['class' => 'btn btn-lg btn-primary']);
 ActiveForm::end();
