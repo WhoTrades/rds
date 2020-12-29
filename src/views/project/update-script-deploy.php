@@ -157,8 +157,8 @@ $project->script_use = $project->script_use ?: "#!/bin/bash -e\n";
                     <ul>
                         <li><strong>$projectName</strong> имя проекта</li>
                         <li><strong>$version</strong> версия сборки</li>
+                        <li><strong>$cron</strong> конфигурация CRON, которую нужно применить</li>
                         <li><strong>$servers</strong> список серверов через пробел, куда заливать проект</li>
-                        <li><strong>$cron</strong> содержимое CRON, которое нужно применить</li>
                     </ul>
                     <p><strong>Результат работы</strong>: Данный скрипт должен активировать CRON проекта на всех серверах. В случае ошибки - завершиться с exit-code != 0</p>
                 </div>
