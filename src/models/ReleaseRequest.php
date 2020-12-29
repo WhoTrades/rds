@@ -4,6 +4,7 @@ namespace whotrades\rds\models;
 use whotrades\rds\components\Status;
 use whotrades\RdsSystem\Message\BuildTask;
 use whotrades\RdsSystem\Message\InstallTask;
+use whotrades\RdsSystem\Message\UseCronTask;
 use whotrades\RdsSystem\Message\UseTask;
 use whotrades\rds\models\User\User;
 use yii\data\Sort;
@@ -55,33 +56,33 @@ class ReleaseRequest extends ActiveRecord
     const FAIL_BUILD_COUNT_THRESHOLD = 3;
     const FAIL_INSTALL_COUNT_THRESHOLD = 3;
 
-    const STATUS_NEW                 = 'new';
-    const STATUS_FAILED              = 'failed';
-    const STATUS_BUILDING            = 'building';
-    const STATUS_BUILT               = 'built';
-    const STATUS_INSTALLING          = 'installing';
-    const STATUS_INSTALLED           = 'installed';
-    const STATUS_USING               = 'using';
-    const STATUS_USED                = 'used';
-    const STATUS_OLD                 = 'old';
-    const STATUS_CANCELLING          = 'cancelling';
-    const STATUS_CANCELLED           = 'cancelled';
+    const STATUS_NEW                    = 'new';
+    const STATUS_FAILED                 = 'failed';
+    const STATUS_BUILDING               = 'building';
+    const STATUS_BUILT                  = 'built';
+    const STATUS_INSTALLING             = 'installing';
+    const STATUS_INSTALLED              = 'installed';
+    const STATUS_USING                  = 'using';
+    const STATUS_USED                   = 'used';
+    const STATUS_OLD                    = 'old';
+    const STATUS_CANCELLING             = 'cancelling';
+    const STATUS_CANCELLED              = 'cancelled';
 
-    const MIGRATION_STATUS_NONE      = 'none';
-    const MIGRATION_STATUS_UPDATING  = 'updating';
-    const MIGRATION_STATUS_FAILED    = 'failed';
-    const MIGRATION_STATUS_UP        = 'up';
+    const MIGRATION_STATUS_NONE         = 'none';
+    const MIGRATION_STATUS_UPDATING     = 'updating';
+    const MIGRATION_STATUS_FAILED       = 'failed';
+    const MIGRATION_STATUS_UP           = 'up';
 
-    const BUILD_LOG_BUILD_ERROR      = 'build error';
-    const BUILD_LOG_BUILD_SUCCESS    = 'build success';
+    const BUILD_LOG_BUILD_ERROR         = 'build error';
+    const BUILD_LOG_BUILD_SUCCESS       = 'build success';
 
-    const BUILD_LOG_INSTALL_START    = 'install start';
-    const BUILD_LOG_INSTALL_ERROR    = 'install error';
-    const BUILD_LOG_INSTALL_SUCCESS  = 'install success';
+    const BUILD_LOG_INSTALL_START       = 'install start';
+    const BUILD_LOG_INSTALL_ERROR       = 'install error';
+    const BUILD_LOG_INSTALL_SUCCESS     = 'install success';
 
-    const BUILD_LOG_USING_START      = 'using start';
-    const BUILD_LOG_USING_ERROR      = 'using error';
-    const BUILD_LOG_USING_SUCCESS    = 'using success';
+    const BUILD_LOG_USING_START         = 'using start';
+    const BUILD_LOG_USING_ERROR         = 'using error';
+    const BUILD_LOG_USING_SUCCESS       = 'using success';
 
     const REDIS_KEY_FAIL_BUILD_COUNT = 'FailBuildCount:ReleaseRequestId:';
     const REDIS_KEY_FAIL_INSTALL_COUNT = 'FailInstallCount:ReleaseRequestId:';
@@ -766,6 +767,8 @@ class ReleaseRequest extends ActiveRecord
                     $this->rr_build_version,
                     $initiatorUserName,
                     $this->project->script_use,
+                    $this->project->script_post_use,
+                    $this->rr_cron_config,
                     $this->project->getProjectServersArray()
                 )
             );
