@@ -187,17 +187,17 @@ class Project extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'obj_id' => 'ID',
-            'obj_created' => 'Created',
-            'obj_modified' => 'Modified',
-            'obj_status_did' => 'Status Did',
-            'project_name' => 'Проект',
-            'project_notification_email' => 'Email оповещеиня о выкладке',
-            'project_notification_subject' => 'Тема оповещения о выкладке',
-            'projectserversarray' => 'Серверы для релиза',
-            'project_servers' => 'Серверы для релиза',
-            'script_migration_up' => 'Скрипт по выполнению всех миграций в данной сборке',
-            'script_migration_new' => 'Скрипт которвый выводит список всех невыполненных миграций',
+            'obj_id' => Yii::t('rds', 'id'),
+            'obj_created' => Yii::t('rds', 'create_date'),
+            'obj_modified' => Yii::t('rds', 'modify_date'),
+            'obj_status_did' => Yii::t('rds', 'status_id'),
+            'project_name' => Yii::t('rds', 'project'),
+            'project_notification_email' => Yii::t('rds', 'project_notification_email'),//'Email оповещеиня о выкладке',
+            'project_notification_subject' => Yii::t('rds', 'project_notification_subject'),//'Тема оповещения о выкладке',
+            'projectserversarray' => Yii::t('rds', 'release_servers'),//'Серверы для релиза',
+            'project_servers' => Yii::t('rds', 'release_servers'), //'Серверы для релиза',
+            'script_migration_up' => Yii::t('rds', 'script_migration_up'),//'Скрипт по выполнению всех миграций в данной сборке',
+            'script_migration_new' => Yii::t('rds', 'script_migration_new'),//'Скрипт которвый выводит список всех невыполненных миграций',
         ];
     }
 

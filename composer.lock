@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "78ace00ef9abf67094a375341ab14df8",
+    "content-hash": "e59023d8f7de7e6e40b4b8fd60d0656e",
     "packages": [
         {
             "name": "bazilio/yii2-stubs-generator",
@@ -97,60 +97,6 @@
                 "web"
             ],
             "time": "2016-07-25T15:51:55+00:00"
-        },
-        {
-            "name": "bower-asset/bootstrap3-dialog",
-            "version": "v1.35.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nakupanda/bootstrap3-dialog.git",
-                "reference": "3dd11d586f78de75356af418907ec6e3b347377c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nakupanda/bootstrap3-dialog/zipball/3dd11d586f78de75356af418907ec6e3b347377c",
-                "reference": "3dd11d586f78de75356af418907ec6e3b347377c",
-                "shasum": ""
-            },
-            "require": {
-                "bower-asset/bootstrap": ">=3.1.0",
-                "bower-asset/jquery": ">=1.9.0"
-            },
-            "type": "bower-asset-library",
-            "extra": {
-                "bower-asset-main": [
-                    "dist/less/bootstrap-dialog.less",
-                    "dist/css/bootstrap-dialog.min.css",
-                    "dist/js/bootstrap-dialog.min.js"
-                ],
-                "bower-asset-ignore": [
-                    "source",
-                    "spec",
-                    ".bowerrc",
-                    ".gitignore",
-                    ".jshintignore",
-                    ".jshintrc",
-                    "bower.json",
-                    "gruntfile.js",
-                    "package.json",
-                    "README.md"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "Make use of Bootstrap Modal more monkey-friendly. http://nakupanda.github.io/bootstrap3-dialog/",
-            "keywords": [
-                "css",
-                "framework",
-                "front-end",
-                "js",
-                "less",
-                "mobile-first",
-                "responsive",
-                "web"
-            ],
-            "time": "2017-03-24T01:21:30+00:00"
         },
         {
             "name": "bower-asset/codemirror",
@@ -925,16 +871,16 @@
         },
         {
             "name": "fxp/composer-asset-plugin",
-            "version": "v1.4.2",
+            "version": "v1.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fxpio/composer-asset-plugin.git",
-                "reference": "61352d99940d2b2392a5d2db83b8c0ef5faf222a"
+                "reference": "886ece037849d3935c5a34cdcd984e46f2de5fae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/61352d99940d2b2392a5d2db83b8c0ef5faf222a",
-                "reference": "61352d99940d2b2392a5d2db83b8c0ef5faf222a",
+                "url": "https://api.github.com/repos/fxpio/composer-asset-plugin/zipball/886ece037849d3935c5a34cdcd984e46f2de5fae",
+                "reference": "886ece037849d3935c5a34cdcd984e46f2de5fae",
                 "shasum": ""
             },
             "require": {
@@ -942,7 +888,7 @@
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "composer/composer": "^1.4.0"
+                "composer/composer": "^1.6.0"
             },
             "type": "composer-plugin",
             "extra": {
@@ -980,25 +926,25 @@
                 "npm",
                 "package"
             ],
-            "time": "2017-10-20T06:53:56+00:00"
+            "time": "2019-08-08T18:36:07+00:00"
         },
         {
-            "name": "kartik-v/yii2-dialog",
-            "version": "v1.0.3",
+            "name": "kartik-v/yii2-bootstrap4-dropdown",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/kartik-v/yii2-dialog.git",
-                "reference": "ae6de7328251b084de7f1a66bac1f7c6279c9ad1"
+                "url": "https://github.com/kartik-v/yii2-bootstrap4-dropdown.git",
+                "reference": "d30830aa7bcf81b05416e34cbcb5437997676a56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-dialog/zipball/ae6de7328251b084de7f1a66bac1f7c6279c9ad1",
-                "reference": "ae6de7328251b084de7f1a66bac1f7c6279c9ad1",
+                "url": "https://api.github.com/repos/kartik-v/yii2-bootstrap4-dropdown/zipball/d30830aa7bcf81b05416e34cbcb5437997676a56",
+                "reference": "d30830aa7bcf81b05416e34cbcb5437997676a56",
                 "shasum": ""
             },
             "require": {
-                "bower-asset/bootstrap3-dialog": "~1.34",
-                "kartik-v/yii2-krajee-base": "~1.7"
+                "kartik-v/yii2-krajee-base": ">=1.9",
+                "yiisoft/yii2-bootstrap4": "*"
             },
             "type": "yii2-extension",
             "extra": {
@@ -1008,7 +954,58 @@
             },
             "autoload": {
                 "psr-4": {
-                    "kartik\\dialog\\": ""
+                    "kartik\\bs4dropdown\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Enhanced Bootstrap 4 dropdown widget for Yii2 with nested submenu support",
+            "homepage": "https://github.com/kartik-v/yii2-bootstrap4-dropdown",
+            "keywords": [
+                "bootstrap",
+                "dropdown",
+                "jquery",
+                "nested",
+                "submenu",
+                "yii2"
+            ],
+            "time": "2018-09-16T12:11:47+00:00"
+        },
+        {
+            "name": "kartik-v/yii2-dialog",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-dialog.git",
+                "reference": "6afae03a4d9f7b99ddc173d2a29dd6e3cc1c56cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-dialog/zipball/6afae03a4d9f7b99ddc173d2a29dd6e3cc1c56cb",
+                "reference": "6afae03a4d9f7b99ddc173d2a29dd6e3cc1c56cb",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/yii2-krajee-base": "~1.9"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "kartik\\dialog\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1032,25 +1029,25 @@
                 "modal",
                 "yii2"
             ],
-            "time": "2017-11-06T16:04:54+00:00"
+            "time": "2018-09-06T19:34:03+00:00"
         },
         {
             "name": "kartik-v/yii2-grid",
-            "version": "v3.1.6",
+            "version": "v3.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-grid.git",
-                "reference": "b74e17902f99fb52c26cee678567b53f12eb8f7b"
+                "reference": "e4ba0c68ecb864e1a158f16cc73a5e73a6cdf7c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-grid/zipball/b74e17902f99fb52c26cee678567b53f12eb8f7b",
-                "reference": "b74e17902f99fb52c26cee678567b53f12eb8f7b",
+                "url": "https://api.github.com/repos/kartik-v/yii2-grid/zipball/e4ba0c68ecb864e1a158f16cc73a5e73a6cdf7c7",
+                "reference": "e4ba0c68ecb864e1a158f16cc73a5e73a6cdf7c7",
                 "shasum": ""
             },
             "require": {
-                "kartik-v/yii2-dialog": "~1.0",
-                "kartik-v/yii2-krajee-base": "~1.7"
+                "kartik-v/yii2-bootstrap4-dropdown": "~1.0",
+                "kartik-v/yii2-dialog": "~1.0"
             },
             "suggest": {
                 "kartik-v/yii2-mpdf": "For exporting grids to PDF"
@@ -1058,12 +1055,12 @@
             "type": "yii2-extension",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.1.x-dev"
+                    "dev-master": "3.3.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "kartik\\grid\\": ""
+                    "kartik\\grid\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1085,20 +1082,26 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2017-10-22T17:25:19+00:00"
+            "funding": [
+                {
+                    "url": "https://opencollective.com/yii2-grid",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2020-03-27T11:31:59+00:00"
         },
         {
             "name": "kartik-v/yii2-krajee-base",
-            "version": "v1.8.9",
+            "version": "v1.9.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-krajee-base.git",
-                "reference": "0cafe6376780cedcd00f52c9d82b172d5851f6b0"
+                "reference": "1693374160c24443524ddc23508d2eb2955443f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-krajee-base/zipball/0cafe6376780cedcd00f52c9d82b172d5851f6b0",
-                "reference": "0cafe6376780cedcd00f52c9d82b172d5851f6b0",
+                "url": "https://api.github.com/repos/kartik-v/yii2-krajee-base/zipball/1693374160c24443524ddc23508d2eb2955443f4",
+                "reference": "1693374160c24443524ddc23508d2eb2955443f4",
                 "shasum": ""
             },
             "require": {
@@ -1107,12 +1110,12 @@
             "type": "yii2-extension",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.8.x-dev"
+                    "dev-master": "1.9.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "kartik\\base\\": ""
+                    "kartik\\base\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1136,7 +1139,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2017-09-29T06:18:14+00:00"
+            "time": "2018-09-27T18:02:35+00:00"
         },
         {
             "name": "kartik-v/yii2-widget-select2",
@@ -1248,6 +1251,542 @@
                 "yii2"
             ],
             "time": "2017-03-30T15:37:10+00:00"
+        },
+        {
+            "name": "npm-asset/babel--runtime",
+            "version": "v7.12.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/babel/babel.git",
+                "reference": "d88c60cea9ef2db7e53a27126c9cf2db7d75efa3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/babel/babel/zipball/d88c60cea9ef2db7e53a27126c9cf2db7d75efa3",
+                "reference": "d88c60cea9ef2db7e53a27126c9cf2db7d75efa3",
+                "shasum": ""
+            },
+            "require-dev": {
+                "npm-asset/babel--cli": ">=7.12.0,<8.0.0",
+                "npm-asset/babel--core": ">=7.12.0,<8.0.0",
+                "npm-asset/babel--eslint-config-internal": "dev-workspace:*",
+                "npm-asset/babel--eslint-parser": "dev-workspace:*",
+                "npm-asset/babel--eslint-plugin-development": "dev-workspace:*",
+                "npm-asset/babel--eslint-plugin-development-internal": "dev-workspace:*",
+                "npm-asset/babel--plugin-proposal-export-namespace-from": ">=7.12.1,<8.0.0",
+                "npm-asset/babel--plugin-proposal-object-rest-spread": ">=7.11.0,<8.0.0",
+                "npm-asset/babel--plugin-transform-for-of": ">=7.10.4,<8.0.0",
+                "npm-asset/babel--plugin-transform-modules-commonjs": ">=7.10.4,<8.0.0",
+                "npm-asset/babel--plugin-transform-runtime": ">=7.12.0,<8.0.0",
+                "npm-asset/babel--preset-env": ">=7.12.0,<8.0.0",
+                "npm-asset/babel--preset-flow": ">=7.10.4,<8.0.0",
+                "npm-asset/babel--preset-typescript": ">=7.12.1,<8.0.0",
+                "npm-asset/babel--register": ">=7.12.0,<8.0.0",
+                "npm-asset/babel--runtime": ">=7.12.0,<8.0.0",
+                "npm-asset/babel-plugin-transform-charcodes": ">=0.2.0,<0.3.0",
+                "npm-asset/chalk": ">=2.4.2,<3.0.0",
+                "npm-asset/charcodes": ">=0.2.0,<0.3.0",
+                "npm-asset/eslint": ">=7.5.0,<8.0.0",
+                "npm-asset/eslint-import-resolver-node": ">=0.3.3,<0.4.0",
+                "npm-asset/eslint-plugin-flowtype": ">=4.6.0,<5.0.0",
+                "npm-asset/eslint-plugin-import": ">=2.22.0,<3.0.0",
+                "npm-asset/eslint-plugin-jest": ">=23.8.2,<24.0.0",
+                "npm-asset/eslint-plugin-prettier": ">=3.1.2,<4.0.0",
+                "npm-asset/fancy-log": ">=1.3.3,<2.0.0",
+                "npm-asset/flow-bin": ">=0.123.0,<0.124.0",
+                "npm-asset/gulp": ">=4.0.2,<5.0.0",
+                "npm-asset/gulp-babel": ">=8.0.0,<9.0.0",
+                "npm-asset/gulp-filter": ">=5.1.0,<6.0.0",
+                "npm-asset/gulp-newer": ">=1.0.0,<2.0.0",
+                "npm-asset/gulp-plumber": ">=1.2.1,<2.0.0",
+                "npm-asset/husky": ">=3.0.0,<4.0.0",
+                "npm-asset/jest": ">=26.6.1,<27.0.0",
+                "npm-asset/lerna-changelog": ">=0.5.0,<0.6.0",
+                "npm-asset/lint-staged": ">=9.2.0,<10.0.0",
+                "npm-asset/lodash": ">=4.17.20,<5.0.0",
+                "npm-asset/mergeiterator": ">=1.2.5,<2.0.0",
+                "npm-asset/prettier": ">=2.0.5,<3.0.0",
+                "npm-asset/rollup": ">=2.26.5,<3.0.0",
+                "npm-asset/rollup--plugin-babel": ">=5.2.0,<6.0.0",
+                "npm-asset/rollup--plugin-commonjs": ">=13.0.0,<14.0.0",
+                "npm-asset/rollup--plugin-json": ">=4.1.0,<5.0.0",
+                "npm-asset/rollup--plugin-node-resolve": ">=9.0.0,<10.0.0",
+                "npm-asset/rollup--plugin-replace": ">=2.3.3,<3.0.0",
+                "npm-asset/rollup-plugin-dts": ">=2.0.0,<3.0.0",
+                "npm-asset/rollup-plugin-node-polyfills": ">=0.2.1,<0.3.0",
+                "npm-asset/rollup-plugin-terser": ">=7.0.0,<8.0.0",
+                "npm-asset/test262-stream": ">=1.3.0,<2.0.0",
+                "npm-asset/through2": ">=2.0.0,<3.0.0",
+                "npm-asset/typescript": ">=4.0.5,<5.0.0",
+                "npm-asset/typescript-eslint--eslint-plugin": ">=4.6.1,<5.0.0",
+                "npm-asset/typescript-eslint--parser": ">=4.6.1,<5.0.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-scripts": {
+                    "bootstrap": "make bootstrap",
+                    "codesandbox:build": "make build-no-bundle",
+                    "build": "make build",
+                    "fix": "make fix",
+                    "lint": "make lint",
+                    "test": "make test",
+                    "version": "yarn --immutable-cache && git add yarn.lock",
+                    "test:esm": "node test/esm/index.mjs"
+                },
+                "npm-asset-engines": {
+                    "node": ">= 6.9.0",
+                    "yarn": ">=1.4.0"
+                },
+                "npm-asset-private": true
+            },
+            "license": [
+                "MIT"
+            ],
+            "time": "2020-12-23T13:55:59+00:00"
+        },
+        {
+            "name": "npm-asset/bootstrap",
+            "version": "4.5.3",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/bootstrap/-/bootstrap-4.5.3.tgz",
+                "shasum": "c6a72b355aaf323920be800246a6e4ef30997fe6"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/twbs/bootstrap/issues"
+                },
+                "npm-asset-main": "dist/js/bootstrap.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/twbs/bootstrap.git"
+                },
+                "npm-asset-scripts": {
+                    "start": "npm-run-all --parallel watch docs-serve",
+                    "bundlewatch": "bundlewatch --config .bundlewatch.config.json",
+                    "css": "npm-run-all css-compile css-prefix css-minify css-copy",
+                    "css-copy": "cross-env-shell shx mkdir -p site/docs/$npm_package_version_short/dist/ && cross-env-shell shx cp -r dist/css/ site/docs/$npm_package_version_short/dist/",
+                    "css-main": "npm-run-all css-lint css-compile-main css-prefix-main css-minify-main css-copy",
+                    "css-docs": "npm-run-all css-compile-docs css-prefix-docs css-minify-docs",
+                    "css-compile": "npm-run-all --parallel css-compile-*",
+                    "css-compile-main": "node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 scss/ -o dist/css/ && npm run css-copy",
+                    "css-compile-docs": "cross-env-shell node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 site/docs/$npm_package_version_short/assets/scss/docs.scss site/docs/$npm_package_version_short/assets/css/docs.min.css",
+                    "css-lint": "npm-run-all --continue-on-error --parallel css-lint-*",
+                    "css-lint-main": "stylelint \"scss/**/*.scss\" --cache --cache-location .cache/.stylelintcache --rd",
+                    "css-lint-docs": "stylelint \"site/docs/**/assets/scss/*.scss\" \"site/docs/**/*.css\" --cache --cache-location .cache/.stylelintcache",
+                    "css-lint-vars": "fusv scss/ site/docs/",
+                    "css-minify": "npm-run-all --parallel css-minify-*",
+                    "css-minify-main": "cleancss --level 1 --format breakWith=lf --source-map --source-map-inline-sources --output dist/css/bootstrap.min.css dist/css/bootstrap.css && cleancss --level 1 --format breakWith=lf --source-map --source-map-inline-sources --output dist/css/bootstrap-grid.min.css dist/css/bootstrap-grid.css && cleancss --level 1 --format breakWith=lf --source-map --source-map-inline-sources --output dist/css/bootstrap-reboot.min.css dist/css/bootstrap-reboot.css",
+                    "css-minify-docs": "cross-env-shell cleancss --level 1 --format breakWith=lf --source-map --source-map-inline-sources --output site/docs/$npm_package_version_short/assets/css/docs.min.css site/docs/$npm_package_version_short/assets/css/docs.min.css",
+                    "css-prefix": "npm-run-all --parallel css-prefix-*",
+                    "css-prefix-main": "postcss --config build/postcss.config.js --replace \"dist/css/*.css\" \"!dist/css/*.min.css\"",
+                    "css-prefix-docs": "postcss --config build/postcss.config.js --replace \"site/docs/**/*.css\"",
+                    "js": "npm-run-all js-compile js-minify js-copy",
+                    "js-copy": "cross-env-shell shx mkdir -p site/docs/$npm_package_version_short/dist/ && cross-env-shell shx cp -r dist/js/ site/docs/$npm_package_version_short/dist/",
+                    "js-main": "npm-run-all js-lint js-compile js-minify-main",
+                    "js-docs": "npm-run-all js-lint-docs js-minify-docs",
+                    "js-compile": "npm-run-all --parallel js-compile-* --sequential js-copy",
+                    "js-compile-standalone": "rollup --environment BUNDLE:false --config build/rollup.config.js --sourcemap",
+                    "js-compile-bundle": "rollup --environment BUNDLE:true --config build/rollup.config.js --sourcemap",
+                    "js-compile-plugins": "node build/build-plugins.js",
+                    "js-compile-plugins-coverage": "cross-env NODE_ENV=test node build/build-plugins.js",
+                    "js-lint": "npm-run-all --continue-on-error --parallel js-lint-*",
+                    "js-lint-main": "eslint --report-unused-disable-directives --cache --cache-location .cache/.eslintcache js/src js/tests build/",
+                    "js-lint-docs": "eslint --report-unused-disable-directives --cache --cache-location .cache/.eslintcache site/",
+                    "js-minify": "npm-run-all --parallel js-minify-main js-minify-docs",
+                    "js-minify-main": "npm-run-all js-minify-standalone js-minify-bundle",
+                    "js-minify-standalone": "terser --compress typeofs=false --mangle --comments \"/^!/\" --source-map \"content=dist/js/bootstrap.js.map,includeSources,url=bootstrap.min.js.map\" --output dist/js/bootstrap.min.js dist/js/bootstrap.js",
+                    "js-minify-bundle": "terser --compress typeofs=false --mangle --comments \"/^!/\" --source-map \"content=dist/js/bootstrap.bundle.js.map,includeSources,url=bootstrap.bundle.min.js.map\" --output dist/js/bootstrap.bundle.min.js dist/js/bootstrap.bundle.js",
+                    "js-minify-docs": "cross-env-shell terser --mangle --comments \\\"/^!/\\\" --output site/docs/$npm_package_version_short/assets/js/docs.min.js site/docs/$npm_package_version_short/assets/js/vendor/anchor.min.js site/docs/$npm_package_version_short/assets/js/vendor/clipboard.min.js site/docs/$npm_package_version_short/assets/js/vendor/bs-custom-file-input.min.js \"site/docs/$npm_package_version_short/assets/js/src/*.js\"",
+                    "js-test": "npm-run-all js-test-karma* js-test-integration",
+                    "js-test-karma": "karma start js/tests/karma.conf.js",
+                    "js-test-karma-old": "cross-env USE_OLD_JQUERY=true npm run js-test-karma",
+                    "js-test-karma-bundle": "cross-env BUNDLE=true npm run js-test-karma",
+                    "js-test-karma-bundle-old": "cross-env BUNDLE=true USE_OLD_JQUERY=true npm run js-test-karma",
+                    "js-test-integration": "rollup --config js/tests/integration/rollup.bundle.js",
+                    "js-test-cloud": "cross-env BROWSER=true npm run js-test-karma",
+                    "lint": "npm-run-all --parallel js-lint css-lint lockfile-lint",
+                    "docs": "npm-run-all css-docs js-docs docs-build docs-lint",
+                    "docs-build": "bundle exec jekyll build",
+                    "docs-compile": "npm run docs-build",
+                    "docs-production": "cross-env JEKYLL_ENV=production npm run docs-build",
+                    "docs-netlify": "cross-env JEKYLL_ENV=netlify npm run docs-build",
+                    "docs-linkinator": "linkinator _gh_pages --recurse --silent --skip \"^(?!http://localhost)\"",
+                    "docs-vnu": "node build/vnu-jar.js",
+                    "docs-lint": "npm-run-all --parallel docs-vnu docs-linkinator",
+                    "docs-serve": "bundle exec jekyll serve",
+                    "docs-serve-only": "npm run docs-serve -- --skip-initial-build --no-watch",
+                    "lockfile-lint": "lockfile-lint --allowed-hosts npm --allowed-schemes https: --empty-hostname false --type npm --path package-lock.json",
+                    "update-deps": "ncu -u -x \"jquery,karma-browserstack-launcher,sinon\" && npm update && bundle update && cross-env-shell echo Manually update \\\"site/docs/$npm_package_version_short/assets/js/vendor/\\\"",
+                    "release": "npm-run-all dist release-sri docs-production release-zip*",
+                    "release-sri": "node build/generate-sri.js",
+                    "release-version": "node build/change-version.js",
+                    "release-zip": "cross-env-shell \"shx rm -rf bootstrap-$npm_package_version-dist && shx cp -r dist/ bootstrap-$npm_package_version-dist && zip -r9 bootstrap-$npm_package_version-dist.zip bootstrap-$npm_package_version-dist && shx rm -rf bootstrap-$npm_package_version-dist\"",
+                    "release-zip-examples": "node build/zip-examples.js",
+                    "dist": "npm-run-all --parallel css js",
+                    "test": "npm-run-all lint dist js-test docs-build docs-lint",
+                    "netlify": "npm-run-all dist release-sri docs-netlify",
+                    "watch": "npm-run-all --parallel watch-*",
+                    "watch-css-main": "nodemon --watch scss/ --ext scss --exec \"npm run css-main\"",
+                    "watch-css-docs": "nodemon --watch \"site/docs/**/assets/scss/\" --ext scss --exec \"npm run css-docs\"",
+                    "watch-js-main": "nodemon --watch js/src/ --ext js --exec \"npm run js-compile\"",
+                    "watch-js-docs": "nodemon --watch \"site/docs/**/assets/js/src/\" --ext js --exec \"npm run js-docs\""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "The Bootstrap Authors",
+                    "url": "https://github.com/twbs/bootstrap/graphs/contributors"
+                },
+                {
+                    "name": "Twitter, Inc."
+                }
+            ],
+            "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+            "homepage": "https://getbootstrap.com/",
+            "keywords": [
+                "css",
+                "framework",
+                "front-end",
+                "mobile-first",
+                "responsive",
+                "sass",
+                "web"
+            ],
+            "time": "2020-10-13T15:56:30+00:00"
+        },
+        {
+            "name": "npm-asset/i18next",
+            "version": "19.8.4",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/i18next/-/i18next-19.8.4.tgz",
+                "shasum": "447718f2a26319b8debdbcc6fbc1a9761be7316b"
+            },
+            "require": {
+                "npm-asset/babel--runtime": ">=7.12.0,<8.0.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/i18next/i18next/issues"
+                },
+                "npm-asset-main": "./dist/cjs/i18next.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/i18next/i18next.git"
+                },
+                "npm-asset-scripts": {
+                    "pretest": "npm run test:typescript && npm run test:typescript:noninterop",
+                    "test": "npm run test:new && npm run test:compat",
+                    "test:new": "karma start karma.conf.js --singleRun",
+                    "test:compat": "karma start karma.backward.conf.js --singleRun",
+                    "test:typescript": "tslint --project tsconfig.json",
+                    "test:typescript:noninterop": "tslint --project tsconfig.nonEsModuleInterop.json",
+                    "tdd": "karma start karma.conf.js",
+                    "tdd:compat": "karma start karma.backward.conf.js",
+                    "build": "rimraf dist && rollup -c && cpy \"./dist/umd/*.js\" ./",
+                    "preversion": "npm run test && npm run build && git push",
+                    "postversion": "git push && git push --tags",
+                    "prettier": "prettier --write \"{,**/}*.{ts,tsx,js,json,md}\""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Mühlemann",
+                    "email": "jan.muehlemann@gmail.com",
+                    "url": "https://github.com/jamuhl"
+                }
+            ],
+            "description": "i18next internationalization framework",
+            "homepage": "http://i18next.com",
+            "keywords": [
+                "gettext",
+                "globalization",
+                "i18n",
+                "i18next",
+                "internationalization",
+                "l10n",
+                "localization",
+                "translation"
+            ],
+            "time": "2020-11-18T16:59:40+00:00"
+        },
+        {
+            "name": "npm-asset/i18next-http-backend",
+            "version": "1.0.21",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/i18next-http-backend/-/i18next-http-backend-1.0.21.tgz",
+                "shasum": "cee901b3527dad5165fa91de973b6aa6404c1c37"
+            },
+            "require": {
+                "npm-asset/node-fetch": "2.6.1"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/i18next/i18next-http-backend/issues"
+                },
+                "npm-asset-main": "./cjs/index.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+ssh://git@github.com/i18next/i18next-http-backend.git"
+                },
+                "npm-asset-scripts": {
+                    "lint": "eslint .",
+                    "compile:esm": "rm -rf esm && mkdir esm && BABEL_ENV=esm babel lib -d esm && cp lib/getFetch.cjs esm/getFetch.cjs",
+                    "compile:cjs": "rm -rf cjs && mkdir cjs && BABEL_ENV=cjs babel lib -d cjs && echo '{\"type\":\"commonjs\"}' > cjs/package.json && cp lib/getFetch.cjs cjs/getFetch.js && node -e \"fs.writeFileSync('cjs/request.js', fs.readFileSync('cjs/request.js').toString().replace('getFetch.cjs', 'getFetch.js'))\"",
+                    "compile": "npm run compile:esm && npm run compile:cjs",
+                    "browser": "browserify --ignore node-fetch --standalone i18nextHttpBackend cjs/index.js -o i18nextHttpBackend.js && uglifyjs i18nextHttpBackend.js --compress --mangle -o i18nextHttpBackend.min.js",
+                    "build": "npm run compile && npm run browser",
+                    "test:xmlhttpreq": "mocha test -R spec --require test/fixtures/xmlHttpRequest.cjs --exit --experimental-modules",
+                    "test:fetch": "mocha test -R spec --exit --experimental-modules",
+                    "test": "npm run lint && npm run build && npm run test:fetch && npm run test:xmlhttpreq",
+                    "test:deno": "deno test test/deno/*.js --allow-net --no-check",
+                    "preversion": "npm run test && npm run build && git push",
+                    "postversion": "git push && git push --tags"
+                },
+                "npm-asset-private": false
+            },
+            "description": "i18next-http-backend is a backend layer for i18next using in Node.js, in the browser and for Deno.",
+            "homepage": "https://github.com/i18next/i18next-http-backend",
+            "keywords": [
+                "i18next",
+                "i18next-backend",
+                "i18next-http-backend"
+            ],
+            "time": "2020-09-22T08:23:07+00:00"
+        },
+        {
+            "name": "npm-asset/i18next-icu",
+            "version": "1.4.2",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/i18next-icu/-/i18next-icu-1.4.2.tgz",
+                "shasum": "2b79d1ac2c2d542725219beac34a74db15cd2ff9"
+            },
+            "require": {
+                "npm-asset/intl-messageformat": "2.2.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/i18next/i18next-icu/issues"
+                },
+                "npm-asset-main": "./index.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/i18next/i18next-icu.git"
+                },
+                "npm-asset-scripts": {
+                    "test": "tsc --noEmit && jest --coverage --runInBand --ci",
+                    "tdd": "jest --watch",
+                    "clean": "rimraf dist && mkdirp dist && rimraf locale-data",
+                    "copyLocale": "cp -R ./node_modules/react-intl/locale-data ./",
+                    "copy": "cp ./dist/umd/i18nextICU.min.js ./i18nextICU.min.js && cp ./dist/umd/i18nextICU.js ./i18nextICU.js",
+                    "copy-win": "xcopy .\\dist\\umd\\i18nextICU.min.js .\\i18nextICU.min.js /y && xcopy .\\dist\\umd\\i18nextICU.js .\\i18nextICU.js /y",
+                    "build:es": "BABEL_ENV=jsnext babel src --out-dir dist/es",
+                    "build:es-win": "SET BABEL_ENV=jsnext babel src --out-dir dist/es",
+                    "build:cjs": "babel src --out-dir dist/commonjs",
+                    "build:umd": "rollup -c rollup.config.js --format umd && rollup -c rollup.config.js --format umd --uglify",
+                    "build:amd": "rollup -c rollup.config.js --format amd && rollup -c rollup.config.js --format umd --uglify",
+                    "build:iife": "rollup -c rollup.config.js --format iife && rollup -c rollup.config.js --format iife --uglify",
+                    "build": "npm run clean && npm run build:cjs && npm run build:es && npm run build:umd && npm run copy && npm run copyLocale",
+                    "build-win": "npm run clean && npm run build:cjs && npm run build:es-win && npm run build:umd && npm run copy-win",
+                    "preversion": "npm run test && npm run build && git push",
+                    "postversion": "git push && git push --tags"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Mühlemann",
+                    "email": "jan.muehlemann@gmail.com",
+                    "url": "https://github.com/jamuhl"
+                }
+            ],
+            "description": "i18nFormat plugin to use ICU format with i18next",
+            "homepage": "https://github.com/i18next/i18next-icu",
+            "keywords": [
+                "i18next",
+                "i18next-format"
+            ],
+            "time": "2020-06-12T06:05:00+00:00"
+        },
+        {
+            "name": "npm-asset/intl-messageformat",
+            "version": "2.2.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/intl-messageformat/-/intl-messageformat-2.2.0.tgz",
+                "shasum": "345bcd46de630b7683330c2e52177ff5eab484fc"
+            },
+            "require": {
+                "npm-asset/intl-messageformat-parser": "1.4.0"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/yahoo/intl-messageformat/issues"
+                },
+                "npm-asset-main": "index.js",
+                "npm-asset-directories": {
+                    "test": "tests"
+                },
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+ssh://git@github.com/yahoo/intl-messageformat.git"
+                },
+                "npm-asset-scripts": {
+                    "test": "istanbul cover -x lib/locales.js -- _mocha tests/runner.js --reporter spec",
+                    "travis": "istanbul cover -x lib/locales.js -- _mocha tests/runner.js --reporter spec && tests/saucelabs.sh",
+                    "prepublish": "grunt"
+                }
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Eric Ferraiuolo",
+                    "email": "eferraiuolo@gmail.com"
+                },
+                {
+                    "name": "Drew Folta",
+                    "email": "drew@folta.net"
+                },
+                {
+                    "name": "Caridy Patino",
+                    "email": "caridy@gmail.com"
+                },
+                {
+                    "name": "Anthony Pipkin",
+                    "email": "a.pipkin@yahoo.com"
+                }
+            ],
+            "description": "Formats ICU Message strings with number, date, plural, and select placeholders to create localized messages.",
+            "homepage": "https://github.com/yahoo/intl-messageformat",
+            "keywords": [
+                "globalization",
+                "i18n",
+                "icu",
+                "internationalization",
+                "intl",
+                "localization",
+                "messageformat",
+                "parser",
+                "plural"
+            ],
+            "time": "2017-10-31T09:01:18+00:00"
+        },
+        {
+            "name": "npm-asset/intl-messageformat-parser",
+            "version": "1.4.0",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/intl-messageformat-parser/-/intl-messageformat-parser-1.4.0.tgz",
+                "shasum": "b43d45a97468cadbe44331d74bb1e8dea44fc075"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/yahoo/intl-messageformat-parser/issues"
+                },
+                "npm-asset-main": "index.js",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git://github.com/yahoo/intl-messageformat-parser.git"
+                },
+                "npm-asset-scripts": {
+                    "test": "istanbul cover -- _mocha test/unit/ --reporter spec",
+                    "prepublish": "grunt"
+                }
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Eric Ferraiuolo",
+                    "email": "eferraiuolo@gmail.com"
+                }
+            ],
+            "description": "Parses ICU Message strings into an AST via JavaScript.",
+            "homepage": "https://github.com/yahoo/intl-messageformat-parser",
+            "keywords": [
+                "globalization",
+                "i18n",
+                "icu",
+                "internationalization",
+                "intl",
+                "localization",
+                "messageformat",
+                "parser",
+                "plural"
+            ],
+            "time": "2017-10-23T12:39:46+00:00"
+        },
+        {
+            "name": "npm-asset/node-fetch",
+            "version": "2.6.1",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.1.tgz",
+                "shasum": "045bd323631f76ed2e2b55573394416b639a0052"
+            },
+            "type": "npm-asset-library",
+            "extra": {
+                "npm-asset-bugs": {
+                    "url": "https://github.com/bitinn/node-fetch/issues"
+                },
+                "npm-asset-main": "lib/index",
+                "npm-asset-directories": [],
+                "npm-asset-repository": {
+                    "type": "git",
+                    "url": "git+https://github.com/bitinn/node-fetch.git"
+                },
+                "npm-asset-scripts": {
+                    "build": "cross-env BABEL_ENV=rollup rollup -c",
+                    "prepare": "npm run build",
+                    "test": "cross-env BABEL_ENV=test mocha --require babel-register --throw-deprecation test/test.js",
+                    "report": "cross-env BABEL_ENV=coverage nyc --reporter lcov --reporter text mocha -R spec test/test.js",
+                    "coverage": "cross-env BABEL_ENV=coverage nyc --reporter json --reporter text mocha -R spec test/test.js && codecov -f coverage/coverage-final.json"
+                },
+                "npm-asset-engines": {
+                    "node": "4.x || >=6.0.0"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "David Frank"
+                }
+            ],
+            "description": "A light-weight module that brings window.fetch to node.js",
+            "homepage": "https://github.com/bitinn/node-fetch",
+            "keywords": [
+                "fetch",
+                "http",
+                "promise"
+            ],
+            "time": "2020-09-05T13:00:44+00:00"
         },
         {
             "name": "php-amqplib/php-amqplib",
@@ -1854,6 +2393,99 @@
             "time": "2017-10-09T19:48:22+00:00"
         },
         {
+            "name": "yiisoft/yii2-bootstrap4",
+            "version": "2.0.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yiisoft/yii2-bootstrap4.git",
+                "reference": "a75555e4a888508416fadfd0a2b94881342cdd45"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap4/zipball/a75555e4a888508416fadfd0a2b94881342cdd45",
+                "reference": "a75555e4a888508416fadfd0a2b94881342cdd45",
+                "shasum": ""
+            },
+            "require": {
+                "npm-asset/bootstrap": "^4.3",
+                "yiisoft/yii2": "~2.0"
+            },
+            "require-dev": {
+                "cweagans/composer-patches": "^1.7",
+                "phpunit/phpunit": "4.8.34",
+                "yiisoft/yii2-coding-standards": "~2.0"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                },
+                "patches": {
+                    "phpunit/phpunit-mock-objects": {
+                        "Fix PHP 7 and 8 compatibility": "https://yiisoft.github.io/phpunit-patches/phpunit_mock_objects.patch"
+                    },
+                    "phpunit/phpunit": {
+                        "Fix PHP 7 compatibility": "https://yiisoft.github.io/phpunit-patches/phpunit_php7.patch",
+                        "Fix PHP 8 compatibility": "https://yiisoft.github.io/phpunit-patches/phpunit_php8.patch"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "yii\\bootstrap4\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Qiang Xue",
+                    "email": "qiang.xue@gmail.com",
+                    "homepage": "http://www.yiiframework.com/"
+                },
+                {
+                    "name": "Alexander Makarov",
+                    "email": "sam@rmcreative.ru",
+                    "homepage": "http://rmcreative.ru/"
+                },
+                {
+                    "name": "Antonio Ramirez",
+                    "email": "amigo.cobos@gmail.com"
+                },
+                {
+                    "name": "Paul Klimov",
+                    "email": "klimov.paul@gmail.com"
+                },
+                {
+                    "name": "Simon Karlen",
+                    "email": "simi.albi@outlook.com"
+                }
+            ],
+            "description": "The Twitter Bootstrap extension for the Yii framework",
+            "keywords": [
+                "bootstrap",
+                "bootstrap4",
+                "yii2"
+            ],
+            "funding": [
+                {
+                    "url": "https://github.com/yiisoft",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/yiisoft",
+                    "type": "open_collective"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/yiisoft/yii2-bootstrap4",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-11-10T12:37:27+00:00"
+        },
+        {
             "name": "yiisoft/yii2-composer",
             "version": "2.0.5",
             "source": {
@@ -2107,6 +2739,60 @@
         }
     ],
     "packages-dev": [
+        {
+            "name": "bower-asset/bootstrap3-dialog",
+            "version": "v1.35.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nakupanda/bootstrap3-dialog.git",
+                "reference": "3dd11d586f78de75356af418907ec6e3b347377c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nakupanda/bootstrap3-dialog/zipball/3dd11d586f78de75356af418907ec6e3b347377c",
+                "reference": "3dd11d586f78de75356af418907ec6e3b347377c",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/bootstrap": ">=3.1.0",
+                "bower-asset/jquery": ">=1.9.0"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "dist/less/bootstrap-dialog.less",
+                    "dist/css/bootstrap-dialog.min.css",
+                    "dist/js/bootstrap-dialog.min.js"
+                ],
+                "bower-asset-ignore": [
+                    "source",
+                    "spec",
+                    ".bowerrc",
+                    ".gitignore",
+                    ".jshintignore",
+                    ".jshintrc",
+                    "bower.json",
+                    "gruntfile.js",
+                    "package.json",
+                    "README.md"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Make use of Bootstrap Modal more monkey-friendly. http://nakupanda.github.io/bootstrap3-dialog/",
+            "keywords": [
+                "css",
+                "framework",
+                "front-end",
+                "js",
+                "less",
+                "mobile-first",
+                "responsive",
+                "web"
+            ],
+            "time": "2017-03-24T01:21:30+00:00"
+        },
         {
             "name": "doctrine/instantiator",
             "version": "1.4.0",
@@ -4112,7 +4798,9 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.2"
+        "php": ">=7.2",
+        "ext-json": "*",
+        "ext-intl": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"

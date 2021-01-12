@@ -5,6 +5,7 @@
  * Что бы его переопределить для себя используйте protected/config/config.local.php
  */
 
+use kartik\grid\Module;
 use whotrades\rds\services\DeployService;
 use whotrades\rds\services\DeployServiceInterface;
 use whotrades\RdsSystem\lib\WebErrorHandler;
@@ -37,7 +38,7 @@ $config = array(
             'allowedIPs' => array('192.168.*', '10.0.2.2'),
         ),
         'gridview' =>  [
-            'class' => \kartik\grid\Module::class,
+            'class' => Module::class,
         ],
         'user' => [
             'class' => dektrium\user\Module::class,
@@ -209,7 +210,21 @@ $config = array(
         ],
         'migrationService' => [
             'class' => MigrationService::class,
-        ]
+        ],
+        'i18n' => [
+            'translations' => [
+                'rds*' => [
+                    'class' => 'yii\i18n\PhpMessageSource',//PhpMessageSource::class,
+                    'basePath' => '@app/translations',
+                    'sourceLanguage' => 'art-US', // We're using artificial language to use invariant placeholders instead of `real` phrases.
+                    'forceTranslation' => true,
+                    'fileMap' => [
+                        'rds' => 'rds.php',
+                        'rds/errors' => 'errors.php',
+                    ],
+                ],
+            ],
+        ],
     ),
 
     'params' => array(
