@@ -44,16 +44,30 @@
         "mito/yii2-sentry": "~1.0.0",
         "dektrium/yii2-rbac": "^1.0",
         "yiisoft/yii2-redis": "~2.0.0",
-        "tuyakhov/yii2-notifications": "^1.2"
+        "tuyakhov/yii2-notifications": "^1.2",
+        "npm-asset/i18next": "~19.8.4",
+        "npm-asset/i18next-icu": "~1.4.2",
+        "npm-asset/i18next-http-backend": "~1.0.21",
+        "ext-json": "*",
+        "ext-intl": "*",
+        "ext-pdo": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "2.0.9",
         "phpunit/phpunit": "~9.3.0"
     },
-    "extra": {
-        "asset-installer-paths": {
-            "npm-asset-library": "vendor/npm",
-            "bower-asset-library": "vendor/bower"
+    "config": {
+        "fxp-asset": {
+            "installer-paths": {
+                "npm-asset-library": "vendor/npm",
+                "bower-asset-library": "vendor/bower"
+            }
         }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php yii.php translation/generate"
+        ],
+        "post-update-cmd": []
     }
 }
