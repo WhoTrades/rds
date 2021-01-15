@@ -15,13 +15,6 @@ class TranslationAsset extends AssetBundle
         'whotrades\rds\assets\I18NextHttpBackendAsset',
     ];
 
-    public $publishOptions = [
-        'forceCopy' => true,
-        'only' => [
-            '*.json',
-        ],
-    ];
-
     /**
      * @return array<string>
      */

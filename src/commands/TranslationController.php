@@ -31,6 +31,7 @@ class TranslationController extends Controller
 
             $messages = [];
             $translationBasePath = Yii::getAlias($messageSource->basePath);
+            $translationPublicPath = Yii::getAlias('@webroot/translations');
 
             foreach ($messageSource->fileMap as $category => $filename) {
                 Yii::info("Converting {$category}:{$filename} at {$messageSource->basePath}");
@@ -58,10 +59,12 @@ class TranslationController extends Controller
                 }
             }
             // Write to a file
+            FileHelper::createDirectory($translationPublicPath);
             foreach ($messages as $locale => $categories) {
                 foreach ($categories as $category => $messages) {
-                    $javascriptFileName = $translationBasePath . "/" . $locale . "/" . $category . ".json";
-                    @file_put_contents($javascriptFileName, json_encode($messages));
+                    $jsonDictionaryPath = $translationPublicPath . '/' . $locale;
+                    FileHelper::createDirectory($jsonDictionaryPath);
+                    file_put_contents($jsonDictionaryPath . '/' . $category . '.json', json_encode($messages));
                 }
             }
 

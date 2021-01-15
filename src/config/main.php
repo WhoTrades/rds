@@ -18,6 +18,7 @@ use tuyakhov\notifications\channels\MailChannel;
 use whotrades\rds\events\NotificationEventHandler;
 use whotrades\rds\services\NotificationService;
 use whotrades\rds\services\NotificationServiceInterface;
+use yii\i18n\PhpMessageSource;
 
 $config = array(
     'id' => 'RDS',
@@ -26,7 +27,7 @@ $config = array(
     'runtimePath' => '/tmp/rds',
     'name' => 'Система управления релизами',
 
-    'language' => 'ru-RU',
+    'language' => 'en-US',
     'controllerNamespace' => 'whotrades\rds\controllers',
 
     'bootstrap' => array('log', 'webSockets', 'dektrium\user\Bootstrap'),
@@ -214,10 +215,10 @@ $config = array(
         'i18n' => [
             'translations' => [
                 'rds*' => [
-                    'class' => 'yii\i18n\PhpMessageSource',//PhpMessageSource::class,
+                    'class' => PhpMessageSource::class,
                     'basePath' => '@app/translations',
-                    'sourceLanguage' => 'art-US', // We're using artificial language to use invariant placeholders instead of `real` phrases.
-                    'forceTranslation' => true,
+                    'sourceLanguage' => 'en-US',
+                    'forceTranslation' => true, // We use placeholders instead of real messages, so we should force translation into real en-US messages.
                     'fileMap' => [
                         'rds' => 'rds.php',
                         'rds/errors' => 'errors.php',

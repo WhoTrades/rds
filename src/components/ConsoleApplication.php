@@ -2,8 +2,9 @@
 namespace whotrades\rds\components;
 
 use Yii;
+use yii\console\Application;
 
-class ConsoleApplication extends \yii\console\Application
+class ConsoleApplication extends Application
 {
     public $user;
 
@@ -15,8 +16,7 @@ class ConsoleApplication extends \yii\console\Application
     public function __construct(array $config)
     {
         parent::__construct($config);
-
-        Yii::setAlias('@webroot', '/');
+        Yii::setAlias('@webroot', realpath(getcwd() . '/' . 'web'));
         Yii::setAlias('@web', '/');
     }
 

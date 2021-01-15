@@ -68,6 +68,8 @@
         "post-install-cmd": [
             "php yii.php translation/generate"
         ],
-        "post-update-cmd": []
+        "post-update-cmd": [
+            "php yii.php translation/generate"
+        ]
     }
 }

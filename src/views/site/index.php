@@ -19,16 +19,6 @@ use \whotrades\rds\assets\TimeJsAsset;
 /** @var TimeJsAsset $timejs */
 $timejs = TimeJsAsset::register($this);
 ?>
-<?php echo Yii::t('rds', 'welcome'); ?><br/>
-<?php echo Yii::t('rds', 'parameters', ['AAA', 'BBB']); ?><br/>
-<?php echo Yii::t('rds', 'named_parameters', ['username' => 'Dear User']); ?><br/>
-<?php echo Yii::t('rds', 'formatted_parameters', [1000000]); ?><br/>
-<?php echo Yii::t('rds', 'plural_parameters', [1000000]); ?><br/>
-<?php echo Yii::t('rds', 'plural_parameters', [0]); ?><br/>
-<?php echo Yii::t('rds', 'plural_parameters', [1]); ?><br/>
-<?php echo Yii::t('rds', 'plural_parameters', [2]); ?><br/>
-<?php echo Yii::t('rds', 'plural_parameters', [5]); ?><br/>
-
 <h1>
     <?=Yii::t('rds', 'head_release_locks')?>
     <a href="<?=yii\helpers\Url::to(['/site/create-release-reject'])?>" class="btn btn-primary"><?=Yii::t('rds', 'btn_new')?></a>
