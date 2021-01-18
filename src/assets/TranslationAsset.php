@@ -7,9 +7,6 @@ use yii\web\AssetBundle;
 
 class TranslationAsset extends AssetBundle
 {
-
-    public $sourcePath = '@app/translations';
-
     public $depends = [
         'whotrades\rds\assets\I18NextICUAsset',
         'whotrades\rds\assets\I18NextHttpBackendAsset',

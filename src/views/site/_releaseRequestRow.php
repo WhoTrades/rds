@@ -50,17 +50,17 @@ return array(
     array(
         'value' => function (ReleaseRequest $releaseRequest) {
             $map = array(
-                ReleaseRequest::STATUS_NEW          => array('time', 'Ожидает сборки', 'black'),
-                ReleaseRequest::STATUS_FAILED       => array('remove', 'Не собралось', 'red'),
-                ReleaseRequest::STATUS_BUILDING     => array('ok', 'Собирается...', 'orange'),
-                ReleaseRequest::STATUS_BUILT        => array('ok', 'Собрано', 'black'),
-                ReleaseRequest::STATUS_INSTALLING   => array('ok', 'Устанавливается...', 'orange'),
-                ReleaseRequest::STATUS_INSTALLED    => array('ok', 'Установлено', 'black'),
-                ReleaseRequest::STATUS_USING        => array('refresh', 'Активируем...', 'orange'),
-                ReleaseRequest::STATUS_USED         => array('ok', 'Активная версия', '#32cd32'),
-                ReleaseRequest::STATUS_OLD          => array('time', 'Старая версия', 'grey'),
-                ReleaseRequest::STATUS_CANCELLING   => array('refresh', 'Отменяем...', 'orange'),
-                ReleaseRequest::STATUS_CANCELLED    => array('ok', 'Отменено', 'red'),
+                ReleaseRequest::STATUS_NEW          => array('time', Yii::t('rds', 'rr_status_waiting_for_build'), 'black'),
+                ReleaseRequest::STATUS_FAILED       => array('remove', Yii::t('rds', 'rr_status_failed'), 'red'),
+                ReleaseRequest::STATUS_BUILDING     => array('ok', Yii::t('rds', 'rr_status_building'), 'orange'),
+                ReleaseRequest::STATUS_BUILT        => array('ok', Yii::t('rds', 'rr_status_built'), 'black'),
+                ReleaseRequest::STATUS_INSTALLING   => array('ok', Yii::t('rds', 'rr_status_installing'), 'orange'),
+                ReleaseRequest::STATUS_INSTALLED    => array('ok', Yii::t('rds', 'rr_status_installed'), 'black'),
+                ReleaseRequest::STATUS_USING        => array('refresh', Yii::t('rds', 'rr_status_using'), 'orange'),
+                ReleaseRequest::STATUS_USED         => array('ok', Yii::t('rds', 'rr_status_used'), '#32cd32'),
+                ReleaseRequest::STATUS_OLD          => array('time', Yii::t('rds', 'rr_status_old'), 'grey'),
+                ReleaseRequest::STATUS_CANCELLING   => array('refresh', Yii::t('rds', 'rr_status_cancelling'), 'orange'),
+                ReleaseRequest::STATUS_CANCELLED    => array('ok', Yii::t('rds', 'rr_status_cancelled'), 'red'),
             );
             list($icon, $text, $color) = $map[$releaseRequest->rr_status];
             $result = ["<span title='{$text}' style='color: " . $color . "'>" . yii\bootstrap\BaseHtml::icon($icon) . " {$releaseRequest->rr_status}</span><br />"];
@@ -68,16 +68,16 @@ return array(
             foreach ($releaseRequest->builds as $val) {
                 /** @var $val Build */
                 $map = array(
-                    Build::STATUS_NEW => array('time', 'Ожидает сборки', 'black'),
-                    Build::STATUS_FAILED => array('exclamation-sign', 'Не собралось', 'red'),
-                    Build::STATUS_BUILDING => array('refresh', 'Собирается', 'orange'),
-                    Build::STATUS_BUILT => array('upload', 'Раскладывается по серверам', 'orange'),
-                    Build::STATUS_INSTALLING => array('ok', 'Копируется на сервер...', 'black'),
-                    Build::STATUS_INSTALLED => array('ok', 'Скопировано на сервер', 'black'),
-                    Build::STATUS_USED => array('ok', 'Установлено', '#32cd32'),
-                    Build::STATUS_CANCELLED => array('ban-circle', 'Отменено', 'red'),
-                    Build::STATUS_PREPROD_USING => array('refresh', 'Устанавливаем на preprod', 'orange'),
-                    Build::STATUS_PREPROD_MIGRATIONS => array('refresh', 'Устанавливаем на preprod', 'orange'),
+                    Build::STATUS_NEW => array('time', Yii::t('rds', 'build_status_waiting'), 'black'),
+                    Build::STATUS_FAILED => array('exclamation-sign', Yii::t('rds', 'build_status_failed'), 'red'),
+                    Build::STATUS_BUILDING => array('refresh', Yii::t('rds', 'build_status_building'), 'orange'),
+                    Build::STATUS_BUILT => array('upload', Yii::t('rds', 'build_status_built'), 'orange'),
+                    Build::STATUS_INSTALLING => array('ok', Yii::t('rds', 'build_status_installing'), 'black'),
+                    Build::STATUS_INSTALLED => array('ok', Yii::t('rds', 'build_status_installed'), 'black'),
+                    Build::STATUS_USED => array('ok', Yii::t('rds', 'build_status_used'), '#32cd32'),
+                    Build::STATUS_CANCELLED => array('ban-circle', Yii::t('rds', 'build_status_cancelled'), 'red'),
+                    Build::STATUS_PREPROD_USING => array('refresh', Yii::t('rds', 'build_status_preprod_using'), 'orange'),
+                    Build::STATUS_PREPROD_MIGRATIONS => array('refresh', Yii::t('rds', 'build_status_preprod_migrations'), 'orange'),
                 );
                 list($icon, $text, $color) = $map[$val->build_status];
 
@@ -164,7 +164,7 @@ return array(
     array(
         'value' => function (ReleaseRequest $releaseRequest) {
             if ($releaseRequest->isDeleted()) {
-                return 'Сборка удалена';
+                return Yii::t('rds', 'release_deleted');
             }
 
             $result = "";
@@ -182,7 +182,7 @@ return array(
                     $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
                     $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
                     $result .= "<a href='" . yii\helpers\Url::to(['/diff/index/', 'id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id]) .
-                        "'>CRON изменен<br />$diffStat</a><br />";
+                        "'>" . Yii::t('rds', 'cron_changed') . "<br />$diffStat</a><br />";
                 }
             }
 
@@ -190,14 +190,14 @@ return array(
                 Modal::begin(
                     [
                         'id' => 'release-request-install-error-' . $releaseRequest->obj_id,
-                        'header' => 'Ошибка раскладки сборки',
-                        'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
+                        'header' => Yii::t('rds/errors', 'deploy_error'),
+                        'footer' => Html::button('Close', array('data-dismiss' => 'modal', 'class' => 'btn btn-default')),
                     ]
                 );
                 echo "<pre>$releaseRequest->rr_last_error_text</pre>";
                 Modal::end();
 
-                $result .= Html::a('Ошибка раскладки', '#', [
+                $result .= Html::a(Yii::t('rds/errors', 'deploy_error'), '#', [
                         'style' => 'info',
                         'data' => ['toggle' => 'modal', 'target' => '#release-request-install-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
                     ]) . "<br />";
@@ -207,14 +207,14 @@ return array(
                 Modal::begin(
                     [
                         'id' => 'release-request-use-error-' . $releaseRequest->obj_id,
-                        'header' => 'Ошибка активации сборки',
+                        'header' => Yii::t('rds/errors', 'activation_error'),
                         'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
                     ]
                 );
                 echo "<pre>$releaseRequest->rr_last_error_text</pre>";
                 Modal::end();
 
-                $result .= Html::a('Ошибка активации', '#', [
+                $result .= Html::a(Yii::t('rds/errors', 'activation_error'), '#', [
                         'style' => 'info',
                         'data' => ['toggle' => 'modal', 'target' => '#release-request-use-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
                     ]) . "<br />";
@@ -222,7 +222,7 @@ return array(
 
             if ($releaseRequest->canBeRecreated()) {
                 $result = "<a href='" . yii\helpers\Url::to(['/site/recreate-release', 'id' => $releaseRequest->obj_id]) .
-                    "' class='ajax-url'>Пересобрать</a><br />";
+                    "' class='ajax-url'>" . Yii::t('rds', 'btn_rebuild') . "</a><br />";
 
                 if ($releaseRequest->rr_status === ReleaseRequest::STATUS_FAILED) {
                     return $result;
@@ -231,7 +231,7 @@ return array(
 
             if ($releaseRequest->shouldBeInstalled()) {
                 $result .= "<a href='" . yii\helpers\Url::to(['/site/install-release', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='install-button'>Разложить</a>";
+                    "' --data-id='$releaseRequest->obj_id' class='install-button'>" . yii\bootstrap\BaseHtml::icon('flash') . Yii::t('rds', 'btn_deploy') . "</a>";
 
                 return $result;
             }
@@ -267,8 +267,8 @@ return array(
                 } else {
                     $result .=
                         "<a href='" . yii\helpers\Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id]) .
-                        "' class='ajax-url'>Запустить pre-миграции</a><br />" .
-                        "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">Показать pre миграции</a>
+                        "' class='ajax-url'>" . Yii::t('rds', 'btn_run_pre_migrations') . "</a><br />" .
+                        "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">" . Yii::t('rds', 'btn_view_pre_migrations') . "</a>
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                     // ag: @see whotrades\rds\models\MigrationBase::getNameForUrl()
                     $getNameForUrl = function ($migrationName) {
@@ -293,7 +293,7 @@ return array(
                 }
 
                 $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='use-button'>Активировать</a>";
+                    "' --data-id='$releaseRequest->obj_id' class='use-button'>" . yii\bootstrap\BaseHtml::icon('flash') . Yii::t('rds', 'btn_activate_release') . "</a>";
 
                 return $result;
             }
@@ -306,7 +306,7 @@ return array(
                 }
 
                 $result .= "<a href='" . yii\helpers\Url::to(['/use/revert', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='use-button'>Откатить до $releaseRequest->rr_old_version</a>";
+                    "' --data-id='$releaseRequest->obj_id' class='use-button'>" . Yii::t('rds', 'btn_revert_release', ['version' => $releaseRequest->rr_old_version]) . "</a>";
 
                 return $result;
             }

@@ -16,16 +16,28 @@ return [
 
     'head_release_locks' => 'Release locks',
     'head_release_lock_create' => 'Lock release',
+    'head_release_request' => 'Release request',
 
     'btn_new' => 'New',
     'btn_create' => 'Create',
     'btn_save' => 'Save',
+    'btn_build_project' => 'Build project',
+    'btn_build_project_t' => 'Build {project}',
+    'btn_revert_release' => 'Revert to {version}',
+    'btn_activate_release' => 'Activate',
+    'btn_run_pre_migrations' => 'Run PRE migrations',
+    'btn_view_pre_migrations' => 'Show PRE migrations',
+    'btn_deploy' => 'Deploy',
+    'btn_rebuild' => 'Rebuild',
+    'btn_preview' => 'Preview',
+    'btn_preview_changes' => 'Preview changes',
 
     // Model common
     'id' => 'ID',
     'create_date' => 'Created',
     'modify_date' => 'Modified',
     'status_id' => 'Status ID',
+    'status' => 'Status',
     'user' => 'User',
     'comment' => 'Comment',
     'project_id' => 'Project ID',
@@ -36,4 +48,37 @@ return [
     'release_servers' => 'Release servers',
     'script_migration_up' => 'New migrations execution script',
     'script_migration_new' => 'New migrations listing script',
+    'locale' => 'Locale',
+
+    // Release request related
+    'rr_status_waiting_for_build' => 'Waiting for build',
+    'rr_status_failed' => 'Failed',
+    'rr_status_building' => 'Building...',
+    'rr_status_built' => 'Built',
+    'rr_status_installing' => 'Installing...',
+    'rr_status_installed' => 'Installed',
+    'rr_status_using' => 'Activating...',
+    'rr_status_used' => 'Active',
+    'rr_status_old' => 'Old',
+    'rr_status_cancelling' => 'Cancelling...',
+    'rr_status_cancelled' => 'Cancelled',
+
+    // Build related
+    'build_status_waiting' => 'Waiting',
+    'build_status_failed' => 'Failed',
+    'build_status_building' => 'Building...',
+    'build_status_built' => 'Built',
+    'build_status_installing' => 'Installing...',
+    'build_status_installed' => 'Installed',
+    'build_status_used' => 'Active',
+    'build_status_cancelled' => 'Cancelled',
+    'build_status_preprod_using' => 'Installing to preprod',
+    'build_status_preprod_migrations' => 'Installing to preprod',
+
+    'deployment_disabled' => 'Deployment disabled',
+    'action_not_allowed' => 'This action isn\'t allowed',
+    'release_deleted' => 'Release deleted',
+    'cron_changed' => 'CRON changed',
+
+    'link_stash_diff' => 'Link to stash with diff between current version and master branch',
 ];

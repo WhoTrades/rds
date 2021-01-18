@@ -6,12 +6,14 @@
  */
 
 use kartik\grid\Module;
+use whotrades\rds\models\User\User;
 use whotrades\rds\services\DeployService;
 use whotrades\rds\services\DeployServiceInterface;
 use whotrades\RdsSystem\lib\WebErrorHandler;
 use whotrades\rds\services\MigrationService;
 use \whotrades\rds\models\Worker;
 use \whotrades\rds\models\ReleaseRequest;
+use yii\base\Application;
 use \yii\helpers\Url;
 use tuyakhov\notifications\Notifier;
 use tuyakhov\notifications\channels\MailChannel;
@@ -321,7 +323,18 @@ $config = array(
                 'class' => DeployService::class,
             ],
         ],
-    ]
+    ],
+    'on ' . Application::EVENT_BEFORE_REQUEST => function () {
+        $user = Yii::$app->getUser();
+        if (!$user->getIsGuest()) {
+            /** @var User $identity */
+            $identity = $user->getIdentity();
+            $locale = $identity->profile->locale;
+            if (!empty($locale)) {
+                Yii::$app->language = $locale;
+            }
+        }
+    },
 );
 
 if (class_exists(\yii\debug\Module::class)) {

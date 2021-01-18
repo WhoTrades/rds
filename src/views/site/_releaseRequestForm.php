@@ -37,7 +37,7 @@ $this->registerJs('
 
     <?php echo $form->field($model, 'rr_comment')->textInput(); ?>
 
-    <a href="#" title="Ссылка на stash с diff от текущей версии проекта до master" id="diff-preview" target="_blank" style="float: right">
+    <a href="#" title="<?=Yii::t('rds', 'link_stash_diff')?>" id="diff-preview" target="_blank" style="float: right">
         <?=yii\bootstrap\BaseHtml::icon('stop')?>
     </a>
 
@@ -77,7 +77,7 @@ $this->registerJs('
             if (version) {
                 var tag = projectName+'-'+version;
                 $('#diff-preview').
-                html('предпросмотр изменений').
+                html(<?=Yii::t('rds', 'btn_preview_changes')?>).
                 attr({
                     'href': 'http://git.finam.ru/projects/WT/repos/sparta/pull-requests?create&targetBranch=refs%2Ftags%2F' + tag + '&sourceBranch=refs%2Fheads%2Fmaster'
                 });

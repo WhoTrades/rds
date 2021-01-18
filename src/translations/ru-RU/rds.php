@@ -21,16 +21,28 @@ return [
 
     'head_release_locks' => 'Запреты релиза',
     'head_release_lock_create' => 'Запретить релиз',
+    'head_release_request' => 'Запрос релиза',
 
     'btn_new' => 'Создать',
     'btn_create' => 'Создать',
     'btn_save' => 'Сохранить',
+    'btn_build_project' => 'Собрать проект',
+    'btn_build_project_t' => 'Собрать {project}',
+    'btn_revert_release' => 'Откатить до {version}',
+    'btn_activate_release' => 'Активировать',
+    'btn_run_pre_migrations' => 'Запустить pre-миграции',
+    'btn_view_pre_migrations' => 'Показать pre-миграции',
+    'btn_deploy' => 'Разложить',
+    'btn_rebuild' => 'Пересобрать',
+    'btn_preview' => 'Предпросмотр',
+    'btn_preview_changes' => 'Предпросмотр изменений',
 
     // Model common
     'id' => 'ID',
     'create_date' => 'Дата создания',
     'modify_date' => 'Дата изменения',
     'status_id' => 'ID статуса',
+    'status' => 'Статус',
     'user' => 'Пользователь',
     'comment' => 'Комментарий',
     'project_id' => 'ID проекта',
@@ -41,4 +53,37 @@ return [
     'release_servers' => 'Серверы для релиза',
     'script_migration_up' => 'Скрипт по выполнению всех миграций в данной сборке',
     'script_migration_new' => 'Скрипт которвый выводит список всех невыполненных миграций',
+    'locale' => 'Локаль',
+
+    // Release request related
+    'rr_status_waiting_for_build' => 'Ожидает сборки',
+    'rr_status_failed' => 'Не собралось',
+    'rr_status_building' => 'Собирается...',
+    'rr_status_built' => 'Собрано',
+    'rr_status_installing' => 'Устанавливается...',
+    'rr_status_installed' => 'Установлено',
+    'rr_status_using' => 'Активируем...',
+    'rr_status_used' => 'Активная версия',
+    'rr_status_old' => 'Старая версия',
+    'rr_status_cancelling' => 'Отменяем...',
+    'rr_status_cancelled' => 'Отменено',
+
+    // Build related
+    'build_status_waiting' => 'Ожидает сборки',
+    'build_status_failed' => 'Не собралось',
+    'build_status_building' => 'Собирается',
+    'build_status_built' => 'Собрано',
+    'build_status_installing' => 'Устанавливается...',
+    'build_status_installed' => 'Установлено',
+    'build_status_used' => 'Активная версия',
+    'build_status_cancelled' => 'Отменено',
+    'build_status_preprod_using' => 'Устанавливаем на preprod',
+    'build_status_preprod_migrations' => 'Устанавливаем на preprod',
+
+    'deployment_disabled' => 'Релизы запрещены',
+    'action_not_allowed' => 'Вам не разрешено производить данное действие',
+    'release_deleted' => 'Сборка удалена',
+    'cron_changed' => 'CRON изменён',
+
+    'link_stash_diff' => 'Ссылка на stash с diff от текущей версии проекта до master',
 ];

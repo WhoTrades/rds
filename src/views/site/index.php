@@ -63,7 +63,7 @@ Pjax::end();
 
 <? if (! $deploymentEnabled) { ?>
     <div class="disabled-container">
-        <div class="disabled">Deployment disabled</div>
+        <div class="disabled"><?=Yii::t('rds', 'deployment_disabled')?></div>
     </div>
 <? } ?>
 
@@ -73,20 +73,18 @@ Pjax::end();
         <?php
         yii\bootstrap\Modal::begin(array(
             'id' => 'release-request-form-modal',
-            'header' => 'Запрос релиза',
-            //'toggleButton' => ['label' => 'Собрать проект', 'class' => 'btn'],
+            'header' => Yii::t('rds', 'head_release_request'),
         ));
         echo $this->render('_releaseRequestForm', ['model' => $releaseRequest['model']], true);
         yii\bootstrap\Modal::end();
         ?>
         <h2 style="margin:0;">
-            Запрос релиза
+            <?=Yii::t('rds', 'head_release_request')?>
 
             <? if ($deploymentEnabled) { ?>
                 <button type="button" accesskey="`" class="btn btn-primary" data-toggle="modal" data-target="#release-request-form-modal"
-                    onclick="refreshCreateReleaseRequestDialog(0)"
-                >
-                    Собрать проект
+                    onclick="refreshCreateReleaseRequestDialog(0)">
+                    <?=Yii::t('rds', 'btn_build_project')?>
                 </button>
             <? } ?>
         </h2>
@@ -97,7 +95,7 @@ Pjax::end();
                 <span data-toggle="tooltip" title="hotkey: alt+<?=$key+1?>">
                     <button type="button" accesskey="<?=$key+1?>" class="btn" data-toggle="modal" data-target="#release-request-form-modal"
                             onclick="refreshCreateReleaseRequestDialog(<?=$project->obj_id?>)">
-                        Собрать <?=$project->project_name?>
+                        <?=Yii::t('rds', 'btn_build_project_t', ['project' => $project->project_name])?>
                     </button>
                 </span>
             <?php }?>
