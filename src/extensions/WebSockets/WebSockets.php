@@ -26,8 +26,7 @@ class WebSockets extends Component
     {
         foreach ($this->zmqLocations as $location) {
             $context = new ZMQContext();
-            $this->sockets[$location] = $context->getSocket(ZMQ::SOCKET_PUSH);
-            $this->sockets[$location]->setSockOpt(ZMQ::SOCKOPT_LINGER, 0);
+            $this->sockets[$location] = $context->getSocket(ZMQ::SOCKET_PUSH)->setSockOpt(ZMQ::SOCKOPT_LINGER, 0);
         }
     }
 
@@ -102,7 +101,7 @@ webSocketSession = {
 };
 
 ab.connect(
-   'ws://'+document.location.host+'$this->server',
+   'wss://'+document.location.host+'$this->server',
    function (session) {
         webSocketSession.session = session;
         webSocketSession.resubscribe();
