@@ -224,7 +224,7 @@ return array(
             $result .= "<div class=\"btn-group\">";
             if ($releaseRequest->canBeRecreated()) {
                 $result .= "<a href='" . yii\helpers\Url::to(['/site/recreate-release', 'id' => $releaseRequest->obj_id]) .
-                    "' class='ajax-url btn btn-primary'>" . Yii::t('rds', 'btn_rebuild') . "</a>";
+                    "' class='ajax-url btn btn-default'>" . \yii\bootstrap\BaseHtml::icon('repeat') . ' ' . Yii::t('rds', 'btn_rebuild') . "</a>";
 
                 if ($releaseRequest->rr_status === ReleaseRequest::STATUS_FAILED) {
                     return $result."</div>";

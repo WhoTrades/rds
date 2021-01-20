@@ -36,7 +36,7 @@ class Profile extends \dektrium\user\models\Profile
     public function validateLocale($attribute, $params)
     {
         $locales = Translations::getAvailableLocales();
-        if (!in_array($attribute, $locales)) {
+        if (!in_array($this->$attribute, $locales)) {
             $this->addError($attribute, \Yii::t('rds/errors', 'wrong_locale_error'));
         }
     }
