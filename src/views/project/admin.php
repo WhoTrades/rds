@@ -9,11 +9,11 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->params['menu'] = array(
-    array('label' => 'Создать проект', 'url' => array('create')),
+    array('label' => Yii::t('rds', 'btn_create_project'), 'url' => array('create')),
 );
 $this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
 ?>
-<h1>Управление проектами</h1>
+<h1><?=Yii::t('rds', 'head_project_management')?></h1>
 <?=GridView::widget(array(
     'id' => 'project-grid',
     'export' => false,
@@ -36,34 +36,34 @@ $this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
 
                 return implode(", ", $result);
             },
-            'header' => 'Сборщик',
+            'header' => Yii::t('rds', 'worker'),
         ],
         [
             'value' => function (Project $project) {
                 $data = [
-                    'Сборка проекта' => [
+                    Yii::t('rds', 'project_build') => [
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-build'],
-                        'hint' => 'Сценарий сборки проекта',
+                        'hint' => Yii::t('rds', 'hint_project_build_script'),
                     ],
-                    'Заливка/активация проекта' => [
+                    Yii::t('rds', 'project_deploy_activation') => [
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-deploy'],
-                        'hint' => 'Непосредственно скрипты заливки на сервера. Как правило, тут находится rsync',
+                        'hint' => Yii::t('rds', 'hint_project_deploy_activation'),
                     ],
-                    'Очистка пакетов' => [
+                    Yii::t('rds', 'project_builds_removal') => [
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-remove'],
-                        'hint' => 'Скрипты удаления старых версий проекта',
+                        'hint' => Yii::t('rds', 'hint_project_builds_removal'),
                     ],
-                    'Миграции' => [
+                    Yii::t('rds', 'migrations') => [
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-migration'],
-                        'hint' => 'Настройка выполнения SQL миграций: команда для получения списка новых миграций и для запуска миграции',
+                        'hint' => Yii::t('rds', 'hint_migrations'),
                     ],
-                    'Локальная настройка' => [
+                    Yii::t('rds', 'local_configuration') => [
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-config-local'],
-                        'hint' => 'Управление настройками окружения (то, что не лежит в git и чем отличается dev и prod контура)',
+                        'hint' => Yii::t('rds', 'hint_local_configuration'),
                     ],
-                    'CRON конфиги' => [
+                    Yii::t('rds', 'cron_configuration') => [
                         'url' => ['/project/update-script/', 'id' => $project->obj_id, 'type' => 'update-script-cron'],
-                        'hint' => 'Скрипты генерации cron конфигов',
+                        'hint' => Yii::t('rds', 'hint_cron_configuration'),
                     ],
                 ];
                 $links = [];
@@ -79,7 +79,7 @@ $this->registerJs('$(function () {$(\'[data-toggle="tooltip"]\').tooltip()})');
                 return implode("<br />", $links);
             },
             'format' => 'raw',
-            'header' => 'Сборочные скрипты',
+            'header' => Yii::t('rds', 'build_scripts'),
         ],
         [
             'class' => yii\grid\ActionColumn::class,

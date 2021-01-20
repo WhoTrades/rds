@@ -1,8 +1,6 @@
 <?php
 
-
 namespace whotrades\rds\helpers;
-
 
 use yii\helpers\FileHelper;
 use yii\i18n\PhpMessageSource;

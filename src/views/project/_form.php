@@ -25,8 +25,7 @@ use kartik\select2\Select2;
                 'options' => [
                     'class' => 'alert-danger',
                 ],
-                'body' => "Внимание! Редактируя настройки, обязательно укажите в комментариях над " .
-                "измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01",
+                'body' => Yii::t('rds', 'hint_local_configuration_warning'),
             ])?>
         <?php } ?>
         <p class="note">Fields with <span class="required">*</span> are required.</p>
@@ -36,7 +35,7 @@ use kartik\select2\Select2;
 
         <?= $form->field($model, 'projectserversarray')->widget(Select2::class, [
             'data' => $model->getKnownServers(),
-            'options' => ['placeholder' => 'Select a servers ...', 'multiple' => true],
+            'options' => ['placeholder' => Yii::t('rds', 'hint_select_servers'), 'multiple' => true],
             'pluginOptions' => [
                 'tags' => true,
                 'tokenSeparators' => [',', ' '],
@@ -44,15 +43,15 @@ use kartik\select2\Select2;
             ],
         ]); ?>
 
-        <label>Дочерние проекты:</label>
+        <label><?=Yii::t('rds', 'child_projects')?>:</label>
         <?= Select2::widget([
             'name' => 'child_project_array',
             'value' => $model->getChildProjectIdList(),
             'data' => $model->getKnownProjectsIdNameList(),
-            'options' => ['placeholder' => 'Select child project ...', 'multiple' => true],
+            'options' => ['placeholder' => Yii::t('rds', 'hint_select_child_project'), 'multiple' => true],
         ]) ?>
 
-        <h2>Локальная конфигурация <a href="<?=Url::to(['/project-config/', 'projectId' => $model->obj_id])?>">управление</a></h2>
+        <h2><?=Yii::t('rds', 'local_configuration')?> (<a href="<?=Url::to(['/project-config/', 'projectId' => $model->obj_id])?>"><?=Yii::t('rds', 'management')?></a>)</h2>
         <?php foreach ($model->projectConfigs as $projectConfig) { ?>
             <h3>
                 <?=$projectConfig->pc_filename?>
@@ -75,7 +74,7 @@ use kartik\select2\Select2;
                 'options' => [
                     'class' => 'alert-info',
                 ],
-                'body' => "F11 - полноэкранный режим редактора, Esc - выход",
+                'body' => Yii::t('rds', 'help_code_editor'),
             ])?>
             <?=CodemirrorWidget::widget([
                 'name' => 'project_config[' . $projectConfig->pc_filename . ']',
@@ -96,7 +95,7 @@ use kartik\select2\Select2;
             ]);?>
         <?php } ?>
         <br />
-        Собирать на:<br />
+        <?=Yii::t('rds', 'build_with')?>:<br />
         <?php foreach ($workers as $worker) {?>
             <?=Html::checkbox('workers[]', isset($list[$worker->obj_id]), array('id' => $id = uniqid(), 'value' => $worker->obj_id))?>
             <label style="display: inline" for="<?=$id?>"><?=$worker->worker_name?></label>
@@ -107,13 +106,12 @@ use kartik\select2\Select2;
                 'options' => [
                     'class' => 'alert-danger',
                 ],
-                'body' => "Внимание! Редактируя настройки, обязательно укажите в комментариях над " .
-                    "измененной строкой - причину и авторство. <br> Пример: // dz: поменял то-то, потому-то @since 2017-01-01",
+                'body' => Yii::t('rds', 'hint_local_configuration_warning'),
             ])?>
         <?php } ?>
         <br />
         <div class="row buttons">
-            <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+            <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save', ['class' => 'btn btn-success']); ?>
         </div>
     <?php ActiveForm::end() ?>
 </div>
