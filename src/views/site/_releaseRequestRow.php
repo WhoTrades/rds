@@ -163,6 +163,7 @@ return array(
     ),
     array(
         'value' => function (ReleaseRequest $releaseRequest) {
+            // TODO: refactor this mess
             if ($releaseRequest->isDeleted()) {
                 return Yii::t('rds', 'release_deleted');
             }
@@ -220,20 +221,21 @@ return array(
                     ]) . "<br />";
             }
 
+            $result .= "<div class=\"btn-group\">";
             if ($releaseRequest->canBeRecreated()) {
-                $result = "<a href='" . yii\helpers\Url::to(['/site/recreate-release', 'id' => $releaseRequest->obj_id]) .
-                    "' class='ajax-url'>" . Yii::t('rds', 'btn_rebuild') . "</a><br />";
+                $result .= "<a href='" . yii\helpers\Url::to(['/site/recreate-release', 'id' => $releaseRequest->obj_id]) .
+                    "' class='ajax-url btn btn-primary'>" . Yii::t('rds', 'btn_rebuild') . "</a>";
 
                 if ($releaseRequest->rr_status === ReleaseRequest::STATUS_FAILED) {
-                    return $result;
+                    return $result."</div>";
                 }
             }
 
             if ($releaseRequest->shouldBeInstalled()) {
                 $result .= "<a href='" . yii\helpers\Url::to(['/site/install-release', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='install-button'>" . yii\bootstrap\BaseHtml::icon('flash') . Yii::t('rds', 'btn_deploy') . "</a>";
+                    "' --data-id='$releaseRequest->obj_id' class='install-button btn btn-primary'>" . Yii::t('rds', 'btn_deploy') . "</a>";
 
-                return $result;
+                return $result."</div>";
             }
 
             if ($releaseRequest->shouldBeMigrated()) {
@@ -260,14 +262,14 @@ return array(
                                     ]
                     );
                     $result .= ' | ';
-                    $result .= Html::a('Retry', ['/use/migrate', 'id' => $releaseRequest->obj_id], ['class' => 'ajax-url']);
-                    $result .= "<br />";
+                    $result .= Html::a('Retry', ['/use/migrate', 'id' => $releaseRequest->obj_id], ['class' => 'ajax-url btn btn-primary']);
+                    //$result .= "<br />";
 
                     return $result;
                 } else {
                     $result .=
                         "<a href='" . yii\helpers\Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id]) .
-                        "' class='ajax-url'>" . Yii::t('rds', 'btn_run_pre_migrations') . "</a><br />" .
+                        "' class='ajax-url btn btn-primary'>" . Yii::t('rds', 'btn_run_pre_migrations') . "</a><br />" .
                         "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">" . Yii::t('rds', 'btn_view_pre_migrations') . "</a>
                                 <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
                     // ag: @see whotrades\rds\models\MigrationBase::getNameForUrl()
@@ -277,11 +279,11 @@ return array(
                     foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
                         $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($getNameForUrl($migration), \whotrades\rds\models\Migration::TYPE_PRE) . ">";
                         $result .= "$migration";
-                        $result .= "</a><br />";
+                        $result .= "</a>";
                     }
                     $result .= "</div>";
 
-                    return $result;
+                    return $result."</div>";
                 }
             }
 
@@ -293,9 +295,9 @@ return array(
                 }
 
                 $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='use-button'>" . yii\bootstrap\BaseHtml::icon('flash') . Yii::t('rds', 'btn_activate_release') . "</a>";
+                    "' --data-id='$releaseRequest->obj_id' class='use-button btn btn-primary'>" . Yii::t('rds', 'btn_activate_release') . "</a>";
 
-                return $result;
+                return $result."</div>";
             }
 
             if ($releaseRequest->canBeReverted()) {
@@ -306,15 +308,15 @@ return array(
                 }
 
                 $result .= "<a href='" . yii\helpers\Url::to(['/use/revert', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='use-button'>" . Yii::t('rds', 'btn_revert_release', ['version' => $releaseRequest->rr_old_version]) . "</a>";
+                    "' --data-id='$releaseRequest->obj_id' class='use-button btn btn-warning'>" . Yii::t('rds', 'btn_revert_release', ['version' => $releaseRequest->rr_old_version]) . "</a>";
 
-                return $result;
+                return $result."</div>";
             }
 
             if (!$releaseRequest->canBeUsedChildren()) {
                 $result .= 'Waiting for children...';
 
-                return $result;
+                return $result."</div>";
             }
 
             return "";
