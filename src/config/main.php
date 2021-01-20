@@ -325,15 +325,21 @@ $config = array(
         ],
     ],
     'on ' . Application::EVENT_BEFORE_REQUEST => function () {
-        $user = Yii::$app->getUser();
-        if (!$user->getIsGuest()) {
-            /** @var User $identity */
-            $identity = $user->getIdentity();
-            $locale = $identity->profile->locale;
-            if (!empty($locale)) {
-                Yii::$app->language = $locale;
+        // We're in web app, not in console
+        if (Yii::$app instanceof \yii\web\Application) {
+            $user = Yii::$app->getUser();
+            if (!$user->getIsGuest()) {
+                /** @var User $identity */
+                $identity = $user->getIdentity();
+                if ($identity->profile->hasAttribute('locale')) {
+                    $locale = $identity->profile->locale;
+                    if (!empty($locale)) {
+                        Yii::$app->language = $locale;
+                    }
+                }
             }
         }
+
     },
 );
 
