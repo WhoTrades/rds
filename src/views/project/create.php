@@ -4,10 +4,10 @@
 use whotrades\rds\models\Project;
 
 $this->params['menu'] = array(
-    array('label' => 'Manage Project', 'url' => array('admin')),
+    array('label' => Yii::t('rds', 'head_project_management'), 'url' => array('admin')),
 );
 ?>
 
-    <h1>Create Project</h1>
+    <h1><?=Yii::t('rds', 'head_project_create')?></h1>
 
 <?php echo $this->render('_form', array('model' => $model, 'list' => $list, 'workers' => $workers));

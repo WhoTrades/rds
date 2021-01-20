@@ -1,5 +1,6 @@
 <?php
 use whotrades\rds\assets\AppAsset;
+use whotrades\rds\assets\TranslationAsset;
 use yii\helpers\Html;
 use yii\bootstrap\NavBar;
 use yii\bootstrap\Nav;
@@ -8,6 +9,7 @@ use yii\helpers\ArrayHelper;
 /** @var $this yii\web\View */
 /** @var $content string */
 AppAsset::register($this);
+TranslationAsset::register($this);
 $this->beginPage();
 Yii::$app->webSockets->registerScripts($this);
 ?>
@@ -22,6 +24,37 @@ Yii::$app->webSockets->registerScripts($this);
     <?php $this->head() ?>
     <script>
         document.onload = [];
+    </script>
+    <script>
+        <?php
+        /** @var TranslationAsset $translationBundle */
+        $translationBundle = $this->getAssetManager()->getBundle(TranslationAsset::class);
+        $language = Yii::$app->language;
+        $locale = explode('-', $language, 2)[0];
+        ?>
+        function t() {
+            if (!window.i18next || !window.i18next.t || 'function' !== typeof window.i18next.t) {
+                return arguments[0];
+            }
+            return window.i18next.t.apply(window.i18next, arguments);
+        }
+        document.onload.push(function () {
+            window.i18next.use(window.i18nextICU).use(window.i18nextHttpBackend).init({
+                i18nFormat: {
+                    localeData: window.ReactIntlLocaleData['<?=$locale?>']
+                },
+                lng: '<?=$language?>',
+                fallbackLng: 'en-US',
+                load: 'currentOnly',
+                debug: false,
+                ns: ['<?=implode("','", $translationBundle->getTranslationNamespaces())?>'],
+                backend: {
+                    loadPath: '<?=Yii::getAlias('@web/translations')?>/{{lng}}/{{ns}}.json'
+                }
+            });
+        });
+    </script>
+    <script>
         function webSocketSubscribe(channels, callback)
         {
             if (typeof channels === 'string') {
@@ -40,12 +73,12 @@ Yii::$app->webSockets->registerScripts($this);
 <body>
 <?php
 $this->beginBody();
-$controllerId       = \Yii::$app->controller->id;
-$controllerUniqueId = \Yii::$app->controller->uniqueId;
-$actionId           = \Yii::$app->controller->action->id;
+$controllerId       = Yii::$app->controller->id;
+$controllerUniqueId = Yii::$app->controller->uniqueId;
+$actionId           = Yii::$app->controller->action->id;
 $modulesNav         = [];
 
-foreach (\Yii::$app->modules as $module) {
+foreach (Yii::$app->modules as $module) {
     if (!$module instanceof whotrades\rds\IHaveNavInterface) {
         continue;
     }
@@ -63,50 +96,50 @@ echo Nav::widget(
         'items' => ArrayHelper::merge(
             [
                 'home' => [
-                    'label' => 'Главная',
+                    'label' => Yii::t('rds', 'menu_index'),
                     'url' => ['/site/index'],
                     'active' => $controllerId == 'site',
                 ],
                 'releases' => [
-                    'label' => 'Настройка сборки',
+                    'label' => Yii::t('rds', 'menu_build_settings'),
                     'url' => ['/project/admin'],
-                    'visible' => \Yii::$app->user->can('developer'),
+                    'visible' => Yii::$app->user->can('developer'),
                     'items' => [
-                        ['label' => 'Проекты', 'url' => ['/project/admin'], 'active' => $controllerId == 'project'],
-                        'workers' => ['label' => 'Сборщики', 'url' => ['/worker/admin'], 'active' => $controllerId == 'worker'],
-                        ['label' => 'Версии', 'url' => ['/release-version/admin'], 'active' => $controllerId == 'release-version'],
+                        ['label' => Yii::t('rds', 'menu_projects'), 'url' => ['/project/admin'], 'active' => $controllerId == 'project'],
+                        'workers' => ['label' => Yii::t('rds', 'menu_build_agents'), 'url' => ['/worker/admin'], 'active' => $controllerId == 'worker'],
+                        ['label' => Yii::t('rds', 'menu_versions'), 'url' => ['/release-version/admin'], 'active' => $controllerId == 'release-version'],
                     ],
                 ],
                 'migrations' => [
-                    'label' => 'Миграции',
+                    'label' => Yii::t('rds', 'menu_migrations'),
                     'url' => ['/migration/index'],
-                    'visible' => \Yii::$app->user->can('developer'),
+                    'visible' => Yii::$app->user->can('developer'),
                     'items' => [
-                        ['label' => 'Миграции PRE/POST', 'url' => ['/migration/index'], 'active' => $controllerId == 'migration'],
+                        ['label' => Yii::t('rds', 'menu_pre_post_migrations'), 'url' => ['/migration/index'], 'active' => $controllerId == 'migration'],
                     ],
                 ]
             ],
             $modulesNav,
             [
                 'journal' => [
-                    'label' => 'Журнал',
+                    'label' => Yii::t('rds', 'menu_activity_log'),
                     'url' => ['/log/index'],
-                    'visible' => \Yii::$app->user->can('developer'),
+                    'visible' => Yii::$app->user->can('developer'),
                 ],
                 'users' => [
-                    'label' => 'Пользователи',
+                    'label' => Yii::t('rds', 'menu_users'),
                     'url' => ['/user/admin'],
                     'active' => $controllerUniqueId == 'user/admin',
                     'visible' => Yii::$app->user->identity && Yii::$app->user->identity->isAdmin,
                 ],
                 'logOut' => [
-                    'label' => \Yii::$app->user->getIsGuest() ? "" : \Yii::$app->user->getIdentity()->email,
+                    'label' => Yii::$app->user->getIsGuest() ? "" : Yii::$app->user->getIdentity()->email,
                     'icon' => 'log-out',
                     'url' => ['/site/logout'],
-                    'visible' => !\Yii::$app->user->isGuest,
+                    'visible' => !Yii::$app->user->isGuest,
                     'items' => [
-                        ['label' => 'Профиль', 'url' => ['/user/settings/profile']],
-                        ['label' => 'Выйти', 'url' => ['/site/logout']],
+                        ['label' => Yii::t('rds', 'menu_user_profile'), 'url' => ['/user/settings/profile']],
+                        ['label' => Yii::t('rds', 'menu_exit'), 'url' => ['/site/logout']],
                     ],
                 ],
             ]

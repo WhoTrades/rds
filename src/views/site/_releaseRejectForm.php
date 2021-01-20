@@ -24,7 +24,7 @@ use whotrades\rds\models\ReleaseVersion;
     <?php echo $form->field($model, 'rr_release_version')->dropDownList(ReleaseVersion::forList()); ?>
 
     <div class="row buttons">
-        <?php echo Html::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
+        <?php echo Html::submitButton($model->isNewRecord ? Yii::t('rds', 'btn_create') : Yii::t('rds', 'btn_save')); ?>
     </div>
 
     <?php ActiveForm::end(); ?>

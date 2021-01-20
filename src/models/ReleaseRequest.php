@@ -7,6 +7,7 @@ use whotrades\RdsSystem\Message\InstallTask;
 use whotrades\RdsSystem\Message\UseCronTask;
 use whotrades\RdsSystem\Message\UseTask;
 use whotrades\rds\models\User\User;
+use Yii;
 use yii\data\Sort;
 use whotrades\rds\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
@@ -304,15 +305,15 @@ class ReleaseRequest extends ActiveRecord
     public function attributeLabels()
     {
         return array(
-            'obj_id' => 'Номер',
-            'obj_created' => 'Дата создания',
-            'obj_modified' => 'Дата модификаии',
-            'obj_status_did' => 'Системный статус',
-            'rr_user_id' => 'Пользователь',
-            'rr_status' => 'Статус',
-            'rr_comment' => 'Комментарий',
-            'rr_project_obj_id' => 'Проект',
-            'rr_build_version' => 'Версия',
+            'obj_id' => Yii::t('rds', 'id'),
+            'obj_created' => Yii::t('rds', 'create_date'),
+            'obj_modified' => Yii::t('rds', 'modify_date'),
+            'obj_status_did' => Yii::t('rds', 'status_id'),
+            'rr_user_id' => Yii::t('rds', 'user'),
+            'rr_status' => Yii::t('rds', 'status'),
+            'rr_comment' => Yii::t('rds', 'comment'),
+            'rr_project_obj_id' => Yii::t('rds', 'project'),
+            'rr_build_version' => Yii::t('rds', 'version'),
             'rr_project_owner_code' => 'SMS Код',
             'rr_release_engineer_code' => 'Код 2',
             'rr_release_version' => 'Основная версия',
@@ -940,22 +941,22 @@ class ReleaseRequest extends ActiveRecord
 
     public function increaseFailBuildCount()
     {
-        \Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
+        Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
     }
 
     public function getFailBuildCount()
     {
-        return (int) \Yii::$app->redis->get($this->getRedisKeyFailBuildCount());
+        return (int) Yii::$app->redis->get($this->getRedisKeyFailBuildCount());
     }
 
     public function increaseFailInstallCount()
     {
-        \Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
+        Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
     }
 
     public function getFailInstallCount()
     {
-        return (int) \Yii::$app->redis->get($this->getRedisKeyFailBuildCount());
+        return (int) Yii::$app->redis->get($this->getRedisKeyFailBuildCount());
     }
 
     protected function getRedisKeyFailBuildCount()

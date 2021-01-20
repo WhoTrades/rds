@@ -5,7 +5,7 @@ use whotrades\rds\models\Migration;
 
 ?>
 
-<h1>Управление PRE/POST миграциями</h1>
+<h1><?=Yii::t('rds', 'head_migrations_management')?></h1>
 
 <?php
 \yii\widgets\Pjax::begin(['id' => 'migration-grid-pjax-container']);

@@ -4,9 +4,7 @@
 use whotrades\rds\models\ReleaseRequest;
 
 ?>
-
-    <h1>Сборка #<?php echo $model->obj_id; ?> (<?= $model->project->project_name ?>
-        -<?= $model->releaseRequest->rr_build_version ?>)</h1>
+<h1><?=Yii::t('rds', 'head_build_with_params', [$model->obj_id, $model->project->project_name . '-' . $model->releaseRequest->rr_build_version])?></h1>
 
 <?php
 echo yii\widgets\DetailView::widget([
@@ -92,10 +90,10 @@ echo yii\widgets\DetailView::widget([
 
 
                 $content = '';
-                $content .= '<table>';
+                $content .= '<table class="table table-condensed table-responsive">';
                 $content .=     '<thead>';
                 $content .=         '<tr style="font-weight: bold">';
-                $content .=             '<td>Название действия</td><td>Затраченное время</td><td>Временная шкала</td>';
+                $content .=             '<td>'.Yii::t('rds', 'action').'</td><td>'. Yii::t('rds', 'spent_time') .'</td><td>'.Yii::t('rds', 'time_scale').'</td>';
                 $content .=         '</tr>';
                 $content .=     '</thead>';
                 $progressTime = 0;
@@ -104,12 +102,12 @@ echo yii\widgets\DetailView::widget([
                     $percent = 100 * $time / $maxTime;
                     $content .= '<tr>';
                     $content .=     '<td>' . $action . '</td>';
+                    $content .=     '<td>' . sprintf("%.2f", $progressTime) . '</td>';
                     $content .=     '<td>';
                     $content .=         '<div class="progress" style="margin: 0">';
                     $content .=             '<div class="progress-bar" style="color: black; width:' . $percent . '%">' . sprintf("%.2f", $time) . '</div>';
                     $content .=         '</div>';
                     $content .=     '</td>';
-                    $content .=     '<td>' . sprintf("%.2f", $progressTime) . '</td>';
                     $content .= '</tr>';
                 }
                 $content .= '</table>';

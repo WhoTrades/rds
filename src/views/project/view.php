@@ -4,24 +4,24 @@
 use yii\helpers\Url;
 
 $this->params['menu'] = array(
-    array('label' => 'Create Project', 'url' => array('create')),
-    array('label' => 'Update Project', 'url' => array('update', 'id' => $model->obj_id)),
-    ['label' => 'Миграции', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-migration']],
-    ['label' => 'Локальная настройка', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-config-local']],
-    ['label' => 'Очистка пакетов', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-remove']],
-    ['label' => 'Заливка/активация проекта', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-deploy']],
-    ['label' => 'CRON конфиги', 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-cron']],
+    array('label' => Yii::t('rds', 'head_project_management'), 'url' => array('admin')),
+    array('label' => Yii::t('rds', 'btn_create_project'), 'url' => array('create')),
+    array('label' => Yii::t('rds', 'btn_update_project'), 'url' => array('update', 'id' => $model->obj_id)),
+    ['label' => Yii::t('rds', 'project_build'), 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-build']],
+    ['label' => Yii::t('rds', 'project_deploy_activation'), 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-deploy']],
+    ['label' => Yii::t('rds', 'project_builds_removal'), 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-remove']],
+    ['label' => Yii::t('rds', 'migrations'), 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-migration']],
+    ['label' => Yii::t('rds', 'local_configuration'), 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-config-local']],
+    ['label' => Yii::t('rds', 'cron_configuration'), 'url' => ['/project/update-script/', 'id' => $model->obj_id, 'type' => 'update-script-cron']],
     array(
-        'label' => 'Delete Project',
+        'label' => Yii::t('rds', 'btn_delete_project'),
         'url' => '#',
         'linkOptions' => array('submit' => array('delete', 'id' => $model->obj_id), 'confirm' => 'Are you sure you want to delete this item?'),
     ),
-
-    array('label' => 'Manage Project', 'url' => array('admin')),
 );
 ?>
 
-<h1>Обзор проекта #<?php echo $model->obj_id; ?></h1>
+<h1><?=Yii::t('rds', 'head_project_view', $model->obj_id)?></h1>
 
 <?= yii\widgets\DetailView::widget([
     'model' => $model,

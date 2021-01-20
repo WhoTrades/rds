@@ -2,6 +2,7 @@
 namespace whotrades\rds\models;
 
 use whotrades\rds\models\User\User;
+use Yii;
 use yii\data\ActiveDataProvider;
 use whotrades\rds\components\ActiveRecord;
 use yii\db\ActiveQuery;
@@ -51,11 +52,11 @@ class Log extends ActiveRecord
     {
         return array(
             'obj_id' => 'Obj',
-            'obj_created' => 'Время',
-            'obj_modified' => 'Obj Modified',
-            'obj_status_did' => 'Obj Status Did',
-            'log_user_id' => 'Пользователь',
-            'log_text' => 'Событие',
+            'obj_created' => Yii::t('rds', 'create_date'),
+            'obj_modified' => Yii::t('rds', 'modify_date'),
+            'obj_status_did' => Yii::t('rds', 'status_id'),
+            'log_user_id' => Yii::t('rds', 'user'),
+            'log_text' => Yii::t('rds', 'event'),
         );
     }
 
@@ -91,14 +92,14 @@ class Log extends ActiveRecord
         if ($user && $userObj = User::findOne(['username' => $user])) {
             $log->log_user_id = $userObj->id;
         } else {
-            $log->log_user_id = empty(\Yii::$app->user) || \Yii::$app->user->isGuest ? null : \Yii::$app->user->id;
+            $log->log_user_id = empty(Yii::$app->user) || Yii::$app->user->isGuest ? null : Yii::$app->user->id;
         }
 
         if (!$log->save()) {
             throw new \Exception("Can't create log request: " . json_encode($log->errors));
         }
 
-        \Yii::$app->webSockets->send('logUpdated', []);
+        Yii::$app->webSockets->send('logUpdated', []);
 
         return $log;
     }

@@ -7,13 +7,13 @@ use yii\bootstrap\Alert;
 use yii\bootstrap\Html;
 
 $this->params['menu'] = array(
-    array('label' => 'Проекты', 'url' => array('/project/admin')),
+    array('label' => Yii::t('rds', 'head_project_management'), 'url' => array('/project/admin')),
 );
 
 $project->script_cron = $project->script_cron ?: "#!/bin/bash -e\n";
 ?>
 <?php $form = ActiveForm::begin() ?>
-<h1>Настройка кронов проекта <?=$project->project_name?></h1>
+<h1><?=Yii::t('rds', 'head_project_cron_configuration', $project->project_name)?></h1>
 <div class="row">
     <div class="col-md-6 col-sm-9">
         <?= $form->field($project, 'script_cron')->widget(
@@ -29,15 +29,15 @@ $project->script_cron = $project->script_cron ?: "#!/bin/bash -e\n";
     <div class="col-md-6 col-sm-3">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Справка</h3>
+                <h3 class="panel-title"><?=Yii::t('rds', 'help')?></h3>
             </div>
             <div class="panel-body">
-                <h5>Доступные переменные окружения</h5>
+                <h5><?=Yii::t('rds', 'available_env_variables')?></h5>
                 <ul>
-                    <li><strong>$projectName</strong> имя проекта</li>
-                    <li><strong>$version</strong> версия сборки</li>
+                    <li><strong>$projectName</strong> <?=Yii::t('rds', 'project_name')?></li>
+                    <li><strong>$version</strong> <?=Yii::t('rds', 'version')?></li>
                 </ul>
-                <p><strong>Результат работы</strong>: Данный скрипт должен вывести в stdout крон конфиг проекта. В случае ошибки - завершиться с exit-code != 0</p>
+                <p><strong><?=Yii::t('rds', 'result')?></strong>: <?=Yii::t('rds', 'help_cron_configuration')?></p>
             </div>
         </div>
 

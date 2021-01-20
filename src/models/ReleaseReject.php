@@ -3,6 +3,7 @@ namespace whotrades\rds\models;
 
 use whotrades\rds\components\ActiveRecord;
 use whotrades\rds\models\User\User;
+use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 
@@ -51,14 +52,14 @@ class ReleaseReject extends ActiveRecord
     public function attributeLabels()
     {
         return array(
-            'obj_id' => 'Номер',
-            'obj_created' => 'Дата создания',
-            'obj_modified' => 'Modified',
-            'obj_status_did' => 'Status Did',
-            'rr_user_id' => 'Пользователь',
-            'rr_comment' => 'Комментарий',
-            'rr_project_obj_id' => 'Номер проекта',
-            'rr_release_version' => 'Версия',
+            'obj_id' => Yii::t('rds', 'id'),//'Номер',
+            'obj_created' => Yii::t('rds', 'create_date'),//'Дата создания',
+            'obj_modified' => Yii::t('rds', 'modify_date'),//'Modified',
+            'obj_status_did' => Yii::t('rds', 'status_id'),//'Status Did',
+            'rr_user_id' => Yii::t('rds', 'user'),//'Пользователь',
+            'rr_comment' => Yii::t('rds', 'comment'),//'Комментарий',
+            'rr_project_obj_id' => Yii::t('rds', 'project_id'),//'Номер проекта',
+            'rr_release_version' => Yii::t('rds', 'version'),//'Версия',
         );
     }
 

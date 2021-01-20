@@ -1,5 +1,3 @@
-<h1>
-Запрос релиза
-</h1>
+<h1><?=\Yii::t('rds', 'head_release_request')?></h1>
 
-Вам не разрешено производить данное действие
+<?=\Yii::t('rds', 'action_not_allowed')?>

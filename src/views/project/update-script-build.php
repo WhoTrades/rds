@@ -6,13 +6,13 @@ use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 
 $this->params['menu'] = array(
-    array('label' => 'Проекты', 'url' => array('/project/admin')),
+    array('label' => Yii::t('rds', 'head_project_management'), 'url' => array('/project/admin')),
 );
 
 $project->script_build = $project->script_build ?: "#!/bin/bash -e\n";
 ?>
 <?php $form = ActiveForm::begin() ?>
-<h1>Настройка сборки проекта <?=$project->project_name?></h1>
+<h1><?=Yii::t('rds', 'head_project_build', $project->project_name)?></h1>
 <div class="row">
     <div class="col-md-6 col-sm-9">
         <?= $form->field($project, 'script_build')->widget(
@@ -28,19 +28,16 @@ $project->script_build = $project->script_build ?: "#!/bin/bash -e\n";
     <div class="col-md-6 col-sm-3">
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">Справка</h3>
+                <h3 class="panel-title"><?=Yii::t('rds', 'help')?></h3>
             </div>
             <div class="panel-body">
-                <h5>Доступные переменные окружения</h5>
+                <h5><?=Yii::t('rds', 'available_env_variables')?></h5>
                 <ul>
-                    <li><strong>$projectDir</strong> папка, куда нужно положить собранную версию проекта</li>
-                    <li><strong>$projectName</strong> имя проекта</li>
-                    <li><strong>$version</strong> версия сборки</li>
+                    <li><strong>$projectDir</strong> <?=Yii::t('rds', 'help_project_dir')?></li>
+                    <li><strong>$projectName</strong> <?=Yii::t('rds', 'project_name')?></li>
+                    <li><strong>$version</strong> <?=Yii::t('rds', 'version')?></li>
                 </ul>
-                <p><strong>
-                    Результат работы</strong>: Данный скрипт должен положить готовый для заливки на сервера пакет сборки в папку $projectDir.
-                    В случае ошибки - завершиться с exit-code != 0
-                </p>
+                <p><strong><?=Yii::t('rds', 'result')?></strong>: <?=Yii::t('rds', 'help_project_buildd')?></p>
             </div>
         </div>
 

@@ -5,18 +5,22 @@
  * Что бы его переопределить для себя используйте protected/config/config.local.php
  */
 
+use kartik\grid\Module;
+use whotrades\rds\models\User\User;
 use whotrades\rds\services\DeployService;
 use whotrades\rds\services\DeployServiceInterface;
 use whotrades\RdsSystem\lib\WebErrorHandler;
 use whotrades\rds\services\MigrationService;
 use \whotrades\rds\models\Worker;
 use \whotrades\rds\models\ReleaseRequest;
+use yii\base\Application;
 use \yii\helpers\Url;
 use tuyakhov\notifications\Notifier;
 use tuyakhov\notifications\channels\MailChannel;
 use whotrades\rds\events\NotificationEventHandler;
 use whotrades\rds\services\NotificationService;
 use whotrades\rds\services\NotificationServiceInterface;
+use yii\i18n\PhpMessageSource;
 
 $config = array(
     'id' => 'RDS',
@@ -25,7 +29,7 @@ $config = array(
     'runtimePath' => '/tmp/rds',
     'name' => 'Система управления релизами',
 
-    'language' => 'ru-RU',
+    'language' => 'en-US',
     'controllerNamespace' => 'whotrades\rds\controllers',
 
     'bootstrap' => array('log', 'webSockets', 'dektrium\user\Bootstrap'),
@@ -37,7 +41,7 @@ $config = array(
             'allowedIPs' => array('192.168.*', '10.0.2.2'),
         ),
         'gridview' =>  [
-            'class' => \kartik\grid\Module::class,
+            'class' => Module::class,
         ],
         'user' => [
             'class' => dektrium\user\Module::class,
@@ -209,7 +213,21 @@ $config = array(
         ],
         'migrationService' => [
             'class' => MigrationService::class,
-        ]
+        ],
+        'i18n' => [
+            'translations' => [
+                'rds*' => [
+                    'class' => PhpMessageSource::class,
+                    'basePath' => '@app/translations',
+                    'sourceLanguage' => 'en-US',
+                    'forceTranslation' => true, // We use placeholders instead of real messages, so we should force translation into real en-US messages.
+                    'fileMap' => [
+                        'rds' => 'rds.php',
+                        'rds/errors' => 'errors.php',
+                    ],
+                ],
+            ],
+        ],
     ),
 
     'params' => array(
@@ -305,7 +323,18 @@ $config = array(
                 'class' => DeployService::class,
             ],
         ],
-    ]
+    ],
+    'on ' . Application::EVENT_BEFORE_REQUEST => function () {
+        $user = Yii::$app->getUser();
+        if (!$user->getIsGuest()) {
+            /** @var User $identity */
+            $identity = $user->getIdentity();
+            $locale = $identity->profile->locale;
+            if (!empty($locale)) {
+                Yii::$app->language = $locale;
+            }
+        }
+    },
 );
 
 if (class_exists(\yii\debug\Module::class)) {

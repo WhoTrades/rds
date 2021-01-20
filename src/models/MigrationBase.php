@@ -6,6 +6,7 @@
  */
 namespace whotrades\rds\models;
 
+use Yii;
 use yii\db\ActiveQuery;
 use whotrades\rds\components\ActiveRecord;
 
@@ -54,14 +55,14 @@ abstract class MigrationBase extends ActiveRecord
     public function attributeLabels()
     {
         return array(
-            'obj_id' => 'ID',
-            'obj_created' => 'Created',
-            'obj_modified' => 'Modified',
-            'obj_status_did' => 'Status',
+            'obj_id' => Yii::t('rds', 'id'),
+            'obj_created' => Yii::t('rds', 'create_date'),
+            'obj_modified' => Yii::t('rds', 'modify_date'),
+            'obj_status_did' => Yii::t('rds', 'status'),
             'migration_type' => 'Migration Type',
             'migration_name' => 'Migration',
             'migration_ticket' => 'Migration Ticket',
-            'migration_project_obj_id' => 'ID проекта',
+            'migration_project_obj_id' => Yii::t('rds', 'project_id'),
             'migration_release_request_obj_id' => 'ID ReleaseRequest',
             'project.project_name' => 'Project',
             'releaseRequest.rr_build_version' => 'Release Request',
