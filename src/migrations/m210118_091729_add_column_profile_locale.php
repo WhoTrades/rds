@@ -14,7 +14,7 @@ class m210118_091729_add_column_profile_locale extends base
      */
     public function safeUp()
     {
-        $this->addColumn('{{%profile}}', 'locale', Schema::TYPE_STRING);
+        $this->addColumn('rds.{{%profile}}', 'locale', Schema::TYPE_STRING);
     }
 
     /**
@@ -22,6 +22,6 @@ class m210118_091729_add_column_profile_locale extends base
      */
     public function safeDown()
     {
-        $this->dropColumn('{{%profile}}', 'locale');
+        $this->dropColumn('rds.{{%profile}}', 'locale');
     }
 }
