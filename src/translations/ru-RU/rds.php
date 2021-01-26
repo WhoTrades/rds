@@ -37,6 +37,7 @@ return [
     'head_project_create' => 'Создать проект',
     'head_build_with_params' => 'Сборка #{0} ({1})',
     'head_migrations_management' => 'Управление PRE/POST миграциями',
+    'head_release_request_migration_error' => 'Ошибка миграции релиза #{0}',
 
     // Buttons
     'btn_new' => 'Создать',
@@ -151,4 +152,5 @@ return [
     'hint_select_child_project' => 'Выберите дочерний проект ...',
     'hint_local_configuration_warning' => 'Внимание! Редактируя настройки, желательно указать в комментариях над измененной строкой - причину и авторство. Пример: // dz: поменял то-то, потому-то @since 2017-01-01',
     'hint_select_servers' => 'Выберите серверы ...',
+    'hint_open_in_a_new_window' => 'Открыть в новом окне',
 ];

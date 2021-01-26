@@ -32,6 +32,7 @@ return [
     'head_project_create' => 'Create project',
     'head_build_with_params' => 'Build #{0} ({1})',
     'head_migrations_management' => 'Migrations management (PRE/POST)',
+    'head_release_request_migration_error' => 'Migration error for release request #{0}',
 
     // Buttons
     'btn_new' => 'New',
@@ -148,4 +149,5 @@ return [
     'hint_select_child_project' => 'Select child project ...',
     'hint_local_configuration_warning' => 'Warning! It\'s better to leave comment above changed line about who and why changed it.',
     'hint_select_servers' => 'Select servers ...',
+    'hint_open_in_a_new_window' => 'Open in a new window',
 ];
