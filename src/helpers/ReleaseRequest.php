@@ -74,7 +74,7 @@ class ReleaseRequest
             return [$buttons, $messages];
         }
 
-        if ($releaseRequest->shouldBeMigrated()) {
+        if (true || $releaseRequest->shouldBeMigrated()) {
             if ($releaseRequest->rr_migration_status == ReleaseRequestModel::MIGRATION_STATUS_UP) {
                 $messages[] = "Wrong migration status";
                 return [$buttons, $messages];
@@ -102,9 +102,13 @@ class ReleaseRequest
                 $getNameForUrl = function ($migrationName) {
                     return str_replace('\\', '/', $migrationName);
                 };
-                foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                    $migrations .= Html::a($migration, $releaseRequest->project->getMigrationUrl($getNameForUrl($migration), \whotrades\rds\models\Migration::TYPE_PRE));
+
+                if (!empty($releaseRequest->rr_new_migrations)) {
+                    foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
+                        $migrations .= Html::a($migration, $releaseRequest->project->getMigrationUrl($getNameForUrl($migration), \whotrades\rds\models\Migration::TYPE_PRE));
+                    }
                 }
+
                 $migrations .= "</div>";
                 $messages[] = $migrations;
 
