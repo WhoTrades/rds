@@ -74,7 +74,7 @@ class ReleaseRequest
             return [$buttons, $messages];
         }
 
-        if (true || $releaseRequest->shouldBeMigrated()) {
+        if ($releaseRequest->shouldBeMigrated()) {
             if ($releaseRequest->rr_migration_status == ReleaseRequestModel::MIGRATION_STATUS_UP) {
                 $messages[] = "Wrong migration status";
                 return [$buttons, $messages];
