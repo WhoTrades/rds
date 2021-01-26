@@ -163,29 +163,7 @@ return array(
     ),
     array(
         'value' => function (ReleaseRequest $releaseRequest) {
-            // TODO: refactor this mess
-            if ($releaseRequest->isDeleted()) {
-                return Yii::t('rds', 'release_deleted');
-            }
-
-            $result = "";
-            if ($releaseRequest->showCronDiff()) {
-                /** @var $currentUsed ReleaseRequest */
-                $currentUsed = ReleaseRequest::find()->where(
-                    [
-                        'rr_status' => ReleaseRequest::getUsedStatuses(),
-                        'rr_project_obj_id' => $releaseRequest->rr_project_obj_id,
-                    ]
-                )->one();
-
-                if ($currentUsed && $currentUsed->getCronConfigCleaned() != $releaseRequest->getCronConfigCleaned()) {
-                    $diffStat = \Yii::$app->diffStat->getDiffStat($currentUsed->getCronConfigCleaned(), $releaseRequest->getCronConfigCleaned());
-                    $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
-                    $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
-                    $result .= "<a href='" . yii\helpers\Url::to(['/diff/index/', 'id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id]) .
-                        "'>" . Yii::t('rds', 'cron_changed') . "<br />$diffStat</a><br />";
-                }
-            }
+            list($buttons, $messages) = \whotrades\rds\helpers\ReleaseRequest::getButtonsAndMessages($releaseRequest);
 
             if ($releaseRequest->showInstallationErrors()) {
                 Modal::begin(
@@ -197,11 +175,6 @@ return array(
                 );
                 echo "<pre>$releaseRequest->rr_last_error_text</pre>";
                 Modal::end();
-
-                $result .= Html::a(Yii::t('rds/errors', 'deploy_error'), '#', [
-                        'style' => 'info',
-                        'data' => ['toggle' => 'modal', 'target' => '#release-request-install-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
-                    ]) . "<br />";
             }
 
             if ($releaseRequest->showActivationErrors()) {
@@ -214,112 +187,34 @@ return array(
                 );
                 echo "<pre>$releaseRequest->rr_last_error_text</pre>";
                 Modal::end();
-
-                $result .= Html::a(Yii::t('rds/errors', 'activation_error'), '#', [
-                        'style' => 'info',
-                        'data' => ['toggle' => 'modal', 'target' => '#release-request-use-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
-                    ]) . "<br />";
             }
 
-            $result .= "<div class=\"btn-group\">";
-            if ($releaseRequest->canBeRecreated()) {
-                $result .= "<a href='" . yii\helpers\Url::to(['/site/recreate-release', 'id' => $releaseRequest->obj_id]) .
-                    "' class='ajax-url btn btn-default'>" . \yii\bootstrap\BaseHtml::icon('repeat') . ' ' . Yii::t('rds', 'btn_rebuild') . "</a>";
-
-                if ($releaseRequest->rr_status === ReleaseRequest::STATUS_FAILED) {
-                    return $result."</div>";
-                }
+            if ($releaseRequest->shouldBeMigrated() && $releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_FAILED) {
+                Modal::begin(
+                    [
+                        'id' => 'release-request-migration-error-' . $releaseRequest->obj_id,
+                        'header' => 'Errors of migration applying ',
+                        'footer' => Html::button('Close', array('data-dismiss' => 'modal', 'class' => 'btn btn-default')),
+                    ]
+                );
+                echo "<pre>$releaseRequest->rr_migration_error</pre>";
+                echo Html::aTargetBlank(Url::toRoute(['site/view-migration-error', 'id' => $releaseRequest->obj_id]), Yii::t('rds', 'hint_open_in_a_new_window'));
+                Modal::end();
             }
 
-            if ($releaseRequest->shouldBeInstalled()) {
-                $result .= "<a href='" . yii\helpers\Url::to(['/site/install-release', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='install-button btn btn-primary'>" . Yii::t('rds', 'btn_deploy') . "</a>";
-
-                return $result."</div>";
+            $result = "";
+            if (!empty($messages)) {
+                $result .= '<div class="panel panel-default">';
+                $result .= '<ul class="list-group">' . implode('', array_map(function ($msg) {
+                        return '<li class="list-group-item">' . $msg . '</li>';
+                    }, $messages)) . '</ul>';
+                $result .= '</div>';
+            }
+            if (!empty($buttons)) {
+                $result .= '<div class="btn-group">' . implode('', $buttons) . '</div>';
             }
 
-            if ($releaseRequest->shouldBeMigrated()) {
-                if ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_UP) {
-                    return "Wrong migration status";
-                } elseif ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_UPDATING) {
-                    return "Updating migrations...";
-                } elseif ($releaseRequest->rr_migration_status == ReleaseRequest::MIGRATION_STATUS_FAILED) {
-                    $result .= "updating migrations failed<br />";
-                    Modal::begin(
-                        [
-                            'id' => 'release-request-migration-error-' . $releaseRequest->obj_id,
-                            'header' => 'Errors of migration applying',
-                            'footer' => Html::button('Close', array('data-dismiss' => 'modal')),
-                        ]
-                    );
-                    echo "<pre>$releaseRequest->rr_migration_error</pre>";
-                    Modal::end();
-
-                    $result .= Html::a(
-                        'view error', '#', [
-                                        'style' => 'info',
-                                        'data' => ['toggle' => 'modal', 'target' => '#release-request-migration-error-' . $releaseRequest->obj_id, 'onclick' => "return false;"],
-                                    ]
-                    );
-                    $result .= ' | ';
-                    $result .= Html::a('Retry', ['/use/migrate', 'id' => $releaseRequest->obj_id], ['class' => 'ajax-url btn btn-primary']);
-                    //$result .= "<br />";
-
-                    return $result;
-                } else {
-                    $result .=
-                        "<a href='" . yii\helpers\Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id]) .
-                        "' class='ajax-url btn btn-primary'>" . Yii::t('rds', 'btn_run_pre_migrations') . "</a><br />" .
-                        "<a href='#' onclick=\"$('#migrations-{$releaseRequest->obj_id}').toggle('fast'); return false;\">" . Yii::t('rds', 'btn_view_pre_migrations') . "</a>
-                                <div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
-                    // ag: @see whotrades\rds\models\MigrationBase::getNameForUrl()
-                    $getNameForUrl = function ($migrationName) {
-                        return str_replace('\\', '/', $migrationName);
-                    };
-                    foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                        $result .= "<a href=" . $releaseRequest->project->getMigrationUrl($getNameForUrl($migration), \whotrades\rds\models\Migration::TYPE_PRE) . ">";
-                        $result .= "$migration";
-                        $result .= "</a>";
-                    }
-                    $result .= "</div>";
-
-                    return $result."</div>";
-                }
-            }
-
-            if ($releaseRequest->canBeUsed()) {
-                if ($releaseRequest->isChild()) {
-                    $result .= 'It is a child';
-
-                    return $result;
-                }
-
-                $result .= "<a href='" . yii\helpers\Url::to(['/use/create', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='use-button btn btn-primary'>" . Yii::t('rds', 'btn_activate_release') . "</a>";
-
-                return $result."</div>";
-            }
-
-            if ($releaseRequest->canBeReverted()) {
-                if ($releaseRequest->isChild()) {
-                    $result .= "Prev version is {$releaseRequest->rr_old_version}";
-
-                    return $result;
-                }
-
-                $result .= "<a href='" . yii\helpers\Url::to(['/use/revert', 'id' => $releaseRequest->obj_id]) .
-                    "' --data-id='$releaseRequest->obj_id' class='use-button btn btn-warning'>" . Yii::t('rds', 'btn_revert_release', ['version' => $releaseRequest->rr_old_version]) . "</a>";
-
-                return $result."</div>";
-            }
-
-            if (!$releaseRequest->canBeUsedChildren()) {
-                $result .= 'Waiting for children...';
-
-                return $result."</div>";
-            }
-
-            return "";
+            return $result;
         },
         'format' => 'raw',
     ),

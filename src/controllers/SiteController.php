@@ -309,6 +309,24 @@ class SiteController extends ControllerRestrictedBase
     }
 
     /**
+     * @param $id
+     *
+     * @return string
+     *
+     * @throws HttpException
+     */
+    public function actionViewMigrationError($id): string
+    {
+        $model = ReleaseRequest::findByPk($id);
+        if (!$model) {
+            throw new HttpException(404, 'The requested page does not exist.');
+        }
+        return $this->render('viewMigrationError', array(
+            'model' => $model,
+        ));
+    }
+
+    /**
      * выход
      */
     public function actionLogout()
