@@ -77,7 +77,7 @@ $this->registerJs('
             if (version) {
                 var tag = projectName+'-'+version;
                 $('#diff-preview').
-                html(<?=Yii::t('rds', 'btn_preview_changes')?>).
+                html('<?=Yii::t('rds', 'btn_preview_changes')?>').
                 attr({
                     'href': 'http://git.finam.ru/projects/WT/repos/sparta/pull-requests?create&targetBranch=refs%2Ftags%2F' + tag + '&sourceBranch=refs%2Fheads%2Fmaster'
                 });
