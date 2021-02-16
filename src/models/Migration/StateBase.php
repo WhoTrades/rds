@@ -51,7 +51,7 @@ abstract class StateBase
      */
     public function tryUpdateStatus($status)
     {
-        return;
+
     }
 
     /**
@@ -75,7 +75,7 @@ abstract class StateBase
      */
     public function succeed()
     {
-        \Yii::error("Can't be succeed. Migration {$this->migration->migration_name} is in status '{$this->migration->getStatusName()}'");
+        Yii::error("Can't be succeed. Migration {$this->migration->migration_name} is in status '{$this->migration->getStatusName()}'");
     }
 
     /**
@@ -83,6 +83,6 @@ abstract class StateBase
      */
     public function failed()
     {
-        \Yii::error("Can't be failed. Migration {$this->migration->migration_name} is in status '{$this->migration->getStatusName()}'");
+        Yii::error("Can't be failed. Migration {$this->migration->migration_name} is in status '{$this->migration->getStatusName()}'");
     }
 }

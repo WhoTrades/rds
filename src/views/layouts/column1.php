@@ -1,4 +1,7 @@
 <?php $this->beginContent('@app/views/layouts/main.php'); ?>
+<?php
+/** @var $content string */
+?>
 <div id="content">
     <?php if (!empty($this->params['menu'])) { ?>
         <div class="row">

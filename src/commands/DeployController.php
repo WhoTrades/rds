@@ -303,10 +303,9 @@ class DeployController extends RabbitListener implements DeployEventInterface
 
         if ($mainReleaseRequest) {
             $oldMainReleaseRequest = $mainReleaseRequest->getOldReleaseRequest();
-        }
-
-        if ($oldMainReleaseRequest && $oldMainReleaseRequest->canBeUsed()) {
-            $oldMainReleaseRequest->sendUseTasks(Yii::$app->user->getIdentity()->username);
+            if ($oldMainReleaseRequest->canBeUsed()) {
+                $oldMainReleaseRequest->sendUseTasks(Yii::$app->user->getIdentity()->username);
+            }
         }
 
         $releaseRequest->addBuildTimeLog(ReleaseRequest::BUILD_LOG_USING_ERROR);

@@ -138,7 +138,7 @@ class Project extends ActiveRecord
             project_build_subversion = ?
             WHERE obj_id=$this->obj_id";
 
-        \Yii::$app->db->createCommand($sql, [1 => $this->project_build_version+1, 2 => json_encode($this->projectBuildSubversionArray)])->execute();
+        Yii::$app->db->createCommand($sql, [1 => $this->project_build_version+1, 2 => json_encode($this->projectBuildSubversionArray)])->execute();
     }
 
     /**
@@ -285,7 +285,7 @@ class Project extends ActiveRecord
      */
     public function getMigrationUrl($migration, $type)
     {
-        $config = \Yii::$app->params['projectMigrationUrlMask'] ?? [];
+        $config = Yii::$app->params['projectMigrationUrlMask'] ?? [];
         if (isset($config[$this->project_name])) {
             return $config[$this->project_name]($migration, $this->project_name, $type, Yii::$app->params['projectMigrationBitBucketBranch']);
         } else {

@@ -61,7 +61,6 @@ class RemovePackagesController extends SingleInstanceController
             $diffDateInterval = $thresholdDateTime->diff($releaseRequestDateTime);
             if ($diffDateInterval->invert === 0) {
                 Yii::info("Skip destroying release request. Waiting for {$diffDateInterval->format("%d days %h hours")} (release_request={$releaseRequest->getBuildTag()})");
-                die;
                 continue;
             }
 
@@ -104,13 +103,11 @@ class RemovePackagesController extends SingleInstanceController
      */
     private function countInstalledBuildsBetweenVersions(int $projectId, string $startVersion, string $endVersion)
     {
-        $count = ReleaseRequest::find()
+        return ReleaseRequest::find()
             ->andWhere(['rr_project_obj_id' => $projectId])
             ->andWhere("string_to_array(rr_build_version, '.')::int[] >= string_to_array('" . addslashes($startVersion) . "', '.')::int[]")
             ->andWhere("string_to_array(rr_build_version, '.')::int[] <= string_to_array('" . addslashes($endVersion) . "', '.')::int[]")
             ->andWhere(['in', 'rr_status', ReleaseRequest::getInstalledStatuses()])
             ->count();
-
-        return $count;
     }
 }

@@ -1,6 +1,7 @@
 <?php
 /** @var $model Project */
-
+/** @var $workers array */
+/** @var $list array */
 use whotrades\rds\models\Project;
 
 $this->params['menu'] = array(

@@ -50,7 +50,8 @@
         "npm-asset/i18next-http-backend": "~1.0.21",
         "ext-json": "*",
         "ext-intl": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "ext-zmq": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "2.0.9",

@@ -5,8 +5,8 @@
 /** @var $newTitle string */
 
 /** @var $currentText string */
-/** @var $currentTtitle string */
-
+/** @var $currentTitle string */
+/** @var $projectName string */
 /** @var $log string */
 
 \Yii::$app->jsdifflib->register($this);

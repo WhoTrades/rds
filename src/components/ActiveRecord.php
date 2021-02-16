@@ -10,7 +10,7 @@ class ActiveRecord extends \yii\db\ActiveRecord
      * @return bool
      * @throws \Exception
      */
-    public function save($runValidation = true, $attributes = null)
+    public function save($runValidation = true, $attributes = null): bool
     {
         if ($this->getDbConnection()->getTransaction()) {
             return parent::save($runValidation, $attributes);
