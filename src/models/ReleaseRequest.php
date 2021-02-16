@@ -792,13 +792,9 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @return string
      */
-    public function getCronConfigCleaned()
+    public function getCronConfigCleaned(): string
     {
-        $text = $this->rr_cron_config;
-        $text = preg_replace('~ --sys__key=\w+~', '', $text);
-        $text = preg_replace('~ --sys__package=[\w-]+-[\d.]+~', '', $text);
-
-        return $text;
+        return \whotrades\rds\helpers\ReleaseRequest::getCronConfigCleaned($this->rr_cron_config);
     }
 
 

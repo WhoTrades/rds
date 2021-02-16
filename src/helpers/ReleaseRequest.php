@@ -10,6 +10,18 @@ use \whotrades\rds\models\ReleaseRequest as ReleaseRequestModel;
 
 class ReleaseRequest
 {
+    /**
+     * @param string $config
+     *
+     * @return string
+     */
+    public static function getCronConfigCleaned(string $config): string
+    {
+        $config = preg_replace('~ --sys__key=\w+~', '', $config);
+        $config = preg_replace('~ --sys__package=[\w-]+-[\d.]+~', '', $config);
+
+        return $config;
+    }
 
     /**
      * Returns array with 2 elements:

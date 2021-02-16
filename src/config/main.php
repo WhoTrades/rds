@@ -190,6 +190,7 @@ $config = array(
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
             ),
+            'cache' => null,
         ),
         'assetManager' => [
             'basePath' => __DIR__ . '/../../web/assets',
