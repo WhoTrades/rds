@@ -7,9 +7,12 @@ use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\Build;
 use \whotrades\rds\helpers\Html;
+use whotrades\rds\services\strategies\CronConfigProcessingStrategyInterface;
 use yii\bootstrap\Alert;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
+/** @var CronConfigProcessingStrategyInterface $cronConfigProcessor */
+$cronConfigProcessor = \Yii::$container->get(CronConfigProcessingStrategyInterface::class);
 
 return array(
     [
@@ -162,8 +165,8 @@ return array(
         'format' => 'raw',
     ),
     array(
-        'value' => function (ReleaseRequest $releaseRequest) {
-            list($buttons, $messages) = \whotrades\rds\helpers\ReleaseRequest::getButtonsAndMessages($releaseRequest);
+        'value' => function (ReleaseRequest $releaseRequest) use ($cronConfigProcessor) {
+            list($buttons, $messages) = \whotrades\rds\helpers\ReleaseRequest::getButtonsAndMessages($releaseRequest, $cronConfigProcessor);
 
             if ($releaseRequest->showInstallationErrors()) {
                 Modal::begin(

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace whotrades\rds\helpers;
 
+use whotrades\rds\services\strategies\CronConfigProcessingStrategyInterface;
 use Yii;
 use yii\bootstrap\BaseHtml;
 use yii\helpers\Url;
@@ -11,28 +12,16 @@ use \whotrades\rds\models\ReleaseRequest as ReleaseRequestModel;
 class ReleaseRequest
 {
     /**
-     * @param string $config
-     *
-     * @return string
-     */
-    public static function getCronConfigCleaned(string $config): string
-    {
-        $config = preg_replace('~ --sys__key=\w+~', '', $config);
-        $config = preg_replace('~ --sys__package=[\w-]+-[\d.]+~', '', $config);
-
-        return $config;
-    }
-
-    /**
      * Returns array with 2 elements:
      * - array of buttons
      * - array of messages
      *
      * @param ReleaseRequestModel $releaseRequest
+     * @param CronConfigProcessingStrategyInterface $cronConfigProcessor
      *
      * @return array|array[]
      */
-    public static function getButtonsAndMessages(ReleaseRequestModel $releaseRequest): array
+    public static function getButtonsAndMessages(ReleaseRequestModel $releaseRequest, CronConfigProcessingStrategyInterface $cronConfigProcessor): array
     {
         $buttons = [];
         $messages = [];
@@ -51,8 +40,11 @@ class ReleaseRequest
                 ]
             )->one();
 
-            if ($currentUsed && $currentUsed->getCronConfigCleaned() != $releaseRequest->getCronConfigCleaned()) {
-                $diffStat = Yii::$app->diffStat->getDiffStat($currentUsed->getCronConfigCleaned(), $releaseRequest->getCronConfigCleaned());
+            $currentCron = $currentUsed ? $cronConfigProcessor->process($currentUsed->rr_cron_config) : '';
+            $newCron = $cronConfigProcessor->process($releaseRequest->rr_cron_config);
+
+            if ($currentUsed && $currentCron != $newCron) {
+                $diffStat = Yii::$app->diffStat->getDiffStat($currentCron, $newCron);
                 $diffStat = preg_replace('~\++~', '<span style="color: #32cd32">$0</span>', $diffStat);
                 $diffStat = preg_replace('~\-+~', '<span style="color: red">$0</span>', $diffStat);
                 $messages[] = Html::aTargetBlank(Url::to(['/diff/index/', 'id1' => $releaseRequest->obj_id, 'id2' => $currentUsed->obj_id]), Yii::t('rds', 'cron_changed')) . '<br />' . $diffStat;

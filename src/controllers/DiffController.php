@@ -3,11 +3,23 @@ namespace whotrades\rds\controllers;
 
 use whotrades\rds\models\ProjectConfigHistory;
 use whotrades\rds\models\ReleaseRequest;
+use whotrades\rds\services\strategies\CronConfigProcessingStrategyInterface;
 use yii\web\NotFoundHttpException;
 
 class DiffController extends ControllerApiBase
 {
     public $pageTitle = 'Различия';
+
+    /** @var CronConfigProcessingStrategyInterface */
+    private $cronConfigProcessor;
+
+    public function __construct($id, $module, CronConfigProcessingStrategyInterface $cronConfigProcessor, $config = null)
+    {
+        $config = $config ?? [];
+        $this->cronConfigProcessor = $cronConfigProcessor;
+
+        parent::__construct($id, $module, $config);
+    }
 
     public function actionIndex($id1, $id2)
     {
@@ -23,9 +35,9 @@ class DiffController extends ControllerApiBase
         return $this->render('index', array(
             'projectName' => $rr1->project->project_name,
             'filename' => 'cron-wt.d',
-            'newText' => $rr1->getCronConfigCleaned(),
+            'newText' => $this->cronConfigProcessor->process($rr1->rr_cron_config),
             'newTitle' => "$rr1->rr_build_version - CURRENT VERSION",
-            'currentText' => $rr2->getCronConfigCleaned(),
+            'currentText' => $this->cronConfigProcessor->process($rr2->rr_cron_config),
             'currentTitle' => "$rr2->rr_build_version - NEW VERSION",
         ));
     }

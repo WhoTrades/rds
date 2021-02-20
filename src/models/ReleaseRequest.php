@@ -12,7 +12,6 @@ use yii\data\Sort;
 use whotrades\rds\components\ActiveRecord;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
-use \whotrades\rds\helpers\ReleaseRequest as ReleaseRequestHelper;
 
 /**
  * This is the model class for table "rds.release_request".
@@ -790,11 +789,13 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
+     * @deprecated
+     *
      * @return string
      */
     public function getCronConfigCleaned(): string
     {
-        return ReleaseRequestHelper::getCronConfigCleaned($this->rr_cron_config);
+        return $this->rr_cron_config;
     }
 
 
