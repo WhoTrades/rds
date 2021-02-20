@@ -789,18 +789,6 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @deprecated
-     *
-     * @return string
-     */
-    public function getCronConfigCleaned(): string
-    {
-        return $this->rr_cron_config;
-    }
-
-
-
-    /**
      * @return ActiveQuery | Build[]
      */
     public function getBuilds()

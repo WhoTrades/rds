@@ -17,14 +17,19 @@ class ReleaseRequest
      * - array of messages
      *
      * @param ReleaseRequestModel $releaseRequest
-     * @param CronConfigProcessingStrategyInterface $cronConfigProcessor
      *
      * @return array|array[]
+     *
+     * @throws \yii\base\InvalidConfigException
+     * @throws \yii\di\NotInstantiableException
      */
-    public static function getButtonsAndMessages(ReleaseRequestModel $releaseRequest, CronConfigProcessingStrategyInterface $cronConfigProcessor): array
+    public static function getButtonsAndMessages(ReleaseRequestModel $releaseRequest): array
     {
         $buttons = [];
         $messages = [];
+
+        /** @var CronConfigProcessingStrategyInterface $cronConfigProcessor */
+        $cronConfigProcessor = \Yii::$container->get(CronConfigProcessingStrategyInterface::class);
 
         if ($releaseRequest->isDeleted()) {
             $messages = [Yii::t('rds', 'release_deleted')];
