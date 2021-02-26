@@ -35,9 +35,9 @@ class DiffController extends ControllerApiBase
         return $this->render('index', array(
             'projectName' => $rr1->project->project_name,
             'filename' => 'cron-wt.d',
-            'newText' => $this->cronConfigProcessor->process($rr1->rr_cron_config),
+            'newText' => $this->cronConfigProcessor->process((string)$rr1->rr_cron_config),
             'newTitle' => "$rr1->rr_build_version - CURRENT VERSION",
-            'currentText' => $this->cronConfigProcessor->process($rr2->rr_cron_config),
+            'currentText' => $this->cronConfigProcessor->process((string)$rr2->rr_cron_config),
             'currentTitle' => "$rr2->rr_build_version - NEW VERSION",
         ));
     }
