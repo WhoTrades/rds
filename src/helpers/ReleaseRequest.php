@@ -45,8 +45,8 @@ class ReleaseRequest
                 ]
             )->one();
 
-            $currentCron = $currentUsed ? $cronConfigProcessor->process($currentUsed->rr_cron_config) : '';
-            $newCron = $cronConfigProcessor->process($releaseRequest->rr_cron_config);
+            $currentCron = $currentUsed ? $cronConfigProcessor->process((string)$currentUsed->rr_cron_config) : '';
+            $newCron = $cronConfigProcessor->process((string)$releaseRequest->rr_cron_config);
 
             if ($currentUsed && $currentCron != $newCron) {
                 $diffStat = Yii::$app->diffStat->getDiffStat($currentCron, $newCron);
