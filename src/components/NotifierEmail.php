@@ -17,8 +17,6 @@ class NotifierEmail extends \yii\base\BaseObject
      */
     protected function getMailer($content)
     {
-        $mailer = Yii::$app->mailer->compose('base', ['content' => $content]);
-
-        return $mailer;
+        return Yii::$app->mailer->compose('base', ['content' => $content]);
     }
 }

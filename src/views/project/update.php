@@ -1,7 +1,7 @@
 <?php
 /**
  * @var $model Project
- * @var $workers Worker[]
+ * @var $workers \whotrades\rds\models\Worker[]
  * @var $list bool[]
  * @var $deployment_enabled bool
  */

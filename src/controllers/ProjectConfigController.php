@@ -22,7 +22,7 @@ class ProjectConfigController extends ControllerRestrictedBase
     {
         return array_merge(parent::behaviors(), [
             'verbs' => [
-                'class' => \yii\filters\VerbFilter::class,
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete' => ['POST'],
                 ],

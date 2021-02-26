@@ -42,6 +42,8 @@ class MigrateController extends BaseMigrateController
         }
 
         $this->stdout("\nMigrated up successfully.\n", Console::FG_GREEN);
+
+        return ExitCode::OK;
     }
 
     /**
@@ -58,5 +60,7 @@ class MigrateController extends BaseMigrateController
         }
 
         $this->stdout("\nMigrated down successfully.\n", Console::FG_GREEN);
+
+        return ExitCode::OK;
     }
 }

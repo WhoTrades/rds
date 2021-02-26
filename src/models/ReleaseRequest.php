@@ -1,10 +1,10 @@
 <?php
 namespace whotrades\rds\models;
 
+use Exception;
 use whotrades\rds\components\Status;
 use whotrades\RdsSystem\Message\BuildTask;
 use whotrades\RdsSystem\Message\InstallTask;
-use whotrades\RdsSystem\Message\UseCronTask;
 use whotrades\RdsSystem\Message\UseTask;
 use whotrades\rds\models\User\User;
 use Yii;
@@ -120,14 +120,15 @@ class ReleaseRequest extends ActiveRecord
 
     /**
      * @param int $projectObjId
+     * @param $releaseVersion
      * @param int $userId
      * @param string $comment
      *
-     * @return self[]
+     * @return void
      *
-     * @throws \Exception
+     * @throws \yii\db\Exception
      */
-    public static function create($projectObjId, $releaseVersion, $userId, $comment)
+    public static function create($projectObjId, $releaseVersion, $userId, $comment): void
     {
         try {
             $transaction = ActiveRecord::getDb()->beginTransaction();
@@ -180,8 +181,8 @@ class ReleaseRequest extends ActiveRecord
             } else {
                 $transaction->rollBack();
             }
-        } catch (\Exception $e) {
-            if ($transaction->isActive) {
+        } catch (Exception $e) {
+            if (!empty($transaction) && $transaction->isActive) {
                 $transaction->rollBack();
             }
 
@@ -193,14 +194,14 @@ class ReleaseRequest extends ActiveRecord
      * @param int $userId
      * @param string | null $comment
      *
-     * @return array
+     * @return void
      *
      * @throws \yii\db\Exception
      */
-    public function recreate($userId, $comment = null)
+    public function recreate($userId, $comment = null) : void
     {
         if (!$this->canBeRecreated()) {
-            return [];
+            return;
         }
 
         try {
@@ -234,8 +235,8 @@ class ReleaseRequest extends ActiveRecord
 
             // ag: Send tasks for this releaseRequest. Tasks for all children releaseRequests was sent in their recreate methods
             $this->sendBuildTasks();
-        } catch (\Exception $e) {
-            if ($transaction->isActive) {
+        } catch (Exception $e) {
+            if (isset($transaction) && $transaction->isActive) {
                 $transaction->rollBack();
             }
 
@@ -668,7 +669,7 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function createBuildTasks()
     {
@@ -689,7 +690,7 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function deleteBuildTasks()
     {
@@ -748,7 +749,7 @@ class ReleaseRequest extends ActiveRecord
      * @param string $initiatorUserName
      * @param bool $withChildren
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function sendUseTasks($initiatorUserName, $withChildren = null)
     {
@@ -788,20 +789,6 @@ class ReleaseRequest extends ActiveRecord
     }
 
     /**
-     * @return string
-     */
-    public function getCronConfigCleaned()
-    {
-        $text = $this->rr_cron_config;
-        $text = preg_replace('~ --sys__key=\w+~', '', $text);
-        $text = preg_replace('~ --sys__package=[\w-]+-[\d.]+~', '', $text);
-
-        return $text;
-    }
-
-
-
-    /**
      * @return ActiveQuery | Build[]
      */
     public function getBuilds()
@@ -837,7 +824,7 @@ class ReleaseRequest extends ActiveRecord
      * @param string $action
      * @param float | null $time
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function addBuildTimeLog($action, $time = null)
     {

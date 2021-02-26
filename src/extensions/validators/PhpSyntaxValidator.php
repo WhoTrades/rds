@@ -1,6 +1,7 @@
 <?php
 namespace whotrades\rds\extensions\validators;
 
+use whotrades\RdsSystem\lib\Exception\CommandExecutorException;
 use yii\validators\Validator;
 use Exception;
 
@@ -34,7 +35,7 @@ class PhpSyntaxValidator extends Validator
         try {
             $command = PHP_BINDIR . DIRECTORY_SEPARATOR . "php -l -ddisplay_errors=On $tempName 2>&1";
             $commandExecutor->executeCommand($command);
-        } catch (\whotrades\RdsSystem\lib\CommandExecutorException $exception) {
+        } catch (CommandExecutorException $exception) {
             $errorMessage = 'Ошибка синтаксиса валидации PHP-кода:' . PHP_EOL;
             $errorMessage .= $exception->getOutput();
             $errorMessage = str_replace($tempName, "\"$attribute\"", $errorMessage);

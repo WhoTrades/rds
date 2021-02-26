@@ -12,6 +12,7 @@
  */
 namespace whotrades\rds\commands;
 
+use whotrades\RdsSystem\lib\Exception\CommandExecutorException;
 use Yii;
 use whotrades\RdsSystem\Cron\SingleInstanceController;
 use whotrades\RdsSystem\lib\CommandExecutor;
@@ -73,7 +74,7 @@ class MigrationController extends SingleInstanceController
      *
      * @return string
      *
-     * @throws \whotrades\RdsSystem\lib\CommandExecutorException
+     * @throws CommandExecutorException
      */
     private function executeScript($script, $scriptPrefix, array $env)
     {

@@ -9,6 +9,8 @@ use kartik\grid\Module;
 use whotrades\rds\models\User\User;
 use whotrades\rds\services\DeployService;
 use whotrades\rds\services\DeployServiceInterface;
+use whotrades\rds\services\strategies\CronConfigNoProcessingStrategy;
+use whotrades\rds\services\strategies\CronConfigProcessingStrategyInterface;
 use whotrades\RdsSystem\lib\WebErrorHandler;
 use whotrades\rds\services\MigrationService;
 use \whotrades\rds\models\Worker;
@@ -190,6 +192,7 @@ $config = array(
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
             ),
+            'cache' => null,
         ),
         'assetManager' => [
             'basePath' => __DIR__ . '/../../web/assets',
@@ -321,6 +324,9 @@ $config = array(
             ],
             DeployServiceInterface::class => [
                 'class' => DeployService::class,
+            ],
+            CronConfigProcessingStrategyInterface::class => [
+                'class' => CronConfigNoProcessingStrategy::class,
             ],
         ],
     ],

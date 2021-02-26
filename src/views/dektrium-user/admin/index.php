@@ -137,6 +137,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <span title="' . Yii::t('user', 'Generate and send new password to user') . '" class="glyphicon glyphicon-envelope">
                     </span> </a>';
                     }
+                    return '';
                 },
                 'switch' => function ($url, $model) {
                     if(\Yii::$app->user->identity->isAdmin && $model->id != Yii::$app->user->id && Yii::$app->getModule('user')->enableImpersonateUser) {
@@ -146,6 +147,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'data-method' => 'POST',
                         ]);
                     }
+                    return '';
                 }
             ]
         ],

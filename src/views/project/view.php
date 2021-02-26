@@ -1,6 +1,9 @@
 <?php
 /** @var $model whotrades\rds\models\Project */
+/** @var $dataProvider yii\data\ActiveDataProvider */
+/** @var $searchModel ProjectConfigHistory */
 
+use whotrades\rds\models\ProjectConfigHistory;
 use yii\helpers\Url;
 
 $this->params['menu'] = array(
