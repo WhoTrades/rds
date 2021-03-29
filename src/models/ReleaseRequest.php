@@ -207,34 +207,22 @@ class ReleaseRequest extends ActiveRecord
         try {
             $transaction = ActiveRecord::getDb()->beginTransaction();
 
-            $this->obj_created = date('c');
-            $this->rr_status = self::STATUS_NEW;
-            $this->rr_user_id = $userId;
-            if ($comment) {
-                $this->rr_comment = $comment;
-            }
-            $this->rr_build_started = null;
-            $this->rr_last_error_text = null;
-            $this->rr_built_time = null;
-            $this->rr_new_migration_count = 0;
-            $this->rr_new_migrations = null;
-            $this->rr_migration_status = 'none';
-            $this->rr_migration_error = null;
-            $this->rr_cron_config = null;
-            $this->save();
-
-            $this->deleteBuildTasks();
-            $this->createBuildTasks();
+            $this->reFill($userId, $comment);
+            $this->reCreateBuildTasks();
 
             /** @var ReleaseRequest $childReleaseRequest */
             foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
-                $childReleaseRequest->recreate($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null);
+                $childReleaseRequest->reFill($userId, $comment ? ($comment . " [child of " . $this->project->project_name . "-$this->rr_build_version]") : null);
+                $childReleaseRequest->reCreateBuildTasks();
             }
 
             $transaction->commit();
 
-            // ag: Send tasks for this releaseRequest. Tasks for all children releaseRequests was sent in their recreate methods
-            $this->sendBuildTasks();
+            $releaseRequestList = array_merge([$this], $this->getReleaseRequests()->all());
+            /** @var self $releaseRequest */
+            foreach ($releaseRequestList as $releaseRequest) {
+                $releaseRequest->sendBuildTasks();
+            }
         } catch (Exception $e) {
             if (isset($transaction) && $transaction->isActive) {
                 $transaction->rollBack();
@@ -954,5 +942,41 @@ class ReleaseRequest extends ActiveRecord
     protected function getRedisKeyFailInstallCount()
     {
         return self::REDIS_KEY_FAIL_INSTALL_COUNT . $this->obj_id;
+    }
+
+    /**
+     * @param int $userId
+     * @param string | null $comment
+     *
+     * @return void
+     *
+     * @throws \yii\db\Exception
+     */
+    private function reFill($userId, $comment = null) : void
+    {
+        $this->obj_created = date('c');
+        $this->rr_status = self::STATUS_NEW;
+        $this->rr_user_id = $userId;
+        if ($comment) {
+            $this->rr_comment = $comment;
+        }
+        $this->rr_build_started = null;
+        $this->rr_last_error_text = null;
+        $this->rr_built_time = null;
+        $this->rr_new_migration_count = 0;
+        $this->rr_new_migrations = null;
+        $this->rr_migration_status = 'none';
+        $this->rr_migration_error = null;
+        $this->rr_cron_config = null;
+        $this->save();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function reCreateBuildTasks()
+    {
+        $this->deleteBuildTasks();
+        $this->createBuildTasks();
     }
 }
