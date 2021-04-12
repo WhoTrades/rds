@@ -12,10 +12,8 @@
  */
 namespace whotrades\rds\commands;
 
-use whotrades\RdsSystem\lib\Exception\CommandExecutorException;
 use Yii;
 use whotrades\RdsSystem\Cron\SingleInstanceController;
-use whotrades\RdsSystem\lib\CommandExecutor;
 use whotrades\rds\models\Migration;
 use whotrades\rds\models\Project;
 use whotrades\rds\models\ReleaseRequest;
@@ -35,25 +33,13 @@ class MigrationController extends SingleInstanceController
             $releaseRequest = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
 
             foreach ([Migration::TYPE_PRE, Migration::TYPE_POST, Migration::TYPE_HARD] as $typeName) {
-                foreach ([MigrateController::MIGRATION_COMMAND_NEW_ALL, MigrateController::MIGRATION_COMMAND_HISTORY] as $migrationCommand) {
-                    $text = $this->executeScript(
-                        $project->script_migration_new,
-                        "/tmp/migration-{$typeName}-script-",
-                        [
-                            'project' => $project->project_name,
-                            'version' => $releaseRequest->rr_build_version,
-                            'type' => $typeName,
-                            'command' => $migrationCommand,
-                        ]
-                    );
+                Yii::info("Process {$typeName} migrations of project {$project->project_name}");
 
-                    Yii::info("Output: $text");
-                    $lines = explode("\n", str_replace("\r", "", $text));
-                    $migrationNameList = array_filter($lines);
-                    $migrationNameList = array_map('trim', $migrationNameList);
+                Yii::info('Start to add or update migrations');
+                Yii::$app->migrationService->addOrUpdateExistedMigrations($typeName, $releaseRequest);
 
-                    Yii::$app->migrationService->createOrUpdateListByCommand($migrationNameList, $typeName, $migrationCommand, $project, $releaseRequest);
-                }
+                Yii::info('Start to delete not existed migrations');
+                Yii::$app->migrationService->deleteNonExistentMigrations($typeName, $releaseRequest);
             }
         }
 
@@ -65,29 +51,5 @@ class MigrationController extends SingleInstanceController
 
         Yii::info('Start auto application of migrations');
         Yii::$app->migrationService->applyCanBeAutoAppliedMigrations();
-    }
-
-    /**
-     * @param string $script
-     * @param string $scriptPrefix
-     * @param array $env
-     *
-     * @return string
-     *
-     * @throws CommandExecutorException
-     */
-    private function executeScript($script, $scriptPrefix, array $env)
-    {
-        $commandExecutor = new CommandExecutor();
-
-        $scriptFilename = $scriptPrefix . uniqid() . ".sh";
-        file_put_contents($scriptFilename, str_replace("\r", "", $script));
-        chmod($scriptFilename, 0777);
-
-        $result = $commandExecutor->executeCommand("$scriptFilename 2>&1", $env);
-
-        unlink($scriptFilename);
-
-        return $result;
     }
 }

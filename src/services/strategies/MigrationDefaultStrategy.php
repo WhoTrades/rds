@@ -15,9 +15,8 @@ use whotrades\rds\models\MigrationBase;
 use whotrades\RdsSystem\Message;
 use whotrades\RdsSystem\Factory as RdsSystemFactory;
 use whotrades\rds\commands\MigrateController;
-use \RuntimeException;
 
-class MigrationDefaultStrategy implements MigrationStrategyInterface
+class MigrationDefaultStrategy extends MigrationStrategyBase
 {
     const COMMAND_NAME_TO_STATUS_ID_MAP = [
         MigrateController::MIGRATION_COMMAND_NEW => Migration::STATUS_PENDING,
@@ -27,30 +26,17 @@ class MigrationDefaultStrategy implements MigrationStrategyInterface
     ];
 
     /**
-     * @var string
+     * {@inheritDoc}
      */
-    protected $migrationTypeName;
-
-    /**
-     * @param string $migrationTypeName
-     */
-    public function __construct($migrationTypeName)
+    public function upsert($migrationName, ReleaseRequest $releaseRequest): MigrationBase
     {
-        $this->migrationTypeName = $migrationTypeName;
+        return Migration::upsert($migrationName, $this->migrationTypeName, $releaseRequest);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function upsert($migrationName, $typeName, Project $project, ReleaseRequest $releaseRequest)
-    {
-        return Migration::upsert($migrationName, $typeName, $project, $releaseRequest);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function sendCommand($migrationCommand, MigrationBase $migration)
+    public function sendCommand($migrationCommand, MigrationBase $migration): void
     {
         if (!in_array($migration->getTypeName(), [Migration::TYPE_PRE, Migration::TYPE_POST])) {
             Yii::warning("Skip sending command. Unsupported migration type '{$migration->getTypeName()}'");
@@ -85,12 +71,8 @@ class MigrationDefaultStrategy implements MigrationStrategyInterface
     /**
      * {@inheritDoc}
      */
-    public function getStatusIdByCommand($command)
+    protected function getMigrationList(Project $project, int $objIdFilter, int $limit): array
     {
-        if (isset(static::COMMAND_NAME_TO_STATUS_ID_MAP[$command])) {
-            return static::COMMAND_NAME_TO_STATUS_ID_MAP[$command];
-        }
-
-        throw new RuntimeException("No status mapped to command {$command} of type {$this->migrationTypeName}");
+        return Migration::findNotDeletedWithLimit($this->migrationTypeName, $project, $objIdFilter, $limit);
     }
 }

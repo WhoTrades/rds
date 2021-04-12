@@ -94,14 +94,23 @@ abstract class MigrationBase extends ActiveRecord
     }
 
     /**
-     * @param string $migrationName
      * @param string $typeName
      * @param Project $project
+     * @param int $objIdFilter
+     * @param int $limit
+     *
+     * @return MigrationBase[]
+     */
+    abstract public static function findNotDeletedWithLimit(string $typeName, Project $project, int $objIdFilter, int $limit): array;
+
+    /**
+     * @param string $migrationName
+     * @param string $typeName
      * @param ReleaseRequest $releaseRequest
      *
      * @return static
      */
-    abstract public static function upsert($migrationName, $typeName, Project $project, ReleaseRequest $releaseRequest);
+    abstract public static function upsert($migrationName, $typeName, ReleaseRequest $releaseRequest);
 
     /**
      * @return string
@@ -158,6 +167,11 @@ abstract class MigrationBase extends ActiveRecord
      * @throws \Exception
      */
     abstract public function updateStatus($status);
+
+    /**
+     * @throws \Exception
+     */
+    abstract public function setStatusDeleted();
 
     /**
      * @param string $jiraTicket

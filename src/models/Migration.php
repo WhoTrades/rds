@@ -10,6 +10,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use whotrades\rds\models\Migration\Exception\UndefinedClassForState;
 use DateTime;
+use Exception;
 
 /**
  * This is the model class for table "rds.migration".
@@ -29,6 +30,7 @@ class Migration extends MigrationBase
     const STATUS_PENDING = 5;
     const STATUS_FAILED_APPLICATION  = 6;
     const STATUS_FAILED_ROLLBACK  = 7;
+    const STATUS_DELETED  = 13;
 
     /**
      * @var Migration\StateBase
@@ -42,6 +44,7 @@ class Migration extends MigrationBase
         self::STATUS_PENDING => Migration\StatePending::class,
         self::STATUS_FAILED_APPLICATION  => Migration\StateFailedApplication::class,
         self::STATUS_FAILED_ROLLBACK  => Migration\StateFailedRollBack::class,
+        self::STATUS_DELETED  => Migration\StateDeleted::class,
     ];
 
     /**
@@ -66,6 +69,7 @@ class Migration extends MigrationBase
             self::STATUS_PENDING => 'Pending',
             self::STATUS_FAILED_APPLICATION  => 'Failed Application',
             self::STATUS_FAILED_ROLLBACK  => 'Failed RollBack',
+            self::STATUS_DELETED  => 'Deleted',
         ];
     }
 
@@ -80,10 +84,26 @@ class Migration extends MigrationBase
     /**
      * {@inheritDoc}
      */
-    public static function upsert($migrationName, $typeName, Project $project, ReleaseRequest $releaseRequest)
+    public static function findNotDeletedWithLimit(string $typeName, Project $project, int $objIdFilter, int $limit): array
     {
+        return Migration::find()->where([
+            'migration_type' => Migration::getTypeIdByName($typeName),
+            'migration_project_obj_id' => $project->obj_id,
+        ])
+            ->andWhere(['not', ['obj_status_did' => self::STATUS_DELETED]])
+            ->andWhere("obj_id < {$objIdFilter}")
+            ->orderBy(['obj_id' => SORT_DESC])->limit($limit)->all();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function upsert($migrationName, $typeName, ReleaseRequest $releaseRequest)
+    {
+        $project = $releaseRequest->project;
+
         if (!preg_match('/^[\w\/\\\_\-]+$/', $migrationName)) {
-            throw new \Exception("Skip processing {$typeName} migration {$migrationName} of project {$project->project_name}. Malformed name.");
+            throw new Exception("Skip processing {$typeName} migration {$migrationName} of project {$project->project_name}. Malformed name.");
 
         }
 
@@ -251,6 +271,15 @@ class Migration extends MigrationBase
     public function updateStatus($status)
     {
         $this->obj_status_did = $status;
+        $this->save();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setStatusDeleted()
+    {
+        $this->obj_status_did = self::STATUS_DELETED;
         $this->save();
     }
 
