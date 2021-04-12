@@ -39,7 +39,7 @@ class MigrationController extends SingleInstanceController
                 Yii::$app->migrationService->addOrUpdateExistedMigrations($typeName, $releaseRequest);
 
                 Yii::info('Start to delete not existed migrations');
-//                Yii::$app->migrationService->deleteNotExistedMigrations($typeName, $releaseRequest);
+                Yii::$app->migrationService->deleteNotExistedMigrations($typeName, $releaseRequest);
             }
         }
 
