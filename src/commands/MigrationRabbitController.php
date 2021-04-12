@@ -67,7 +67,7 @@ class MigrationRabbitController extends RabbitListener
             return;
         }
 
-        Yii::$app->migrationService->createOrUpdateListByCommand($message->migrations, $message->type, $message->command, $project, $releaseRequest);
+        Yii::$app->migrationService->addOrUpdateListByCommand($message->migrations, $message->command, $message->type, $releaseRequest);
 
         // ag: For backward compatibility after #WTA-2267
         if ($message->type === Migration::TYPE_PRE && in_array($message->command, [MigrateController::MIGRATION_COMMAND_NEW, MigrateController::MIGRATION_COMMAND_NEW_ALL])) {
