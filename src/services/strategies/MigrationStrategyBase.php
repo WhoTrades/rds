@@ -45,18 +45,18 @@ abstract class MigrationStrategyBase
     abstract public function sendCommand($migrationCommand, MigrationBase $migration): void;
 
     /**
-     * @param array $existedMigrationNameList
+     * @param array $existentMigrationNameList
      * @param Project $project
      *
      * @return void
      */
-    public function deleteNotExistedMigrations(array $existedMigrationNameList, Project $project): void
+    public function deleteNonExistentMigrations(array $existentMigrationNameList, Project $project): void
     {
         $objIdFilter = PHP_INT_MAX;
         while ($migrationList = $this->getMigrationList($project, $objIdFilter, self::MIGRATION_LIMIT)) {
             /** @var MigrationBase $migration */
             foreach ($migrationList as $migration) {
-                if (!in_array($migration->migration_name, $existedMigrationNameList)) {
+                if (!in_array($migration->migration_name, $existentMigrationNameList)) {
                     Yii::info("Delete migration {$migration->migration_name}");
                     $migration->setStatusDeleted();
                 }

@@ -61,14 +61,14 @@ class MigrationService
      *
      * @return void
      */
-    public function deleteNotExistedMigrations(string $typeName, ReleaseRequest $releaseRequest)
+    public function deleteNonExistentMigrations(string $typeName, ReleaseRequest $releaseRequest)
     {
-        $existedMigrationNameList = array_merge(
+        $existentMigrationNameList = array_merge(
             $this->getMigrationNameList(MigrateController::MIGRATION_COMMAND_NEW_ALL, $typeName, $releaseRequest),
             $this->getMigrationNameList(MigrateController::MIGRATION_COMMAND_HISTORY_ALL, $typeName, $releaseRequest)
         );
 
-        $this->getMigrationStrategy($typeName)->deleteNotExistedMigrations($existedMigrationNameList, $releaseRequest->project);
+        $this->getMigrationStrategy($typeName)->deleteNonExistentMigrations($existentMigrationNameList, $releaseRequest->project);
     }
     /**
      * @param MigrationBase $migration
