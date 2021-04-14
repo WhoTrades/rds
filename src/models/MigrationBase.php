@@ -104,6 +104,24 @@ abstract class MigrationBase extends ActiveRecord
     abstract public static function findNotDeletedWithLimit(string $typeName, Project $project, int $objIdFilter, int $limit): array;
 
     /**
+     * @return ActiveQuery
+     */
+    public static function findWithoutLog(): ActiveQuery
+    {
+        return self::find()->select([
+            'obj_id',
+            'obj_created',
+            'obj_modified',
+            'obj_status_did',
+            'migration_type',
+            'migration_name',
+            'migration_ticket',
+            'migration_project_obj_id',
+            'migration_release_request_obj_id',
+        ]);
+    }
+
+    /**
      * @param string $migrationName
      * @param string $typeName
      * @param ReleaseRequest $releaseRequest
