@@ -11,6 +11,7 @@ use yii\data\ActiveDataProvider;
 use whotrades\rds\models\Migration\Exception\UndefinedClassForState;
 use DateTime;
 use Exception;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.migration".
@@ -93,6 +94,14 @@ class Migration extends MigrationBase
             ->andWhere(['not', ['obj_status_did' => self::STATUS_DELETED]])
             ->andWhere("obj_id < {$objIdFilter}")
             ->orderBy(['obj_id' => SORT_DESC])->limit($limit)->all();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function findWithoutLog(): ActiveQuery
+    {
+        return parent::findWithoutLog()->addSelect('migration_auto_apply');
     }
 
     /**
@@ -206,7 +215,7 @@ class Migration extends MigrationBase
      */
     public static function getPreMigrationCanBeAppliedList()
     {
-        $preMigrationPendingList = self::find()
+        $preMigrationPendingList = static::findWithoutLog()
             ->andWhere(['migration_type' => self::TYPE_ID_PRE])
             ->andWhere(['IN', 'obj_status_did', [self::STATUS_PENDING, self::STATUS_FAILED_APPLICATION]])
             ->all();
@@ -221,7 +230,7 @@ class Migration extends MigrationBase
      */
     public static function getPostMigrationCanBeAppliedList()
     {
-        $postMigrationPendingList = self::find()
+        $postMigrationPendingList = static::findWithoutLog()
             ->andWhere(['migration_type' => self::TYPE_ID_POST])
             ->andWhere(['IN', 'obj_status_did', [self::STATUS_PENDING, self::STATUS_FAILED_APPLICATION]])
             ->all();
@@ -271,7 +280,7 @@ class Migration extends MigrationBase
     public function updateStatus($status)
     {
         $this->obj_status_did = $status;
-        $this->save();
+        $this->save(false);
     }
 
     /**
@@ -280,7 +289,7 @@ class Migration extends MigrationBase
     public function setStatusDeleted()
     {
         $this->obj_status_did = self::STATUS_DELETED;
-        $this->save();
+        $this->save(false);
     }
 
     /**
