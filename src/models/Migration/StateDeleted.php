@@ -38,7 +38,7 @@ class StateDeleted extends StateBase
      */
     public function tryUpdateStatus($status)
     {
-        if ($status === Migration::STATUS_PENDING) {
+        if (in_array($status, [Migration::STATUS_PENDING, Migration::STATUS_APPLIED])) {
             $this->migration->updateStatus($status);
         }
     }
