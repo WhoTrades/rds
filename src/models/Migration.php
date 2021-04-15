@@ -117,13 +117,13 @@ class Migration extends MigrationBase
         }
 
         $migrationTypeId = Migration::getTypeIdByName($typeName);
-        $migration = Migration::findByAttributes(
+        $migration = Migration::findWithoutLog()->where(
             [
                 'migration_type' => $migrationTypeId,
                 'migration_name' => $migrationName,
                 'migration_project_obj_id' => $project->obj_id,
             ]
-        );
+        )->one();
 
         if ($migration) {
             Yii::info("Skip creating {$typeName} migration {$migrationName} of project {$project->project_name}. Already exists in DB");
