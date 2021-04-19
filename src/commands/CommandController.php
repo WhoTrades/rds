@@ -17,7 +17,6 @@ class CommandController extends \whotrades\RdsSystem\commands\CommandController
             $this->createCommand(DeployController::class, 'index', [], "rds_async_reader_deploy"),
             $this->createCommand(RemovePackagesController::class, 'index', [], "rds_async_reader_remove_packages", '1 */5 * * * *'),
             $this->createCommand(MigrationRabbitController::class, 'index', [], "rds_async_reader_migration"),
-            $this->createCommand(MigrationController::class, 'update', [], "rds_migration_update", '41 * * * * *'),
         ];
     }
 }
