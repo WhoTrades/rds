@@ -143,29 +143,12 @@ abstract class MigrationBase extends ActiveRecord
     /**
      * @return self[]
      */
-    abstract protected static function getMigrationReadyBeAutoAppliedList();
-
-    /**
-     * @return static[]
-     */
-    public static function getMigrationCanBeAutoAppliedList()
-    {
-        $migrationListForApplying = static::getMigrationReadyBeAutoAppliedList();
-
-        return array_filter($migrationListForApplying, function (self $migration) {
-            return $migration->canBeAutoApplied();
-        });
-    }
+    abstract public static function getMigrationCanBeAutoAppliedList();
 
     /**
      * @return bool
      */
     abstract public function canBeApplied();
-
-    /**
-     * @return bool
-     */
-    abstract public function canBeAutoApplied();
 
     /**
      * @return void
