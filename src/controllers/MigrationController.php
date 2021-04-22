@@ -74,36 +74,6 @@ class MigrationController extends ControllerRestrictedBase
     }
 
     /**
-     * @param int $migrationId
-     *
-     * @throws HttpException
-     */
-    public function actionAutoApplyDisable($migrationId)
-    {
-        /** @var Migration $migration */
-        $migration = $this->loadModel($migrationId);
-        Log::createLogMessage("Деактивировано авто выполнение миграции '{$migration->migration_name}' проекта '{$migration->project->project_name}'");
-        $migration->autoApplyDisable();
-
-        $this->redirect('/migration/index');
-    }
-
-    /**
-     * @param int $migrationId
-     *
-     * @throws HttpException
-     */
-    public function actionAutoApplyEnable($migrationId)
-    {
-        /** @var Migration $migration */
-        $migration = $this->loadModel($migrationId);
-        Log::createLogMessage("Активировано авто выполнение миграции 'э'{$migration->migration_name}' проекта '{$migration->project->project_name}'");
-        $migration->autoApplyEnable();
-
-        $this->redirect('/migration/index');
-    }
-
-    /**
      * @param int $id
      *
      * @return Migration

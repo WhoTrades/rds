@@ -11,7 +11,6 @@ use yii\data\ActiveDataProvider;
 use whotrades\rds\models\Migration\Exception\UndefinedClassForState;
 use DateTime;
 use Exception;
-use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "rds.migration".
@@ -19,7 +18,6 @@ use yii\db\ActiveQuery;
  * The followings are the available columns in table 'rds.migration':
  *
  * {@inheritDoc}
- * @property bool $migration_auto_apply
  */
 class Migration extends MigrationBase
 {
@@ -99,14 +97,6 @@ class Migration extends MigrationBase
     /**
      * {@inheritDoc}
      */
-    public static function findWithoutLog(): ActiveQuery
-    {
-        return parent::findWithoutLog()->addSelect('migration_auto_apply');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public static function upsert($migrationName, $typeName, ReleaseRequest $releaseRequest)
     {
         $project = $releaseRequest->project;
@@ -158,16 +148,6 @@ class Migration extends MigrationBase
     }
 
     /**
-     * @return array customized attribute labels (name=>label)
-     */
-    public function attributeLabels()
-    {
-        return array_merge(parent::attributeLabels(), [
-            'migration_auto_apply' => 'Auto Apply',
-        ]);
-    }
-
-    /**
      * Creates data provider instance with search query applied
      *
      * @param array $params
@@ -201,13 +181,9 @@ class Migration extends MigrationBase
     /**
      * {@inheritDoc}
      */
-    protected static function getMigrationReadyBeAutoAppliedList()
+    public static function getMigrationCanBeAutoAppliedList()
     {
-        $migrationCanBeAppliedList = self::getPreMigrationCanBeAppliedList();
-
-        return array_filter($migrationCanBeAppliedList, function (self $migration) {
-            return $migration->canBeAutoApplied();
-        });
+        return self::getPreMigrationCanBeAppliedList();
     }
 
     /**
@@ -330,14 +306,6 @@ class Migration extends MigrationBase
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function canBeAutoApplied()
-    {
-        return $this->migration_auto_apply;
-    }
-
-    /**
      * @return bool
      */
     public function canBeRolledBack()
@@ -376,25 +344,6 @@ class Migration extends MigrationBase
     public function failed()
     {
         $this->getStateObject()->failed();
-    }
-
-    /**
-     * @return void
-     */
-    public function autoApplyDisable()
-    {
-        $this->migration_auto_apply = false;
-        $this->save();
-    }
-
-
-    /**
-     * @return void
-     */
-    public function autoApplyEnable()
-    {
-        $this->migration_auto_apply = true;
-        $this->save();
     }
 
     /**

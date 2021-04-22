@@ -51,31 +51,6 @@ return [
         'format' => 'raw',
     ],
     [
-        'header' => 'Auto Apply',
-        'class' => 'yii\grid\ActionColumn',
-        'template' => '{disable} {enable}',
-        'visibleButtons' => [
-            'disable' => function (Migration $migration) {
-                return $migration->migration_auto_apply;
-            },
-            'enable' => function (Migration $migration) {
-                return !$migration->migration_auto_apply;
-            },
-        ],
-        'buttons' => [
-            'disable' => function ($url, Migration $migration) {
-                $url    = Url::to(['/migration/auto-apply-disable', 'migrationId' => $migration->obj_id]);
-
-                return '<span class="glyphicon glyphicon-ok" style="color: green" ></span>' . Html::a(' Disable', $url);
-            },
-            'enable' => function ($url, Migration $migration) {
-                $url    = Url::to(['/migration/auto-apply-enable', 'migrationId' => $migration->obj_id]);
-
-                return '<span class="glyphicon glyphicon-remove" style="color: red" ></span>' . Html::a(' Enable', $url);
-            },
-        ],
-    ],
-    [
         'attribute' => 'obj_status_did',
         'value' => function(Migration $migration) {
             $statusLine = $migration->getStatusName();
