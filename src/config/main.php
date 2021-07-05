@@ -6,6 +6,13 @@
  */
 
 use kartik\grid\Module;
+use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Monolog\Processor\ProcessorInterface;
+use Monolog\Processor\PsrLogMessageProcessor;
+use Psr\Log\LoggerInterface;
+use whotrades\rds\extensions\PsrTarget\PsrTarget;
 use whotrades\rds\models\User\User;
 use whotrades\rds\services\DeployService;
 use whotrades\rds\services\DeployServiceInterface;
@@ -121,19 +128,7 @@ $config = array(
             'flushInterval' => 1,
             'targets' => [
                 [
-                    'class' => yii\log\SyslogTarget::class,
-                    'identity' => 'yii-service-rds',
-                    'levels' => ['info', 'warning', 'error'],
-                    'except' => ['yii\db\Command::query'],
-                    'logVars' => [],
-                    'facility' => LOG_LOCAL4,
-                    'options' => 0,
-                ],
-                [
-                    'class' => 'codemix\streamlog\Target',
-                    'url' => 'php://stdout',
-                    'levels' => ['info', 'warning', 'error'],
-                    'except' => ['yii\db\Command::query'],
+                    'class' => PsrTarget::class,
                     'logVars' => [],
                     'exportInterval' => 1,
                 ],
@@ -274,6 +269,14 @@ $config = array(
                 'phones' => '',
             ),
         ),
+        'logger' => [
+            'processors' => [
+                new PsrLogMessageProcessor(),
+            ],
+            'handlers' => [
+                new StreamHandler("php://stdout", Logger::INFO),
+            ],
+        ],
         'sentry' => [
             'baseUrl' => 'https://sentry.com/sentry/',
             'projectNameMap' => [], // ag: Mapping of RDS project name to Sentry project name
@@ -328,6 +331,30 @@ $config = array(
             CronConfigProcessingStrategyInterface::class => [
                 'class' => CronConfigNoProcessingStrategy::class,
             ],
+            LoggerInterface::class => function () {
+                $loggerConfig = Yii::$app->params['logger'];
+                $processors = $loggerConfig['processors'] ?: [];
+                $handlers = $loggerConfig['handlers'] ?: [];
+
+                $logger = new Logger('main');
+
+                foreach ($processors as $processor) {
+                    if ($processor instanceof ProcessorInterface) {
+                        $logger->pushProcessor($processor);
+                    }
+                }
+
+                foreach ($handlers as $handler) {
+                    if (is_callable($handler)) {
+                        $handler = call_user_func($handler);
+                    }
+                    if ($handler instanceof HandlerInterface) {
+                        $logger->pushHandler($handler);
+                    }
+                }
+
+                return $logger;
+            },
         ],
     ],
     'on ' . Application::EVENT_BEFORE_REQUEST => function () {
