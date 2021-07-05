@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace whotrades\rds\services;
 
+use samdark\log\PsrMessage;
 use whotrades\rds\components\Deploy\DeployEventInterface;
 use whotrades\rds\events\Deploy\CronConfigAfterEvent;
 use whotrades\rds\events\Deploy\CronConfigBeforeEvent;
@@ -117,13 +118,12 @@ class DeployService implements DeployServiceInterface
         ]);
 
         if (!$build) {
-            Yii::error("Skip message. Build of releaseRequest {$project->project_name}-{$message->version} for worker {$worker->worker_name} not found");
-            Yii::$app->sentry->captureMessage('unknown_build_info', [
+            Yii::error(new PsrMessage("Skip message. Build of releaseRequest {$project->project_name}-{$message->version} for worker {$worker->worker_name} not found", [
                 'build_project_obj_id' => $project->obj_id,
                 'build_worker_obj_id' => $worker->obj_id,
                 'build_release_request_obj_id' => $releaseRequest->obj_id,
                 'message' => $message,
-            ]);
+            ]));
             $message->accepted();
 
             return;
