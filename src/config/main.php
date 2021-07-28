@@ -30,6 +30,8 @@ use whotrades\rds\events\NotificationEventHandler;
 use whotrades\rds\services\NotificationService;
 use whotrades\rds\services\NotificationServiceInterface;
 use yii\i18n\PhpMessageSource;
+use whotrades\RdsSystem\Migration\LogAggregatorUrlInterface as MigrationLogAggregatorUrlInterface;
+use whotrades\rds\components\MigrationLogAggregatorUrl;
 
 $config = array(
     'id' => 'RDS',
@@ -350,6 +352,10 @@ $config = array(
 
                 return $logger;
             },
+            MigrationLogAggregatorUrlInterface::class => [
+                ['class' => MigrationLogAggregatorUrl::class],
+                ['http://migration-logger-aggregator.url?migration_name=#migration_name#&migration_type=#migration_type#&migration_project=#migration_project#'],
+            ],
         ],
     ],
     'on ' . Application::EVENT_BEFORE_REQUEST => function () {

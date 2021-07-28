@@ -1,7 +1,9 @@
 <?php
 /** @var Migration $model */
+/** @var MigrationLogAggregatorUrlInterface $migrationLogAggregatorUrl */
 
 use whotrades\rds\models\Migration;
+use whotrades\RdsSystem\Migration\LogAggregatorUrlInterface as MigrationLogAggregatorUrlInterface;
 
 echo yii\grid\GridView::widget([
    'id' => 'build-grid',

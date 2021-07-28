@@ -1,7 +1,9 @@
 <?php
 /** @var Migration $model */
+/** @var MigrationLogAggregatorUrlInterface $migrationLogAggregatorUrl */
 
 use whotrades\rds\models\Migration;
+use whotrades\RdsSystem\Migration\LogAggregatorUrlInterface as MigrationLogAggregatorUrlInterface;
 
 ?>
 
@@ -9,7 +11,10 @@ use whotrades\rds\models\Migration;
 
 <?php
 \yii\widgets\Pjax::begin(['id' => 'migration-grid-pjax-container']);
-echo $this->render('_migrationGrid', ['dataProvider' => $model->search($model->attributes), 'filterModel' => $model, 'model' => $model]);
+echo $this->render(
+        '_migrationGrid',
+        ['dataProvider' => $model->search($model->attributes), 'filterModel' => $model, 'model' => $model, 'migrationLogAggregatorUrl' => $migrationLogAggregatorUrl]
+);
 \yii\widgets\Pjax::end();
 ?>
 
