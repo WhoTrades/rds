@@ -7,10 +7,25 @@ namespace whotrades\rds\controllers;
 use whotrades\rds\models\Migration;
 use whotrades\rds\models\Log;
 use yii\web\HttpException;
+use whotrades\RdsSystem\Migration\LogAggregatorUrlInterface as MigrationLogAggregatorUrlInterface;
 
 class MigrationController extends ControllerRestrictedBase
 {
     public $pageTitle = 'Migrations';
+
+    /** @var MigrationLogAggregatorUrlInterface */
+    private $migrationLogAggregatorUrl;
+
+    /**
+     * {@inheritDoc}
+     * @param MigrationLogAggregatorUrlInterface $migrationLogAggregatorUrl
+     */
+    public function __construct($id, $module, MigrationLogAggregatorUrlInterface $migrationLogAggregatorUrl, $config = null)
+    {
+        $this->migrationLogAggregatorUrl = $migrationLogAggregatorUrl;
+        $config = $config ?? [];
+        parent::__construct($id, $module, $config);
+    }
 
     /**
      * @return string
@@ -24,6 +39,7 @@ class MigrationController extends ControllerRestrictedBase
 
         return $this->render('index', array(
             'model' => $model,
+            'migrationLogAggregatorUrl' => $this->migrationLogAggregatorUrl,
         ));
     }
 

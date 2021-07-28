@@ -1,10 +1,13 @@
 <?php
 
+/** @var MigrationLogAggregatorUrlInterface $migrationLogAggregatorUrl */
+
 use whotrades\rds\models\Migration;
 use whotrades\rds\models\Project;
 use yii\helpers\Url;
 use whotrades\rds\helpers\Html;
 use yii\bootstrap\Html as bootstrapHtml;
+use whotrades\RdsSystem\Migration\LogAggregatorUrlInterface as MigrationLogAggregatorUrlInterface;
 
 return [
     'obj_id',
@@ -65,7 +68,7 @@ return [
     ],
     [
         'header' => 'Action',
-        'value' => function(Migration $migration) {
+        'value' => function (Migration $migration) use ($migrationLogAggregatorUrl) {
             $lines = [];
 
             if (($waitingDays = $migration->getWaitingDays()) > 0) {
@@ -80,8 +83,12 @@ return [
                 $lines[] = Html::a('RollBack', Url::to(['/migration/roll-back', 'migrationId' => $migration->obj_id]), ['class' => 'ajax-url']);
             }
 
+            $lines[] = Html::aTargetBlank(
+                $migrationLogAggregatorUrl->generateFiltered($migration->migration_name, $migration->getTypeName(), $migration->project->project_name),
+                'View log'
+            );
             if ($migration->migration_log) {
-                $lines[] = Html::aTargetBlank(Url::to(['/migration/view-log', 'migrationId' => $migration->obj_id]), 'View log');
+                $lines[] = Html::aTargetBlank(Url::to(['/migration/view-log', 'migrationId' => $migration->obj_id]), 'View log (deprecated)');
             }
 
             return implode("<br />", $lines);
