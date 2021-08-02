@@ -128,6 +128,7 @@ $config = array(
                     'class' => PsrTarget::class,
                     'logVars' => [],
                     'exportInterval' => 1,
+                    'except' => ['yii\db\Command::query'],
                 ],
             ],
         ],
