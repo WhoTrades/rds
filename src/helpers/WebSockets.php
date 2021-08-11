@@ -6,6 +6,7 @@
  */
 namespace whotrades\rds\helpers;
 
+use whotrades\RdsSystem\Migration\LogAggregatorUrlInterface as MigrationLogAggregatorUrlInterface;
 use Yii;
 use whotrades\rds\models\ReleaseRequest;
 use whotrades\rds\models\Migration;
@@ -44,10 +45,12 @@ class WebSockets
         Yii::info("Sending to comet new data of migration #$migrationId");
 
         $model = Migration::findByPk($migrationId);
+        $migrationLogAggregatorUrl = Yii::createObject(MigrationLogAggregatorUrlInterface::class);
 
         $html = Yii::$app->view->renderFile(__DIR__ . '/../views/migration/_migrationGrid.php', [
             'dataProvider' => $model->search(['obj_id' => $migrationId]),
             'model' => $model,
+            'migrationLogAggregatorUrl' => $migrationLogAggregatorUrl,
         ]);
 
         Yii::info("html code generated");
