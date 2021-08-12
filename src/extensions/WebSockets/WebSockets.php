@@ -26,7 +26,8 @@ class WebSockets extends Component
     {
         foreach ($this->zmqLocations as $location) {
             $context = new ZMQContext();
-            $this->sockets[$location] = $context->getSocket(ZMQ::SOCKET_PUSH)->setSockOpt(ZMQ::SOCKOPT_LINGER, 0);
+            $this->sockets[$location] = $context->getSocket(ZMQ::SOCKET_PUSH);
+            $this->sockets[$location]->setSockOpt(ZMQ::SOCKOPT_LINGER, 0);
         }
     }
 
