@@ -46,16 +46,23 @@ class UsingSucceed extends BaseNotification
      */
     protected $ticketList;
 
+    /** @var string */
+    protected $initiatorUserName;
+
     /**
      * @param Project $project
      * @param ReleaseRequest $releaseRequestNew
      * @param ReleaseRequest $releaseRequestOld
-     * @param string $versionNew
-     * @param string $versionOld
      * @param TicketInterface[] $ticketList
+     * @param string $initiatorUserName
      */
-    public function __construct(Project $project, ReleaseRequest $releaseRequestNew, ReleaseRequest $releaseRequestOld, array $ticketList = null)
-    {
+    public function __construct(
+        Project $project,
+        ReleaseRequest $releaseRequestNew,
+        ReleaseRequest $releaseRequestOld,
+        array $ticketList,
+        string $initiatorUserName
+    ) {
         $ticketList = $ticketList ?? [];
         array_walk(
             $ticketList,
@@ -77,6 +84,7 @@ class UsingSucceed extends BaseNotification
         $this->versionNew = $this->releaseRequestNew->rr_build_version;
         $this->versionOld = $this->releaseRequestOld->rr_build_version;
         $this->ticketList = $ticketList;
+        $this->initiatorUserName = $initiatorUserName;
     }
 
     public function exportForMail(): MailMessage

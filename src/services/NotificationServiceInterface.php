@@ -55,8 +55,9 @@ interface NotificationServiceInterface
      * @param Project $project
      * @param ReleaseRequest $releaseRequestNew
      * @param ReleaseRequest $releaseRequestOld
+     * @param string $initiatorUserName
      */
-    public function sendUsingSucceed(Project $project, ReleaseRequest $releaseRequestNew, ReleaseRequest $releaseRequestOld): void;
+    public function sendUsingSucceed(Project $project, ReleaseRequest $releaseRequestNew, ReleaseRequest $releaseRequestOld, string $initiatorUserName): void;
 
     /**
      * @param string $projectName
