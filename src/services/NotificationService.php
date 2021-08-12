@@ -123,12 +123,12 @@ class NotificationService extends BaseObject implements NotificationServiceInter
     /**
      * {@inheritDoc}
      */
-    public function sendUsingSucceed(Project $project, ReleaseRequest $releaseRequestNew, ReleaseRequest $releaseRequestOld): void
+    public function sendUsingSucceed(Project $project, ReleaseRequest $releaseRequestNew, ReleaseRequest $releaseRequestOld, string $initiatorUserName): void
     {
         try {
             $this->notifier->send(
                 $this->getUsingSucceedRecipientList($project, $releaseRequestNew, $releaseRequestOld),
-                $this->getUsingSucceedNotification($project, $releaseRequestNew, $releaseRequestOld)
+                $this->getUsingSucceedNotification($project, $releaseRequestNew, $releaseRequestOld, $initiatorUserName)
             );
         } catch (\Throwable $e) {
             // Notifications errors shouldn't affect main program flow
@@ -291,15 +291,20 @@ class NotificationService extends BaseObject implements NotificationServiceInter
      * @param Project $project
      * @param ReleaseRequest $releaseRequestNew
      * @param ReleaseRequest $releaseRequestOld
+     * @param string $initiatorUserName
      *
      * @return NotificationInterface
      */
-    protected function getUsingSucceedNotification(Project $project, ReleaseRequest $releaseRequestNew, ReleaseRequest $releaseRequestOld): NotificationInterface
-    {
-        $notification = new notification\UsingSucceed($project, $releaseRequestNew, $releaseRequestOld);
+    protected function getUsingSucceedNotification(
+        Project $project,
+        ReleaseRequest $releaseRequestNew,
+        ReleaseRequest $releaseRequestOld,
+        string $initiatorUserName
+    ): NotificationInterface {
+        $notification = new notification\UsingSucceed($project, $releaseRequestNew, $releaseRequestOld, [], $initiatorUserName);
         $isRollBack = $releaseRequestNew->rr_build_version < $releaseRequestOld->rr_build_version;
         if ($isRollBack) {
-            $notification = new notification\RollBackSucceed($project, $releaseRequestNew, $releaseRequestOld);
+            $notification = new notification\RollBackSucceed($project, $releaseRequestNew, $releaseRequestOld, [], $initiatorUserName);
         }
 
         return $notification;

@@ -93,7 +93,12 @@ class DeployController extends RabbitListener implements DeployEventInterface
         Event::on(DeployServiceInterface::class, DeployEventInterface::EVENT_USED_VERSION_AFTER, function (UsedVersionAfterEvent $event) {
             // dg: Don't send notifications about child releases
             if (!$event->getReleaseRequest()->isChild()) {
-                $this->notificationService->sendUsingSucceed($event->getReleaseRequest()->project, $event->getReleaseRequest(), $event->getReleaseRequestOld());
+                $this->notificationService->sendUsingSucceed(
+                    $event->getReleaseRequest()->project,
+                    $event->getReleaseRequest(),
+                    $event->getReleaseRequestOld(),
+                    $event->getMessage()->initiatorUserName
+                );
             }
             Yii::$app->webSockets->send('updateAllReleaseRequests', []);
         });
