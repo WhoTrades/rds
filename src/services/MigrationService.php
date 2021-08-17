@@ -70,7 +70,7 @@ class MigrationService
         );
 
         if (!$existentMigrationNameList) {
-            Yii::warning("There are not existent new and apllied migrations in project {$releaseRequest->project->project_name}.");
+            Yii::warning("There are not existent new and applied migrations in project {$releaseRequest->project->project_name}.");
             Yii::warning("It is possible an error of executing a migration script on project");
             Yii::warning("Skip deleting all migrations.");
 
