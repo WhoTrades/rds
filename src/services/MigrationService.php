@@ -6,6 +6,7 @@
  */
 namespace whotrades\rds\services;
 
+use Yii;
 use whotrades\rds\models\MigrationBase;
 use whotrades\rds\models\Migration as MigrationModel;
 use whotrades\rds\models\ReleaseRequest;
@@ -67,6 +68,14 @@ class MigrationService
             $this->getMigrationNameList(MigrateController::MIGRATION_COMMAND_NEW_ALL, $typeName, $releaseRequest),
             $this->getMigrationNameList(MigrateController::MIGRATION_COMMAND_HISTORY_ALL, $typeName, $releaseRequest)
         );
+
+        if (!$existentMigrationNameList) {
+            Yii::warning("There are not existent new and apllied migrations in project {$releaseRequest->project->project_name}.");
+            Yii::warning("It is possible an error of executing a migration script on project");
+            Yii::warning("Skip deleting all migrations.");
+
+            return;
+        }
 
         $this->getMigrationStrategy($typeName)->deleteNonExistentMigrations($existentMigrationNameList, $releaseRequest->project);
     }
