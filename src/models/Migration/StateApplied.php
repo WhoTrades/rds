@@ -5,6 +5,7 @@
 namespace whotrades\rds\models\Migration;
 
 use whotrades\rds\models\Migration;
+use whotrades\rds\models\ReleaseRequest;
 
 class StateApplied extends StateBase
 {
@@ -27,7 +28,7 @@ class StateApplied extends StateBase
     /**
      * {@inheritDoc}
      */
-    public function apply()
+    public function apply(ReleaseRequest $releaseRequest = null)
     {
         \Yii::info("Migration {$this->migration->migration_name} is applied already");
     }

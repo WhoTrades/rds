@@ -102,41 +102,13 @@ class MigrationRabbitController extends RabbitListener
             return;
         }
 
-        $transaction = Yii::$app->db->beginTransaction();
-
-        // ag: For backward compatibility after #WTA-2267
-        if (!$message->migrationName && $message->type === Migration::TYPE_PRE) {
-            $releaseRequest->rr_migration_status = $message->status;
-
-            if ($message->status === Message\MigrationStatus::STATUS_FAILED) {
-                $releaseRequest->rr_migration_error = $message->result;
-            }
-
-            if ($message->status === Message\MigrationStatus::STATUS_SUCCESS) {
-                $releaseRequest->rr_new_migration_count = 0;
-
-                ReleaseRequest::updateAll(['rr_migration_status' => $message->status, 'rr_new_migration_count' => 0], 'rr_build_version <= :version AND rr_project_obj_id = :id', [
-                    ':version'  => $message->version,
-                    ':id'       => $projectObj->obj_id,
-                ]);
-            }
-
-            $releaseRequest->save();
-
-            WebSocketsHelper::sendReleaseRequestUpdated($releaseRequest->obj_id);
-        }
-
-        $transaction->commit();
-
-        $migrationTypeId = Migration::getTypeIdByName($message->type);
         $migration = Migration::findByAttributes(
             [
-                'migration_type' => $migrationTypeId,
+                'migration_type' => Migration::getTypeIdByName($message->type),
                 'migration_name' => $message->migrationName,
                 'migration_project_obj_id' => $projectObj->obj_id,
             ]
         );
-
         if (!$migration) {
             Yii::error("Skip unknown {$message->type} migration: project={$message->project}, migration_name={$message->migrationName}");
             $message->accepted();
@@ -146,19 +118,35 @@ class MigrationRabbitController extends RabbitListener
 
         $transaction = Yii::$app->db->beginTransaction();
 
-        switch ($message->status) {
-            case Message\MigrationStatus::STATUS_SUCCESS:
-                $migration->succeed();
-                break;
-            case Message\MigrationStatus::STATUS_FAILED:
-                $migration->failed();
-                break;
+        if ($message->status === Message\MigrationStatus::STATUS_SUCCESS) {
+            $migration->succeed();
+        } elseif ($message->status === Message\MigrationStatus::STATUS_FAILED) {
+            $migration->failed();
         }
         $migration->updateLog($message->result);
 
-        WebSocketsHelper::sendMigrationUpdated($migration->obj_id);
+        if ($releaseRequest->shouldBeMigrated() && $message->type === Migration::TYPE_PRE) {
+            if ($message->status === Message\MigrationStatus::STATUS_SUCCESS) {
+                $releaseRequest->rr_new_migration_count--;
+            } elseif ($message->status === Message\MigrationStatus::STATUS_FAILED) {
+                $releaseRequest->rr_migration_error .= $message->result;
+                $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_FAILED;
+            }
+            $releaseRequest->save();
+
+            if ($releaseRequest->rr_new_migration_count === 0) {
+                ReleaseRequest::updateAll(
+                    ['rr_migration_status' => ReleaseRequest::MIGRATION_STATUS_UP, 'rr_new_migration_count' => 0],
+                    'rr_build_version <= :version AND rr_project_obj_id = :id',
+                    [':version' => $message->version, ':id' => $projectObj->obj_id]
+                );
+            }
+        }
 
         $transaction->commit();
+
+        WebSocketsHelper::sendMigrationUpdated($migration->obj_id);
+        WebSocketsHelper::sendReleaseRequestUpdated($releaseRequest->obj_id);
 
         $message->accepted();
     }

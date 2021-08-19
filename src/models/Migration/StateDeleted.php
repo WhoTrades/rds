@@ -4,6 +4,7 @@
  */
 namespace whotrades\rds\models\Migration;
 
+use whotrades\rds\models\ReleaseRequest;
 use Yii;
 use whotrades\rds\models\Migration;
 
@@ -20,7 +21,7 @@ class StateDeleted extends StateBase
     /**
      * {@inheritDoc}
      */
-    public function apply()
+    public function apply(ReleaseRequest $releaseRequest = null)
     {
         Yii::warning("Can't apply deleted migration {$this->migration->migration_name}");
     }

@@ -36,7 +36,7 @@ class MigrationDefaultStrategy extends MigrationStrategyBase
     /**
      * {@inheritDoc}
      */
-    public function sendCommand($migrationCommand, MigrationBase $migration): void
+    public function sendCommand($migrationCommand, MigrationBase $migration, ReleaseRequest $releaseRequest = null): void
     {
         if (!in_array($migration->getTypeName(), [Migration::TYPE_PRE, Migration::TYPE_POST])) {
             Yii::warning("Skip sending command. Unsupported migration type '{$migration->getTypeName()}'");
@@ -45,7 +45,7 @@ class MigrationDefaultStrategy extends MigrationStrategyBase
         }
 
         if ($migration->getTypeName() === Migration::TYPE_PRE) {
-            $releaseRequest = $migration->releaseRequest;
+            $releaseRequest = $releaseRequest ?? $migration->releaseRequest;
         } else {
             $releaseRequest = ReleaseRequest::getUsedReleaseByProjectId($migration->project->obj_id);
         }

@@ -100,10 +100,11 @@ class MigrationService
 
     /**
      * @param MigrationBase $migration
+     * @param ReleaseRequest|null $releaseRequest
      */
-    public function sendApplyCommand(MigrationBase $migration)
+    public function sendApplyCommand(MigrationBase $migration, ReleaseRequest $releaseRequest = null)
     {
-        $this->sendCommand(MigrateController::MIGRATION_COMMAND_UP_ONE, $migration);
+        $this->sendCommand(MigrateController::MIGRATION_COMMAND_UP_ONE, $migration, $releaseRequest);
     }
 
     /**
@@ -117,10 +118,11 @@ class MigrationService
     /**
      * @param string $migrationCommand // ag: @see \whotrades\rds\commands\MigrateController::MIGRATION_COMMAND_*
      * @param MigrationBase $migration
+     * @param ReleaseRequest|null $releaseRequest
      */
-    protected function sendCommand($migrationCommand, MigrationBase $migration)
+    protected function sendCommand($migrationCommand, MigrationBase $migration, ReleaseRequest $releaseRequest = null)
     {
-        $this->getMigrationStrategy($migration->getTypeName())->sendCommand($migrationCommand, $migration);
+        $this->getMigrationStrategy($migration->getTypeName())->sendCommand($migrationCommand, $migration, $releaseRequest);
     }
 
     /**

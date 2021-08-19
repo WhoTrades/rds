@@ -103,7 +103,6 @@ class Migration extends MigrationBase
 
         if (!preg_match('/^[\w\/\\\_\-]+$/', $migrationName)) {
             throw new Exception("Skip processing {$typeName} migration {$migrationName} of project {$project->project_name}. Malformed name.");
-
         }
 
         $migrationTypeId = Migration::getTypeIdByName($typeName);
@@ -316,9 +315,9 @@ class Migration extends MigrationBase
     /**
      * {@inheritDoc}
      */
-    public function apply()
+    public function apply(ReleaseRequest $releaseRequest = null)
     {
-        $this->getStateObject()->apply();
+        $this->getStateObject()->apply($releaseRequest);
     }
 
     /**
