@@ -108,7 +108,7 @@ class UseController extends ControllerRestrictedBase
         }
 
         WebSocketsHelper::sendReleaseRequestUpdated($releaseRequest->obj_id);
-        Log::createLogMessage("Запущены pre миграции {$releaseRequest->getTitle()}");
+        Log::createLogMessage("Migrations of {$releaseRequest->getBuildTag()} are run");
 
         return $this->redirect('/');
     }
