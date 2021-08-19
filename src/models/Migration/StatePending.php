@@ -5,6 +5,7 @@
 namespace whotrades\rds\models\Migration;
 
 use whotrades\rds\models\Migration;
+use whotrades\rds\models\ReleaseRequest;
 
 class StatePending extends StateBase
 {
@@ -31,7 +32,7 @@ class StatePending extends StateBase
     /**
      * {@inheritDoc}
      */
-    public function apply()
+    public function apply(ReleaseRequest $releaseRequest = null)
     {
         if (!$this->canBeApplied()) {
             \Yii::warning("Post migration {$this->migration->migration_name} is waiting {$this->migration->getWaitingDays()} days for applying");
@@ -39,7 +40,7 @@ class StatePending extends StateBase
             return;
         }
 
-        $this->migrationService->sendApplyCommand($this->migration);
+        $this->migrationService->sendApplyCommand($this->migration, $releaseRequest);
 
         $this->migration->obj_status_did = Migration::STATUS_STARTED_APPLICATION;
         $this->migration->save();

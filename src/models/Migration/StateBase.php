@@ -4,6 +4,7 @@
  */
 namespace whotrades\rds\models\Migration;
 
+use whotrades\rds\models\ReleaseRequest;
 use Yii;
 use whotrades\rds\models\Migration;
 use whotrades\rds\services\MigrationService;
@@ -35,9 +36,11 @@ abstract class StateBase
     abstract public function getStatusId();
 
     /**
+     * @param ReleaseRequest|null $releaseRequest
+     *
      * @return void
      */
-    abstract public function apply();
+    abstract public function apply(ReleaseRequest $releaseRequest = null);
 
     /**
      * @return void

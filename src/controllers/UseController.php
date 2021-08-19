@@ -4,11 +4,9 @@ namespace whotrades\rds\controllers;
 use Yii;
 use whotrades\rds\models\Migration;
 use whotrades\rds\models\Log;
-use whotrades\rds\models\Project2worker;
 use yii\web\HttpException;
 use whotrades\rds\models\RdsDbConfig;
 use whotrades\rds\models\ReleaseRequest;
-use whotrades\rds\commands\MigrateController;
 use whotrades\rds\helpers\WebSockets as WebSocketsHelper;
 
 class UseController extends ControllerRestrictedBase
@@ -75,35 +73,44 @@ class UseController extends ControllerRestrictedBase
     {
         $releaseRequest = $this->loadModel($id);
         if (!$releaseRequest->shouldBeMigrated()) {
-            $this->redirect('/');
+            return $this->redirect('/');
+        }
+
+        $migrationList = Migration::findWithoutLog()
+            ->andWhere([
+                'migration_type' => Migration::TYPE_ID_PRE,
+                'migration_project_obj_id' => $releaseRequest->project->obj_id,
+            ])
+            ->andWhere(['IN', 'obj_status_did', [Migration::STATUS_PENDING, Migration::STATUS_FAILED_APPLICATION]])
+            ->andWhere(['<=', 'migration_release_request_obj_id', $releaseRequest->obj_id])
+            ->orderBy(['migration_name' => SORT_ASC])
+            ->all();
+
+        if (!$migrationList) {
+            Yii::info("No pending migrations for {$releaseRequest->getBuildTag()}");
+
+            $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_UP;
+            $releaseRequest->rr_new_migration_count = 0;
+            $releaseRequest->save();
+
+            WebSocketsHelper::sendReleaseRequestUpdated($releaseRequest->obj_id);
+
+            return $this->redirect('/');
         }
 
         $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_UPDATING;
-        $logMessage = "Запущены pre миграции {$releaseRequest->getTitle()}";
+        $releaseRequest->rr_new_migration_count = count($migrationList);
+        $releaseRequest->save();
 
-        foreach ($releaseRequest->project->project2workers as $p2w) {
-            /** @var Project2worker $p2w */
-            $worker = $p2w->worker;
-            (new \whotrades\RdsSystem\Factory())->
-                getMessagingRdsMsModel()->
-                sendMigrationTask(
-                    $worker->worker_name,
-                    new \whotrades\RdsSystem\Message\MigrationTask(
-                        $releaseRequest->project->project_name,
-                        $releaseRequest->rr_build_version,
-                        Migration::TYPE_PRE,
-                        $releaseRequest->project->script_migration_up,
-                        MigrateController::MIGRATION_COMMAND_UP
-                    )
-                );
+        /** @var Migration $migration */
+        foreach ($migrationList as $migration) {
+            $migration->apply($releaseRequest);
         }
 
-        if ($releaseRequest->save()) {
-            WebSocketsHelper::sendReleaseRequestUpdated($releaseRequest->obj_id);
-            Log::createLogMessage($logMessage);
-        }
+        WebSocketsHelper::sendReleaseRequestUpdated($releaseRequest->obj_id);
+        Log::createLogMessage("Запущены pre миграции {$releaseRequest->getTitle()}");
 
-        $this->redirect('/');
+        return $this->redirect('/');
     }
 
     /**

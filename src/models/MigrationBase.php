@@ -151,9 +151,11 @@ abstract class MigrationBase extends ActiveRecord
     abstract public function canBeApplied();
 
     /**
+     * @param ReleaseRequest|null $releaseRequest
+     *
      * @return void
      */
-    abstract public function apply();
+    abstract public function apply(ReleaseRequest $releaseRequest = null);
 
     /**
      * @param int | string $status

@@ -41,8 +41,9 @@ abstract class MigrationStrategyBase
     /**
      * @param string $migrationCommand // ag: @see \whotrades\rds\commands\MigrateController::MIGRATION_COMMAND_*
      * @param MigrationBase $migration
+     * @param ReleaseRequest|null $releaseRequest
      */
-    abstract public function sendCommand($migrationCommand, MigrationBase $migration): void;
+    abstract public function sendCommand($migrationCommand, MigrationBase $migration, ReleaseRequest $releaseRequest = null): void;
 
     /**
      * @param array $existentMigrationNameList
@@ -52,14 +53,22 @@ abstract class MigrationStrategyBase
      */
     public function deleteNonExistentMigrations(array $existentMigrationNameList, Project $project): void
     {
+        $usedReleaseRequest = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
+
         $objIdFilter = PHP_INT_MAX;
         while ($migrationList = $this->getMigrationList($project, $objIdFilter, self::MIGRATION_LIMIT)) {
             /** @var MigrationBase $migration */
             foreach ($migrationList as $migration) {
-                if (!in_array($migration->migration_name, $existentMigrationNameList)) {
-                    Yii::info("Delete migration {$migration->migration_name}");
-                    $migration->setStatusDeleted();
+                // ag: Skip deleting migration from ReleaseRequest newer than used
+                if ($migration->migration_release_request_obj_id > $usedReleaseRequest->obj_id) {
+                    continue;
                 }
+                if (in_array($migration->migration_name, $existentMigrationNameList)) {
+                    continue;
+                }
+
+                Yii::info("Delete migration {$migration->migration_name}");
+                $migration->setStatusDeleted();
             }
             $objIdFilter = $migrationList[array_key_last($migrationList)]->obj_id;
         };

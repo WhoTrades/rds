@@ -5,6 +5,7 @@
 namespace whotrades\rds\models\Migration;
 
 use whotrades\rds\models\Migration;
+use whotrades\rds\models\ReleaseRequest;
 
 class StateStartedRollBack extends StateBase
 {
@@ -19,7 +20,7 @@ class StateStartedRollBack extends StateBase
     /**
      * {@inheritDoc}
      */
-    public function apply()
+    public function apply(ReleaseRequest $releaseRequest = null)
     {
         \Yii::warning("Roll back of migration {$this->migration->migration_name} is started already");
     }
