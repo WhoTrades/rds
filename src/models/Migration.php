@@ -182,7 +182,12 @@ class Migration extends MigrationBase
      */
     public static function getMigrationCanBeAutoAppliedList()
     {
-        return self::getPreMigrationCanBeAppliedList();
+        $preMigrationCanBeAppliedList = self::getPreMigrationCanBeAppliedList();
+
+        // ag: Exclude failed migrations from AUTO application. Deal with them manually.
+        return array_filter($preMigrationCanBeAppliedList, function (self $migration) {
+            return !$migration->isFailed();
+        });
     }
 
     /**
