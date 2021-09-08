@@ -13,7 +13,7 @@ class StopDeploymentForm extends \yii\base\Model
     public function attributeLabels()
     {
         return [
-            'reason' => 'Причина отключения',
+            'reason' => \Yii::t('rds', 'shutdown_reason'),
             'status' => 'Статус',
         ];
     }
@@ -35,7 +35,7 @@ class StopDeploymentForm extends \yii\base\Model
     public function check()
     {
         if (! $this->status && ! $this->reason) {
-            $this->addError('reason', 'Укажите причину и время отключения сервиса');
+            $this->addError('reason', \Yii::t('rds/errors', 'prod_deploy_disabled_reason_required'));
         }
     }
 

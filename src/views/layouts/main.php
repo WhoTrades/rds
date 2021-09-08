@@ -89,6 +89,7 @@ NavBar::begin([
     'brandLabel' => 'RDS',
     'innerContainerOptions' => ['class' => 'container-fluid'],
 ]);
+
 echo Nav::widget(
     [
         'options' => ['class' => 'navbar-nav navbar-left'],
@@ -108,6 +109,7 @@ echo Nav::widget(
                         ['label' => Yii::t('rds', 'menu_projects'), 'url' => ['/project/admin'], 'active' => $controllerId == 'project'],
                         'workers' => ['label' => Yii::t('rds', 'menu_build_agents'), 'url' => ['/worker/admin'], 'active' => $controllerId == 'worker'],
                         ['label' => Yii::t('rds', 'menu_versions'), 'url' => ['/release-version/admin'], 'active' => $controllerId == 'release-version'],
+                        ['label' => Yii::t('rds', 'menu_system'), 'url' => ['/system'], 'active' => $controllerId == 'system'],
                     ],
                 ],
                 'migrations' => [

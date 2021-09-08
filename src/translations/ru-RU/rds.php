@@ -18,6 +18,7 @@ return [
     'menu_users' => 'Пользователи',
     'menu_user_profile' => 'Профиль',
     'menu_exit' => 'Выйти',
+    'menu_system' => 'Ограничение функциональности',
 
     // Headers
     'head_release_locks' => 'Запреты релиза',
@@ -38,6 +39,7 @@ return [
     'head_build_with_params' => 'Сборка #{0} ({1})',
     'head_migrations_management' => 'Управление PRE/POST миграциями',
     'head_release_request_migration_error' => 'Ошибка миграции релиза #{0}',
+    'head_system_management' => 'Управление RDS',
 
     // Buttons
     'btn_new' => 'Создать',
@@ -57,6 +59,8 @@ return [
     'btn_update_project' => 'Изменить проект',
     'btn_delete_project' => 'Удалить проект',
     'btn_view' => 'Просмотр',
+    'btn_disable_deploy_config_sync' => 'Отключить деплой проектов/синхронизацию конфигов',
+    'btn_enable_deploy_config_sync' => 'Включить деплой проектов/синхронизацию конфигов',
 
     // Common
     'id' => 'ID',
@@ -94,6 +98,7 @@ return [
     'spent_time' => 'Затраченное время',
     'time_scale' => 'Временная шкала',
     'event' => 'Событие',
+    'shutdown_reason' => 'Причина отключения',
 
     // Release request related
     'rr_status_waiting_for_build' => 'Ожидает сборки',
@@ -153,4 +158,11 @@ return [
     'hint_local_configuration_warning' => 'Внимание! Редактируя настройки, желательно указать в комментариях над измененной строкой - причину и авторство. Пример: // dz: поменял то-то, потому-то @since 2017-01-01',
     'hint_select_servers' => 'Выберите серверы ...',
     'hint_open_in_a_new_window' => 'Открыть в новом окне',
+
+    // Notifications
+    'notif_deployment_enabled' => 'Обновление серверов влючено',
+    'notif_deployment_disabled' => 'Обновление серверов отключено',
+    'notif_deployment_disabled_reason' => 'Причина: {0}',
+    'notif_deployment_enabled_body' => 'Теперь можно собирать, активировать сборки, синхронизировать конфигурацию.',
+    'notif_deployment_disabled_body' => 'Сборки проектов, активация сборок и синронизация конфигов временно отключена.',
 ];
