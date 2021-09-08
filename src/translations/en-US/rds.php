@@ -155,4 +155,11 @@ return [
     'hint_local_configuration_warning' => 'Warning! It\'s better to leave comment above changed line about who and why changed it.',
     'hint_select_servers' => 'Select servers ...',
     'hint_open_in_a_new_window' => 'Open in a new window',
+
+    // Notifications
+    'notif_deployment_enabled' => 'Deployment enabled',
+    'notif_deployment_disabled' => 'Deployment disabled',
+    'notif_deployment_disabled_reason' => 'Reason: {0}',
+    'notif_deployment_enabled_body' => 'Now you can build, use releases and do a configuration synchronisation.',
+    'notif_deployment_disabled_body' => 'Project builds, release activation and configuration synchronisation are temporarily disabled.',
 ];

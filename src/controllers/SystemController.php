@@ -28,14 +28,14 @@ class SystemController extends ControllerRestrictedBase
                 $config->save();
 
                 if ($config->deployment_enabled) {
-                    $title  = "Обновление серверов влючено";
-                    $body   = "Теперь можно собирать, активировать сборки, синхронизировать конфигурацию.";
+                    $title  = \Yii::t('rds', 'notif_deployment_enabled');
+                    $body   = \Yii::t('rds', 'notif_deployment_enabled_body');
                     $reason = '';
                     $type   = 'success';
                 } else {
-                    $title  = "Обновление серверов отключено";
-                    $body   = "Сборки проектов, активация сборок и синронизация конфигов временно отключена.";
-                    $reason = 'Причина: ' . ($model->reason ?: 'неизвестно');
+                    $title  = \Yii::t('rds', 'notif_deployment_disabled');
+                    $body   = \Yii::t('rds', 'notif_deployment_disabled_body');
+                    $reason = \Yii::t('rds', 'notif_deployment_disabled_reason', [$model->reason ?: 'неизвестно']);
                     $type   = 'danger';
                 }
 

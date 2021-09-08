@@ -158,4 +158,11 @@ return [
     'hint_local_configuration_warning' => 'Внимание! Редактируя настройки, желательно указать в комментариях над измененной строкой - причину и авторство. Пример: // dz: поменял то-то, потому-то @since 2017-01-01',
     'hint_select_servers' => 'Выберите серверы ...',
     'hint_open_in_a_new_window' => 'Открыть в новом окне',
+
+    // Notifications
+    'notif_deployment_enabled' => 'Обновление серверов влючено',
+    'notif_deployment_disabled' => 'Обновление серверов отключено',
+    'notif_deployment_disabled_reason' => 'Причина: {0}',
+    'notif_deployment_enabled_body' => 'Теперь можно собирать, активировать сборки, синхронизировать конфигурацию.',
+    'notif_deployment_disabled_body' => 'Сборки проектов, активация сборок и синронизация конфигов временно отключена.',
 ];
