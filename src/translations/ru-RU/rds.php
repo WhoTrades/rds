@@ -18,6 +18,7 @@ return [
     'menu_users' => 'Пользователи',
     'menu_user_profile' => 'Профиль',
     'menu_exit' => 'Выйти',
+    'menu_system' => 'Ограничение функциональности',
 
     // Headers
     'head_release_locks' => 'Запреты релиза',
@@ -38,6 +39,7 @@ return [
     'head_build_with_params' => 'Сборка #{0} ({1})',
     'head_migrations_management' => 'Управление PRE/POST миграциями',
     'head_release_request_migration_error' => 'Ошибка миграции релиза #{0}',
+    'head_system_management' => 'Управление RDS',
 
     // Buttons
     'btn_new' => 'Создать',
@@ -57,6 +59,8 @@ return [
     'btn_update_project' => 'Изменить проект',
     'btn_delete_project' => 'Удалить проект',
     'btn_view' => 'Просмотр',
+    'btn_disable_deploy_config_sync' => 'Отключить деплой проектов/синхронизацию конфигов',
+    'btn_enable_deploy_config_sync' => 'Включить деплой проектов/синхронизацию конфигов',
 
     // Common
     'id' => 'ID',
@@ -94,6 +98,7 @@ return [
     'spent_time' => 'Затраченное время',
     'time_scale' => 'Временная шкала',
     'event' => 'Событие',
+    'shutdown_reason' => 'Причина отключения',
 
     // Release request related
     'rr_status_waiting_for_build' => 'Ожидает сборки',

@@ -22,5 +22,5 @@ $this->params['menu'] = array(
 if ($deployment_enabled) {
     echo $this->render('_form', array('model' => $model, 'list' => $list, 'workers' => $workers));
 } else {
-    echo Alert::widget(['options' => ['class' => 'alert-danger'], 'body' => Yii::t('rds', 'prod_deploy_disabled')]);
+    echo Alert::widget(['options' => ['class' => 'alert-danger'], 'body' => Yii::t('rds/errors', 'prod_deploy_disabled')]);
 }

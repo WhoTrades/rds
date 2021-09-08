@@ -13,6 +13,7 @@ return [
     'menu_users' => 'Users',
     'menu_user_profile' => 'Profile',
     'menu_exit' => 'Exit',
+    'menu_system' => 'Limitations',
 
     // Headers
     'head_release_locks' => 'Release locks',
@@ -33,6 +34,7 @@ return [
     'head_build_with_params' => 'Build #{0} ({1})',
     'head_migrations_management' => 'Migrations management (PRE/POST)',
     'head_release_request_migration_error' => 'Migration error for release request #{0}',
+    'head_system_management' => 'RDS Management',
 
     // Buttons
     'btn_new' => 'New',
@@ -52,6 +54,8 @@ return [
     'btn_update_project' => 'Update project',
     'btn_delete_project' => 'Delete project',
     'btn_view' => 'View',
+    'btn_disable_deploy_config_sync' => 'Disable project deployment & local configuration synchronisation',
+    'btn_enable_deploy_config_sync' => 'Enable project deployment & local configuration synchronisation',
 
     // Common
     'id' => 'ID',
@@ -89,6 +93,7 @@ return [
     'spent_time' => 'Spent time',
     'time_scale' => 'Time scale',
     'event' => 'Event',
+    'shutdown_reason' => 'Shutdown reason',
 
 
     // Release request related
