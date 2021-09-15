@@ -294,8 +294,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
             $build->save();
         }
 
-        $oldReleaseRequest = ReleaseRequest::getUsedReleaseByProjectId($releaseRequest->project->obj_id);
-        if ($oldReleaseRequest) {
+        if ($oldReleaseRequest = ReleaseRequest::getUsedReleaseByProjectId($releaseRequest->project->obj_id)) {
             $oldReleaseRequest->setOld();
         }
 
