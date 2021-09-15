@@ -294,6 +294,19 @@ class DeployController extends RabbitListener implements DeployEventInterface
             $build->save();
         }
 
+        $oldReleaseRequest = ReleaseRequest::getUsedReleaseByProjectId($releaseRequest->project->obj_id);
+        if ($oldReleaseRequest) {
+            $oldReleaseRequest->rr_status = ReleaseRequest::STATUS_OLD;
+            $oldReleaseRequest->rr_last_time_on_prod = date("r");
+            $oldReleaseRequest->rr_revert_after_time = null;
+            $oldReleaseRequest->save(false);
+
+            foreach ($oldReleaseRequest->builds as $build) {
+                $build->build_status = Build::STATUS_INSTALLED;
+                $build->save();
+            }
+        }
+
         $releaseRequest->rr_last_error_text = $message->text;
         $releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLED;
         $releaseRequest->save();
@@ -309,7 +322,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
         if ($mainReleaseRequest) {
             $oldMainReleaseRequest = $mainReleaseRequest->getOldReleaseRequest();
             if ($oldMainReleaseRequest->canBeUsed()) {
-                $oldMainReleaseRequest->sendUseTasks(Yii::$app->user->getIdentity()->username);
+                $oldMainReleaseRequest->sendUseTasks($message->initiatorUserName);
             }
         }
 
