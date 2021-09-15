@@ -153,18 +153,8 @@ class DeployService implements DeployServiceInterface
         $oldVersion = (string) $project->project_current_version;
         $project->updateCurrentVersion($message->version);
 
-        $releaseRequestOld = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
-        if ($releaseRequestOld) {
-            $releaseRequestOld->rr_status = ReleaseRequest::STATUS_OLD;
-            $releaseRequestOld->rr_last_time_on_prod = date("r");
-            $releaseRequestOld->rr_revert_after_time = null;
-            $releaseRequestOld->save(false);
-
-            foreach ($releaseRequestOld->builds as $build) {
-                /** @var $build Build */
-                $build->build_status = Build::STATUS_INSTALLED;
-                $build->save();
-            }
+        if ($releaseRequestOld = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id)) {
+            $releaseRequestOld->setOld();
         }
 
         $releaseRequest->rr_last_error_text = null;

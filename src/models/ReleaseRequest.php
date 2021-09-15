@@ -979,4 +979,20 @@ class ReleaseRequest extends ActiveRecord
         $this->deleteBuildTasks();
         $this->createBuildTasks();
     }
+
+    /**
+     * @throws Exception
+     */
+    public function setOld()
+    {
+        $this->rr_status = ReleaseRequest::STATUS_OLD;
+        $this->rr_last_time_on_prod = date("r");
+        $this->rr_revert_after_time = null;
+        $this->save(false);
+
+        foreach ($this->builds as $build) {
+            $build->build_status = Build::STATUS_INSTALLED;
+            $build->save();
+        }
+    }
 }

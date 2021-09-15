@@ -294,6 +294,10 @@ class DeployController extends RabbitListener implements DeployEventInterface
             $build->save();
         }
 
+        if ($oldReleaseRequest = ReleaseRequest::getUsedReleaseByProjectId($releaseRequest->project->obj_id)) {
+            $oldReleaseRequest->setOld();
+        }
+
         $releaseRequest->rr_last_error_text = $message->text;
         $releaseRequest->rr_status = ReleaseRequest::STATUS_INSTALLED;
         $releaseRequest->save();
@@ -309,7 +313,7 @@ class DeployController extends RabbitListener implements DeployEventInterface
         if ($mainReleaseRequest) {
             $oldMainReleaseRequest = $mainReleaseRequest->getOldReleaseRequest();
             if ($oldMainReleaseRequest->canBeUsed()) {
-                $oldMainReleaseRequest->sendUseTasks(Yii::$app->user->getIdentity()->username);
+                $oldMainReleaseRequest->sendUseTasks($message->initiatorUserName);
             }
         }
 
