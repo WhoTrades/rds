@@ -63,14 +63,14 @@ class DeployController extends RabbitListener implements DeployEventInterface
             $this->deployService->setCronConfig($message);
         });
 
-        $model->readUseError(false, function (Message\ReleaseRequestUseError $message) use ($model) {
-            Yii::info("Received use error message: " . json_encode($message));
-            $this->actionSetUseError($message);
-        });
-
         $model->readUsedVersion(false, function (Message\ReleaseRequestUsedVersion $message) use ($model) {
             Yii::info("Received used version message: " . json_encode($message));
             $this->deployService->setUsedVersion($message);
+        });
+
+        $model->readUseError(false, function (Message\ReleaseRequestUseError $message) use ($model) {
+            Yii::info("Received use error message: " . json_encode($message));
+            $this->actionSetUseError($message);
         });
 
         $model->readProjectConfigResult(false, function (Message\ProjectConfigResult $message) use ($model) {
