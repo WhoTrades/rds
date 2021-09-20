@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace whotrades\rds\events;
 
+use samdark\log\PsrMessage;
 use Yii;
 use tuyakhov\notifications\events\NotificationEvent;
 
@@ -19,7 +20,7 @@ class NotificationEventHandler
     public function afterSend(NotificationEvent $event)
     {
         if ($event->response instanceof \Throwable) {
-            Yii::error($event->response->getMessage());
+            Yii::error(new PsrMessage($event->response->getMessage(), ['exception' => $event->response]));
         }
     }
 }
