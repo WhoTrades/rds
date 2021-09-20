@@ -8,8 +8,10 @@ declare(strict_types=1);
 
 namespace whotrades\rds\services;
 
+use samdark\log\PsrMessage;
 use tuyakhov\notifications\NotifiableInterface;
 use tuyakhov\notifications\NotificationInterface;
+use Yii;
 use yii\base\BaseObject;
 use tuyakhov\notifications\Notifier;
 use whotrades\rds\services\notification;
@@ -52,7 +54,7 @@ class NotificationService extends BaseObject implements NotificationServiceInter
             );
         } catch (\Throwable $e) {
             // Notifications errors shouldn't affect main program flow
-            \Yii::error($e->getMessage());
+            Yii::error(new PsrMessage($e->getMessage(), ['exception' => $e]));
         }
     }
 
@@ -68,7 +70,7 @@ class NotificationService extends BaseObject implements NotificationServiceInter
             );
         } catch (\Throwable $e) {
             // Notifications errors shouldn't affect main program flow
-            \Yii::error($e->getMessage());
+            Yii::error(new PsrMessage($e->getMessage(), ['exception' => $e]));
         }
     }
 
@@ -84,7 +86,7 @@ class NotificationService extends BaseObject implements NotificationServiceInter
             );
         } catch (\Throwable $e) {
             // Notifications errors shouldn't affect main program flow
-            \Yii::error($e->getMessage());
+            Yii::error(new PsrMessage($e->getMessage(), ['exception' => $e]));
         }
     }
 
@@ -100,7 +102,7 @@ class NotificationService extends BaseObject implements NotificationServiceInter
             );
         } catch (\Throwable $e) {
             // Notifications errors shouldn't affect main program flow
-            \Yii::error($e->getMessage());
+            Yii::error(new PsrMessage($e->getMessage(), ['exception' => $e]));
         }
     }
 
@@ -116,7 +118,7 @@ class NotificationService extends BaseObject implements NotificationServiceInter
             );
         } catch (\Throwable $e) {
             // Notifications errors shouldn't affect main program flow
-            \Yii::error($e->getMessage());
+            Yii::error(new PsrMessage($e->getMessage(), ['exception' => $e]));
         }
     }
 
@@ -132,7 +134,7 @@ class NotificationService extends BaseObject implements NotificationServiceInter
             );
         } catch (\Throwable $e) {
             // Notifications errors shouldn't affect main program flow
-            \Yii::error($e->getMessage());
+            Yii::error(new PsrMessage($e->getMessage(), ['exception' => $e]));
         }
     }
 
@@ -148,7 +150,7 @@ class NotificationService extends BaseObject implements NotificationServiceInter
             );
         } catch (\Throwable $e) {
             // Notifications errors shouldn't affect main program flow
-            \Yii::error($e->getMessage());
+            Yii::error(new PsrMessage($e->getMessage(), ['exception' => $e]));
         }
     }
 
