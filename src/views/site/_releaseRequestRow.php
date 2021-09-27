@@ -222,6 +222,7 @@ return array(
     array(
         'class' => yii\grid\ActionColumn::class,
         'template' => '{deleteReleaseRequest}',
+        'controller' => 'site',
         'buttons' => [
             'deleteReleaseRequest' => function ($url, ReleaseRequest $model, $key) {
                 if ($model->isChild() || $model->isDeleted()) {
@@ -236,12 +237,8 @@ return array(
                             'data-pjax' => '1',
                         ]
                     );
-
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, $options);
                 }
-            },
-            'urlCreator' => function (string $action, ReleaseRequest $model) {
-                return Url::to(["/site/$action", 'id' => $model->obj_id, 'returnUrl' => Yii::$app->request->getUrl()]);
             },
         ],
     ),
