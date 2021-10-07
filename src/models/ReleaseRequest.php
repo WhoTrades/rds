@@ -44,6 +44,7 @@ use yii\db\ActiveQuery;
  * @property string $rr_built_time
  * @property string $rr_cron_config
  * @property string $rr_build_started
+ * @property array $rr_additional
  *
  * @property Build[] $builds
  * @property User $user
@@ -84,9 +85,6 @@ class ReleaseRequest extends ActiveRecord
     const BUILD_LOG_USING_START         = 'using start';
     const BUILD_LOG_USING_ERROR         = 'using error';
     const BUILD_LOG_USING_SUCCESS       = 'using success';
-
-    const REDIS_KEY_FAIL_BUILD_COUNT = 'FailBuildCount:ReleaseRequestId:';
-    const REDIS_KEY_FAIL_INSTALL_COUNT = 'FailInstallCount:ReleaseRequestId:';
 
     /**
      * @return string the associated database table name
@@ -916,32 +914,26 @@ class ReleaseRequest extends ActiveRecord
 
     public function increaseFailBuildCount()
     {
-        Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
+        $newCountBuildFail = !empty($this->rr_additional['count_build_fail']) ? (int) $this->rr_additional['count_build_fail'] + 1 : 1;
+        $this->rr_additional = array_merge($this->rr_additional, ['count_build_fail' => $newCountBuildFail]);
+        $this->save(false);
     }
 
     public function getFailBuildCount()
     {
-        return (int) Yii::$app->redis->get($this->getRedisKeyFailBuildCount());
+        return !empty($this->rr_additional['count_build_fail']) ? (int) $this->rr_additional['count_build_fail'] : 0;
     }
 
     public function increaseFailInstallCount()
     {
-        Yii::$app->redis->incr($this->getRedisKeyFailBuildCount());
+        $newCountInstallFail = !empty($this->rr_additional['count_install_fail']) ? (int) $this->rr_additional['count_install_fail'] + 1 : 1;
+        $this->rr_additional = array_merge($this->rr_additional, ['count_install_fail' => $newCountInstallFail]);
+        $this->save(false);
     }
 
     public function getFailInstallCount()
     {
-        return (int) Yii::$app->redis->get($this->getRedisKeyFailBuildCount());
-    }
-
-    protected function getRedisKeyFailBuildCount()
-    {
-        return self::REDIS_KEY_FAIL_BUILD_COUNT . $this->obj_id;
-    }
-
-    protected function getRedisKeyFailInstallCount()
-    {
-        return self::REDIS_KEY_FAIL_INSTALL_COUNT . $this->obj_id;
+        return !empty($this->rr_additional['count_install_fail']) ? (int) $this->rr_additional['count_install_fail'] : 0;
     }
 
     /**

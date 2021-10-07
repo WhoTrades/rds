@@ -228,6 +228,7 @@ $config = array(
 
     'params' => array(
         'migrationAutoApplicationEnabled' => true,
+        'autoReleaseRequestUserId' => 1,
         'projectMigrationUrlMask' => [
                 '*' => function ($migration, $projectName, $type, $branch) {
                     /** @var string $migration - migration name with url slashes */
