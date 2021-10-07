@@ -201,12 +201,6 @@ $config = array(
             'assignmentTable' => 'rds.user_rbac_assignment',
             'ruleTable' => 'rds.user_rbac_rule',
         ],
-        'redis' => [
-            'class' => 'yii\redis\Connection',
-            'hostname' => 'localhost',
-            'port' => 6379,
-            'database' => 0,
-        ],
         'migrationService' => [
             'class' => MigrationService::class,
         ],

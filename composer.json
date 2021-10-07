@@ -41,7 +41,6 @@
         "codemix/yii2-streamlog": "1.2.1",
         "bazilio/yii2-stubs-generator": "~1",
         "dektrium/yii2-rbac": "^1.0",
-        "yiisoft/yii2-redis": "~2.0.0",
         "tuyakhov/yii2-notifications": "^1.2",
         "npm-asset/i18next": "~19.8.4",
         "npm-asset/i18next-icu": "~1.4.2",
