@@ -201,12 +201,6 @@ $config = array(
             'assignmentTable' => 'rds.user_rbac_assignment',
             'ruleTable' => 'rds.user_rbac_rule',
         ],
-        'redis' => [
-            'class' => 'yii\redis\Connection',
-            'hostname' => 'localhost',
-            'port' => 6379,
-            'database' => 0,
-        ],
         'migrationService' => [
             'class' => MigrationService::class,
         ],
@@ -228,6 +222,7 @@ $config = array(
 
     'params' => array(
         'migrationAutoApplicationEnabled' => true,
+        'autoReleaseRequestUserId' => 1,
         'projectMigrationUrlMask' => [
                 '*' => function ($migration, $projectName, $type, $branch) {
                     /** @var string $migration - migration name with url slashes */
