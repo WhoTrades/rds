@@ -86,6 +86,9 @@ class ReleaseRequest extends ActiveRecord
     const BUILD_LOG_USING_ERROR         = 'using error';
     const BUILD_LOG_USING_SUCCESS       = 'using success';
 
+    const ADDITIONAL_BUILD_FAIL_COUNT       = 'count_build_fail';
+    const ADDITIONAL_INSTALL_FAIL_COUNT     = 'count_install_fail';
+
     /**
      * @return string the associated database table name
      */
@@ -914,26 +917,26 @@ class ReleaseRequest extends ActiveRecord
 
     public function increaseFailBuildCount()
     {
-        $newCountBuildFail = !empty($this->rr_additional['count_build_fail']) ? (int) $this->rr_additional['count_build_fail'] + 1 : 1;
-        $this->rr_additional = array_merge($this->rr_additional, ['count_build_fail' => $newCountBuildFail]);
+        $newCountBuildFail = !empty($this->rr_additional[self::ADDITIONAL_BUILD_FAIL_COUNT]) ? (int) $this->rr_additional[self::ADDITIONAL_BUILD_FAIL_COUNT] + 1 : 1;
+        $this->rr_additional = array_merge($this->rr_additional, [self::ADDITIONAL_BUILD_FAIL_COUNT => $newCountBuildFail]);
         $this->save(false);
     }
 
     public function getFailBuildCount()
     {
-        return !empty($this->rr_additional['count_build_fail']) ? (int) $this->rr_additional['count_build_fail'] : 0;
+        return !empty($this->rr_additional[self::ADDITIONAL_BUILD_FAIL_COUNT]) ? (int) $this->rr_additional[self::ADDITIONAL_BUILD_FAIL_COUNT] : 0;
     }
 
     public function increaseFailInstallCount()
     {
-        $newCountInstallFail = !empty($this->rr_additional['count_install_fail']) ? (int) $this->rr_additional['count_install_fail'] + 1 : 1;
-        $this->rr_additional = array_merge($this->rr_additional, ['count_install_fail' => $newCountInstallFail]);
+        $newCountInstallFail = !empty($this->rr_additional[self::ADDITIONAL_INSTALL_FAIL_COUNT]) ? (int) $this->rr_additional[self::ADDITIONAL_INSTALL_FAIL_COUNT] + 1 : 1;
+        $this->rr_additional = array_merge($this->rr_additional, [self::ADDITIONAL_INSTALL_FAIL_COUNT => $newCountInstallFail]);
         $this->save(false);
     }
 
     public function getFailInstallCount()
     {
-        return !empty($this->rr_additional['count_install_fail']) ? (int) $this->rr_additional['count_install_fail'] : 0;
+        return !empty($this->rr_additional[self::ADDITIONAL_INSTALL_FAIL_COUNT]) ? (int) $this->rr_additional[self::ADDITIONAL_INSTALL_FAIL_COUNT] : 0;
     }
 
     /**
