@@ -106,7 +106,7 @@ class Migration extends MigrationBase
         }
 
         $migrationTypeId = Migration::getTypeIdByName($typeName);
-        $migration = Migration::findWithoutLog()->where(
+        $migration = Migration::find()->where(
             [
                 'migration_type' => $migrationTypeId,
                 'migration_name' => $migrationName,
@@ -195,7 +195,7 @@ class Migration extends MigrationBase
      */
     public static function getPreMigrationCanBeAppliedList()
     {
-        $preMigrationPendingList = static::findWithoutLog()
+        $preMigrationPendingList = static::find()
             ->andWhere(['migration_type' => self::TYPE_ID_PRE])
             ->andWhere(['IN', 'obj_status_did', [self::STATUS_PENDING, self::STATUS_FAILED_APPLICATION]])
             ->all();
@@ -210,7 +210,7 @@ class Migration extends MigrationBase
      */
     public static function getPostMigrationCanBeAppliedList()
     {
-        $postMigrationPendingList = static::findWithoutLog()
+        $postMigrationPendingList = static::find()
             ->andWhere(['migration_type' => self::TYPE_ID_POST])
             ->andWhere(['IN', 'obj_status_did', [self::STATUS_PENDING, self::STATUS_FAILED_APPLICATION]])
             ->all();

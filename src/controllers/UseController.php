@@ -76,7 +76,7 @@ class UseController extends ControllerRestrictedBase
             return $this->redirect('/');
         }
 
-        $migrationList = Migration::findWithoutLog()
+        $migrationList = Migration::find()
             ->andWhere([
                 'migration_type' => Migration::TYPE_ID_PRE,
                 'migration_project_obj_id' => $releaseRequest->project->obj_id,

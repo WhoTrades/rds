@@ -70,26 +70,6 @@ class MigrationController extends ControllerRestrictedBase
     }
 
     /**
-     * @param int $migrationId
-     *
-     * @return string
-     */
-    public function actionViewLog($migrationId)
-    {
-        /** @var Migration $migration */
-        $migration = $this->loadModel($migrationId);
-
-        if (!$migration) {
-            return 'There is not migration with id ' . $migrationId;
-        }
-
-        return $this->render('viewLog', array(
-            'migrationName' => $migration->migration_name,
-            'log' => $migration->migration_log,
-        ));
-    }
-
-    /**
      * @param int $id
      *
      * @return Migration
