@@ -2190,16 +2190,16 @@
         },
         {
             "name": "whotrades/rds-system",
-            "version": "v1.0.7",
+            "version": "v1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WhoTrades/rds-system.git",
-                "reference": "205795c6a75ff097545c32741b02441bed9dcc39"
+                "reference": "269df65bfdd007909d440140db6af9e7b280c9d3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/205795c6a75ff097545c32741b02441bed9dcc39",
-                "reference": "205795c6a75ff097545c32741b02441bed9dcc39",
+                "url": "https://api.github.com/repos/WhoTrades/rds-system/zipball/269df65bfdd007909d440140db6af9e7b280c9d3",
+                "reference": "269df65bfdd007909d440140db6af9e7b280c9d3",
                 "shasum": ""
             },
             "require": {
