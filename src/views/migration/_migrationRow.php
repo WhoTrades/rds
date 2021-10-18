@@ -87,9 +87,6 @@ return [
                 $migrationLogAggregatorUrl->generateFiltered($migration->migration_name, $migration->getTypeName(), $migration->project->project_name),
                 'View log'
             );
-            if ($migration->migration_log) {
-                $lines[] = Html::aTargetBlank(Url::to(['/migration/view-log', 'migrationId' => $migration->obj_id]), 'View log (deprecated)');
-            }
 
             return implode("<br />", $lines);
         },

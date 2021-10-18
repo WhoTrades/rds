@@ -123,13 +123,12 @@ class MigrationRabbitController extends RabbitListener
         } elseif ($message->status === Message\MigrationStatus::STATUS_FAILED) {
             $migration->failed();
         }
-        $migration->updateLog($message->result);
 
         if ($releaseRequest->shouldBeMigrated() && $message->type === Migration::TYPE_PRE) {
             if ($message->status === Message\MigrationStatus::STATUS_SUCCESS) {
                 $releaseRequest->rr_new_migration_count--;
             } elseif ($message->status === Message\MigrationStatus::STATUS_FAILED) {
-                $releaseRequest->rr_migration_error .= $message->result;
+                $releaseRequest->rr_migration_error .= $message->error;
                 $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_FAILED;
             }
             $releaseRequest->save();
