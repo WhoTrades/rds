@@ -44,6 +44,10 @@ $config = array(
     'controllerNamespace' => 'whotrades\rds\controllers',
 
     'bootstrap' => array('log', 'webSockets', 'dektrium\user\Bootstrap'),
+    'aliases' => [
+        '@bower' => '@vendor/bower-asset',
+        '@npm'   => '@vendor/npm-asset',
+    ],
     'layout' => 'column1',
     'modules' => array(
         // uncomment the following to enable the Gii tool
