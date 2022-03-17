@@ -122,24 +122,18 @@ class MigrationRabbitController extends RabbitListener
             $migration->succeed();
         } elseif ($message->status === Message\MigrationStatus::STATUS_FAILED) {
             $migration->failed();
+
+            $releaseRequest->rr_migration_error .= $message->error;
+            $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_FAILED;
+            $releaseRequest->save();
         }
 
-        if ($releaseRequest->shouldBeMigrated() && $message->type === Migration::TYPE_PRE) {
-            if ($message->status === Message\MigrationStatus::STATUS_SUCCESS) {
-                $releaseRequest->rr_new_migration_count--;
-            } elseif ($message->status === Message\MigrationStatus::STATUS_FAILED) {
-                $releaseRequest->rr_migration_error .= $message->error;
-                $releaseRequest->rr_migration_status = ReleaseRequest::MIGRATION_STATUS_FAILED;
-            }
-            $releaseRequest->save();
-
-            if ($releaseRequest->rr_new_migration_count === 0) {
-                ReleaseRequest::updateAll(
-                    ['rr_migration_status' => ReleaseRequest::MIGRATION_STATUS_UP, 'rr_new_migration_count' => 0],
-                    'rr_build_version <= :version AND rr_project_obj_id = :id',
-                    [':version' => $message->version, ':id' => $projectObj->obj_id]
-                );
-            }
+        if ($releaseRequest->getPreMigrationCount() === 0) {
+            ReleaseRequest::updateAll(
+                ['rr_migration_status' => ReleaseRequest::MIGRATION_STATUS_UP, 'rr_new_migration_count' => 0],
+                'rr_build_version <= :version AND rr_project_obj_id = :id',
+                [':version' => $message->version, ':id' => $projectObj->obj_id]
+            );
         }
 
         $transaction->commit();

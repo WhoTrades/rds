@@ -76,15 +76,7 @@ class UseController extends ControllerRestrictedBase
             return $this->redirect('/');
         }
 
-        $migrationList = Migration::find()
-            ->andWhere([
-                'migration_type' => Migration::TYPE_ID_PRE,
-                'migration_project_obj_id' => $releaseRequest->project->obj_id,
-            ])
-            ->andWhere(['IN', 'obj_status_did', [Migration::STATUS_PENDING, Migration::STATUS_FAILED_APPLICATION]])
-            ->andWhere(['<=', 'migration_release_request_obj_id', $releaseRequest->obj_id])
-            ->orderBy(['migration_name' => SORT_ASC])
-            ->all();
+        $migrationList = $releaseRequest->getPreMigrationList();
 
         if (!$migrationList) {
             Yii::info("No pending migrations for {$releaseRequest->getBuildTag()}");

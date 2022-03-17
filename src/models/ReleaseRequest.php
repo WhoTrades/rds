@@ -89,6 +89,8 @@ class ReleaseRequest extends ActiveRecord
     const ADDITIONAL_BUILD_FAIL_COUNT       = 'count_build_fail';
     const ADDITIONAL_INSTALL_FAIL_COUNT     = 'count_install_fail';
 
+    private array $preMigrationList;
+
     /**
      * @return string the associated database table name
      */
@@ -473,7 +475,7 @@ class ReleaseRequest extends ActiveRecord
      */
     public function shouldBeMigrated()
     {
-        return (($this->rr_status === self::STATUS_INSTALLED) && $this->rr_new_migration_count);
+        return (($this->rr_status === self::STATUS_INSTALLED) && $this->getPreMigrationCount());
     }
 
     /**
@@ -989,5 +991,33 @@ class ReleaseRequest extends ActiveRecord
             $build->build_status = Build::STATUS_INSTALLED;
             $build->save();
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getPreMigrationList(): array
+    {
+        if (!isset($this->preMigrationList)) {
+            $this->preMigrationList = Migration::find()
+                ->andWhere([
+                    'migration_type' => Migration::TYPE_ID_PRE,
+                    'migration_project_obj_id' => $this->project->obj_id,
+                ])
+                ->andWhere(['IN', 'obj_status_did', [Migration::STATUS_PENDING, Migration::STATUS_FAILED_APPLICATION]])
+                ->andWhere(['<=', 'migration_release_request_obj_id', $this->obj_id])
+                ->orderBy(['migration_name' => SORT_ASC])
+                ->all();
+        }
+
+        return $this->preMigrationList;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPreMigrationCount(): int
+    {
+        return count($this->getPreMigrationList());
     }
 }
