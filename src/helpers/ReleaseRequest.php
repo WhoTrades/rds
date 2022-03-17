@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace whotrades\rds\helpers;
 
+use whotrades\rds\models\Migration;
 use whotrades\rds\services\strategies\CronConfigProcessingStrategyInterface;
 use Yii;
 use yii\bootstrap\BaseHtml;
@@ -104,15 +105,13 @@ class ReleaseRequest
             } else {
                 $buttons[] = Html::a(Yii::t('rds', 'btn_run_pre_migrations'), Url::to(['/use/migrate', 'id' => $releaseRequest->obj_id]), ['class' => 'ajax-url btn btn-primary']);
 
-                if (!empty($releaseRequest->rr_new_migrations)) {
+                if ($releaseRequest->getPreMigrationCount() > 0) {
                     $migrations = Html::a(Yii::t('rds', 'btn_view_pre_migrations'), '#', ['onclick' => '$(\'#migrations-' . $releaseRequest->obj_id . '\').toggle(\'fast\'); return false;']);
                     $migrations .= "<div id='migrations-{$releaseRequest->obj_id}' style='display: none'>";
-                    // ag: @see whotrades\rds\models\MigrationBase::getNameForUrl()
-                    $getNameForUrl = function ($migrationName) {
-                        return str_replace('\\', '/', $migrationName);
-                    };
-                    foreach (json_decode($releaseRequest->rr_new_migrations) as $migration) {
-                        $migrations .= Html::a($migration, $releaseRequest->project->getMigrationUrl($getNameForUrl($migration), \whotrades\rds\models\Migration::TYPE_PRE));
+                    /** @var Migration $migration */
+                    foreach ($releaseRequest->getPreMigrationList() as $migration) {
+                        $migrations .= Html::a($migration->migration_name, $releaseRequest->project->getMigrationUrl($migration->getNameForUrl(), Migration::TYPE_PRE));
+                        $migrations .= '<br />';
                     }
                     $migrations .= "</div>";
                     $messages[] = $migrations;
