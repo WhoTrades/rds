@@ -37,14 +37,7 @@ $this->registerJs('
 
     <?php echo $form->field($model, 'rr_comment')->textInput(); ?>
 
-    <a href="#" title="<?=Yii::t('rds', 'link_stash_diff')?>" id="diff-preview" target="_blank" style="float: right">
-        <?=yii\bootstrap\BaseHtml::icon('stop')?>
-    </a>
-
-    <?php echo $form->field($model, 'rr_project_obj_id')->dropDownList(
-        \whotrades\rds\models\Project::forList(),
-        ['onchange' => 'updateStashUri();']
-    ); ?>
+    <?php echo $form->field($model, 'rr_project_obj_id')->dropDownList(\whotrades\rds\models\Project::forList()); ?>
 
     <div style="display: none">
         <?php echo $form->field($model, 'rr_release_version')->dropDownList(\whotrades\rds\models\ReleaseVersion::forList()); ?>
@@ -57,34 +50,3 @@ $this->registerJs('
     ?>
 
 </div><!-- form -->
-
-<script type="text/javascript">
-    updateStashUri = function(){
-        var projectName = $('#releaserequest-rr_project_obj_id option:selected').html();
-        if (!projectName) return;
-        if (typeof this.ajax != 'undefined') {
-            this.ajax.abort();
-        }
-
-        $('#diff-preview').html(<?=json_encode(yii\bootstrap\BaseHtml::icon('refresh'))?>);
-
-        this.ajax = $.ajax({
-            url: "/api/getProjectCurrentVersion",
-            data: {
-                projectName: projectName
-            }
-        }).done(function(version){
-            if (version) {
-                var tag = projectName+'-'+version;
-                $('#diff-preview').
-                html('<?=Yii::t('rds', 'btn_preview_changes')?>').
-                attr({
-                    'href': 'http://git.finam.ru/projects/WT/repos/sparta/pull-requests?create&targetBranch=refs%2Ftags%2F' + tag + '&sourceBranch=refs%2Fheads%2Fmaster'
-                });
-            } else {
-                $('#diff-preview').html(<?=json_encode(yii\bootstrap\BaseHtml::icon('stop'))?>).attr('a', '#');
-            }
-        });
-    };
-    document.onload.push(updateStashUri);
-</script>
