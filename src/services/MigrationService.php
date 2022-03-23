@@ -192,7 +192,7 @@ class MigrationService
         file_put_contents($scriptFilename, str_replace("\r", "", $script));
         chmod($scriptFilename, 0777);
 
-        $result = $commandExecutor->executeCommand("$scriptFilename 2>&1", $env);
+        $result = $commandExecutor->executeCommand("/bin/bash $scriptFilename 2>&1", $env);
 
         unlink($scriptFilename);
 
