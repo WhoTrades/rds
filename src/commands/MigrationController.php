@@ -12,6 +12,8 @@
  */
 namespace whotrades\rds\commands;
 
+use samdark\log\PsrMessage;
+use whotrades\RdsSystem\lib\Exception\CommandExecutorException;
 use Yii;
 use whotrades\RdsSystem\Cron\SingleInstanceController;
 use whotrades\rds\models\Migration;
@@ -36,10 +38,18 @@ class MigrationController extends SingleInstanceController
                 Yii::info("Process {$typeName} migrations of project {$project->project_name}");
 
                 Yii::info('Start to add or update migrations');
-                Yii::$app->migrationService->addOrUpdateExistedMigrations($typeName, $releaseRequest);
+                try {
+                    Yii::$app->migrationService->addOrUpdateExistedMigrations($typeName, $releaseRequest);
+                } catch (CommandExecutorException $e) {
+                    Yii::error(new PsrMessage("Can't add or update migrations. Error: " . $e->getMessage(), ['exception' => $e]));
+                }
 
                 Yii::info('Start to delete not existed migrations');
-                Yii::$app->migrationService->deleteNonExistentMigrations($typeName, $releaseRequest);
+                try {
+                    Yii::$app->migrationService->deleteNonExistentMigrations($typeName, $releaseRequest);
+                } catch (CommandExecutorException $e) {
+                    Yii::error(new PsrMessage("Can't delete non existent migrations. Error: " . $e->getMessage(), ['exception' => $e]));
+                }
             }
         }
 
