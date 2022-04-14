@@ -554,7 +554,7 @@ class ReleaseRequest extends ActiveRecord
 
         $lastBuildVersion = $project->getLastVersion($releaseVersion);
 
-        return self::find()->where(['rr_build_version' => $lastBuildVersion])->one();
+        return self::find()->where(['rr_project_obj_id' => $projectId, 'rr_build_version' => $lastBuildVersion])->one();
     }
 
     /**
