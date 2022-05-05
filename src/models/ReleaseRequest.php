@@ -434,12 +434,13 @@ class ReleaseRequest extends ActiveRecord
     /**
      * @return bool
      */
-    public function canBeRecreated()
+    public function canBeRecreated(): bool
     {
         return (in_array($this->rr_status, [self::STATUS_INSTALLED, self::STATUS_FAILED])) &&
             $this->obj_status_did === Status::ACTIVE &&
             (!in_array($this->rr_migration_status, [self::MIGRATION_STATUS_UPDATING, self::MIGRATION_STATUS_UP])) &&
-            $this->isLastReleaseRequest();
+            $this->isLastReleaseRequest() &&
+            $this->canBeRecreatedChildren();
     }
 
     /**
@@ -1019,5 +1020,20 @@ class ReleaseRequest extends ActiveRecord
     public function getPreMigrationCount(): int
     {
         return count($this->getPreMigrationList());
+    }
+
+    /**
+     * @return bool
+     */
+    private function canBeRecreatedChildren(): bool
+    {
+        /** @var ReleaseRequest $childReleaseRequest */
+        foreach ($this->getReleaseRequests()->all() as $childReleaseRequest) {
+            if (!$childReleaseRequest->canBeRecreated()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
