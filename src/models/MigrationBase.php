@@ -158,6 +158,11 @@ abstract class MigrationBase extends ActiveRecord
     abstract public function setStatusDeleted();
 
     /**
+     * @return bool
+     */
+    abstract public function isApplied(): bool;
+
+    /**
      * @param string $jiraTicket
      *
      * @throws \Exception
