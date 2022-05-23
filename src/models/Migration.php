@@ -281,6 +281,14 @@ class Migration extends MigrationBase
     }
 
     /**
+     * @return bool
+     */
+    public function isApplied(): bool
+    {
+        return $this->obj_status_did === self::STATUS_APPLIED;
+    }
+
+    /**
      * @return int
      *
      * @throws \Exception
