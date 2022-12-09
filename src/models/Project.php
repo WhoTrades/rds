@@ -26,6 +26,7 @@ use yii\db\ActiveQuery;
  * @property string             $project_notification_subject
  * @property string             $project_servers
  * @property string             $script_migration_up
+ * @property string             $script_migration_up_hard
  * @property string             $script_migration_new
  * @property string             $script_config_local
  * @property string             $script_remove_release
@@ -63,7 +64,7 @@ class Project extends ActiveRecord
         return [
             ['project_name', 'required'],
             ['obj_status_did', 'number'],
-            [['script_migration_up', 'script_migration_new', 'script_config_local', 'script_remove_release', 'script_cron', 'script_deploy', 'script_post_deploy', 'script_build', 'script_use', 'script_post_use'], 'string'],
+            [['script_migration_up', 'script_migration_up_hard', 'script_migration_new', 'script_config_local', 'script_remove_release', 'script_cron', 'script_deploy', 'script_post_deploy', 'script_build', 'script_use', 'script_post_use'], 'string'],
             ['project_notification_email', 'email'],
             ['project_servers', 'safe'],
             ['project_config', 'safe'],
@@ -197,6 +198,7 @@ class Project extends ActiveRecord
             'projectserversarray' => Yii::t('rds', 'release_servers'),//'Серверы для релиза',
             'project_servers' => Yii::t('rds', 'release_servers'), //'Серверы для релиза',
             'script_migration_up' => Yii::t('rds', 'script_migration_up'),//'Скрипт по выполнению всех миграций в данной сборке',
+            'script_migration_up_hard' => Yii::t('rds', 'script_migration_up_hard'),//'Скрипт по выполнению всех миграций в данной сборке',
             'script_migration_new' => Yii::t('rds', 'script_migration_new'),//'Скрипт которвый выводит список всех невыполненных миграций',
         ];
     }
