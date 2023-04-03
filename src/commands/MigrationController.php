@@ -33,6 +33,10 @@ class MigrationController extends SingleInstanceController
         foreach ($projectList as $project) {
             /** @var ReleaseRequest $releaseRequest */
             $releaseRequest = ReleaseRequest::getUsedReleaseByProjectId($project->obj_id);
+            if (!$releaseRequest) {
+                Yii::warning(sprintf("Project %s does NOT have used Release Request yet.", $project->project_name));
+                continue;
+            }
 
             foreach ([Migration::TYPE_PRE, Migration::TYPE_POST, Migration::TYPE_HARD] as $typeName) {
                 Yii::info("Process {$typeName} migrations of project {$project->project_name}");
