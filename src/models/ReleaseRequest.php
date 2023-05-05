@@ -328,7 +328,7 @@ class ReleaseRequest extends ActiveRecord
         $query->andFilterWhere(['like', 'rr_build_version', $params['rr_build_version'] ?? ""]);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' => new Sort(['defaultOrder' => ['obj_id' => SORT_DESC]]),
+            'sort' => new Sort(['defaultOrder' => ['obj_created' => SORT_DESC]]),
         ]);
         $this->load($params, 'search');
 

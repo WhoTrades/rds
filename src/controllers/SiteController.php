@@ -109,12 +109,22 @@ class SiteController extends ControllerRestrictedBase
             $user = \Yii::$app->user;
             $projectId = $_POST['ReleaseRequest']['rr_project_obj_id'];
             $comment = $_POST['ReleaseRequest']['rr_comment'];
-            ReleaseRequest::create(
-                $projectId,
-                $_POST['ReleaseRequest']['rr_release_version'],
-                $user->id,
-                $comment
-            );
+
+            /** @var ReleaseRequest $lastReleaseRequest */
+            $lastReleaseRequest = ReleaseRequest::getLastReleaseRequestByProjectId($projectId);
+            if ($lastReleaseRequest && $lastReleaseRequest->canBeRecreated()) {
+                $lastReleaseRequest->recreate(
+                    $user->id,
+                    $comment
+                );
+            } else {
+                ReleaseRequest::create(
+                    $projectId,
+                    $_POST['ReleaseRequest']['rr_release_version'],
+                    $user->id,
+                    $comment
+                );
+            }
 
             $project = Project::findByPk($projectId);
             $this->notificationService->sendBuildStarted($project->project_name, $user->identity->username, $comment);
