@@ -49,7 +49,7 @@
         "ext-pdo": "*",
         "ext-zmq": "*",
         "samdark/yii2-psr-log-target": "~1.1.3",
-        "monolog/monolog": "^1.2.5"
+        "monolog/monolog": "^1.2.5|^2.7"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "2.0.9",
