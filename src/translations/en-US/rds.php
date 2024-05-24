@@ -139,6 +139,7 @@ return [
     'help_local_configuration' => 'Script should deploy local configurations to all servers. In case of error script should exit with exit-code != 0',
     'help_config_dir' => 'folder with configurations to deploy to servers',
     'help_servers' => 'space-separated list of servers for project deployment',
+    'help_initiator_user_name' => 'username (login) of the user who initiated the process',
     'help_project_dir' => 'directory where project should be built',
     'help_project_build' => 'Script should build deploy-ready project into a $projectDir directory. In case of error script should exit with exit-code != 0',
     'help_project_deploy' => 'Script should upload project build to all servers. In case of error script should exit with exit-code != 0',
