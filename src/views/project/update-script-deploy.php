@@ -120,6 +120,7 @@ $project->script_use = $project->script_use ?: "#!/bin/bash -e\n";
                         <li><strong>$projectName</strong> <?=Yii::t('rds', 'project_name')?></li>
                         <li><strong>$version</strong> <?=Yii::t('rds', 'version')?></li>
                         <li><strong>$servers</strong> <?=Yii::t('rds', 'help_servers')?></li>
+                        <li><strong>$initiatorUserName</strong> <?=Yii::t('rds', 'help_initiator_user_name')?></li>
                     </ul>
                     <p><strong><?=Yii::t('rds', 'result')?></strong>: <?=Yii::t('rds', 'help_project_activation')?></p>
                 </div>
