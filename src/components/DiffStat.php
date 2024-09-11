@@ -7,7 +7,7 @@ final class DiffStat extends \yii\base\BaseObject
     /**
      * @param string $text1
      * @param string $text2
-     * @return mixed|null
+     * @return mixed|string
      */
     public function getDiffStat($text1, $text2)
     {
@@ -25,7 +25,7 @@ final class DiffStat extends \yii\base\BaseObject
         if ($returnVar == 0) {
             return str_replace('unknown | ', '', reset($output));
         } else {
-            return null;
+            return '';
         }
     }
 }
